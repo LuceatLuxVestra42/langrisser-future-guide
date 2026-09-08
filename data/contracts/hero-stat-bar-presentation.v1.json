@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s1-presentation-contract",
+  "status": "FROZEN",
+  "purpose": "Define the presentation-only scale and layout contract for visualizing each verified Tier4 final-job Hero-body stat as a horizontal relative-strength bar on Hero detail pages.",
+  "authoritativePredecessor": {
+    "artifact": "data/generated/hero-final-job-extrema.v1.json",
+    "stage": "hero-b3-final-job-extrema-consumer",
+    "requiredEligibilityField": "ConfigDataJobInfo.Rank",
+    "requiredRank": 4,
+    "candidateCount": 533,
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "recomputeSemanticStats": false,
+    "reclassifyFinalJobs": false
+  },
+  "scale": {
+    "kind": "LINEAR_GLOBAL_EXTREMA_WITH_VISUAL_FLOOR",
+    "domainSource": "Use the authoritative global min and max for the same stat from data/generated/hero-final-job-extrema.v1.json.",
+    "valueSource": "Use the exact candidate values already projected from the B3 consumer for the displayed final-job row.",
+    "minimumFillPercent": 25,
+    "maximumFillPercent": 100,
+    "formula": "ratio = (value - min) / (max - min); barPercent = clamp(25 + ratio * 75, 25, 100)",
+    "clamp": {"minPercent": 25, "maxPercent": 100},
+    "degenerateDomainPolicy": "FAIL_CLOSED_IF_MAX_IS_NOT_GREATER_THAN_MIN",
+    "interpretation": "The bar visualizes the candidate's relative position within the global Tier4 Normal + RELEASED SP distribution for that same stat. Percent widths are not comparable as absolute units across different stats.",
+    "requiredFixtures": [
+      "value == global min -> 25%",
+      "value == global max -> 100%",
+      "midpoint -> 62.5%",
+      "equal stat values -> equal bar widths",
+      "values outside the domain are clamped but must be treated as a validator failure against the current B3 authority"
+    ]
+  },
+  "layout": {
+    "pattern": "3-B",
+    "unit": "one final-job card/block per B3 candidate row",
+    "statOrder": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "displayLabelsKr": {"hp":"생명","at":"공격","magic":"지력","df":"방어","magicDf":"마방","dex":"기술"},
+    "rows": "six stat rows stacked vertically inside each final-job card",
+    "barDirection": "LEFT_TO_RIGHT",
+    "numericValuePlacement": "RIGHT_OF_BAR",
+    "numericValueAuthority": "exact B3 candidate value; never derive a display value from the bar width",
+    "desktopPriority": true,
+    "mobileScope": "sanity only; prevent destructive overflow or disappearing content, while detailed responsive optimization is deferred"
+  },
+  "variantPresentation": {
+    "normal": "Visible in the normal Hero detail presentation.",
+    "spCurrentTemporaryPolicy": "RELEASED SP final-job cards remain visibly rendered alongside Normal cards for this implementation so the bar presentation can be inspected before SP mode exists.",
+    "spTargetFuturePolicy": "When a dedicated [SP로 전환] interaction is implemented, SP-specific job/stat/bar presentation is expected to move into that SP presentation state.",
+    "spToggleImplementationInScope": false,
+    "spSemanticReclassification": false
+  },
+  "boundaries": {
+    "owner": "frontend/presentation",
+    "semanticMutation": false,
+    "rawConfigDataRead": false,
+    "nameJoin": false,
+    "idArithmetic": false,
+    "frontendTier4Recomputation": false,
+    "frontendStatFormulaRecomputation": false,
+    "extremaRecomputationFrom533Candidates": false
+  },
+  "nonScope": [
+    "B1/B2 bonded stat recalculation",
+    "B3 candidate or extrema recomputation",
+    "Tier4 eligibility changes",
+    "SP semantic/release changes",
+    "implementation of [SP로 전환]",
+    "detailed mobile/tablet redesign",
+    "main-page extrema/ranking widgets"
+  ],
+  "completion": {
+    "required": [
+      "25%-100% linear visual scale is explicitly frozen",
+      "each stat uses only its own B3 global min/max domain",
+      "displayed values remain exact B3 candidate values",
+      "3-B final-job card layout and left-bar/right-number placement are frozen",
+      "temporary visible SP policy and future SP-toggle handoff are explicit",
+      "no semantic owner is reopened"
+    ],
+    "nextStage": "S2 B3 extrema presentation supply"
+  }
+}
