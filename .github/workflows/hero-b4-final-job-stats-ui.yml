@@ -1,0 +1,63 @@
+name: Hero B4 final-job stats UI
+
+on:
+  push:
+    branches:
+      - b4-hero-final-job-stats-ui
+    paths:
+      - 'src/routes/heroes_.$heroId.tsx'
+      - 'src/components/hero-final-job-stats-section.tsx'
+      - 'src/lib/hero-final-job-extrema.server.ts'
+      - 'src/lib/hero-final-job-extrema.functions.ts'
+      - 'scripts/apply_hero_b4_final_job_stats_ui.mjs'
+      - 'scripts/validate_hero_b4_final_job_stats_ui.mjs'
+      - '.github/workflows/hero-b4-final-job-stats-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preflight-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: b4-hero-final-job-stats-ui
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+      - name: Apply bounded B4 route patch
+        run: node scripts/apply_hero_b4_final_job_stats_ui.mjs
+      - name: Validate B4 consumer boundary
+        run: node scripts/validate_hero_b4_final_job_stats_ui.mjs
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build frontend
+        run: bun run build
+      - name: Assert bounded tracked mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain --untracked-files=no | sed -E 's/^...//' | sort)
+          if [[ ${#changed[@]} -eq 0 ]]; then
+            echo 'B4 route patch already materialized.'
+            exit 0
+          fi
+          if [[ ${#changed[@]} -ne 1 || "${changed[0]}" != 'src/routes/heroes_.$heroId.tsx' ]]; then
+            printf 'Unexpected B4 tracked mutation:\n%s\n' "${changed[*]}" >&2
+            exit 1
+          fi
+      - name: Commit materialized route patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$(git status --porcelain --untracked-files=no)" ]]; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'src/routes/heroes_.$heroId.tsx'
+          git commit -m 'B4: consume frozen final-job stats in hero detail'
+          git push origin HEAD:b4-hero-final-job-stats-ui
