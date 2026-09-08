@@ -32,49 +32,49 @@ jobs:
         with:
           node-version: 22
 
-      - name: Hydrate pinned external snapshot
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          node scripts/hydrate-configdata-source-pack-v1.mjs \
-            --target-dir "$RUNNER_TEMP/configdata-hydrated"
-
-      - name: Count SkillCost value 3
+      - name: Count Cost-4D final Hero source population
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
 
-          const file = `${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`;
-          const root = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const manifestPath = 'data/generated/hero-detail.v1.json';
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const byHeroId = manifest?.storage?.byHeroId;
 
-          if (!Array.isArray(root)) {
-            throw new Error('ConfigDataSkillInfo root is not an array');
+          if (!byHeroId || typeof byHeroId !== 'object' || Array.isArray(byHeroId)) {
+            throw new Error('hero-detail manifest storage.byHeroId is missing or malformed');
           }
 
-          let present = 0;
-          let eq3 = 0;
+          const entries = Object.entries(byHeroId);
+          let jobLevelRows = 0;
 
-          for (const row of root) {
-            if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
-            if (!Object.prototype.hasOwnProperty.call(row, 'SkillCost')) continue;
-
-            present += 1;
-            if (typeof row.SkillCost !== 'number' || !Number.isFinite(row.SkillCost)) {
-              throw new Error('SkillCost non-finite/non-number encountered during Cost-3E');
+          for (const [heroId, meta] of entries) {
+            if (!meta || typeof meta.path !== 'string') {
+              throw new Error(`missing shard path for hero ${heroId}`);
             }
-            if (row.SkillCost === 3) eq3 += 1;
+            const shard = JSON.parse(fs.readFileSync(meta.path, 'utf8'));
+            if (String(shard.heroId) !== String(heroId)) {
+              throw new Error(`heroId mismatch for shard ${heroId}`);
+            }
+            const connections = shard?.normal?.jobTree?.connections;
+            if (!Array.isArray(connections)) {
+              throw new Error(`normal.jobTree.connections missing for hero ${heroId}`);
+            }
+            for (const connection of connections) {
+              if (!Array.isArray(connection?.levels)) {
+                throw new Error(`levels missing for hero ${heroId}`);
+              }
+              jobLevelRows += connection.levels.length;
+            }
           }
 
-          console.log(JSON.stringify({ total: root.length, present, eq3 }));
+          console.log(JSON.stringify({ heroShards: entries.length, jobLevelRows }));
           NODE
 
-      - name: Verify hydrated shape and repository non-mutation
+      - name: Verify repository non-mutation
         run: |
           set -euo pipefail
-          count="$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
-          test "$count" = "753"
           git diff --exit-code
           test -z "$(git status --porcelain)"
