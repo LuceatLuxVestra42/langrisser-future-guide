@@ -1,0 +1,49 @@
+name: Hero B1 Normal Bonded Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-b1-normal-bonded-consumer.v1.json'
+      - 'scripts/run_hero_b1_normal_bonded_consumer.cjs'
+      - 'scripts/validate_hero_b1_normal_bonded_consumer.cjs'
+      - '.github/workflows/hero-b1-normal-bonded-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-b1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Materialize B1 normal bonded Hero shards
+        run: node scripts/run_hero_b1_normal_bonded_consumer.cjs
+
+      - name: Run independent B1 validator
+        run: node scripts/validate_hero_b1_normal_bonded_consumer.cjs
+
+      - name: Show B1 validation summary
+        if: always() && hashFiles('data/validation/hero-b1-normal-bonded-consumer.v1.json') != ''
+        run: |
+          node - <<'NODE'
+          const v = require('./data/validation/hero-b1-normal-bonded-consumer.v1.json');
+          console.log(JSON.stringify(v, null, 2));
+          NODE
+
+      - name: Show generated scope
+        if: always()
+        run: |
+          git status --short -- data/generated/hero-detail.v1.json data/generated/hero-detail-shared.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-3-final.v1.json data/checkpoints/hero-stage6-3-full-generation.json data/checkpoints/hero-stage6-3-full-generation.md data/validation/hero-b1-normal-bonded-consumer.v1.json || true
