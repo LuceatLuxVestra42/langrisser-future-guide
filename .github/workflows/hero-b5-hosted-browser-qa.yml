@@ -94,8 +94,28 @@ jobs:
           git commit -m "B5 hosted candidate ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
 
-      - name: Strict hosted QA
-        run: node tools/route-hosted-qa/cli/check.mjs --expected-sha "${GITHUB_SHA}"
+      - name: Strict hosted QA with bounded propagation retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            echo "Strict hosted QA attempt ${attempt}/12"
+            set +e
+            output="$(node tools/route-hosted-qa/cli/check.mjs --expected-sha "${GITHUB_SHA}" 2>&1)"
+            status=$?
+            set -e
+            printf '%s\n' "$output"
+            if [ "$status" -eq 0 ]; then
+              exit 0
+            fi
+            if [ "$status" -ne 4 ] || ! grep -q '"status":"FAIL_STALE_DEPLOYMENT"' <<<"$output"; then
+              exit "$status"
+            fi
+            if [ "$attempt" -lt 12 ]; then
+              sleep 10
+            fi
+          done
+          exit 4
 
       - name: Install Chromium browser QA runtime
         run: |
