@@ -28,14 +28,21 @@ jobs:
           node scripts/trace_hero_heart_fetter_skillinfo.mjs \
             --source-root "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Upload trace artifact
+      - name: Trace Heart Fetter passive records
+        run: |
+          node scripts/trace_hero_heart_fetter_passives.mjs \
+            --source-root "$RUNNER_TEMP/configdata-hydrated"
+
+      - name: Upload trace artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: heart-fetter-skillinfo-trace
-          path: heart-fetter-skillinfo-trace.json
+          name: heart-fetter-effect-trace
+          path: |
+            heart-fetter-skillinfo-trace.json
+            heart-fetter-passive-trace.json
 
       - name: Clean trace output
-        run: rm heart-fetter-skillinfo-trace.json
+        run: rm heart-fetter-skillinfo-trace.json heart-fetter-passive-trace.json
 
       - name: Assert repository read-only
         run: |
