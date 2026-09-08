@@ -40,7 +40,7 @@ jobs:
           node scripts/hydrate-configdata-source-pack-v1.mjs \
             --target-dir "$RUNNER_TEMP/configdata-hydrated"
 
-      - name: Census present SkillCost distinct raw values
+      - name: Count SkillCost value 1
         shell: bash
         run: |
           set -euo pipefail
@@ -55,7 +55,7 @@ jobs:
           }
 
           let present = 0;
-          const values = new Set();
+          let eq1 = 0;
 
           for (const row of root) {
             if (!row || typeof row !== 'object' || Array.isArray(row)) continue;
@@ -63,28 +63,12 @@ jobs:
 
             present += 1;
             if (typeof row.SkillCost !== 'number' || !Number.isFinite(row.SkillCost)) {
-              throw new Error('SkillCost non-finite/non-number encountered during Cost-3A');
+              throw new Error('SkillCost non-finite/non-number encountered during Cost-3C');
             }
-            values.add(row.SkillCost);
+            if (row.SkillCost === 1) eq1 += 1;
           }
 
-          const distinctValues = [...values].sort((a, b) => a - b);
-          if (distinctValues.length > 5) {
-            console.log(JSON.stringify({
-              total: root.length,
-              present,
-              distinctCount: distinctValues.length,
-              sample: distinctValues.slice(0, 5),
-            }));
-            throw new Error('Cost-3A distinct value set exceeds bounded output limit of 5');
-          }
-
-          console.log(JSON.stringify({
-            total: root.length,
-            present,
-            distinctCount: distinctValues.length,
-            values: distinctValues,
-          }));
+          console.log(JSON.stringify({ total: root.length, present, eq1 }));
           NODE
 
       - name: Verify hydrated shape and repository non-mutation
