@@ -22,6 +22,10 @@ const write = (rel, value) => {
   fs.writeFileSync(abs(rel), JSON.stringify(value, null, 2) + '\n');
 };
 const sha256 = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
+const stable = value => JSON.stringify(value);
+const stripIdentity = row => Object.fromEntries(
+  Object.entries(row || {}).filter(([key]) => !['heroId', 'nameKr', 'nameCn', 'nameEn'].includes(key))
+);
 
 function decimalFraction(value) {
   if (!Number.isFinite(value)) throw new Error('non-finite progressionBase');
@@ -83,6 +87,8 @@ check('contract-frozen', contract?.stage === 'hero-b1-normal-bonded-consumer' &&
 check('stage4-complete', stage4Validation?.status === 'PASS' && stage4Validation?.stage4CompletionStatus === 'COMPLETE' && (stage4Validation?.hardErrors?.length ?? 1) === 0);
 check('stage4-canonical-267', Array.isArray(stage4?.records) && stage4.records.length === 267, 'count=' + (stage4?.records?.length ?? null));
 check('manifest-sharded-267', manifest?.storage?.mode === 'SHARDED_BY_HERO' && manifest?.storage?.recordCount === 267, String(manifest?.storage?.mode) + '/' + String(manifest?.storage?.recordCount));
+check('manifest-b1-materialized', manifest?.b1NormalBondedStats?.status === 'VERIFIED' && manifest?.b1NormalBondedStats?.heroCount === 267,
+  JSON.stringify(manifest?.b1NormalBondedStats || null));
 
 const stage4ByHero = new Map();
 for (const row of stage4?.records || []) {
@@ -99,6 +105,7 @@ const manifestIndex = manifest?.storage?.byHeroId || {};
 let heroShardCount = 0;
 let normalConnectionCount = 0;
 let generatedConnectionCount = 0;
+let normalPayloadMismatchCount = 0;
 let connectionParityMismatchCount = 0;
 let formulaMismatchCount = 0;
 let nonIntegerOrNegativeCount = 0;
@@ -106,6 +113,7 @@ let bondedBelowUnbondedCount = 0;
 let metadataMismatchCount = 0;
 let shardIntegrityMismatchCount = 0;
 let leonRegressionMatchCount = 0;
+let totalShardBytes = 0;
 
 for (const [heroId, stage4Row] of [...stage4ByHero.entries()].sort((a, b) => a[0] - b[0])) {
   const failures = [];
@@ -117,12 +125,18 @@ for (const [heroId, stage4Row] of [...stage4ByHero.entries()].sort((a, b) => a[0
   }
   const buffer = fs.readFileSync(abs(locator.path));
   heroShardCount += 1;
+  totalShardBytes += buffer.length;
   if (sha256(buffer) !== locator.sha256 || buffer.length !== locator.byteLength) {
     shardIntegrityMismatchCount += 1;
     failures.push('SHARD_INTEGRITY');
   }
   const shard = JSON.parse(buffer.toString('utf8'));
   if (Number(shard?.heroId) !== heroId) failures.push('HERO_ID_MISMATCH');
+
+  if (stable(shard?.normal) !== stable(stripIdentity(stage4Row))) {
+    normalPayloadMismatchCount += 1;
+    failures.push('NORMAL_FROZEN_PARITY');
+  }
 
   const block = shard?.normalBondedStats;
   if (!block || block.status !== 'VERIFIED' || block.heroLevel !== 70 || block.star !== 6 || block.bondProfile !== 'MAX' || block.bondSelfMul !== 2500 || block.rounding !== 'HALF_TO_EVEN') {
@@ -189,6 +203,9 @@ for (const [heroId, stage4Row] of [...stage4ByHero.entries()].sort((a, b) => a[0
 
 check('all-267-shards-present', heroShardCount === 267, 'actual=' + heroShardCount);
 check('shard-integrity', shardIntegrityMismatchCount === 0, 'mismatch=' + shardIntegrityMismatchCount);
+check('manifest-total-shard-bytes', totalShardBytes === manifest?.storage?.totalShardBytes,
+  'expected=' + manifest?.storage?.totalShardBytes + ', actual=' + totalShardBytes);
+check('normal-frozen-payload-parity', normalPayloadMismatchCount === 0, 'mismatch=' + normalPayloadMismatchCount);
 check('normal-connection-count-parity', normalConnectionCount === generatedConnectionCount && connectionParityMismatchCount === 0,
   'source=' + normalConnectionCount + ', generated=' + generatedConnectionCount + ', heroMismatch=' + connectionParityMismatchCount);
 check('metadata-exact', metadataMismatchCount === 0, 'mismatch=' + metadataMismatchCount);
@@ -206,11 +223,13 @@ const output = {
   status,
   completion,
   contract: P.contract,
+  predecessor: 'current COMPLETE/FROZEN Hero Stage 6-3 shards',
   summary: {
     canonicalHeroCount: stage4ByHero.size,
     heroShardCount,
     normalConnectionCount,
     generatedConnectionCount,
+    normalPayloadMismatchCount,
     connectionParityMismatchCount,
     formulaMismatchCount,
     nonIntegerOrNegativeCount,
