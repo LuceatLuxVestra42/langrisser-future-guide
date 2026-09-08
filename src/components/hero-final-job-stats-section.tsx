@@ -29,6 +29,15 @@ const STATS = [
   ["dex", "기술"],
 ] as const satisfies ReadonlyArray<readonly [StatKey, string]>;
 
+const STAT_STYLES: Record<StatKey, { fill: string; value: string; tone: string }> = {
+  hp: { fill: "bg-lime-400", value: "text-lime-600 dark:text-lime-300", tone: "lime" },
+  at: { fill: "bg-red-500", value: "text-red-600 dark:text-red-300", tone: "red" },
+  magic: { fill: "bg-blue-500", value: "text-blue-600 dark:text-blue-300", tone: "blue" },
+  df: { fill: "bg-orange-400", value: "text-orange-600 dark:text-orange-300", tone: "orange" },
+  magicDf: { fill: "bg-indigo-400", value: "text-indigo-600 dark:text-indigo-300", tone: "indigo" },
+  dex: { fill: "bg-purple-500", value: "text-purple-600 dark:text-purple-300", tone: "purple" },
+};
+
 const MINIMUM_FILL_PERCENT = 25;
 const MAXIMUM_FILL_PERCENT = 100;
 
@@ -94,17 +103,19 @@ export function HeroFinalJobStatsSection({ data }: { data: FinalJobStatsData }) 
                 {STATS.map(([key, label]) => {
                   const value = row.values[key];
                   const barPercent = getBarPercent(value, data.scaleDomains[key]);
+                  const style = STAT_STYLES[key];
                   return (
                     <div
                       key={key}
                       className="grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_3.75rem] items-center gap-3"
                       data-stat-bar-row={key}
+                      data-stat-tone={style.tone}
                       data-extreme={row.extremes[key] ?? undefined}
                     >
                       <span className="text-xs font-bold text-muted-foreground">{label}</span>
-                      <div className="h-3 min-w-0 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                      <div className="h-4 min-w-0 overflow-hidden bg-muted/80" aria-hidden="true">
                         <div
-                          className="h-full rounded-full bg-foreground/75 transition-[width] duration-300"
+                          className={`h-full ${style.fill} transition-[width] duration-300`}
                           style={{ width: `${barPercent}%` }}
                           data-stat-bar={key}
                           data-bar-percent={barPercent.toFixed(4)}
@@ -113,7 +124,7 @@ export function HeroFinalJobStatsSection({ data }: { data: FinalJobStatsData }) 
                         />
                       </div>
                       <div className="flex min-w-0 flex-col items-end gap-1">
-                        <span className="tabular-nums text-sm font-bold text-foreground" data-stat-value={key}>{value}</span>
+                        <span className={`tabular-nums text-sm font-extrabold ${style.value}`} data-stat-value={key}>{value}</span>
                         <ExtremeBadge kind={row.extremes[key]} />
                       </div>
                     </div>
