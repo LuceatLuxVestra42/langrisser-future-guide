@@ -11,13 +11,13 @@
       "gitBlobSha": "111c81ae79b31517a0c41ae97d35083c3e7e14c0"
     },
     "data/generated/hero-detail.v1.json": {
-      "gitBlobSha": "1bb3122478522271991db94439725a53c317f8b6"
+      "gitBlobSha": "8bdc47c202366f9af461983c20b4a24605c492d7"
     },
     "data/generated/hero-detail-shared.v1.json": {
       "gitBlobSha": "cd455c567e7a9e3f8449e2eedf44a43897bf4c68"
     },
     "data/validation/hero-stage6-3-final.v1.json": {
-      "gitBlobSha": "160f4f6f658f7380f023544a43a167439d0e2024"
+      "gitBlobSha": "cabbc869f2042e144efae719de59ae6e609ca334"
     },
     "data/validation/hero-exclusive-equipment-relation-stageB-final.v1.json": {
       "gitBlobSha": "ff3b0a8b1c7a9b364f4c638f0a1110aa3d7626ee"
@@ -59,106 +59,26 @@
     "hardErrorCount": 0
   },
   "checks": [
-    {
-      "name": "contract-frozen",
-      "pass": true,
-      "detail": "1/hero-page-6-4/FROZEN"
-    },
-    {
-      "name": "stage6-3-complete",
-      "pass": true,
-      "detail": "{\"completion\":\"COMPLETE\",\"canonical\":267,\"generated\":267,\"structuralFail\":0,\"siteUsable\":267,\"hard\":0}"
-    },
-    {
-      "name": "stage-b-final-closed",
-      "pass": true,
-      "detail": "B-FINAL/PASS_ACCEPTED/closed=true/hard=0"
-    },
-    {
-      "name": "stage-b-consumer-admitted",
-      "pass": true,
-      "detail": "{\"heroCount\":267,\"heroOwnershipKeys\":167,\"heroesWithoutExclusiveKey\":100,\"equipmentOwnershipKeys\":167,\"ownershipPairCount\":167,\"equipmentMetadataCoverage\":167,\"legacyPairParityMismatch\":0,\"legacyAbsenceParityMismatch\":0,\"hardErrorCount\":0}"
-    },
-    {
-      "name": "manifest-stage6-3",
-      "pass": true,
-      "detail": "hero-page-6-3/COMPLETE/SHARDED_BY_HERO/records=267"
-    },
-    {
-      "name": "manifest-267-unique-hero-keys",
-      "pass": true,
-      "detail": "keys=267"
-    },
-    {
-      "name": "shared-payload-integrity",
-      "pass": true,
-      "detail": "expected=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2, actual=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2"
-    },
-    {
-      "name": "shared-soldier-metadata-present",
-      "pass": true,
-      "detail": "count=224"
-    },
-    {
-      "name": "b-byhero-cardinality",
-      "pass": true,
-      "detail": "summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1,\"canonicalHeroesWithoutKey\":100}, keys=167"
-    },
-    {
-      "name": "b-byequipment-cardinality",
-      "pass": true,
-      "detail": "summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1}, keys=167"
-    },
-    {
-      "name": "b-index-roundtrip",
-      "pass": true,
-      "detail": "mismatch=0"
-    },
-    {
-      "name": "exclusive-equipment-metadata-coverage",
-      "pass": true,
-      "detail": "detail=167, list=167, detailUnique=167, missing=0"
-    },
-    {
-      "name": "all-shards-present",
-      "pass": true,
-      "detail": "missing=0"
-    },
-    {
-      "name": "all-shards-integrity-pass",
-      "pass": true,
-      "detail": "hashOrSize=0, heroId=0"
-    },
-    {
-      "name": "all-shards-site-usable",
-      "pass": true,
-      "detail": "mismatch=0"
-    },
-    {
-      "name": "all-soldier-metadata-resolves",
-      "pass": true,
-      "detail": "missingRefs=0"
-    },
-    {
-      "name": "exclusive-b-adoption-parity",
-      "pass": true,
-      "detail": "mismatch=0, released=167, absent=100"
-    },
-    {
-      "name": "sp-population-preserved",
-      "pass": true,
-      "detail": "released=25, notReleased=242"
-    },
-    {
-      "name": "total-shard-bytes-preserved",
-      "pass": true,
-      "detail": "expected=15110965, actual=15110965"
-    },
-    {
-      "name": "production-input-boundary",
-      "pass": true,
-      "detail": "[]"
-    }
+    {"name":"contract-frozen","pass":true,"detail":"1/hero-page-6-4/FROZEN"},
+    {"name":"stage6-3-complete","pass":true,"detail":"{\"completion\":\"COMPLETE\",\"canonical\":267,\"generated\":267,\"structuralFail\":0,\"siteUsable\":267,\"hard\":0}"},
+    {"name":"stage-b-final-closed","pass":true,"detail":"B-FINAL/PASS_ACCEPTED/closed=true/hard=0"},
+    {"name":"stage-b-consumer-admitted","pass":true,"detail":"{\"heroCount\":267,\"heroOwnershipKeys\":167,\"heroesWithoutExclusiveKey\":100,\"equipmentOwnershipKeys\":167,\"ownershipPairCount\":167,\"equipmentMetadataCoverage\":167,\"legacyPairParityMismatch\":0,\"legacyAbsenceParityMismatch\":0,\"hardErrorCount\":0}"},
+    {"name":"manifest-stage6-3","pass":true,"detail":"hero-page-6-3/COMPLETE/SHARDED_BY_HERO/records=267"},
+    {"name":"manifest-267-unique-hero-keys","pass":true,"detail":"keys=267"},
+    {"name":"shared-payload-integrity","pass":true,"detail":"expected=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2, actual=9ed3fc3f8c0733ea4cba21de53809f2759c83881f8cc725f502bcbb90be0fab2"},
+    {"name":"shared-soldier-metadata-present","pass":true,"detail":"count=224"},
+    {"name":"b-byhero-cardinality","pass":true,"detail":"summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1,\"canonicalHeroesWithoutKey\":100}, keys=167"},
+    {"name":"b-byequipment-cardinality","pass":true,"detail":"summary={\"keyCount\":167,\"relationCount\":167,\"maxValueCountPerKey\":1}, keys=167"},
+    {"name":"b-index-roundtrip","pass":true,"detail":"mismatch=0"},
+    {"name":"exclusive-equipment-metadata-coverage","pass":true,"detail":"detail=167, list=167, detailUnique=167, missing=0"},
+    {"name":"all-shards-present","pass":true,"detail":"missing=0"},
+    {"name":"all-shards-integrity-pass","pass":true,"detail":"hashOrSize=0, heroId=0"},
+    {"name":"all-shards-site-usable","pass":true,"detail":"mismatch=0"},
+    {"name":"all-soldier-metadata-resolves","pass":true,"detail":"missingRefs=0"},
+    {"name":"exclusive-b-adoption-parity","pass":true,"detail":"mismatch=0, released=167, absent=100"},
+    {"name":"sp-population-preserved","pass":true,"detail":"released=25, notReleased=242"},
+    {"name":"total-shard-bytes-preserved","pass":true,"detail":"expected=15113701, actual=15113701"},
+    {"name":"production-input-boundary","pass":true,"detail":"[]"}
   ],
   "productionConsumerContract": {
     "detailRoute": "/hero/$heroId",
@@ -173,16 +93,8 @@
     "relationReDerivationAdmitted": false
   },
   "nonBlockingReviews": [
-    {
-      "owner": "Hero Stage 6-3 publication metadata",
-      "issue": "Hero records may retain presentation-only REVIEW (Soldier Korean names, CV/faction/origin/skin localization, source asset delivery).",
-      "blockingStage64Completion": false
-    },
-    {
-      "owner": "frontend/asset integration",
-      "issue": "Source asset paths still require web-delivery conversion and final responsive rendering. This is outside Hero semantic-data Stage 6.",
-      "blockingStage64Completion": false
-    }
+    {"owner":"Hero Stage 6-3 publication metadata","issue":"Hero records may retain presentation-only REVIEW (Soldier Korean names, CV/faction/origin/skin localization, source asset delivery).","blockingStage64Completion":false},
+    {"owner":"frontend/asset integration","issue":"Source asset paths still require web-delivery conversion and final responsive rendering. This is outside Hero semantic-data Stage 6.","blockingStage64Completion":false}
   ],
   "failedHeroIds": [],
   "hardErrors": [],
