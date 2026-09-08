@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "stage": "hero-stat-bar-s7-visual-polish",
+  "status": "COMPLETE",
+  "completion": "S7_COMPLETE",
+  "predecessor": {
+    "stage": "hero-stat-bar-s6-browser-qa",
+    "sha": "946d8f89aa50f44f1c871d452a322a78eec40f80",
+    "status": "COMPLETE"
+  },
+  "scope": {
+    "owner": "frontend/presentation",
+    "heroDetailStatBars": true,
+    "semanticRecomputation": false,
+    "tier4Reclassification": false,
+    "bondedStatRecalculation": false,
+    "mobilePolish": false
+  },
+  "visualPolicy": {
+    "hp": { "label": "생명", "bar": "lime-400", "value": "lime-600", "intent": "light green" },
+    "at": { "label": "공격", "bar": "red-500", "value": "red-600", "intent": "red" },
+    "magic": { "label": "지력", "bar": "blue-500", "value": "blue-600", "intent": "blue" },
+    "df": { "label": "방어", "bar": "orange-400", "value": "orange-600", "intent": "orange" },
+    "magicDf": { "label": "마방", "bar": "indigo-400", "value": "indigo-600", "intent": "light navy/indigo" },
+    "dex": { "label": "기술", "bar": "purple-500", "value": "purple-600", "intent": "purple" },
+    "barHeight": "h-4",
+    "barEnds": "square",
+    "numericColorMatchedToBar": true,
+    "minimumFillPercent": 25
+  },
+  "validation": {
+    "workflow": ".github/workflows/hero-stat-bar-s7-visual-polish.yml",
+    "initialRunId": 34231029925,
+    "initialRunStatus": "success",
+    "staticVisualValidator": "PASS",
+    "s5ParityRegression": "PASS",
+    "productionBuild": "PASS",
+    "hostedStrictSha": "PASS",
+    "s6GeometryRegression": "PASS",
+    "s7ComputedStyleBrowserQa": "PASS",
+    "repositoryReadOnly": "PASS"
+  },
+  "blockers": [],
+  "review": [
+    {
+      "type": "NON_BLOCKING_VISUAL_REVIEW",
+      "note": "Color taste and exact saturation remain user-adjustable presentation choices without reopening semantic owners."
+    }
+  ],
+  "reopenConditions": [
+    "stat color mapping becomes visually ambiguous",
+    "computed bar radius becomes non-zero",
+    "rendered bar height regresses below S7 thickness",
+    "S5 bar/value parity fails",
+    "hosted browser reproduces layout or resource errors"
+  ]
+}
