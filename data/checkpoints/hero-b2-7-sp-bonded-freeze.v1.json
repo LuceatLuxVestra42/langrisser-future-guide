@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "stage": "hero-b2-7-sp-bonded-freeze",
+  "status": "FINAL_FROZEN",
+  "completion": "B2_7_FINAL_FROZEN",
+  "authoritativePredecessors": {
+    "b2_5Checkpoint": "data/checkpoints/hero-b2-5-sp-bonded-producer.v1.json",
+    "b2_5Status": "COMPLETE",
+    "b2_6Checkpoint": "data/checkpoints/hero-b2-6-sp-bonded-validator.v1.json",
+    "b2_6Status": "COMPLETE",
+    "b2_6ValidatorResult": "PASS",
+    "preFreezeCommitSha": "421bf4719ec8d2b99293ba63281529374277ef35"
+  },
+  "sourceProvenance": {
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "configDataSourceTree": "b18983f60cb054c2e6e094d64cdb98979211d7fc",
+    "sourcePackReleaseTag": "source-configdata-v1-6475e63e",
+    "sourcePackArchiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "sourcePackInventorySha256": "ea7c6381e0901a55fe11014d14bb82862d9474c418e89d11869e03ba876dcade",
+    "hydratedFileCount": 753
+  },
+  "frozenPopulation": {
+    "canonicalHeroCount": 267,
+    "spReleasedCount": 25,
+    "spNotReleasedCount": 242,
+    "spBondedPresentCount": 25,
+    "notReleasedPollution": 0
+  },
+  "frozenConsumer": {
+    "manifest": "data/generated/hero-detail.v1.json",
+    "heroShardTemplate": "data/generated/hero-detail/by-id/{heroId}.json",
+    "field": "spBondedStats",
+    "preservedFields": ["normal", "normalBondedStats", "sp"]
+  },
+  "frozenSemantics": {
+    "stats": ["hp", "at", "magic", "df", "magicDf", "dex"],
+    "heroLevel": 70,
+    "star": 6,
+    "bondProfile": "MAX",
+    "rounding": "HALF_TO_EVEN",
+    "intermediateRounding": false,
+    "formula": "RoundHalfToEven((INI + UP * 69 / 10) * (1 + starCorrection / 10000) * (1 + 2500 / 10000 + reshapeSelfMul / 10000) + masteryFlat)",
+    "progressionRelation": "SP jobConnectionId -> JobConnectionInfo.ID -> JobLevels_ID -> JobLevelInfo.ID",
+    "masteryAuthority": "Stage4 Hero-global mastered-normal-job flat totals",
+    "reshapePropertyIdToStat": {"99":"hp","100":"at","101":"df","102":"magic","103":"magicDf","104":"dex"}
+  },
+  "independentValidation": {
+    "workflowRunId": 34210941450,
+    "workflowJobId": 102011518001,
+    "formulaMismatchCount": 0,
+    "relationErrorCount": 0,
+    "inputErrorCount": 0,
+    "reshapeErrorCount": 0,
+    "predecessorMutationCount": 0,
+    "fixtureFailureCount": 0,
+    "manifestIntegrityErrorCount": 0,
+    "provenanceMismatchCount": 0,
+    "hardErrorCount": 0,
+    "readOnlyGate": "PASS"
+  },
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "jobConnectionId": 66,
+      "jobId": 377,
+      "finalJobLevelId": 661,
+      "reshapeBuffId": 8570110,
+      "values": {"hp":4041,"at":602,"magic":224,"df":260,"magicDf":231,"dex":125}
+    },
+    "matthew": {
+      "heroId": 1,
+      "jobConnectionId": 22,
+      "jobId": 262,
+      "reshapeBuffId": 8670110,
+      "reshapeProperties": [{"propertyId":103,"value":500},{"propertyId":101,"value":500}]
+    }
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "Stage5-4 SP source snapshot changes",
+    "ConfigData source-pack snapshot or relevant schema changes",
+    "B1/Stage4 global mastery authority changes",
+    "explicit SP JobConnection/JobLevel relation contradiction",
+    "reshape PropertyModify numeric mapping contradiction",
+    "materialized spBondedStats changes",
+    "owning independent validator hard failure",
+    "actual canonical/parity damage"
+  ],
+  "nonReopenReasons": [
+    "presentation/UI changes",
+    "localization changes",
+    "asset changes",
+    "hosting/deployment failures",
+    "confidence-only REVIEW"
+  ],
+  "handoff": {
+    "nextOwner": "B3 Normal/SP integrated final-job consumer",
+    "nextStart": "Reuse frozen normalBondedStats and spBondedStats; select final-job candidates only where authoritative JobInfo Tier==4; compute HP/ATK/INT/DEF/MDEF/DEX global min/max with all ties preserved. No B1/B2 stat recomputation."
+  }
+}
