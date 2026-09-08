@@ -1,0 +1,37 @@
+name: Hero B2-6 independent SP bonded validator
+
+on:
+  push:
+    branches:
+      - b2-6-sp-bonded-validator
+    paths:
+      - 'scripts/validate_hero_b2_sp_bonded_consumer.cjs'
+      - 'data/contracts/hero-b2-sp-bonded-validator.v1.json'
+      - '.github/workflows/hero-b2-6-validator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: b2-6-sp-bonded-validator
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate B2-6 independently
+        run: node scripts/validate_hero_b2_sp_bonded_consumer.cjs
+      - name: Assert validator is read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git status --short
+            echo "B2-6 validator mutated tracked repository files" >&2
+            exit 1
+          fi
