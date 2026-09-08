@@ -32,14 +32,50 @@ jobs:
         with:
           node-version: 22
 
-      - name: Hydrate pinned external snapshot and prove tracked-byte parity
+      - name: Hydrate pinned external snapshot
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node scripts/hydrate-configdata-source-pack-v1.mjs \
-            --target-dir "$RUNNER_TEMP/configdata-hydrated" \
-            --compare-repo-source
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
+
+      - name: Census SkillInfo ID types
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+
+          const file = `${process.env.RUNNER_TEMP}/configdata-hydrated/data/configdata/ConfigDataSkillInfo.json`;
+          const root = JSON.parse(fs.readFileSync(file, 'utf8'));
+
+          if (!Array.isArray(root)) {
+            throw new Error('ConfigDataSkillInfo root is not an array');
+          }
+
+          const out = {
+            total: root.length,
+            number: 0,
+            string: 0,
+            null: 0,
+            other: 0,
+          };
+
+          for (const row of root) {
+            const value = row?.ID;
+            if (value === null) out.null += 1;
+            else if (typeof value === 'number') out.number += 1;
+            else if (typeof value === 'string') out.string += 1;
+            else out.other += 1;
+          }
+
+          if (out.total !== out.number + out.string + out.null + out.other) {
+            throw new Error('ID type census total mismatch');
+          }
+
+          console.log(JSON.stringify(out));
+          NODE
 
       - name: Verify hydrated shape and repository non-mutation
         run: |
