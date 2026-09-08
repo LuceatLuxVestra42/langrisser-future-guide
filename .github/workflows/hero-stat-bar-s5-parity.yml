@@ -1,0 +1,45 @@
+name: Hero stat bar S5 parity
+
+on:
+  push:
+    branches:
+      - s5-hero-stat-bar-parity
+    paths:
+      - 'scripts/validate_hero_stat_bar_s5_parity.mjs'
+      - '.github/workflows/hero-stat-bar-s5-parity.yml'
+      - 'data/checkpoints/hero-stat-bar-s5-parity.v1.json'
+      - 'src/components/hero-final-job-stats-section.tsx'
+      - 'src/lib/hero-final-job-extrema.server.ts'
+      - 'data/contracts/hero-stat-bar-presentation.v1.json'
+      - 'data/generated/hero-final-job-extrema.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: s5-hero-stat-bar-parity
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+      - name: Validate S5 B3/bar parity
+        run: node scripts/validate_hero_stat_bar_s5_parity.mjs
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+      - name: Build frontend
+        run: bun run build
+      - name: Assert repository remained read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+            echo 'Unexpected tracked repository mutation during S5 validation:' >&2
+            git status --short --untracked-files=no >&2
+            exit 1
+          fi
