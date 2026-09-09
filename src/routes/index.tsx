@@ -82,12 +82,13 @@ function navigateWithFreshDocument(event: React.MouseEvent<HTMLAnchorElement>, h
 
 function CategoryCard({ category }: { category: Category }) {
   const href = resolveCategoryHref(category.to);
+  const isHeroCategory = category.title === "캐릭터" && category.to === "/heroes";
 
   return (
     <a
       href={href}
       onClick={(event) => navigateWithFreshDocument(event, href)}
-      aria-label={category.title}
+      aria-label={isHeroCategory ? "캐릭터 · 영웅 상세 · 스킬 코스트" : category.title}
       className={`card-nav card-nav-hover group flex flex-col items-center px-8 py-9 ${
         category.primary ? "card-nav-primary" : ""
       }`}
@@ -106,6 +107,9 @@ function CategoryCard({ category }: { category: Category }) {
         />
       </div>
       <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
+      {isHeroCategory ? (
+        <p className="mt-2 text-sm font-semibold text-muted-foreground">영웅 상세 · 스킬 코스트</p>
+      ) : null}
     </a>
   );
 }
