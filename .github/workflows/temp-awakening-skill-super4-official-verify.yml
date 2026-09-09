@@ -1,0 +1,146 @@
+name: Temporary Awakening Skill Super4 Official Verify
+
+on:
+  push:
+    branches:
+      - diag/awakening-skill-super4-official-verify-20260910
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install verifier dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow
+      - name: Verify Skill_Super4 against official installer 1.1.113
+        shell: bash
+        run: |
+          set +e
+          mkdir -p out/awakening-skill-super4-official-verify
+          python <<'PY'
+          import binascii, hashlib, json, pathlib, struct, traceback, urllib.error, urllib.request, zlib
+          import UnityPy
+
+          OUT = pathlib.Path('out/awakening-skill-super4-official-verify')
+          RESULT = OUT / 'result.json'
+          VERSION = '1.1.113'
+          BASE = f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VERSION}'
+          ROOT_PREFIX = 'assets/gameproject/runtimeassets'
+          TARGET = 'ui/icon/skill_abs/skill_super4.png'
+          BUNDLE_STEM = 'ui_icon_skill_abs'
+          UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+          MAX_PART, MISS_BREAK = 90, 8
+
+          def norm(v): return str(v).replace('\\','/').strip('/').lower()
+          def sha256(data): return hashlib.sha256(data).hexdigest()
+          def request(url,start=None,end=None):
+              headers={'User-Agent':UA,'Accept-Encoding':'identity'}
+              if start is not None: headers['Range']=f'bytes={start}-{end}'
+              req=urllib.request.Request(url,headers=headers)
+              with urllib.request.urlopen(req,timeout=90) as r: data=r.read()
+              if start is not None and len(data)!=end-start+1: raise RuntimeError('range mismatch')
+              return data
+          def head_size(url):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD')
+              try:
+                  with urllib.request.urlopen(req,timeout=45) as r: return int(r.headers['Content-Length'])
+              except urllib.error.HTTPError as e:
+                  if e.code in (403,404): return None
+                  raise
+          def zip_directory(url,total):
+              tail_size=min(131072,total); tail=request(url,total-tail_size,total-1); eocd=tail.rfind(b'PK\x05\x06')
+              if eocd<0: raise RuntimeError('EOCD missing')
+              _,_,_,_,central_size,central_offset,_=struct.unpack_from('<HHHHIIH',tail,eocd+4)
+              central=request(url,central_offset,central_offset+central_size-1); entries=[]; i=0
+              while i+46<=len(central) and central[i:i+4]==b'PK\x01\x02':
+                  flags,method=struct.unpack_from('<HH',central,i+8); crc,compressed,uncompressed=struct.unpack_from('<III',central,i+16)
+                  fn_len,extra_len,comment_len=struct.unpack_from('<HHH',central,i+28); local_offset=struct.unpack_from('<I',central,i+42)[0]
+                  name_bytes=central[i+46:i+46+fn_len]; name=name_bytes.decode('utf-8' if flags&0x800 else 'cp437','replace')
+                  entries.append({'name':name,'method':method,'crc32':f'{crc:08X}','compressedBytes':compressed,'uncompressedBytes':uncompressed,'localOffset':local_offset})
+                  i+=46+fn_len+extra_len+comment_len
+              return entries
+          def fetch_zip_entry(url,entry):
+              offset=entry['localOffset']; header=request(url,offset,offset+4095)
+              method=struct.unpack_from('<H',header,8)[0]; fn_len,extra_len=struct.unpack_from('<HH',header,26); start=offset+30+fn_len+extra_len
+              compressed=request(url,start,start+entry['compressedBytes']-1)
+              raw=compressed if method==0 else zlib.decompress(compressed,-15) if method==8 else None
+              if raw is None: raise RuntimeError(f'unsupported compression {method}')
+              if len(raw)!=entry['uncompressedBytes']: raise RuntimeError('uncompressed size mismatch')
+              if f'{binascii.crc32(raw)&0xffffffff:08X}'!=entry['crc32']: raise RuntimeError('CRC mismatch')
+              return raw
+          def runtime_relative(path):
+              actual,prefix=norm(path),norm(ROOT_PREFIX)
+              return actual[len(prefix)+1:] if actual.startswith(prefix+'/') else None
+          def reader_of(value): return value.deref() if hasattr(value,'deref') else value
+
+          result={'version':1,'schemaId':'awakening-skill-super4-official-verify/v1','status':'RUNNING','source':{'kind':'OFFICIAL_INSTALLER','installVersion':VERSION,'base':BASE,'unityParser':'UnityPy==1.25.3'},'target':{'heroId':6,'skillId':12079,'sourcePath':'UI/Icon/Skill_ABS/Skill_Super4.png'},'hits':[],'blockers':[]}
+          code=0
+          try:
+              seen=False; miss=0; candidates=[]; package_count=0
+              for part in range(1,MAX_PART+1):
+                  package_name=f'InstallPage_{VERSION}_{part}.zip'; url=f'{BASE}/{package_name}'; total=head_size(url)
+                  if total is None:
+                      if seen:
+                          miss+=1
+                          if miss>=MISS_BREAK: break
+                      continue
+                  seen=True; miss=0; package_count+=1
+                  for entry in zip_directory(url,total):
+                      if norm(entry['name']).rsplit('/',1)[-1].endswith(BUNDLE_STEM+'.b'):
+                          candidates.append((part,package_name,url,entry))
+              result['packageCatalog']={'officialPackageCount':package_count,'candidateSkillBundleCount':len(candidates)}
+              for part,package_name,url,entry in candidates:
+                  raw=fetch_zip_entry(url,entry); bundle_sha=sha256(raw); env=UnityPy.load(raw)
+                  for container_path,value in env.container.items():
+                      rel=runtime_relative(container_path)
+                      if rel!=TARGET: continue
+                      reader=reader_of(value); raw_obj=reader.get_raw_data(); data=reader.read(); image=data.image.convert('RGBA'); rgba=image.tobytes(); alpha_bbox=image.getchannel('A').getbbox()
+                      result['hits'].append({'packagePart':part,'packageName':package_name,'bundleEntry':entry['name'],'bundleBytes':len(raw),'bundleSha256':bundle_sha,'containerPath':str(container_path).replace('\\','/'),'normalizedRuntimePath':rel,'objectType':getattr(getattr(reader,'type',None),'name',None),'pathId':int(getattr(reader,'path_id',0) or 0),'rawObjectBytes':len(raw_obj),'rawObjectSha256':sha256(raw_obj),'width':image.width,'height':image.height,'mode':'RGBA','rgbaSha256':sha256(rgba),'alphaBbox':list(alpha_bbox) if alpha_bbox else None,'nonEmptyAlpha':alpha_bbox is not None})
+              if not result['hits']:
+                  result['status']='BLOCKER'; result['blockers']=['NO_EXACT_HIT']; code=2
+              elif any(h['objectType']!='Sprite' or not h['nonEmptyAlpha'] for h in result['hits']):
+                  result['status']='BLOCKER'; result['blockers']=['INVALID_EXACT_HIT']; code=2
+              else:
+                  render={(h['width'],h['height'],h['rgbaSha256']) for h in result['hits']}
+                  if len(render)!=1:
+                      result['status']='BLOCKER'; result['blockers']=['AMBIGUOUS_NON_EQUIVALENT_EXACT_SOURCES']; code=2
+                  else:
+                      result['status']='PASS'
+          except Exception as exc:
+              result['status']='DIAGNOSTIC_ERROR'; result['blockers']=[f'{type(exc).__name__}:{exc}']; result['traceback']=traceback.format_exc(); code=3
+          RESULT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          raise SystemExit(code)
+          PY
+          code=$?
+          echo "$code" > out/awakening-skill-super4-official-verify/exit-code.txt
+          exit 0
+      - name: Upload verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: awakening-skill-super4-official-verify
+          path: out/awakening-skill-super4-official-verify
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove temporary diagnostic workflow
+        if: always()
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-awakening-skill-super4-official-verify.yml
+          git commit -m "Remove temporary awakening skill icon diagnostic"
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Enforce verifier status
+        if: always()
+        shell: bash
+        run: |
+          code=$(cat out/awakening-skill-super4-official-verify/exit-code.txt 2>/dev/null || echo 99)
+          test "$code" = "0"
