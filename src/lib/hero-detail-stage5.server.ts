@@ -387,7 +387,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     : [];
   const heroDirectSkills = Array.isArray(shard.normal?.skills?.heroDirectSkills)
     ? shard.normal.skills.heroDirectSkills
-        .map(projectSkill)
+        .map(projectEquipableSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
   const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);
