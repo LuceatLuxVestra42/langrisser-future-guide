@@ -22,12 +22,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "랑그릿사 모바일 한국 서버의 업데이트, 가챠 배너, 전용장비·율정, 스킨, 시공, 이벤트 미래 정보를 한 곳에서 확인하세요.",
+          "랑그릿사 모바일 한국 서버의 업데이트, 가챠 배너, 영웅, 장비, 용병, 스킨, PVE, 이벤트 미래 정보를 한 곳에서 확인하세요.",
       },
       { property: "og:title", content: "랑그릿사 모바일 미래시 정보" },
       {
         property: "og:description",
-        content: "업데이트 · 가챠 배너 · 전용장비 · 스킨 · 시공 · 이벤트 미래 정보를 한 곳에서.",
+        content: "업데이트 · 가챠 배너 · 영웅 · 장비 · 용병 · 스킨 · PVE · 이벤트 미래 정보를 한 곳에서.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -38,22 +38,32 @@ export const Route = createFileRoute("/")({
 
 type Category = {
   title: string;
-  image: string;
-  to: string;
-  primary?: boolean;
+  image?: string;
+  status: "LIVE" | "COMING_SOON";
+  to?: string;
   imageClassName?: string;
 };
 
 const categories: Category[] = [
-  { title: "업데이트", image: cardUpdate, to: "/", primary: true },
-  { title: "가챠 배너", image: cardGacha, to: "/banners" },
-  { title: "캐릭터", image: cardCharacter, to: "/heroes" },
-  { title: "장비", image: cardEquip, to: "/equipment" },
-  { title: "스킨", image: cardSkin, to: "/" },
-  { title: "용병", image: cardMerc, to: "/soldiers" },
-  { title: "이벤트", image: cardEvent, to: "/", imageClassName: "h-[132px] w-[132px]" },
-  { title: "시공", image: cardRift, to: "/" },
-  { title: "서밋 신규맵", image: cardSummit, to: "/", imageClassName: "h-[132px] w-[132px]" },
+  { title: "가챠 배너", image: cardGacha, status: "LIVE", to: "/banners" },
+  { title: "영웅", image: cardCharacter, status: "LIVE", to: "/heroes" },
+  { title: "장비", image: cardEquip, status: "LIVE", to: "/equipment" },
+  { title: "용병", image: cardMerc, status: "LIVE", to: "/soldiers" },
+  { title: "스킨", image: cardSkin, status: "COMING_SOON" },
+  { title: "PVE 던전", image: cardRift, status: "COMING_SOON" },
+  {
+    title: "이벤트",
+    image: cardEvent,
+    status: "COMING_SOON",
+    imageClassName: "h-[132px] w-[132px]",
+  },
+  {
+    title: "서밋",
+    image: cardSummit,
+    status: "COMING_SOON",
+    imageClassName: "h-[132px] w-[132px]",
+  },
+  { title: "뉴비 가이드", status: "COMING_SOON" },
 ];
 
 function resolveCategoryHref(to: string) {
@@ -80,31 +90,58 @@ function navigateWithFreshDocument(event: React.MouseEvent<HTMLAnchorElement>, h
   window.location.assign(`${href}${separator}fresh=${Date.now()}`);
 }
 
+function CategoryArtwork({ category }: { category: Category }) {
+  if (!category.image) {
+    return (
+      <div className="flex h-40 w-40 items-center justify-center rounded-xl bg-illustration-bg text-center">
+        <span className="text-sm font-semibold tracking-[0.18em] text-muted-foreground">GUIDE</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-xl bg-illustration-bg">
+      <img
+        src={category.image}
+        alt=""
+        width={512}
+        height={512}
+        loading="lazy"
+        decoding="async"
+        className={`${
+          category.imageClassName ?? "h-36 w-36"
+        } object-contain transition-transform duration-200 group-hover:scale-105`}
+      />
+    </div>
+  );
+}
+
 function CategoryCard({ category }: { category: Category }) {
-  const href = resolveCategoryHref(category.to);
+  if (category.status === "COMING_SOON") {
+    return (
+      <article
+        aria-label={`${category.title} 준비 중`}
+        className="card-nav group flex flex-col items-center px-8 py-9 opacity-75"
+      >
+        <CategoryArtwork category={category} />
+        <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
+        <span className="mt-2 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+          준비 중
+        </span>
+      </article>
+    );
+  }
+
+  const href = resolveCategoryHref(category.to!);
 
   return (
     <a
       href={href}
       onClick={(event) => navigateWithFreshDocument(event, href)}
       aria-label={category.title}
-      className={`card-nav card-nav-hover group flex flex-col items-center px-8 py-9 ${
-        category.primary ? "card-nav-primary" : ""
-      }`}
+      className="card-nav card-nav-hover group flex flex-col items-center px-8 py-9"
     >
-      <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-xl bg-illustration-bg">
-        <img
-          src={category.image}
-          alt=""
-          width={512}
-          height={512}
-          loading="lazy"
-          decoding="async"
-          className={`${
-            category.imageClassName ?? "h-36 w-36"
-          } object-contain transition-transform duration-200 group-hover:scale-105`}
-        />
-      </div>
+      <CategoryArtwork category={category} />
       <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
     </a>
   );
@@ -176,6 +213,48 @@ function HeroSection() {
   );
 }
 
+function UpdatesSection() {
+  return (
+    <section aria-labelledby="home-updates-title" className="rounded-2xl border border-border bg-card p-6">
+      <div className="flex items-center gap-5">
+        <div className="hidden h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-illustration-bg sm:flex">
+          <img
+            src={cardUpdate}
+            alt=""
+            width={512}
+            height={512}
+            loading="lazy"
+            decoding="async"
+            className="h-20 w-20 object-contain"
+          />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-muted-foreground">최근 정보</p>
+          <h2 id="home-updates-title" className="mt-1 text-2xl font-bold tracking-tight text-foreground">
+            업데이트
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            신규 영웅, 용병, 장비와 주요 콘텐츠 업데이트를 한 흐름에서 확인할 수 있도록 준비 중입니다.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ReportSection() {
+  return (
+    <section aria-labelledby="home-report-title" className="rounded-2xl border border-border bg-card px-6 py-5 text-center">
+      <h2 id="home-report-title" className="text-lg font-semibold text-foreground">
+        오탈자 · 정보 수정 제보
+      </h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        검증된 제보 접수 경로를 연결하기 전까지는 이 영역에서 외부 링크를 제공하지 않습니다.
+      </p>
+    </section>
+  );
+}
+
 function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -195,11 +274,17 @@ function Index() {
       <HeroSection />
 
       <main className="mx-auto -mt-12 w-full max-w-6xl flex-1 px-8 pb-12">
-        <nav aria-label="정보 카테고리" className="mt-14 grid grid-cols-3 gap-7">
+        <UpdatesSection />
+
+        <nav aria-label="정보 카테고리" className="mt-7 grid grid-cols-3 gap-7">
           {categories.map((category) => (
             <CategoryCard key={category.title} category={category} />
           ))}
         </nav>
+
+        <div className="mt-7">
+          <ReportSection />
+        </div>
       </main>
 
       <footer className="border-t border-border bg-card">
