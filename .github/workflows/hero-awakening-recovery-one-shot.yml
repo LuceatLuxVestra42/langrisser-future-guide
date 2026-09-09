@@ -1,0 +1,169 @@
+name: Hero Awakening Recovery One Shot
+
+on:
+  push:
+    branches:
+      - work/hero-awakening-recovery-20260909
+    paths:
+      - '.github/workflows/hero-awakening-recovery-one-shot.yml'
+      - 'scripts/hero-awakening-recovery-one-shot.cjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: work/hero-awakening-recovery-20260909
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply verified awakening semantic patch
+        run: node scripts/hero-awakening-recovery-one-shot.cjs
+
+      - name: Rebuild and validate Hero Stage 4
+        run: |
+          node scripts/validate_hero_stage4_upstream_direct.cjs
+          node scripts/prepare_hero_basic_combat_stage45.cjs
+          node scripts/validate_hero_stage4_final.cjs
+          node scripts/validate_hero_stage4_a_boundary.cjs
+
+      - name: Enforce Stage 4 awakening and SkillCost invariants
+        run: |
+          node - <<'NODE'
+          const s = require('./data/validation/hero-basic-combat-stage4-5-summary.v1.json');
+          const a = s.awakeningSummary || {};
+          if (s.status !== 'PASS' || s.stage4CompletionStatus !== 'COMPLETE') throw new Error(`Stage4 ${s.status}/${s.stage4CompletionStatus}`);
+          if (a.canonicalAwakenInfoRows !== 267 || a.verifiedLevel2Skill !== 257 || a.level2SkillNotDefined !== 10 || a.falseNone !== 0) throw new Error(`awakening ${JSON.stringify(a)}`);
+          const directGate = (s.semanticGates || []).find(x => x.id === 'heroDirectSkillCost');
+          const jobGate = (s.semanticGates || []).find(x => x.id === 'equipableSkillCost');
+          if (directGate?.status !== 'VERIFIED' || jobGate?.status !== 'VERIFIED') throw new Error('SkillCost gates regressed');
+          console.log(JSON.stringify({stage4:s.status, awakening:a, directSkillCost:directGate.status, jobSkillCost:jobGate.status}, null, 2));
+          NODE
+
+      - name: Rebuild Hero Stage 6-1
+        run: node scripts/build_hero_stage6_1_detail.cjs
+
+      - name: Rebuild Hero Stage 6-2
+        run: node scripts/build_hero_stage6_2_fixture_qa.cjs
+
+      - name: Rebuild and shard Hero Stage 6-3
+        run: |
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+
+      - name: Validate and freeze Hero Stage 6-4
+        run: node scripts/validate_hero_stage6_4_site_consumer.cjs
+
+      - name: Enforce Stage 6 awakening parity
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const dir = 'data/generated/hero-detail/by-id';
+          const files = fs.readdirSync(dir).filter(x => x.endsWith('.json'));
+          if (files.length !== 267) throw new Error(`shards=${files.length}`);
+          let verified = 0, notDefined = 0, none = 0, fail = 0;
+          for (const file of files) {
+            const row = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+            const a = row?.normal?.awakening;
+            if (a?.status === 'NONE') none++;
+            else if (a?.status === 'FAIL' || !a) fail++;
+            else if (a?.level2Status === 'LEVEL2_SKILL_NOT_DEFINED') notDefined++;
+            else if (a?.status === 'VERIFIED' && Number.isInteger(a?.level2SkillId) && a?.skill?.skillId === a.level2SkillId) verified++;
+            else fail++;
+          }
+          if (verified !== 257 || notDefined !== 10 || none !== 0 || fail !== 0) throw new Error(`stage6 awakening verified=${verified} notDefined=${notDefined} none=${none} fail=${fail}`);
+          const leon = require('./data/generated/hero-detail/by-id/6.json');
+          if (leon?.normal?.awakening?.status !== 'VERIFIED' || !leon?.normal?.awakening?.skill) throw new Error('heroId 6 awakening did not recover');
+          const v = require('./data/validation/hero-stage6-4-final.v1.json');
+          if (!['PASS','PASS_WITH_REVIEW'].includes(v.status) || v.completion !== 'COMPLETE') throw new Error(`Stage6-4 ${v.status}/${v.completion}`);
+          console.log(JSON.stringify({shards:files.length, verified, notDefined, none, fail, hero6:leon.normal.awakening, stage6_4:{status:v.status,completion:v.completion}}, null, 2));
+          NODE
+
+      - name: Reject unexpected tracked mutations
+        run: |
+          node - <<'NODE'
+          const { execFileSync } = require('child_process');
+          const lines = execFileSync('git', ['status','--porcelain'], {encoding:'utf8'}).trim().split(/\n/).filter(Boolean);
+          const paths = lines.map(line => line.slice(3));
+          const allowed = [
+            /^data\/checkpoints\/awakening-z7-source-state\.v1\.json$/,
+            /^data\/hero-basic-combat-stage4-5\.v1\.json$/,
+            /^scripts\/prepare_hero_basic_combat_stage45\.cjs$/,
+            /^scripts\/validate_hero_stage4_final\.cjs$/,
+            /^tools\/project-check\/contracts\/owners\.v1\.json$/,
+            /^data\/generated\/hero-basic-combat\.v1\.json$/,
+            /^data\/validation\/hero-basic-combat-stage4-5-summary\.v1\.json$/,
+            /^data\/validation\/hero-stage4-upstream-direct\.v1\.json$/,
+            /^data\/validation\/hero-stage4-a-boundary\.v1\.json$/,
+            /^data\/generated\/hero-detail-stage6-1\.v1\.json$/,
+            /^data\/validation\/hero-stage6-1-final\.v1\.json$/,
+            /^data\/generated\/hero-stage6-2-representative-fixtures\.v1\.json$/,
+            /^data\/validation\/hero-stage6-2-final\.v1\.json$/,
+            /^data\/generated\/hero-detail\.v1\.json$/,
+            /^data\/generated\/hero-detail-shared\.v1\.json$/,
+            /^data\/generated\/hero-detail\/by-id\/.+\.json$/,
+            /^data\/validation\/hero-stage6-3-final\.v1\.json$/,
+            /^data\/checkpoints\/hero-stage6-3-full-generation\.(json|md)$/,
+            /^data\/validation\/hero-stage6-4-final\.v1\.json$/,
+            /^data\/checkpoints\/hero-stage6-4-site-consumer\.(json|md)$/,
+          ];
+          const unexpected = paths.filter(p => !allowed.some(re => re.test(p)));
+          if (unexpected.length) throw new Error(`unexpected tracked mutations: ${unexpected.join(', ')}`);
+          console.log(`tracked mutation paths admitted=${paths.length}`);
+          NODE
+
+      - name: Commit recovered semantic and frozen outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/checkpoints/awakening-z7-source-state.v1.json \
+            data/hero-basic-combat-stage4-5.v1.json \
+            scripts/prepare_hero_basic_combat_stage45.cjs \
+            scripts/validate_hero_stage4_final.cjs \
+            tools/project-check/contracts/owners.v1.json \
+            data/generated/hero-basic-combat.v1.json \
+            data/validation/hero-basic-combat-stage4-5-summary.v1.json \
+            data/validation/hero-stage4-upstream-direct.v1.json \
+            data/validation/hero-stage4-a-boundary.v1.json \
+            data/generated/hero-detail-stage6-1.v1.json \
+            data/validation/hero-stage6-1-final.v1.json \
+            data/generated/hero-stage6-2-representative-fixtures.v1.json \
+            data/validation/hero-stage6-2-final.v1.json \
+            data/generated/hero-detail.v1.json \
+            data/generated/hero-detail-shared.v1.json \
+            data/generated/hero-detail/by-id \
+            data/validation/hero-stage6-3-final.v1.json \
+            data/checkpoints/hero-stage6-3-full-generation.json \
+            data/checkpoints/hero-stage6-3-full-generation.md \
+            data/validation/hero-stage6-4-final.v1.json \
+            data/checkpoints/hero-stage6-4-site-consumer.json \
+            data/checkpoints/hero-stage6-4-site-consumer.md
+          git commit -m 'Recover Hero awakening semantic and Stage 6 consumers'
+
+      - name: Render current Hero Status Source declaration
+        run: node tools/status-source/cli/lifecycle.mjs closeout --pipeline hero --write
+
+      - name: Commit Status Source projection when changed
+        run: |
+          if [ -n "$(git status --porcelain -- tools/status-source/declarations/hero.v1.json)" ]; then
+            git add tools/status-source/declarations/hero.v1.json
+            git commit -m 'Refresh Hero Status Source declaration after awakening recovery'
+          fi
+
+      - name: Push recovered branch
+        run: |
+          git fetch origin work/hero-awakening-recovery-20260909
+          git rebase origin/work/hero-awakening-recovery-20260909
+          git push origin HEAD:work/hero-awakening-recovery-20260909
