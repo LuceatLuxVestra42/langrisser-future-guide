@@ -101,8 +101,8 @@ check(
 
 check(
   'home-character-route',
-  index.includes('{ title: "캐릭터", image: cardCharacter, to: "/heroes" }'),
-  'home character card points to /heroes',
+  index.includes('{ title: "영웅", image: cardCharacter, status: "LIVE", to: "/heroes" }'),
+  'home hero card points to /heroes',
 );
 
 const result = {
