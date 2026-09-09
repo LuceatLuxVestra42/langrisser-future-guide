@@ -19,12 +19,14 @@
     "displayJobStats": "round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5",
     "heroSoldierModifiers": "HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100",
     "talentStarProgression": "JobConnectionInfo.TalentSkill_IDs[star - 1] for star 1..6",
-    "equipableSkillCost": "ConfigDataSkillInfo.SkillCost projected by exact skillId onto Stage 4-4 jobLevelAcquisitions[].skill.cost only"
+    "equipableSkillCost": "ConfigDataSkillInfo.SkillCost projected by exact skillId onto Stage 4-4 jobLevelAcquisitions[].skill.cost",
+    "heroDirectSkillCost": "ConfigDataSkillInfo.SkillCost projected by exact skillId onto the preserved Stage 4-4 heroDirectSkills[].cost population"
   },
   "verifiedComponents": [
     "Stage 4-3 normal job topology for canonical 267 heroes",
     "Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes",
     "Equipable job-level skill cost from ConfigDataSkillInfo.SkillCost by exact SkillID",
+    "Hero-direct skill cost from ConfigDataSkillInfo.SkillCost by exact preserved SkillID",
     "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID",
     "displayJobStats at Lv70 / 6-star for every normal JobConnection",
     "Hero-owned soldier modifier percentages from Cmd fields",
@@ -63,8 +65,14 @@
     {
       "id": "equipableSkillCost",
       "status": "VERIFIED",
-      "rule": "For Stage 4-4 jobLevelAcquisitions only, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as skill.cost. Missing, non-integer or values outside the frozen equipable domain {1,2} are hard errors.",
-      "scope": "Do not project SkillCost onto heroDirectSkills, hiddenSkills, talent, awakening, SP rewards or other unproven skill paths."
+      "rule": "For Stage 4-4 jobLevelAcquisitions, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as skill.cost. Missing, non-integer or values outside the frozen equipable domain {1,2} are hard errors.",
+      "scope": "This gate preserves the already-frozen job-level SkillCost population and does not infer any new relation."
+    },
+    {
+      "id": "heroDirectSkillCost",
+      "status": "VERIFIED",
+      "rule": "For the already-established Stage 4-4 heroDirectSkills population sourced from ConfigDataHeroInfo.Skills, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as cost. Missing, non-integer or values outside the observed normal-skill domain {1,2} are hard errors.",
+      "scope": "Preserve heroDirectSkills provenance separately from jobLevelAcquisitions. Do not project SkillCost onto hiddenSkills, talent, awakening, SP rewards or other paths."
     }
   ],
   "relationBoundary": {

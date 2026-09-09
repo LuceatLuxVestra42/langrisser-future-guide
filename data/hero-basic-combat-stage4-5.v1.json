@@ -2,7 +2,7 @@
   "version": 3,
   "stage": "4-5",
   "status": "final-validation-contract",
-  "purpose": "Generate final normal-job combat data for all canonical Heroes from UnityDataTool direct JSON, including display job stats, Hero-owned soldier modifiers, talent star progression, awakening and canonical equipable skill cost, while preserving the A-1/A-9 identity and relation ownership boundaries.",
+  "purpose": "Generate final normal-job combat data for all canonical Heroes from UnityDataTool direct JSON, including display job stats, Hero-owned soldier modifiers, talent star progression, awakening and canonical SkillCost projection for established normal skill paths, while preserving the A-1/A-9 identity and relation ownership boundaries.",
   "primaryKey": "heroId",
   "sharedRelationBoundary": {
     "status": "A1_A9_ADOPTED",
@@ -57,8 +57,14 @@
     {
       "id": "equipableSkillCost",
       "status": "VERIFIED",
-      "rule": "For Stage 4-4 jobLevelAcquisitions only, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as skill.cost. Missing, non-integer or values outside the frozen equipable domain {1,2} are hard errors.",
-      "scope": "Do not project SkillCost onto heroDirectSkills, hiddenSkills, talent, awakening, SP rewards or other unproven skill paths."
+      "rule": "For Stage 4-4 jobLevelAcquisitions, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as skill.cost. Missing, non-integer or values outside the frozen equipable domain {1,2} are hard errors.",
+      "scope": "This gate preserves the already-frozen job-level SkillCost population and does not infer any new relation."
+    },
+    {
+      "id": "heroDirectSkillCost",
+      "status": "VERIFIED",
+      "rule": "For the already-established Stage 4-4 heroDirectSkills population sourced from ConfigDataHeroInfo.Skills, resolve ConfigDataSkillInfo.SkillCost by exact skillId and project it as cost. Missing, non-integer or values outside the observed normal-skill domain {1,2} are hard errors.",
+      "scope": "Preserve heroDirectSkills provenance separately from jobLevelAcquisitions. Do not project SkillCost onto hiddenSkills, talent, awakening, SP rewards or other paths."
     }
   ],
   "normalizationRules": [
@@ -72,9 +78,10 @@
     "Require six star-correction values for every stat and six TalentSkill_IDs for every Hero talent set.",
     "Keep soldierModifiers limited to Hero-owned troop stat percentages and never embed soldierId arrays or Hero-Soldier membership.",
     "Preserve Stage 4-3 topology and Stage 4-4 skill acquisition payloads without changing their semantic ownership.",
-    "For Stage 4-4 jobLevelAcquisitions only, resolve ConfigDataSkillInfo.SkillCost by exact skillId and add it to the existing resolved skill payload as cost.",
-    "Fail closed when an equipable job-level skill has missing, non-integer, zero, 3, 4, 5 or any other SkillCost outside the frozen observed domain {1,2}; do not coerce, infer or fall back.",
-    "Do not add SkillCost to heroDirectSkills, hiddenSkills, talent, awakening, SP rewards or other paths whose equipable-cost semantics were not proven."
+    "For Stage 4-4 jobLevelAcquisitions, resolve ConfigDataSkillInfo.SkillCost by exact skillId and add it to the existing resolved skill payload as cost.",
+    "For Stage 4-4 heroDirectSkills, preserve the existing HeroInfo.Skills population and resolve ConfigDataSkillInfo.SkillCost only by each existing exact skillId; do not create or remove direct-skill relations.",
+    "Fail closed when a job-level or hero-direct normal skill has no exact SkillInfo row, missing/non-integer SkillCost, or SkillCost outside {1,2}; do not coerce, infer or fall back.",
+    "Do not add SkillCost to hiddenSkills, talent, awakening, SP rewards or other unproven paths."
   ],
   "validationPolicy": {
     "FAIL": [
@@ -85,10 +92,11 @@
       "A nonzero JobInfo mastery PropertyModify ID is outside the verified 87-92 mapping.",
       "A Cmd modifier is negative, non-integer or not divisible by 100.",
       "A Stage 4-4 jobLevelAcquisition skill has no exact SkillInfo row, missing/non-integer SkillCost, SkillCost outside {1,2}, or a mismatched resolved skillId.",
+      "A Stage 4-4 heroDirectSkills entry has no exact SkillInfo row, missing/non-integer SkillCost, SkillCost outside {1,2}, or disagrees with its preserved heroDirectSkillIds population.",
       "Stage 4-5 embeds or independently computes usable-Soldier membership."
     ],
     "PASS": [
-      "267 records are generated with all semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved, and every equipable job-level skill carries exact SkillInfo SkillCost."
+      "267 records are generated with all semantic gates verified, zero hard errors, A-1 identity parity and A-9 ownership preserved, and every job-level and hero-direct normal skill carries exact SkillInfo SkillCost without changing its upstream population."
     ]
   },
   "output": {
