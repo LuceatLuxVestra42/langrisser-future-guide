@@ -231,6 +231,12 @@ function HeroDetailPage() {
   };
   const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
+  const equipableSkillById = new Map<number, SkillView>();
+  for (const skill of detail.skills.heroDirectSkills) equipableSkillById.set(skill.skillId, skill);
+  for (const row of detail.skills.jobLevelAcquisitions) {
+    if (!equipableSkillById.has(row.skillId)) equipableSkillById.set(row.skillId, row.skill);
+  }
+  const equipableSkills = [...equipableSkillById.values()];
 
   return (
     <main
@@ -371,25 +377,14 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="스킬" />
 
-          <div className="mt-5">
-            {detail.skills.heroDirectSkills.length > 0 ? (
+          <div className="mt-5" data-hero-equipable-skills="true" data-equipable-skill-count={equipableSkills.length}>
+            <h3 className="mb-3 text-sm font-bold text-foreground">장착 가능 스킬</h3>
+            {equipableSkills.length > 0 ? (
               <div className="grid gap-3 lg:grid-cols-2">
-                {detail.skills.heroDirectSkills.map((skill) => <SkillCard key={`direct-${skill.skillId}`} heroId={hero.heroId} skill={skill} sourceLabel="Hero 직접 보유" />)}
+                {equipableSkills.map((skill) => <SkillCard key={`equipable-${skill.skillId}`} heroId={hero.heroId} skill={skill} />)}
               </div>
             ) : (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">기본 보유 스킬 없음</p>
-            )}
-          </div>
-
-          <div className="mt-7 border-t border-border pt-5">
-            {detail.skills.jobLevelAcquisitions.length > 0 ? (
-              <div className="grid gap-3 lg:grid-cols-2">
-                {detail.skills.jobLevelAcquisitions.map((row) => (
-                  <SkillCard key={`job-${row.acquisitionOrder ?? "x"}-${row.skillId}`} heroId={hero.heroId} skill={row.skill} sourceLabel={`${row.jobNameCn ?? `Job ${row.jobId ?? "?"}`} · Hero Lv.${row.jobLevelUpHeroLevel ?? "-"}`} />
-                ))}
-              </div>
-            ) : (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">전직 습득 스킬 없음</p>
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">장착 가능 스킬 없음</p>
             )}
           </div>
 
@@ -397,7 +392,7 @@ function HeroDetailPage() {
             <h3 className="mb-3 text-sm font-bold text-foreground">각성기</h3>
             {detail.skills.awakening.status === "VERIFIED" && detail.skills.awakening.skill ? (
               <div className="grid gap-3 lg:grid-cols-2">
-                <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} sourceLabel="각성기" />
+                <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} />
               </div>
             ) : detail.skills.awakening.status === "NONE" ? (
               <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
@@ -594,7 +589,7 @@ function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) 
   return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" /></div>;
 }
 
-function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; sourceLabel: string }) {
+function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
   return (
     <article className="rounded-xl border border-border bg-muted/20 p-4">
       <div className="flex items-start gap-3">
@@ -606,7 +601,7 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView; source
             <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span>
             <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span>
-            {heroId === 6 && Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
+            {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
           </div>
           <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p>
         </div>
