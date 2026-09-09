@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "scope": "hero-skill-presentation",
+  "status": "REVIEW",
+  "owner": "frontend/presentation",
+  "source": "data/validation/hero-stage6-4-final.v1.json",
+  "rules": {
+    "equipableSkillProjection": "heroDirectSkills followed by jobLevelAcquisitions, presentation-deduplicated only by exact skillId",
+    "semanticProvenancePreserved": true,
+    "awakeningSeparate": true,
+    "costDisplay": "Render skill.cost for any SkillCard when cost is an integer; no Hero-ID gating"
+  },
+  "completionCriteria": [
+    "Project Check passes for changed paths",
+    "production build passes",
+    "hosted Hero detail direct-entry resolves after merge/deploy",
+    "browser/UI confirms one equipable skill group with Cost metadata and separate awakening section"
+  ]
+}
