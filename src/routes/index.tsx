@@ -42,13 +42,12 @@ type Category = {
   to: string;
   primary?: boolean;
   imageClassName?: string;
-  subtitle?: string;
 };
 
 const categories: Category[] = [
   { title: "업데이트", image: cardUpdate, to: "/", primary: true },
   { title: "가챠 배너", image: cardGacha, to: "/banners" },
-  { title: "캐릭터", image: cardCharacter, to: "/heroes", subtitle: "영웅 상세 · 스킬 코스트" },
+  { title: "캐릭터", image: cardCharacter, to: "/heroes" },
   { title: "장비", image: cardEquip, to: "/equipment" },
   { title: "스킨", image: cardSkin, to: "/" },
   { title: "용병", image: cardMerc, to: "/soldiers" },
@@ -83,13 +82,13 @@ function navigateWithFreshDocument(event: React.MouseEvent<HTMLAnchorElement>, h
 
 function CategoryCard({ category }: { category: Category }) {
   const href = resolveCategoryHref(category.to);
-  const ariaLabel = category.subtitle ? `${category.title} · ${category.subtitle}` : category.title;
+  const isHeroCategory = category.title === "캐릭터" && category.to === "/heroes";
 
   return (
     <a
       href={href}
       onClick={(event) => navigateWithFreshDocument(event, href)}
-      aria-label={ariaLabel}
+      aria-label={isHeroCategory ? "캐릭터 · 영웅 상세 · 스킬 코스트" : category.title}
       className={`card-nav card-nav-hover group flex flex-col items-center px-8 py-9 ${
         category.primary ? "card-nav-primary" : ""
       }`}
@@ -108,8 +107,8 @@ function CategoryCard({ category }: { category: Category }) {
         />
       </div>
       <h3 className="mt-6 text-2xl font-bold tracking-tight text-foreground">{category.title}</h3>
-      {category.subtitle ? (
-        <p className="mt-2 text-sm font-semibold text-muted-foreground">{category.subtitle}</p>
+      {isHeroCategory ? (
+        <p className="mt-2 text-sm font-semibold text-muted-foreground">영웅 상세 · 스킬 코스트</p>
       ) : null}
     </a>
   );
