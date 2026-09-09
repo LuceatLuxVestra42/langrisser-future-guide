@@ -1,0 +1,143 @@
+name: Hero Awakening Recovery Freeze V2
+
+on:
+  push:
+    branches:
+      - work/hero-awakening-recovery-20260909
+    paths:
+      - '.github/workflows/hero-awakening-recovery-freeze-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  recover-freeze-reattest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/hero-awakening-recovery-20260909
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild owning Hero pipeline
+        run: |
+          node scripts/hero-awakening-recovery-one-shot.cjs
+          node scripts/validate_hero_stage4_upstream_direct.cjs
+          node scripts/prepare_hero_basic_combat_stage45.cjs
+          node scripts/validate_hero_stage4_final.cjs
+          node scripts/validate_hero_stage4_a_boundary.cjs
+          node scripts/build_hero_stage6_1_detail.cjs
+          node scripts/build_hero_stage6_2_fixture_qa.cjs
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+          node scripts/validate_hero_stage6_4_site_consumer.cjs
+
+      - name: Verify awakening parity before freeze
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const summary = require('./data/validation/hero-basic-combat-stage4-5-summary.v1.json');
+          const a = summary.awakeningSummary || {};
+          if (summary.status !== 'PASS' || a.canonicalAwakenInfoRows !== 267 || a.verifiedLevel2Skill !== 257 || a.level2SkillNotDefined !== 10 || a.falseNone !== 0) {
+            throw new Error(JSON.stringify({status: summary.status, awakening: a}));
+          }
+          const files = fs.readdirSync('data/generated/hero-detail/by-id').filter(x => x.endsWith('.json'));
+          let verified = 0, notDefined = 0, none = 0, fail = 0;
+          for (const file of files) {
+            const row = JSON.parse(fs.readFileSync(path.join('data/generated/hero-detail/by-id', file), 'utf8'));
+            const x = row?.normal?.awakening;
+            if (x?.status === 'NONE') none++;
+            else if (!x || x.status === 'FAIL') fail++;
+            else if (x.level2Status === 'LEVEL2_SKILL_NOT_DEFINED') notDefined++;
+            else if (x.status === 'VERIFIED' && Number.isInteger(x.level2SkillId) && x.skill?.skillId === x.level2SkillId) verified++;
+            else fail++;
+          }
+          const hero6 = require('./data/generated/hero-detail/by-id/6.json').normal.awakening;
+          const final = require('./data/validation/hero-stage6-4-final.v1.json');
+          if (files.length !== 267 || verified !== 257 || notDefined !== 10 || none !== 0 || fail !== 0 || hero6.status !== 'VERIFIED' || hero6.level2SkillId !== 12079 || hero6.skill?.skillId !== 12079 || !['PASS','PASS_WITH_REVIEW'].includes(final.status) || final.completion !== 'COMPLETE') {
+            throw new Error(JSON.stringify({files: files.length, verified, notDefined, none, fail, hero6, final: {status: final.status, completion: final.completion}}));
+          }
+          console.log(JSON.stringify({files: files.length, verified, notDefined, none, fail, hero6: {status: hero6.status, level2SkillId: hero6.level2SkillId, skillId: hero6.skill.skillId}}, null, 2));
+          NODE
+
+      - name: Fail closed on unexpected recovery mutations
+        run: |
+          node - <<'NODE'
+          const {execFileSync}=require('child_process');
+          const lines=execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).split(/\n/).filter(Boolean);
+          const paths=lines.map(line=>line.slice(3));
+          const allowed=[
+            /^data\/checkpoints\/awakening-z7-source-state\.v1\.json$/,/^data\/hero-basic-combat-stage4-5\.v1\.json$/,/^scripts\/prepare_hero_basic_combat_stage45\.cjs$/,/^scripts\/validate_hero_stage4_final\.cjs$/,/^tools\/project-check\/contracts\/owners\.v1\.json$/,
+            /^data\/generated\/hero-basic-combat\.v1\.json$/,/^data\/validation\/hero-basic-combat-stage4-5-summary\.v1\.json$/,/^data\/validation\/hero-stage4-upstream-direct\.v1\.json$/,/^data\/validation\/hero-stage4-a-boundary\.v1\.json$/,
+            /^data\/generated\/hero-detail-stage6-1\.v1\.json$/,/^data\/validation\/hero-stage6-1-final\.v1\.json$/,/^data\/generated\/hero-stage6-2-representative-fixtures\.v1\.json$/,/^data\/validation\/hero-stage6-2-final\.v1\.json$/,
+            /^data\/generated\/hero-detail\.v1\.json$/,/^data\/generated\/hero-detail-shared\.v1\.json$/,/^data\/generated\/hero-detail\/by-id\/.+\.json$/,/^data\/validation\/hero-stage6-3-final\.v1\.json$/,/^data\/checkpoints\/hero-stage6-3-full-generation\.(json|md)$/,
+            /^data\/validation\/hero-stage6-4-final\.v1\.json$/,/^data\/checkpoints\/hero-stage6-4-site-consumer\.(json|md)$/
+          ];
+          const unexpected=paths.filter(p=>!allowed.some(re=>re.test(p)));
+          if(unexpected.length) throw new Error(`unexpected tracked mutations: ${unexpected.join(', ')}`);
+          console.log(JSON.stringify(paths,null,2));
+          NODE
+
+      - name: Commit recovered semantic and Stage 6 outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/checkpoints/awakening-z7-source-state.v1.json data/hero-basic-combat-stage4-5.v1.json scripts/prepare_hero_basic_combat_stage45.cjs scripts/validate_hero_stage4_final.cjs tools/project-check/contracts/owners.v1.json data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-stage4-a-boundary.v1.json data/generated/hero-detail-stage6-1.v1.json data/validation/hero-stage6-1-final.v1.json data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json data/generated/hero-detail.v1.json data/generated/hero-detail-shared.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-3-final.v1.json data/checkpoints/hero-stage6-3-full-generation.json data/checkpoints/hero-stage6-3-full-generation.md data/validation/hero-stage6-4-final.v1.json data/checkpoints/hero-stage6-4-site-consumer.json data/checkpoints/hero-stage6-4-site-consumer.md
+          test -n "$(git diff --cached --name-only)"
+          git commit -m 'Recover Hero awakening semantic and Stage 6 consumers'
+
+      - name: Reattest same-authority Hero Status Source provenance
+        run: |
+          ACTUAL_SHA="$(git hash-object data/validation/hero-stage6-4-final.v1.json)"
+          export ACTUAL_SHA
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'data/status-sources/baseline.v1.json';
+          const expectedOld = 'a6e0701511c12d6112b5b5a0123102c01f06de06';
+          const actual = process.env.ACTUAL_SHA;
+          if (!/^[0-9a-f]{40}$/.test(actual || '')) throw new Error(`invalid actual SHA: ${actual}`);
+          const text = fs.readFileSync(file, 'utf8');
+          const parsed = JSON.parse(text);
+          const matches = (parsed.entries || []).filter(e => e.id === 'hero-stage6-4-final' && e.domain === 'hero');
+          if (matches.length !== 1) throw new Error(`expected one Hero baseline entry, got ${matches.length}`);
+          const entry = matches[0];
+          const source = 'data/validation/hero-stage6-4-final.v1.json';
+          if (entry.sourcePath !== source || entry.sourceProvenance?.sourcePath !== source || entry.sourceProvenance?.hashAlgorithm !== 'git-blob-sha1') throw new Error('Hero Status Source identity/path/hash algorithm changed');
+          const previous = entry.sourceProvenance.gitBlobSha;
+          if (previous !== expectedOld && previous !== actual) throw new Error(`unexpected predecessor provenance: ${previous}`);
+          if (previous !== actual) {
+            const occurrences = text.split(previous).length - 1;
+            if (occurrences !== 1) throw new Error(`expected unique previous provenance occurrence, got ${occurrences}`);
+            fs.writeFileSync(file, text.replace(previous, actual));
+          }
+          console.log(JSON.stringify({previous, actual, changed: previous !== actual}));
+          NODE
+          git diff --check -- data/status-sources/baseline.v1.json
+          git add data/status-sources/baseline.v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Reattest Hero Stage 6-4 Status Source provenance'
+          fi
+
+      - name: Validate Status Source after reattestation
+        run: |
+          node tools/status-source/test/current-main-parity.mjs
+          node tools/status-source/test/promotion-parity.mjs
+          node tools/status-source/test/producer-gate-parity.mjs
+          node tools/status-source/test/artifact-bridge-parity.mjs
+          node tools/status-source/test/lifecycle-parity.mjs
+          node tools/status-source/cli/select.mjs
+          node tools/status-source/cli/lifecycle.mjs declaration --pipeline hero
+          node tools/status-source/cli/lifecycle.mjs closeout --pipeline hero
+          node tools/status-source/cli/lifecycle.mjs handoff --pipeline hero --expected-predecessor hero-stage6-4-final --id hero-stage6-4-final --source data/validation/hero-stage6-4-final.v1.json
+          test -z "$(git status --porcelain)"
+
+      - name: Push frozen recovery branch
+        run: |
+          git fetch origin work/hero-awakening-recovery-20260909
+          git rebase origin/work/hero-awakening-recovery-20260909
+          git push origin HEAD:work/hero-awakening-recovery-20260909
