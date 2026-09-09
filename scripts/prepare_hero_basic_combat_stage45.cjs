@@ -37,6 +37,7 @@ function numberArray(v) { return Array.isArray(v) ? v.filter(Number.isFinite) : 
 function uniqueInts(v) { return [...new Set(v.filter(Number.isInteger))].sort((a, b) => a - b); }
 function sameArray(a, b) { return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => v === b[i]); }
 function setDiff(a, b) { return [...a].filter((v) => !b.has(v)).sort((x, y) => x - y); }
+function hasOwn(value, key) { return Boolean(value && Object.prototype.hasOwnProperty.call(value, key)); }
 
 function indexUnique(rows, idField, label, errors, filter = () => true) {
   const map = new Map();
@@ -297,6 +298,12 @@ function main() {
 
   const skillByHero = new Map((skillAcquisition.records || []).map((r) => [r.heroId, r]));
   const records = [];
+  const awakeningSummary = {
+    canonicalAwakenInfoRows: 0,
+    verifiedLevel2Skill: 0,
+    level2SkillNotDefined: 0,
+    falseNone: 0,
+  };
 
   for (const treeHero of jobTree.records || []) {
     const hero = heroIndex.get(treeHero.heroId);
@@ -330,22 +337,48 @@ function main() {
       };
     });
 
-    const awakenId = Number.isInteger(hero.Awaken_ID) && hero.Awaken_ID > 0 ? hero.Awaken_ID : null;
-    let awakening = { status: 'NONE', awakenId: null, level2SkillId: null, skill: null };
-    if (awakenId) {
-      const awaken = awakenIndex.get(awakenId);
-      if (!awaken) errors.push(`heroId ${treeHero.heroId}: Awaken_ID ${awakenId} missing from AwakenInfo`);
-      const level2SkillId = awaken?.Level2SkillID || null;
-      const awakenSkill = level2SkillId ? skillIndex.get(level2SkillId) : null;
-      if (level2SkillId && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
-      awakening = {
-        status: awaken && (!level2SkillId || awakenSkill) ? 'VERIFIED' : 'FAIL',
-        awakenId,
-        nameCn: awaken?.Name ?? null,
-        level2SkillId,
-        skill: skillSnapshot(awakenSkill),
-      };
+    const awaken = awakenIndex.get(treeHero.heroId);
+    let awakening = {
+      status: 'FAIL',
+      awakenId: treeHero.heroId,
+      nameCn: null,
+      level2Status: 'UNRESOLVED',
+      level2SkillId: null,
+      skill: null,
+    };
+
+    if (!awaken) {
+      errors.push(`heroId ${treeHero.heroId}: canonical AwakenInfo row missing`);
+    } else {
+      awakeningSummary.canonicalAwakenInfoRows += 1;
+      const hasLevel2SkillId = hasOwn(awaken, 'Level2SkillID');
+      if (hasLevel2SkillId) {
+        const level2SkillId = awaken.Level2SkillID;
+        if (!Number.isInteger(level2SkillId) || level2SkillId <= 0) errors.push(`heroId ${treeHero.heroId}: invalid Level2SkillID=${level2SkillId}`);
+        const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
+        if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
+        awakening = {
+          status: awakenSkill ? 'VERIFIED' : 'FAIL',
+          awakenId: awaken.ID,
+          nameCn: awaken.Name ?? null,
+          level2Status: awakenSkill ? 'DEFINED' : 'UNRESOLVED',
+          level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
+          skill: skillSnapshot(awakenSkill),
+        };
+        if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
+      } else {
+        awakening = {
+          status: 'VERIFIED',
+          awakenId: awaken.ID,
+          nameCn: awaken.Name ?? null,
+          level2Status: 'LEVEL2_SKILL_NOT_DEFINED',
+          level2SkillId: null,
+          skill: null,
+        };
+        awakeningSummary.level2SkillNotDefined += 1;
+      }
     }
+    if (awakening.status === 'NONE') awakeningSummary.falseNone += 1;
 
     records.push({
       heroId: treeHero.heroId,
@@ -381,6 +414,11 @@ function main() {
     });
   }
 
+  if (awakeningSummary.canonicalAwakenInfoRows !== 267) errors.push(`canonical AwakenInfo rows=${awakeningSummary.canonicalAwakenInfoRows}, expected 267`);
+  if (awakeningSummary.verifiedLevel2Skill !== 257) errors.push(`verified Level2 skills=${awakeningSummary.verifiedLevel2Skill}, expected 257`);
+  if (awakeningSummary.level2SkillNotDefined !== 10) errors.push(`Level2 skill not defined=${awakeningSummary.level2SkillNotDefined}, expected 10`);
+  if (awakeningSummary.falseNone !== 0) errors.push(`false awakening NONE=${awakeningSummary.falseNone}`);
+
   const output = { version: 3, stage: '4-5', status: 'PASS', recordCount: records.length, records };
   const leaks = findForbiddenMembershipKeys(output);
   if (leaks.length) errors.push(`A-9 membership-field leakage: ${leaks.slice(0, 20).join(', ')}`);
@@ -392,7 +430,7 @@ function main() {
 
   const semanticGates = (contract.semanticGates || []).map((gate) => ({
     ...gate,
-    status: ['displayJobStats', 'heroSoldierModifiers', 'talentStarProgression', 'equipableSkillCost', 'heroDirectSkillCost'].includes(gate.id) ? 'VERIFIED' : gate.status,
+    status: ['awakeningClassification', 'displayJobStats', 'heroSoldierModifiers', 'talentStarProgression', 'equipableSkillCost', 'heroDirectSkillCost'].includes(gate.id) ? (finalStatus === 'PASS' ? 'VERIFIED' : 'FAIL') : gate.status,
   }));
   const summary = {
     version: 3,
@@ -411,6 +449,7 @@ function main() {
       skillInfo: skillIndex.size,
       awakenInfo: awakenIndex.size,
     },
+    awakeningSummary,
     formulaContract: {
       displayJobStats: 'round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5',
       heroSoldierModifiers: 'HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100',
@@ -423,7 +462,9 @@ function main() {
       'Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes',
       'Equipable job-level skill cost from ConfigDataSkillInfo.SkillCost by exact SkillID',
       'Hero-direct skill cost from ConfigDataSkillInfo.SkillCost by exact preserved SkillID',
-      'HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID',
+      'Domain-proven canonical Hero.ID -> same-valued AwakenInfo.ID relation for 267 heroes',
+      '257 explicit AwakenInfo.Level2SkillID -> exact SkillInfo.ID references',
+      '10 canonical AwakenInfo rows preserved as LEVEL2_SKILL_NOT_DEFINED instead of false NONE',
       'displayJobStats at Lv70 / 6-star for every normal JobConnection',
       'Hero-owned soldier modifier percentages from Cmd fields',
       'TalentSkill_IDs star 1..6 selection rule',
@@ -441,7 +482,7 @@ function main() {
   writeJson(SUMMARY_PATH, summary);
 
   console.log(`STAGE 4-5 RESULT: ${finalStatus}`);
-  console.log(`heroes=${records.length} canonical=${canonicalIds.size} errors=${errors.length} membershipLeaks=${leaks.length}`);
+  console.log(`heroes=${records.length} canonical=${canonicalIds.size} awakening=${awakeningSummary.canonicalAwakenInfoRows}/${awakeningSummary.verifiedLevel2Skill}/${awakeningSummary.level2SkillNotDefined} errors=${errors.length} membershipLeaks=${leaks.length}`);
   if (errors.length) {
     for (const error of errors.slice(0, 100)) console.log(`- FAIL: ${error}`);
     process.exitCode = 1;

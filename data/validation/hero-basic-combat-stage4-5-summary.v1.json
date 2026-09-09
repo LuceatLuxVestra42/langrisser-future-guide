@@ -15,6 +15,12 @@
     "skillInfo": 27198,
     "awakenInfo": 283
   },
+  "awakeningSummary": {
+    "canonicalAwakenInfoRows": 267,
+    "verifiedLevel2Skill": 257,
+    "level2SkillNotDefined": 10,
+    "falseNone": 0
+  },
   "formulaContract": {
     "displayJobStats": "round((INI + UP * 69 / 10) * (1 + HeroInfo.StatStar[5] / 10000)) + global JobInfo mastery flat; bond effects excluded until Stage 5",
     "heroSoldierModifiers": "HeroInfo.HPCmd_INI/ATCmd_INI/DFCmd_INI/MagicDFCmd_INI divided by 100",
@@ -27,7 +33,9 @@
     "Stage 4-4 normal skill acquisition/reference data for canonical 267 heroes",
     "Equipable job-level skill cost from ConfigDataSkillInfo.SkillCost by exact SkillID",
     "Hero-direct skill cost from ConfigDataSkillInfo.SkillCost by exact preserved SkillID",
-    "HeroInfo.Awaken_ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID",
+    "Domain-proven canonical Hero.ID -> same-valued AwakenInfo.ID relation for 267 heroes",
+    "257 explicit AwakenInfo.Level2SkillID -> exact SkillInfo.ID references",
+    "10 canonical AwakenInfo rows preserved as LEVEL2_SKILL_NOT_DEFINED instead of false NONE",
     "displayJobStats at Lv70 / 6-star for every normal JobConnection",
     "Hero-owned soldier modifier percentages from Cmd fields",
     "TalentSkill_IDs star 1..6 selection rule",
@@ -38,7 +46,7 @@
     {
       "id": "awakeningClassification",
       "status": "VERIFIED",
-      "rule": "HeroInfo.Awaken_ID -> AwakenInfo.ID -> AwakenInfo.Level2SkillID -> SkillInfo.ID"
+      "rule": "For each canonical Hero, resolve the domain-proven same-valued AwakenInfo.ID row. If Level2SkillID is explicitly defined, require a positive integer and an exact SkillInfo.ID reference; do not require Awaken2Unlock=true as a universal validity gate. If Level2SkillID is absent, preserve the source row as LEVEL2_SKILL_NOT_DEFINED; do not collapse it to Hero awakening NONE."
     },
     {
       "id": "displayJobStats",
