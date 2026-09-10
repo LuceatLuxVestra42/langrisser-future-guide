@@ -1,4 +1,4 @@
-name: F3 Extract Leon SP Stat Inputs
+name: F3 Assert Leon Central Bond Stat Formula
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
 jobs:
-  probe:
+  prove:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Extract exact Leon SP/job inputs
+      - name: Assert exact Leon SP central-bond delta
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -28,18 +28,43 @@ jobs:
           const fs = require('fs');
           const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
           const load = name => JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
-          const one = (rows,id,label) => {
-            const hits=[]; rows.forEach((record,recordIndex)=>{if(record&&record.ID===id)hits.push({recordIndex,record});});
-            if(hits.length!==1) throw new Error(`${label} ${id}: expected 1 hit, got ${hits.length}`); return hits[0];
-          };
+          const one = (rows,id,label) => { const h=rows.filter(r=>r&&r.ID===id); if(h.length!==1)throw new Error(`${label} ${id}: ${h.length}`); return h[0]; };
           const sp=one(load('ConfigDataSPHeroInfo.json'),6,'SPHeroInfo');
-          const jc=one(load('ConfigDataJobConnectionInfo.json'),Number(sp.record.JobConnection_ID),'JobConnectionInfo');
-          const job=one(load('ConfigDataJobInfo.json'),Number(jc.record.Job_ID),'JobInfo');
-          const levels=load('ConfigDataJobLevelInfo.json');
-          const levelHits=(jc.record.JobLevels_ID||[]).map(id=>one(levels,Number(id),'JobLevelInfo'));
-          console.log('=== LEON_SP_INPUTS_START ===');
-          console.log(JSON.stringify({sp,jc,job,levels:levelHits},null,2));
-          console.log('=== LEON_SP_INPUTS_END ===');
+          const jc=one(load('ConfigDataJobConnectionInfo.json'),Number(sp.JobConnection_ID),'JobConnectionInfo');
+          const level=one(load('ConfigDataJobLevelInfo.json'),Number(jc.JobLevels_ID[0]),'JobLevelInfo');
+          const info=one(load('ConfigDataHeroInformationInfo.json'),6,'HeroInformationInfo');
+          const heart=one(load('ConfigDataHeroHeartFetterInfo.json'),Number(info.HeroHeartFetterId),'HeroHeartFetterInfo');
+          const skills=load('ConfigDataSkillInfo.json');
+          const lv10HeartSkill=one(skills,Number(heart.HeroHeartFetterSkills[9]),'HeartLv10Skill');
+          const allStatSkillId=heart.HeartFetterUnlockSkills.find(x=>Number(x.HeartFetterLevelUnlock)===10)?.SkillId;
+          const allStatSkill=one(skills,Number(allStatSkillId),'HeartUnlockLv10Skill');
+          if(!/生命\+750/.test(lv10HeartSkill.Desc)||!/防御\+30/.test(lv10HeartSkill.Desc)||!/魔防\+40/.test(lv10HeartSkill.Desc)) throw new Error('flat semantic mismatch');
+          if(!/全属性/.test(allStatSkill.Desc)||!/\+5%/.test(allStatSkill.Desc)) throw new Error('5% semantic mismatch');
+
+          const defs={
+            hp:{ini:'HP_INI',up:'HP_UP',star:'HPStar',current:4041,target:4929,flat:750},
+            at:{ini:'AT_INI',up:'AT_UP',star:'ATStar',current:602,target:623,flat:0},
+            magic:{ini:'Magic_INI',up:'Magic_UP',star:'MagicStar',current:224,target:233,flat:0},
+            df:{ini:'DF_INI',up:'DF_UP',star:'DFStar',current:260,target:300,flat:30},
+            magicDf:{ini:'MagicDF_INI',up:'MagicDF_UP',star:'MagicDFStar',current:231,target:280,flat:40},
+            dex:{ini:'DEX_INI',up:'DEX_UP',star:'DEXStar',current:125,target:130,flat:0},
+          };
+          const rows=[];
+          for(const [stat,d] of Object.entries(defs)){
+            const progressionBase=Number(level[d.ini]||0)+Number(level[d.up]||0)*69/10;
+            const starCorrection=Number(sp[d.star][5]);
+            const starAdjustedRaw=progressionBase*(1+starCorrection/10000);
+            const heartPercentDelta=Math.round(starAdjustedRaw*0.05);
+            const corrected=d.current+heartPercentDelta+d.flat;
+            const combinedMultiplierDelta=Math.round(starAdjustedRaw*1.30)-Math.round(starAdjustedRaw*1.25);
+            const combinedCandidate=d.current+combinedMultiplierDelta+d.flat;
+            rows.push({stat,progressionBase,starCorrection,starAdjustedRaw,heartPercentDelta,flat:d.flat,current:d.current,corrected,target:d.target,exact:corrected===d.target,combinedCandidate,combinedExact:combinedCandidate===d.target});
+            if(corrected!==d.target) throw new Error(`${stat}: corrected ${corrected} != target ${d.target}`);
+          }
+          if(rows.find(x=>x.stat==='df').combinedExact) throw new Error('DEF discriminator unexpectedly failed');
+          console.log('=== LEON_CENTRAL_BOND_FORMULA_PROOF_START ===');
+          console.log(JSON.stringify({heroId:6,spJobConnectionId:sp.JobConnection_ID,spJobLevelId:jc.JobLevels_ID[0],heartFetterId:info.HeroHeartFetterId,heartFlatSkillId:lv10HeartSkill.ID,heartPercentSkillId:allStatSkill.ID,formula:'corrected = legacyCurrent + round(starAdjustedRaw * 0.05) + heartFlat',rows},null,2));
+          console.log('=== LEON_CENTRAL_BOND_FORMULA_PROOF_END ===');
           NODE
       - name: Verify repository unchanged
         run: |
