@@ -1,0 +1,34 @@
+name: Hero Awakening Icon Official Package Inventory
+
+on:
+  pull_request:
+    branches:
+      - work/awakening-skill-icon-a6-2-official-verifier-contract-20260910
+      - main
+    paths:
+      - '.github/workflows/hero-awakening-icon-official-package-inventory.yml'
+      - 'scripts/freeze-hero-awakening-icon-official-package-inventory.py'
+      - 'data/generated/hero-awakening-icon-official-package-inventory.v1.json'
+      - 'data/contracts/hero-awakening-icon-official-verifier.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-package-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen official package inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          before="$(git status --porcelain=v1 --untracked-files=all)"
+          python scripts/freeze-hero-awakening-icon-official-package-inventory.py
+          after="$(git status --porcelain=v1 --untracked-files=all)"
+          test "$before" = "$after"
