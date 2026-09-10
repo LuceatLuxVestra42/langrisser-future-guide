@@ -1,41 +1,42 @@
 name: Hero Awakening Icon Official Bulk Verification
 
 on:
-  push:
+  pull_request:
     branches:
-      - work/awakening-skill-icon-a6-6-bulk-verify-20260910
+      - main
+      - work/awakening-skill-icon-a6-5-small-canary-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-official-bulk-verification.yml'
+      - 'scripts/freeze-hero-awakening-icon-official-bulk-verification.py'
+      - 'scripts/verify-hero-awakening-icon-official.py'
+      - 'data/contracts/hero-awakening-icon-official-verifier.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bulk-verification.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bundle-locator.v1.json'
+      - 'data/generated/hero-awakening-icon-verification-targets.v1.json'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  freeze-bulk-verification:
+  validate-bulk-verification:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: work/awakening-skill-icon-a6-6-bulk-verify-20260910
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install verifier dependencies
         run: pip install UnityPy==1.25.3 Pillow
-      - name: Verify all 256 targets in deterministic shards and freeze result
-        run: python scripts/freeze-hero-awakening-icon-official-bulk-verification.py --write
-      - name: Commit frozen bulk verification when changed
+      - name: Validate frozen 256-target bulk verification
         shell: bash
         run: |
           set -euo pipefail
-          git add data/generated/hero-awakening-icon-official-bulk-verification.v1.json
-          if git diff --cached --quiet; then
-            echo 'Frozen bulk verification already current.'
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m 'Freeze official awakening icon bulk verification'
-          git push origin HEAD:work/awakening-skill-icon-a6-6-bulk-verify-20260910
+          before="$(git status --porcelain=v1 --untracked-files=all)"
+          python scripts/verify-hero-awakening-icon-official.py --contract-check
+          python scripts/freeze-hero-awakening-icon-official-bulk-verification.py
+          after="$(git status --porcelain=v1 --untracked-files=all)"
+          test "$before" = "$after"
