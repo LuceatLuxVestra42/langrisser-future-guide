@@ -7,7 +7,7 @@ const {
   assertCentralBondPercentSkill,
   computeCentralBondPercentDelta,
   applyCentralBondToLegacy,
-} = require('./lib/hero-central-bond-stat-effect.cjs');
+} = require('./hero-central-bond-stat-effect.cjs');
 
 const PERCENT_DESC = '英雄全属性<color=#DC143C>+5%</color>。';
 assert.strictEqual(assertCentralBondPercentSkill(PERCENT_DESC), 0.05);
