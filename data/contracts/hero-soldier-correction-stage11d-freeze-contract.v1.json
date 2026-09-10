@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-correction-stage11d-freeze-contract/v1",
+  "stage": "HERO_SOLDIER_CORRECTION_11D",
+  "status": "FREEZE_CONTRACT_FROZEN",
+  "purpose": "Freeze the reusable Hero soldier-correction contract proven by Stage 11B and Stage 11C without reopening Normal or SP semantic investigation.",
+  "scope": {
+    "inScope": [
+      "canonical Hero ID",
+      "form-specific base soldier correction for Normal and SP",
+      "Hero3 bond soldier-correction contribution",
+      "runtime form selection",
+      "final soldier correction arithmetic"
+    ],
+    "outOfScope": [
+      "new Hero population discovery",
+      "name-based joins",
+      "ID arithmetic for semantic relations",
+      "frontend presentation",
+      "asset provenance",
+      "localization",
+      "recomputation of completed bond semantics"
+    ]
+  },
+  "predecessors": {
+    "stage11B": "COMPLETE",
+    "stage11C": "COMPLETE",
+    "normalPipeline": "COMPLETE"
+  },
+  "runtimeAuthority": {
+    "sourceKind": "OFFICIAL_CN_CLIENT_INSTALLER",
+    "installVersion": "1.1.113",
+    "calculationOwner": "BlackJack.ProjectL.Battle.BattleProperty.ComputeSoldierProperties",
+    "spSelector": "GetSPHeroInfoIfJobIsSP(int heroId, int jobConnectionId)",
+    "modifierAccessor": "BlackJack.ProjectL.Battle.BattlePropertyModifier.Get",
+    "modifierAccessorContract": "PropertyModifyType integer is used as the direct index into the modifier int array.",
+    "spCmdFieldOffsets": {
+      "HPCmd_INI": "0x40",
+      "DFCmd_INI": "0x44",
+      "ATCmd_INI": "0x48",
+      "MagicDFCmd_INI": "0x4c"
+    },
+    "hero3ModifierTypes": {
+      "HPCmdAdd": 93,
+      "ATCmdAdd": 94,
+      "DFCmdAdd": 95,
+      "MagicDFCmdAdd": 96
+    },
+    "evidenceArtifacts": [
+      {
+        "name": "sp-native-xref",
+        "digest": "sha256:5ffb9fc5bfb6da8c16a7965aa4bf1a640e7f6cd768310305bf8f5783055f36cf"
+      },
+      {
+        "name": "sp-cmd-offset-confirm",
+        "digest": "sha256:e11e14aa7a5e99eb14604341bb16ac2acbdccbda95f2ec2086174e504292a632"
+      },
+      {
+        "name": "stage11c-v2",
+        "digest": "sha256:8c604b47212e34298da3a243474056c873d388dee77d84ab27a20ab2dc727133"
+      },
+      {
+        "name": "stage11c-get",
+        "digest": "sha256:f8c2dd478c450a5010740a6baf42e887b56f3012c6d05b8f6f94581058559cdd"
+      },
+      {
+        "name": "stage11c-fetter",
+        "digest": "sha256:06e265fa698db52620ce01ccb6aaf3cb3b08605df52d6e8d29702bf437148104"
+      }
+    ]
+  },
+  "canonicalContract": {
+    "identity": "HeroInfo.ID is the canonical Hero ID; SPHeroInfo.ID uses that canonical Hero ID for SP Hero lookup.",
+    "normalBase": {
+      "source": "HeroInfo.*Cmd_INI",
+      "normalization": "Cmd_INI / 100"
+    },
+    "spBase": {
+      "selection": "heroId + jobConnectionId -> GetSPHeroInfoIfJobIsSP -> ConfigDataSPHeroInfo when the active job is SP",
+      "source": "SPHeroInfo.*Cmd_INI when SPHeroInfo is selected; otherwise Normal HeroInfo base",
+      "normalization": "Cmd_INI / 100"
+    },
+    "bondContribution": {
+      "source": "existing Hero3_*CmdAdd modifier contribution resolved by the completed bond pipeline",
+      "spPolicy": "REUSED_UNCHANGED",
+      "replacementOrExclusionInSp": false
+    },
+    "finalFormula": {
+      "normal": "NormalBase + Hero3BondContribution",
+      "sp": "SPBase + Hero3BondContribution"
+    }
+  },
+  "leonFixture": {
+    "heroId": 6,
+    "normalRawBase": {
+      "hp": 1500,
+      "atk": 1500,
+      "def": 0,
+      "mdef": 0
+    },
+    "spRawBase": {
+      "hp": 1500,
+      "atk": 1500,
+      "def": 0,
+      "mdef": 0
+    },
+    "normalBasePercent": {
+      "hp": 15,
+      "atk": 15,
+      "def": 0,
+      "mdef": 0
+    },
+    "spBasePercent": {
+      "hp": 15,
+      "atk": 15,
+      "def": 0,
+      "mdef": 0
+    },
+    "bondContributionPercent": {
+      "hp": 25,
+      "atk": 25,
+      "def": 10,
+      "mdef": 10
+    },
+    "normalFinalPercent": {
+      "hp": 40,
+      "atk": 40,
+      "def": 10,
+      "mdef": 10
+    },
+    "spFinalPercent": {
+      "hp": 40,
+      "atk": 40,
+      "def": 10,
+      "mdef": 10
+    },
+    "baseClassification": "SAME_BASE_CONFIRMED",
+    "spBondPolicy": "REUSED_UNCHANGED"
+  },
+  "freezePolicy": {
+    "status": "FINAL_FROZEN",
+    "silentFallbackAllowed": false,
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "frontendSemanticRecomputeAllowed": false,
+    "reopenConditions": [
+      "new authoritative runtime contradiction",
+      "relevant source snapshot change",
+      "contract or schema change",
+      "canonical or parity damage",
+      "owning validator hard failure"
+    ]
+  },
+  "completionCriteria": {
+    "stage11BComplete": true,
+    "stage11CComplete": true,
+    "runtimeSelectionAndApplicationFrozen": true,
+    "leonFixtureArithmeticPasses": true,
+    "independentValidatorPasses": true
+  }
+}
