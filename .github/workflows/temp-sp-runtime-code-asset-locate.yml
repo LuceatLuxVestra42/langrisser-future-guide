@@ -1,0 +1,96 @@
+name: Temporary SP runtime code asset locator
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  locate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan official installer package directories for runtime code assets
+        shell: bash
+        run: |
+          set +e
+          mkdir -p out/sp-runtime-code-asset-locate
+          python <<'PY'
+          import json, pathlib, struct, urllib.error, urllib.request
+          OUT=pathlib.Path('out/sp-runtime-code-asset-locate')
+          VERSION='1.1.113'
+          BASE=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{VERSION}'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+          MAX_PART=90; MISS_BREAK=8
+          TARGETS=('assembly-csharp.dll','gameassembly.dll','global-metadata.dat','libil2cpp.so','configdata_abs.b')
+          LUA_HINTS=('lua','hotfix')
+          def request(url,start=None,end=None):
+              h={'User-Agent':UA,'Accept-Encoding':'identity'}
+              if start is not None: h['Range']=f'bytes={start}-{end}'
+              with urllib.request.urlopen(urllib.request.Request(url,headers=h),timeout=90) as r: return r.read()
+          def head_size(url):
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=45) as r: return int(r.headers['Content-Length'])
+              except urllib.error.HTTPError as e:
+                  if e.code in (403,404): return None
+                  raise
+          def zip_directory(url,total):
+              n=min(131072,total); tail=request(url,total-n,total-1); p=tail.rfind(b'PK\x05\x06')
+              if p<0: raise RuntimeError('EOCD missing')
+              _,_,_,_,size,off,_=struct.unpack_from('<HHHHIIH',tail,p+4)
+              central=request(url,off,off+size-1); out=[]; i=0
+              while i+46<=len(central) and central[i:i+4]==b'PK\x01\x02':
+                  flags=struct.unpack_from('<H',central,i+8)[0]
+                  comp,uncomp=struct.unpack_from('<II',central,i+20)
+                  fn,ex,cm=struct.unpack_from('<HHH',central,i+28)
+                  name=central[i+46:i+46+fn].decode('utf-8' if flags&0x800 else 'cp437','replace')
+                  out.append({'name':name,'compressedBytes':comp,'uncompressedBytes':uncomp})
+                  i += 46+fn+ex+cm
+              return out
+          result={'version':1,'schemaId':'sp-runtime-code-asset-locate/v1','status':'RUNNING','source':{'kind':'OFFICIAL_INSTALLER','installVersion':VERSION,'base':BASE},'packages':[],'exactHits':[],'luaHotfixHints':[],'blockers':[]}
+          try:
+              seen=False; miss=0
+              for part in range(1,MAX_PART+1):
+                  package=f'InstallPage_{VERSION}_{part}.zip'; url=f'{BASE}/{package}'; total=head_size(url)
+                  if total is None:
+                      if seen:
+                          miss+=1
+                          if miss>=MISS_BREAK: break
+                      continue
+                  seen=True; miss=0
+                  entries=zip_directory(url,total)
+                  result['packages'].append({'part':part,'packageName':package,'bytes':total,'entryCount':len(entries)})
+                  for e in entries:
+                      low=e['name'].replace('\\','/').lower()
+                      if any(low.endswith(t) for t in TARGETS): result['exactHits'].append({'part':part,'packageName':package,**e})
+                      elif any(h in low for h in LUA_HINTS) and (low.endswith('.dll') or low.endswith('.b') or low.endswith('.bytes') or low.endswith('.zip') or low.endswith('.lua')):
+                          result['luaHotfixHints'].append({'part':part,'packageName':package,**e})
+              result['status']='PASS' if result['packages'] else 'BLOCKER'
+              if not result['packages']: result['blockers']=['NO_OFFICIAL_PACKAGES']
+          except Exception as exc:
+              result['status']='DIAGNOSTIC_ERROR'; result['blockers']=[f'{type(exc).__name__}:{exc}']
+          (OUT/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          raise SystemExit(0 if result['status']=='PASS' else 2)
+          PY
+          echo $? > out/sp-runtime-code-asset-locate/exit-code.txt
+          exit 0
+      - name: Upload locator evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: sp-runtime-code-asset-locate
+          path: out/sp-runtime-code-asset-locate
+          retention-days: 7
+      - name: Remove temporary diagnostic workflow
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-sp-runtime-code-asset-locate.yml
+          git commit -m "Remove temporary SP runtime code asset locator"
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Enforce locator status
+        shell: bash
+        run: |
+          code=$(cat out/sp-runtime-code-asset-locate/exit-code.txt 2>/dev/null || echo 99)
+          test "$code" = "0"
