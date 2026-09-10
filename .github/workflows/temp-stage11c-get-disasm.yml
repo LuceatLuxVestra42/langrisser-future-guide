@@ -1,0 +1,49 @@
+name: Temporary Stage11C modifier Get disasm
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract GameAssembly and disassemble BattlePropertyModifier.Get
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage11c-get out/stage11c-get
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib,hashlib,json
+          D=pathlib.Path('/tmp/stage11c-get'); V='1.1.113'; u=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}/InstallPage_{V}_1.zip'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          def rq(a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:t=int(r.headers['Content-Length'])
+          n=min(131072,t); x=rq(t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(o,o+s-1); i=0; e=None
+          while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+            fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace')
+            if nm=='Client/GameAssembly.dll': e=(nm,me,cr,co,un,lo); break
+            i+=46+fn+ex+cm
+          nm,me,cr,co,un,lo=e; h=rq(lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; z=rq(st,st+co-1); raw=z if me==0 else zlib.decompress(z,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr
+          (D/'GameAssembly.dll').write_bytes(raw); pathlib.Path('out/stage11c-get/source.json').write_text(json.dumps({'installVersion':V,'sha256':hashlib.sha256(raw).hexdigest()},indent=2)+'\n')
+          PY
+          objdump -D -Mintel --start-address=0x1817a13d0 --stop-address=0x1817a1460 /tmp/stage11c-get/GameAssembly.dll > out/stage11c-get/get-disasm.txt
+          cat out/stage11c-get/get-disasm.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage11c-get
+          path: out/stage11c-get
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-stage11c-get-disasm.yml
+          git commit -m "Remove temporary Stage11C Get probe"
+          git push origin HEAD:${GITHUB_REF_NAME}
