@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "schemaId": "hero-fetter-skill-relation-final/v1",
+  "stage": "HERO_FETTER_SKILL_RELATION_PROOF",
+  "checkpoint": "HERO_FETTER_SKILL_RELATION_FREEZE",
+  "status": "PASS_TYPED_RELATION",
+  "completion": "COMPLETE",
+  "freezeState": "FINAL_FROZEN",
+  "contract": "data/contracts/hero-fetter-skill-relation-contract.v1.json",
+  "authority": {
+    "runtimeInstallVersion": "1.1.113",
+    "sourceField": "ConfigDataHeroFetterInfo.GotSkills_ID",
+    "runtimeConsumer": "BlackJack.ProjectL.Common.BattleUtility.GetHeroFetterSkillInfos",
+    "targetLookup": "BlackJack.ConfigData.ClientConfigDataLoader.GetConfigDataSkillInfo(int key)",
+    "targetType": "ConfigDataSkillInfo"
+  },
+  "proofChecks": {
+    "gotSkillsGetterReturnsOffset48": true,
+    "consumerLoadsOffset48": true,
+    "consumerSelectsIntElement": true,
+    "selectedIntUsedAsLookupKey": true,
+    "skillInfoMethodInfoPointerConfirmed": true,
+    "skillInfoSharedLookupHelperConfirmed": true,
+    "consumerReturnsSkillInfoList": true
+  },
+  "boundaryChecks": {
+    "nameJoinCount": 0,
+    "idArithmeticSemanticMappingCount": 0,
+    "arrayOrderSemanticMappingCount": 0,
+    "numericCoincidenceProofCount": 0,
+    "producerImplementationCount": 0,
+    "runtimeBinaryCommitted": false
+  },
+  "reviews": [],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "nextStartPoint": "Materialize Hero3 soldier-correction contribution per canonical Hero ID using the frozen HeroFetter.GotSkills_ID to ConfigDataSkillInfo.ID typed relation; do not recompute completed Normal/SP semantics.",
+  "reopenConditions": [
+    "new authoritative runtime contradiction",
+    "relevant source snapshot change",
+    "contract or schema change",
+    "owning validator hard failure"
+  ]
+}
