@@ -23,7 +23,33 @@ jobs:
       - name: Install verifier dependencies
         run: pip install UnityPy==1.25.3 Pillow
       - name: Verify and freeze three locator-group canaries
-        run: python scripts/freeze-hero-awakening-icon-official-canary.py --write
+        shell: bash
+        run: |
+          set +e
+          python scripts/freeze-hero-awakening-icon-official-canary.py --write
+          rc=$?
+          python - <<'PY'
+          import json
+          p='data/generated/hero-awakening-icon-official-canary.v1.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps([
+            {
+              'sourcePath': r['target']['sourcePath'],
+              'status': r['status'],
+              'reason': r['reason'],
+              'exactHits': [
+                {
+                  'status': h.get('status'),
+                  'reason': h.get('reason'),
+                  'objectType': h.get('objectType'),
+                  'pathId': h.get('pathId'),
+                  'runtimeContainerPath': h.get('runtimeContainerPath')
+                } for h in r['exactHits']
+              ]
+            } for r in data['results']
+          ], ensure_ascii=False, indent=2))
+          PY
+          exit "$rc"
       - name: Commit frozen canary when changed
         shell: bash
         run: |
