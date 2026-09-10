@@ -75,26 +75,29 @@ def verify_canaries(targets, locator, by_path, by_prefix):
         for container_path, value in env.container.items():
             if verifier.runtime_relative(container_path) != wanted:
                 continue
-            reader = verifier.reader_of(value)
-            object_type = getattr(getattr(reader, 'type', None), 'name', None)
-            if object_type != 'Sprite':
-                hits.append({'status':'BLOCKER','reason':'TYPE_MISMATCH','objectType':object_type,'runtimeContainerPath':str(container_path).replace('\\','/')})
-                continue
-            raw_obj = reader.get_raw_data()
-            image = reader.read().image.convert('RGBA')
-            alpha_bbox = image.getchannel('A').getbbox()
-            hits.append({
-                'status': 'VERIFIED' if alpha_bbox is not None else 'BLOCKER',
-                'reason': None if alpha_bbox is not None else 'EMPTY_ALPHA',
-                'runtimeContainerPath': str(container_path).replace('\\','/'),
-                'objectType': object_type,
-                'pathId': int(getattr(reader, 'path_id', 0) or 0),
-                'width': image.width,
-                'height': image.height,
-                'rawObjectSha256': verifier.sha256_bytes(raw_obj),
-                'rgbaSha256': verifier.sha256_bytes(image.tobytes()),
-                'nonEmptyAlpha': alpha_bbox is not None,
-            })
+            try:
+                reader = verifier.reader_of(value)
+                object_type = getattr(getattr(reader, 'type', None), 'name', None)
+                if object_type != 'Sprite':
+                    hits.append({'status':'BLOCKER','reason':'TYPE_MISMATCH','objectType':object_type,'runtimeContainerPath':str(container_path).replace('\\','/')})
+                    continue
+                raw_obj = reader.get_raw_data()
+                image = reader.read().image.convert('RGBA')
+                alpha_bbox = image.getchannel('A').getbbox()
+                hits.append({
+                    'status': 'VERIFIED' if alpha_bbox is not None else 'BLOCKER',
+                    'reason': None if alpha_bbox is not None else 'EMPTY_ALPHA',
+                    'runtimeContainerPath': str(container_path).replace('\\','/'),
+                    'objectType': object_type,
+                    'pathId': int(getattr(reader, 'path_id', 0) or 0),
+                    'width': image.width,
+                    'height': image.height,
+                    'rawObjectSha256': verifier.sha256_bytes(raw_obj),
+                    'rgbaSha256': verifier.sha256_bytes(image.tobytes()),
+                    'nonEmptyAlpha': alpha_bbox is not None,
+                })
+            except Exception as exc:
+                hits.append({'status':'BLOCKER','reason':f'UNITY_DECODE_FAIL:{type(exc).__name__}:{exc}','runtimeContainerPath':str(container_path).replace('\\','/')})
         if not hits:
             status, reason = 'REVIEW', 'NO_EXACT_RUNTIME_PATH_HIT_IN_CANDIDATE_BUNDLE'
         elif any(h['status'] != 'VERIFIED' for h in hits):
@@ -159,7 +162,14 @@ def main():
     if args.write:
         OUTPUT.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     validate_frozen(expected)
-    print(json.dumps({'checkpoint':'AWAKENING_ICON_A6_5_SMALL_CANARY','status':expected['status'],**expected['summary'],'canaryResultSha256':expected['canaryResultSha256'],'semanticReopen':False}, ensure_ascii=False, indent=2))
+    print(json.dumps({
+        'checkpoint':'AWAKENING_ICON_A6_5_SMALL_CANARY',
+        'status':expected['status'],
+        **expected['summary'],
+        'canaries':[{'sourcePath':r['target']['sourcePath'],'status':r['status'],'reason':r['reason'],'exactHitCount':len(r['exactHits'])} for r in expected['results']],
+        'canaryResultSha256':expected['canaryResultSha256'],
+        'semanticReopen':False
+    }, ensure_ascii=False, indent=2))
     if expected['status'] == 'BLOCKER':
         raise SystemExit(2)
 
