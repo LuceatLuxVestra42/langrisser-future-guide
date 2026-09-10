@@ -1,4 +1,4 @@
-name: F3 Extract Leon Heart Fetter Skills
+name: F3 Extract Leon Heart Fetter Passive Buffs
 
 on:
   workflow_dispatch:
@@ -24,13 +24,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Leon Heart Fetter skill records
+      - name: Discover and extract Leon Heart Fetter passive buff records
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
+          const path = require('path');
           const {
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
@@ -43,7 +44,7 @@ jobs:
             const hits = [];
             for (let i = 0; i < records.length; i++) {
               const record = records[i];
-              if (record && typeof record === 'object' && record.ID === id) {
+              if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) {
                 hits.push({ recordIndex: i, record });
               }
             }
@@ -71,36 +72,85 @@ jobs:
           if (JSON.stringify(leonHeart.record.HeroHeartFetterSkills) !== JSON.stringify(expectedSkillIds)) {
             throw new Error(`Leon HeroHeartFetterSkills mismatch: ${JSON.stringify(leonHeart.record.HeroHeartFetterSkills)}`);
           }
-          if (leonHeart.record.MaxLevel !== 10) {
-            throw new Error(`Leon HeartFetter MaxLevel mismatch: ${leonHeart.record.MaxLevel}`);
-          }
 
           const skillRecords = load('ConfigDataSkillInfo.json');
-          const hits = expectedSkillIds.map((id) => uniqueById(skillRecords, id, 'ConfigDataSkillInfo'));
+          const skills = expectedSkillIds.map((id) => uniqueById(skillRecords, id, 'ConfigDataSkillInfo'));
+          const passiveIds = skills.map(({ record }) => {
+            if (!Array.isArray(record.PassiveBuffs_ID) || record.PassiveBuffs_ID.length !== 1 || record.PassiveBuffs_ID[0] !== record.ID) {
+              throw new Error(`Skill ${record.ID}: expected PassiveBuffs_ID=[${record.ID}], got ${JSON.stringify(record.PassiveBuffs_ID)}`);
+            }
+            return record.PassiveBuffs_ID[0];
+          });
 
-          console.log('=== F3_LEON_HEART_FETTER_SKILL_META_START ===');
+          const sourceDir = path.dirname(resolveConfigDataFile('ConfigDataHeroInfo.json'));
+          const jsonFiles = fs.readdirSync(sourceDir).filter((name) => name.endsWith('.json')).sort();
+          const candidates = [];
+
+          for (const file of jsonFiles) {
+            if (file === 'ConfigDataSkillInfo.json') continue;
+            let records;
+            try {
+              records = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8'));
+            } catch {
+              continue;
+            }
+            if (!Array.isArray(records)) continue;
+
+            const byId = new Map();
+            for (let i = 0; i < records.length; i++) {
+              const record = records[i];
+              if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+              if (!passiveIds.includes(record.ID)) continue;
+              if (!byId.has(record.ID)) byId.set(record.ID, []);
+              byId.get(record.ID).push({ recordIndex: i, record });
+            }
+
+            const complete = passiveIds.every((id) => byId.has(id) && byId.get(id).length === 1);
+            if (!complete) continue;
+            candidates.push({
+              file,
+              hits: passiveIds.map((id) => byId.get(id)[0]),
+            });
+          }
+
+          console.log('=== F3_LEON_PASSIVE_BUFF_TARGET_CANDIDATES_START ===');
+          console.log(JSON.stringify(candidates.map((candidate) => ({
+            file: candidate.file,
+            targets: candidate.hits.map((hit) => ({
+              ID: hit.record.ID,
+              recordIndex: hit.recordIndex,
+              keys: Object.keys(hit.record),
+            })),
+          })), null, 2));
+          console.log('=== F3_LEON_PASSIVE_BUFF_TARGET_CANDIDATES_END ===');
+
+          if (candidates.length !== 1) {
+            throw new Error(`Expected exactly one non-Skill ConfigData table containing all passive IDs; found ${candidates.length}`);
+          }
+
+          const target = candidates[0];
+          console.log('=== F3_LEON_PASSIVE_BUFF_META_START ===');
           console.log(JSON.stringify({
-            sourceFile: 'ConfigDataHeroHeartFetterInfo.json',
-            sourceRecordIndex: leonHeart.recordIndex,
-            sourceID: leonHeart.record.ID,
-            sourceField: 'HeroHeartFetterSkills',
-            sourceValues: expectedSkillIds,
-            targetFile: 'ConfigDataSkillInfo.json',
+            sourceFile: 'ConfigDataSkillInfo.json',
+            sourceField: 'PassiveBuffs_ID',
+            sourceSkillIds: expectedSkillIds,
+            passiveBuffIds: passiveIds,
+            targetFile: target.file,
             targetKey: 'ID',
-            targets: hits.map((hit, index) => ({
+            targets: target.hits.map((hit, index) => ({
               heartFetterLevel: index + 1,
               targetID: hit.record.ID,
               targetRecordIndex: hit.recordIndex,
             })),
           }, null, 2));
-          console.log('=== F3_LEON_HEART_FETTER_SKILL_META_END ===');
+          console.log('=== F3_LEON_PASSIVE_BUFF_META_END ===');
 
-          for (let i = 0; i < hits.length; i++) {
-            const hit = hits[i];
+          for (let i = 0; i < target.hits.length; i++) {
+            const hit = target.hits[i];
             const level = i + 1;
-            console.log(`=== F3_LEON_HEART_FETTER_LV${level}_SKILL_${hit.record.ID}_START ===`);
+            console.log(`=== F3_LEON_PASSIVE_BUFF_LV${level}_${hit.record.ID}_START ===`);
             console.log(JSON.stringify(hit.record, null, 2));
-            console.log(`=== F3_LEON_HEART_FETTER_LV${level}_SKILL_${hit.record.ID}_END ===`);
+            console.log(`=== F3_LEON_PASSIVE_BUFF_LV${level}_${hit.record.ID}_END ===`);
           }
           NODE
 
