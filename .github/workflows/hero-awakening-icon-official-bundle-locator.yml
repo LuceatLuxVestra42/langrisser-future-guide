@@ -1,0 +1,37 @@
+name: Hero Awakening Icon Official Bundle Locator
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-4-bundle-locator-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-bundle-locator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a6-4-bundle-locator-20260910
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan ZIP central directories and freeze bundle locator
+        run: python scripts/freeze-hero-awakening-icon-official-bundle-locator.py --write
+      - name: Commit frozen bundle locator when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-official-bundle-locator.v1.json
+          if git diff --cached --quiet; then
+            echo 'Frozen bundle locator already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze official bundle locator'
+          git push origin HEAD:work/awakening-skill-icon-a6-4-bundle-locator-20260910
