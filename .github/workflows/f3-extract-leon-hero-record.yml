@@ -1,4 +1,4 @@
-name: F3 Extract JobConnection ID 60 Record
+name: F3 Extract JobConnection IDs 61-65 Records
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract JobConnection ID 60 record
+      - name: Extract JobConnection IDs 61-65 records
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -37,22 +37,38 @@ jobs:
 
           const sourcePath = resolveConfigDataFile('ConfigDataJobConnectionInfo.json');
           const records = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
-          const recordIndex = 35;
-          const record = records[recordIndex];
+          const targets = [
+            { ID: 61, recordIndex: 36 },
+            { ID: 62, recordIndex: 37 },
+            { ID: 63, recordIndex: 38 },
+            { ID: 64, recordIndex: 39 },
+            { ID: 65, recordIndex: 40 },
+          ];
 
-          if (!record) {
-            throw new Error(`recordIndex ${recordIndex} missing`);
-          }
-          if (record.ID !== 60) {
-            throw new Error(`identity mismatch: expected ID 60, got ${record.ID}`);
+          for (const target of targets) {
+            const record = records[target.recordIndex];
+            if (!record) {
+              throw new Error(`recordIndex ${target.recordIndex} missing for ID ${target.ID}`);
+            }
+            if (record.ID !== target.ID) {
+              throw new Error(`identity mismatch at recordIndex ${target.recordIndex}: expected ID ${target.ID}, got ${record.ID}`);
+            }
           }
 
-          console.log('=== F3_JOBCONNECTION_60_META_START ===');
-          console.log(JSON.stringify({ file: 'ConfigDataJobConnectionInfo.json', recordIndex, ID: record.ID }, null, 2));
-          console.log('=== F3_JOBCONNECTION_60_META_END ===');
-          console.log('=== F3_JOBCONNECTION_60_RECORD_START ===');
-          console.log(JSON.stringify(record, null, 2));
-          console.log('=== F3_JOBCONNECTION_60_RECORD_END ===');
+          console.log('=== F3_JOBCONNECTION_61_65_META_START ===');
+          console.log(JSON.stringify(targets.map((target) => ({
+            file: 'ConfigDataJobConnectionInfo.json',
+            recordIndex: target.recordIndex,
+            ID: target.ID,
+          })), null, 2));
+          console.log('=== F3_JOBCONNECTION_61_65_META_END ===');
+
+          for (const target of targets) {
+            const record = records[target.recordIndex];
+            console.log(`=== F3_JOBCONNECTION_${target.ID}_RECORD_START ===`);
+            console.log(JSON.stringify(record, null, 2));
+            console.log(`=== F3_JOBCONNECTION_${target.ID}_RECORD_END ===`);
+          }
           NODE
 
       - name: Verify repository unchanged
