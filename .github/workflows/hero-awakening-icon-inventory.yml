@@ -1,0 +1,28 @@
+name: Hero Awakening Icon Inventory
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hero-awakening-icon-inventory.yml'
+      - 'scripts/validate-hero-awakening-icon-inventory-readonly.mjs'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'public/images/heroes/skill-icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  awakening-icon-inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate frozen awakening icon inventory
+        run: node scripts/validate-hero-awakening-icon-inventory-readonly.mjs
