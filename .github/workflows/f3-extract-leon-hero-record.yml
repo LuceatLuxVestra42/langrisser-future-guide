@@ -1,4 +1,4 @@
-name: F3 Extract JobConnection IDs 61-65 Records
+name: F3 Extract Skill ID 90085 Record
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract JobConnection IDs 61-65 records
+      - name: Extract Skill ID 90085 record
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -35,40 +35,36 @@ jobs:
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const sourcePath = resolveConfigDataFile('ConfigDataJobConnectionInfo.json');
+          const sourcePath = resolveConfigDataFile('ConfigDataSkillInfo.json');
           const records = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
-          const targets = [
-            { ID: 61, recordIndex: 36 },
-            { ID: 62, recordIndex: 37 },
-            { ID: 63, recordIndex: 38 },
-            { ID: 64, recordIndex: 39 },
-            { ID: 65, recordIndex: 40 },
-          ];
+          const matches = [];
 
-          for (const target of targets) {
-            const record = records[target.recordIndex];
-            if (!record) {
-              throw new Error(`recordIndex ${target.recordIndex} missing for ID ${target.ID}`);
-            }
-            if (record.ID !== target.ID) {
-              throw new Error(`identity mismatch at recordIndex ${target.recordIndex}: expected ID ${target.ID}, got ${record.ID}`);
+          for (let i = 0; i < records.length; i++) {
+            const record = records[i];
+            if (record && typeof record === 'object' && record.ID === 90085) {
+              matches.push({ recordIndex: i, record });
             }
           }
 
-          console.log('=== F3_JOBCONNECTION_61_65_META_START ===');
-          console.log(JSON.stringify(targets.map((target) => ({
-            file: 'ConfigDataJobConnectionInfo.json',
-            recordIndex: target.recordIndex,
-            ID: target.ID,
-          })), null, 2));
-          console.log('=== F3_JOBCONNECTION_61_65_META_END ===');
-
-          for (const target of targets) {
-            const record = records[target.recordIndex];
-            console.log(`=== F3_JOBCONNECTION_${target.ID}_RECORD_START ===`);
-            console.log(JSON.stringify(record, null, 2));
-            console.log(`=== F3_JOBCONNECTION_${target.ID}_RECORD_END ===`);
+          if (matches.length !== 1) {
+            throw new Error(`expected exactly one Skill record with ID 90085; found ${matches.length}`);
           }
+
+          const hit = matches[0];
+          if (hit.record.ID !== 90085) {
+            throw new Error(`identity mismatch: expected ID 90085, got ${hit.record.ID}`);
+          }
+
+          console.log('=== F3_SKILL_90085_META_START ===');
+          console.log(JSON.stringify({
+            file: 'ConfigDataSkillInfo.json',
+            recordIndex: hit.recordIndex,
+            ID: hit.record.ID,
+          }, null, 2));
+          console.log('=== F3_SKILL_90085_META_END ===');
+          console.log('=== F3_SKILL_90085_RECORD_START ===');
+          console.log(JSON.stringify(hit.record, null, 2));
+          console.log('=== F3_SKILL_90085_RECORD_END ===');
           NODE
 
       - name: Verify repository unchanged
