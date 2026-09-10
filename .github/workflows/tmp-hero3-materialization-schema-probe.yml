@@ -14,38 +14,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect frozen Stage5 MAX selection and ConfigData skill schema
+        with:
+          ref: 6475e63ee23d18adf733756c26a14fa9e3ed662c
+      - name: Locate exact ConfigData owner for PassiveBuff IDs
         run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const path = require('path');
-          const read = p => JSON.parse(fs.readFileSync(p, 'utf8'));
-          const records = p => { const x=read(p); return Array.isArray(x)?x:(Array.isArray(x.records)?x.records:[]); };
-          const bonds = read('data/generated/hero-page-stage5-1-bonds-final.v1.json');
-          const heroes = Array.isArray(bonds) ? bonds : (bonds.heroes || bonds.records || []);
-          const leon = heroes.find(h => Number(h.heroId) === 6);
-          if (!leon) throw new Error('Leon heroId=6 missing from frozen Stage5 output');
-          const selected = leon.bonds.map(b => ({
-            fetterId: Number(b.fetterId),
-            maxLevel: Number(b.maxLevel),
-            gotSkillIds: b.gotSkillIds,
-            selectedAtMax: Array.isArray(b.gotSkillIds) ? b.gotSkillIds[Number(b.maxLevel)-1] : null,
-          }));
-          console.log('LEON_MAX_SELECTION=' + JSON.stringify(selected));
-          const cfgDir='data/configdata';
-          const files=fs.readdirSync(cfgDir).filter(f=>/Skill|Buff|Property|Fetter/i.test(f)).sort();
-          console.log('RELATED_FILES=' + JSON.stringify(files));
-          const skillPath=path.join(cfgDir,'ConfigDataSkillInfo.json');
-          const skills=records(skillPath);
-          const ids=new Set(selected.map(x=>Number(x.selectedAtMax)).filter(Number.isFinite));
-          for (const row of skills.filter(r=>ids.has(Number(r.ID)))) {
-            console.log('SELECTED_SKILL_ROW=' + JSON.stringify(row));
-          }
-          for (const f of files) {
-            if (!/Passive|Buff|Property/i.test(f)) continue;
-            const p=path.join(cfgDir,f);
-            let rs=[];
-            try { rs=records(p); } catch { continue; }
-            console.log('SCHEMA_FILE=' + f + ';COUNT=' + rs.length + ';KEYS=' + JSON.stringify(Object.keys(rs[0]||{})));
-          }
-          NODE
+          python3 <<'PY'
+          import glob, json, os
+
+          TARGETS = {5111, 5181}
+          hits = []
+
+          def walk(node, path='$'):
+              if isinstance(node, dict):
+                  if node.get('ID') in TARGETS:
+                      hits.append((current_file, path, node))
+                  for k, v in node.items():
+                      walk(v, f'{path}.{k}')
+              elif isinstance(node, list):
+                  for i, v in enumerate(node):
+                      walk(v, f'{path}[{i}]')
+
+          for current_file in sorted(glob.glob('data/configdata/*.json')):
+              try:
+                  with open(current_file, encoding='utf-8') as f:
+                      data = json.load(f)
+              except Exception:
+                  continue
+              walk(data)
+
+          print('TARGET_IDS=' + json.dumps(sorted(TARGETS)))
+          print('DIRECT_ID_HIT_COUNT=' + str(len(hits)))
+          for filename, jpath, row in hits:
+              print('DIRECT_ID_HIT=' + json.dumps({
+                  'file': filename,
+                  'jsonPath': jpath,
+                  'record': row,
+              }, ensure_ascii=False, separators=(',', ':')))
+
+          found = {int(row['ID']) for _, _, row in hits if isinstance(row.get('ID'), int)}
+          missing = sorted(TARGETS - found)
+          print('MISSING_TARGET_IDS=' + json.dumps(missing))
+          if missing:
+              raise SystemExit('Target IDs not found as explicit ID records: ' + repr(missing))
+          PY
