@@ -1,0 +1,46 @@
+name: Hero Awakening Icon Manifest Admission
+
+on:
+  pull_request:
+    branches:
+      - work/awakening-skill-icon-a7-1-materialize-20260910
+      - main
+    paths:
+      - data/generated/hero-skill-icon-assets.v1.json
+      - data/generated/hero-awakening-icon-materialization.v1.json
+      - data/generated/hero-awakening-icon-verification-provenance.v1.json
+      - scripts/admit-hero-awakening-icon-manifest.py
+      - scripts/validate-hero-skill-icon-assets-readonly.mjs
+      - .github/workflows/hero-awakening-icon-manifest-admission.yml
+  push:
+    branches:
+      - work/awakening-skill-icon-a7-2-manifest-admission-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-manifest-admission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record worktree state before validation
+        shell: bash
+        run: git status --porcelain=v1 --untracked-files=all > /tmp/a7-2-before.txt
+      - name: Validate frozen A7-2 manifest admission read-only
+        run: python scripts/admit-hero-awakening-icon-manifest.py
+      - name: Validate legacy Hero 6 manifest contract
+        run: node scripts/validate-hero-skill-icon-assets-readonly.mjs
+      - name: Require no repository mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain=v1 --untracked-files=all > /tmp/a7-2-after.txt
+          diff -u /tmp/a7-2-before.txt /tmp/a7-2-after.txt
