@@ -1,9 +1,17 @@
 import manifest from "../../data/generated/hero-skill-icon-assets.v1.json";
 
-type ManifestRecord = (typeof manifest.records)[number];
+type ManifestAssetRecord = {
+  sourcePath: string;
+  publicPath: string;
+};
 
-const bySourcePath = new Map<string, ManifestRecord>(
-  manifest.records.map((record) => [record.sourcePath, record]),
+const admittedRecords: ManifestAssetRecord[] = [
+  ...manifest.records,
+  ...manifest.awakeningRecords,
+];
+
+const bySourcePath = new Map<string, ManifestAssetRecord>(
+  admittedRecords.map((record) => [record.sourcePath, record]),
 );
 
 function resolvePublicAssetUrl(publicPath: string) {
@@ -13,8 +21,8 @@ function resolvePublicAssetUrl(publicPath: string) {
   return `${basePrefix}${normalizedPath}`;
 }
 
-export function getHeroSkillIconUrl(heroId: number, sourcePath: string | null | undefined) {
-  if (heroId !== manifest.scope.heroId || !sourcePath) return null;
+export function getHeroSkillIconUrl(_heroId: number, sourcePath: string | null | undefined) {
+  if (!sourcePath) return null;
   const record = bySourcePath.get(sourcePath);
   if (!record) return null;
   return resolvePublicAssetUrl(record.publicPath);
