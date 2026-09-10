@@ -20,6 +20,7 @@ const sha256Bytes = (buf) => crypto.createHash('sha256').update(buf).digest('hex
 const compactSha = (value) => sha256Bytes(Buffer.from(JSON.stringify(value)));
 const fileSha = (relative) => sha256Bytes(fs.readFileSync(path.join(repoRoot, relative)));
 const publicToFs = (publicPath) => path.join('public', publicPath.replace(/^\//, ''));
+const sourcePathOrder = (a, b) => a.sourcePath < b.sourcePath ? -1 : a.sourcePath > b.sourcePath ? 1 : 0;
 
 const manifest = readJson(MANIFEST_PATH);
 const materialization = readJson(MATERIALIZATION_PATH);
@@ -96,7 +97,7 @@ if (missingCount || hashMismatchCount || sizeMismatchCount || materializationMis
   fail(`asset parity failure missing=${missingCount} hash=${hashMismatchCount} size=${sizeMismatchCount} materialization=${materializationMismatchCount}`);
 }
 
-validationRows.sort((a, b) => a.sourcePath.localeCompare(b.sourcePath, 'en'));
+validationRows.sort(sourcePathOrder);
 const awakeningMap = validationRows.map(({sourcePath, publicPath, pngSha256}) => ({sourcePath, publicPath, pngSha256}));
 const awakeningMapSha256 = compactSha(awakeningMap);
 if (awakeningMapSha256 !== EXPECTED_AWAKENING_MAP_SHA) fail(`manifest awakening map hash mismatch ${awakeningMapSha256}`);
