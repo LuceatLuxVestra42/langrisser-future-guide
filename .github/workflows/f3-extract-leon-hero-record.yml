@@ -1,4 +1,4 @@
-name: F3 Discover HeroID 6 Reverse References
+name: F3 Extract Leon Fetter Target Records
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  discover:
+  extract:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,79 +24,99 @@ jobs:
         with:
           node-version: 22
 
-      - name: Discover explicit HeroID 6 reverse references
+      - name: Extract Leon HeroInformation and Fetter targets
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const path = require('path');
           const {
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const sourceDir = path.dirname(resolveConfigDataFile('ConfigDataHeroInfo.json'));
-          const files = fs.readdirSync(sourceDir).filter((name) => name.endsWith('.json')).sort();
-          const semanticNameRx = /(fetter|bond|heart|favor|affection|intimacy|friend|relation)/i;
-          const semanticFiles = [];
-          const heroIdRefs = [];
-
-          const valueContainsSix = (value) => value === 6 || (Array.isArray(value) && value.includes(6));
-          const isHeroIdField = (key) => {
-            const normalized = key.replace(/[^A-Za-z0-9]/g, '');
-            return /hero/i.test(normalized) && /ids?$/i.test(normalized);
-          };
-
-          for (const file of files) {
-            const fullPath = path.join(sourceDir, file);
-            let data;
-            try {
-              data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
-            } catch {
-              continue;
-            }
-            if (!Array.isArray(data)) continue;
-
-            if (semanticNameRx.test(file)) {
-              const first = data.find((record) => record && typeof record === 'object' && !Array.isArray(record));
-              semanticFiles.push({
-                file,
-                recordCount: data.length,
-                sampleKeys: first ? Object.keys(first) : [],
-              });
-            }
-
-            for (let recordIndex = 0; recordIndex < data.length; recordIndex++) {
-              const record = data[recordIndex];
-              if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
-
-              for (const [field, value] of Object.entries(record)) {
-                if (!isHeroIdField(field) || !valueContainsSix(value)) continue;
-                heroIdRefs.push({
-                  file,
-                  recordIndex,
-                  recordID: Object.prototype.hasOwnProperty.call(record, 'ID') ? record.ID : null,
-                  recordName: Object.prototype.hasOwnProperty.call(record, 'Name') ? record.Name : null,
-                  field,
-                  value,
-                  keys: Object.keys(record),
-                });
-              }
-            }
+          function load(name) {
+            return JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
           }
 
-          console.log('=== F3_SEMANTIC_FILENAME_CANDIDATES_START ===');
-          console.log(JSON.stringify(semanticFiles, null, 2));
-          console.log('=== F3_SEMANTIC_FILENAME_CANDIDATES_END ===');
-          console.log('=== F3_HEROID6_EXPLICIT_REVERSE_REFS_START ===');
-          console.log(JSON.stringify(heroIdRefs, null, 2));
-          console.log('=== F3_HEROID6_EXPLICIT_REVERSE_REFS_END ===');
+          function uniqueById(records, id, label) {
+            const hits = [];
+            for (let i = 0; i < records.length; i++) {
+              const record = records[i];
+              if (record && typeof record === 'object' && record.ID === id) {
+                hits.push({ recordIndex: i, record });
+              }
+            }
+            if (hits.length !== 1) {
+              throw new Error(`${label}: expected exactly one ID ${id}; found ${hits.length}`);
+            }
+            return hits[0];
+          }
+
+          const heroInfoRecords = load('ConfigDataHeroInfo.json');
+          const leonHero = uniqueById(heroInfoRecords, 6, 'ConfigDataHeroInfo');
+          if (leonHero.record.HeroInformation_ID !== 6) {
+            throw new Error(`Leon HeroInformation_ID mismatch: ${leonHero.record.HeroInformation_ID}`);
+          }
+
+          const informationRecords = load('ConfigDataHeroInformationInfo.json');
+          const leonInfo = uniqueById(informationRecords, leonHero.record.HeroInformation_ID, 'ConfigDataHeroInformationInfo');
+          if (leonInfo.record.Name !== '利昂') {
+            throw new Error(`Leon information identity mismatch: ${leonInfo.record.Name}`);
+          }
+          if (!Array.isArray(leonInfo.record.HeroFetters_ID)) {
+            throw new Error('Leon HeroFetters_ID is not an array');
+          }
+          if (!Number.isInteger(leonInfo.record.HeroHeartFetterId)) {
+            throw new Error(`Leon HeroHeartFetterId is not an integer: ${leonInfo.record.HeroHeartFetterId}`);
+          }
+
+          console.log('=== F3_LEON_HERO_INFORMATION_META_START ===');
           console.log(JSON.stringify({
-            scannedJsonFiles: files.length,
-            semanticFilenameCandidateCount: semanticFiles.length,
-            explicitHeroId6ReferenceCount: heroIdRefs.length,
+            sourceHeroRecordIndex: leonHero.recordIndex,
+            HeroInformation_ID: leonHero.record.HeroInformation_ID,
+            targetFile: 'ConfigDataHeroInformationInfo.json',
+            targetRecordIndex: leonInfo.recordIndex,
+            targetID: leonInfo.record.ID,
+            HeroFetters_ID: leonInfo.record.HeroFetters_ID,
+            HeroHeartFetterId: leonInfo.record.HeroHeartFetterId,
           }, null, 2));
+          console.log('=== F3_LEON_HERO_INFORMATION_META_END ===');
+          console.log('=== F3_LEON_HERO_INFORMATION_RECORD_START ===');
+          console.log(JSON.stringify(leonInfo.record, null, 2));
+          console.log('=== F3_LEON_HERO_INFORMATION_RECORD_END ===');
+
+          const heartRecords = load('ConfigDataHeroHeartFetterInfo.json');
+          const heart = uniqueById(heartRecords, leonInfo.record.HeroHeartFetterId, 'ConfigDataHeroHeartFetterInfo');
+          console.log('=== F3_LEON_HEART_FETTER_META_START ===');
+          console.log(JSON.stringify({
+            sourceField: 'HeroHeartFetterId',
+            sourceValue: leonInfo.record.HeroHeartFetterId,
+            targetFile: 'ConfigDataHeroHeartFetterInfo.json',
+            targetRecordIndex: heart.recordIndex,
+            targetID: heart.record.ID,
+          }, null, 2));
+          console.log('=== F3_LEON_HEART_FETTER_META_END ===');
+          console.log('=== F3_LEON_HEART_FETTER_RECORD_START ===');
+          console.log(JSON.stringify(heart.record, null, 2));
+          console.log('=== F3_LEON_HEART_FETTER_RECORD_END ===');
+
+          const fetterRecords = load('ConfigDataHeroFetterInfo.json');
+          const fetters = leonInfo.record.HeroFetters_ID.map((id) => uniqueById(fetterRecords, id, 'ConfigDataHeroFetterInfo'));
+          console.log('=== F3_LEON_FETTER_META_START ===');
+          console.log(JSON.stringify(fetters.map((hit, i) => ({
+            sourceField: 'HeroFetters_ID',
+            sourceValue: leonInfo.record.HeroFetters_ID[i],
+            targetFile: 'ConfigDataHeroFetterInfo.json',
+            targetRecordIndex: hit.recordIndex,
+            targetID: hit.record.ID,
+          })), null, 2));
+          console.log('=== F3_LEON_FETTER_META_END ===');
+          for (const hit of fetters) {
+            console.log(`=== F3_LEON_FETTER_${hit.record.ID}_RECORD_START ===`);
+            console.log(JSON.stringify(hit.record, null, 2));
+            console.log(`=== F3_LEON_FETTER_${hit.record.ID}_RECORD_END ===`);
+          }
           NODE
 
       - name: Verify repository unchanged
