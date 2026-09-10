@@ -1,0 +1,43 @@
+name: Hero Awakening Icon Source Snapshot Gap
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-7-source-gap-20260910
+  pull_request:
+    branches:
+      - main
+      - work/awakening-skill-icon-a6-6-bulk-verify-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-source-snapshot-gap.yml'
+      - 'scripts/freeze-hero-awakening-icon-source-snapshot-gap.py'
+      - 'scripts/verify-hero-awakening-icon-official.py'
+      - 'data/generated/hero-awakening-icon-source-snapshot-gap.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bulk-verification.v1.json'
+      - 'data/generated/hero-awakening-icon-official-package-inventory.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bundle-locator.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-source-gap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate frozen exhaustive A6-7 result read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          before="$(git status --porcelain=v1 --untracked-files=all)"
+          python scripts/verify-hero-awakening-icon-official.py --contract-check
+          python scripts/freeze-hero-awakening-icon-source-snapshot-gap.py --validate-frozen-only
+          after="$(git status --porcelain=v1 --untracked-files=all)"
+          test "$before" = "$after"
