@@ -131,6 +131,7 @@ def build():
         else:
             raise RuntimeError(f'unresolved A6-6 status for {path}: {row.get("status")}')
         records.append(base)
+    records.sort(key=lambda row: row['sourcePath'])
     paths = [r['sourcePath'] for r in records]
     if len(records) != EXPECTED_TARGET_COUNT or len(set(paths)) != EXPECTED_TARGET_COUNT or paths != sorted(paths):
         raise RuntimeError('A6-9 record population/order mismatch')
