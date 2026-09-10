@@ -287,22 +287,38 @@ def validate_frozen_only():
     if frozen.get('schemaId') != 'hero-awakening-icon-source-snapshot-gap/v1' or frozen.get('completion') != 'COMPLETE' or frozen.get('status') != 'PASS' or frozen.get('semanticReopen') is not False:
         raise RuntimeError('A6-7 frozen status contract mismatch')
     summary = frozen.get('summary', {})
-    expected_summary = {
-        'reviewInputCount': 3,
-        'packageScanCount': EXPECTED_PACKAGE_COUNT,
-        'bundleScanCount': EXPECTED_BUNDLE_COUNT,
-        'verifiedCount': 0,
-        'notInSourceSnapshotCount': 3,
-        'blockerCount': 0,
-        'scanErrorCount': 0,
-    }
-    if summary != expected_summary:
-        raise RuntimeError(f'A6-7 frozen summary mismatch: {summary}')
+    if summary.get('reviewInputCount') != len(REVIEW_PATHS) or summary.get('packageScanCount') != EXPECTED_PACKAGE_COUNT or summary.get('bundleScanCount') != EXPECTED_BUNDLE_COUNT:
+        raise RuntimeError(f'A6-7 frozen coverage summary mismatch: {summary}')
+    if summary.get('blockerCount') != 0 or summary.get('scanErrorCount') != 0:
+        raise RuntimeError(f'A6-7 frozen result contains blocker/scan gap: {summary}')
+    if summary.get('verifiedCount', 0) + summary.get('notInSourceSnapshotCount', 0) != len(REVIEW_PATHS):
+        raise RuntimeError(f'A6-7 frozen classification count mismatch: {summary}')
     results = frozen.get('results', [])
     if [r.get('sourcePath') for r in results] != REVIEW_PATHS:
         raise RuntimeError('A6-7 frozen path order mismatch')
-    if any(r.get('status') != 'NOT_IN_SOURCE_SNAPSHOT' or r.get('exactHits') for r in results):
-        raise RuntimeError('A6-7 frozen classification mismatch')
+    verified_count = 0
+    not_in_count = 0
+    for row in results:
+        status = row.get('status')
+        exact_hits = row.get('exactHits', [])
+        if status == 'VERIFIED':
+            verified_count += 1
+            if row.get('reason') is not None or not exact_hits:
+                raise RuntimeError(f'A6-7 invalid VERIFIED row: {row.get("sourcePath")}')
+            sprite_hits = [h for h in exact_hits if h.get('objectType') == 'Sprite']
+            if not sprite_hits or any(h.get('nonEmptyAlpha') is not True for h in sprite_hits):
+                raise RuntimeError(f'A6-7 VERIFIED row lacks valid Sprite proof: {row.get("sourcePath")}')
+            render_keys = {(h.get('width'), h.get('height'), h.get('rgbaSha256')) for h in sprite_hits}
+            if len(render_keys) != 1:
+                raise RuntimeError(f'A6-7 VERIFIED row has non-equivalent Sprite proofs: {row.get("sourcePath")}')
+        elif status == 'NOT_IN_SOURCE_SNAPSHOT':
+            not_in_count += 1
+            if exact_hits or row.get('reason') != 'NO_EXACT_RUNTIME_PATH_HIT_AFTER_EXHAUSTIVE_ALL_BUNDLES':
+                raise RuntimeError(f'A6-7 invalid NOT_IN_SOURCE_SNAPSHOT row: {row.get("sourcePath")}')
+        else:
+            raise RuntimeError(f'A6-7 unexpected frozen classification: {status}')
+    if verified_count != summary.get('verifiedCount') or not_in_count != summary.get('notInSourceSnapshotCount'):
+        raise RuntimeError('A6-7 frozen summary/result classification mismatch')
     if frozen.get('scanErrors') != []:
         raise RuntimeError('A6-7 frozen scan errors must be empty')
     if frozen.get('gapResultSha256') != compact_sha(results):
