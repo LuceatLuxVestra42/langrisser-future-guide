@@ -1,0 +1,34 @@
+name: Hero Central Bond Stage5 Stat Effect
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/lib/hero-central-bond-stat-effect.cjs
+      - scripts/validate_hero_central_bond_stat_effect_stage5.cjs
+      - data/contracts/hero-central-bond-stat-effect-stage5.v1.json
+      - .github/workflows/hero-central-bond-stage5-stat-effect.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate central-bond stat effect
+        run: node scripts/validate_hero_central_bond_stat_effect_stage5.cjs
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
