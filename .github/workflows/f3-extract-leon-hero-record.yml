@@ -1,4 +1,4 @@
-name: F3 Extract Leon Fetter Target Records
+name: F3 Extract Leon Heart Fetter Skills
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Leon HeroInformation and Fetter targets
+      - name: Extract Leon Heart Fetter skill records
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -53,69 +53,54 @@ jobs:
             return hits[0];
           }
 
-          const heroInfoRecords = load('ConfigDataHeroInfo.json');
-          const leonHero = uniqueById(heroInfoRecords, 6, 'ConfigDataHeroInfo');
+          const heroRecords = load('ConfigDataHeroInfo.json');
+          const leonHero = uniqueById(heroRecords, 6, 'ConfigDataHeroInfo');
           if (leonHero.record.HeroInformation_ID !== 6) {
             throw new Error(`Leon HeroInformation_ID mismatch: ${leonHero.record.HeroInformation_ID}`);
           }
 
           const informationRecords = load('ConfigDataHeroInformationInfo.json');
-          const leonInfo = uniqueById(informationRecords, leonHero.record.HeroInformation_ID, 'ConfigDataHeroInformationInfo');
-          if (leonInfo.record.Name !== '利昂') {
-            throw new Error(`Leon information identity mismatch: ${leonInfo.record.Name}`);
+          const leonInfo = uniqueById(informationRecords, 6, 'ConfigDataHeroInformationInfo');
+          if (leonInfo.record.Name !== '利昂' || leonInfo.record.HeroHeartFetterId !== 6) {
+            throw new Error('Leon HeroInformation identity / HeroHeartFetterId mismatch');
           }
-          if (!Array.isArray(leonInfo.record.HeroFetters_ID)) {
-            throw new Error('Leon HeroFetters_ID is not an array');
-          }
-          if (!Number.isInteger(leonInfo.record.HeroHeartFetterId)) {
-            throw new Error(`Leon HeroHeartFetterId is not an integer: ${leonInfo.record.HeroHeartFetterId}`);
-          }
-
-          console.log('=== F3_LEON_HERO_INFORMATION_META_START ===');
-          console.log(JSON.stringify({
-            sourceHeroRecordIndex: leonHero.recordIndex,
-            HeroInformation_ID: leonHero.record.HeroInformation_ID,
-            targetFile: 'ConfigDataHeroInformationInfo.json',
-            targetRecordIndex: leonInfo.recordIndex,
-            targetID: leonInfo.record.ID,
-            HeroFetters_ID: leonInfo.record.HeroFetters_ID,
-            HeroHeartFetterId: leonInfo.record.HeroHeartFetterId,
-          }, null, 2));
-          console.log('=== F3_LEON_HERO_INFORMATION_META_END ===');
-          console.log('=== F3_LEON_HERO_INFORMATION_RECORD_START ===');
-          console.log(JSON.stringify(leonInfo.record, null, 2));
-          console.log('=== F3_LEON_HERO_INFORMATION_RECORD_END ===');
 
           const heartRecords = load('ConfigDataHeroHeartFetterInfo.json');
-          const heart = uniqueById(heartRecords, leonInfo.record.HeroHeartFetterId, 'ConfigDataHeroHeartFetterInfo');
-          console.log('=== F3_LEON_HEART_FETTER_META_START ===');
-          console.log(JSON.stringify({
-            sourceField: 'HeroHeartFetterId',
-            sourceValue: leonInfo.record.HeroHeartFetterId,
-            targetFile: 'ConfigDataHeroHeartFetterInfo.json',
-            targetRecordIndex: heart.recordIndex,
-            targetID: heart.record.ID,
-          }, null, 2));
-          console.log('=== F3_LEON_HEART_FETTER_META_END ===');
-          console.log('=== F3_LEON_HEART_FETTER_RECORD_START ===');
-          console.log(JSON.stringify(heart.record, null, 2));
-          console.log('=== F3_LEON_HEART_FETTER_RECORD_END ===');
+          const leonHeart = uniqueById(heartRecords, 6, 'ConfigDataHeroHeartFetterInfo');
+          const expectedSkillIds = [70343,70344,70345,70346,70347,70348,70349,70350,70351,70352];
+          if (JSON.stringify(leonHeart.record.HeroHeartFetterSkills) !== JSON.stringify(expectedSkillIds)) {
+            throw new Error(`Leon HeroHeartFetterSkills mismatch: ${JSON.stringify(leonHeart.record.HeroHeartFetterSkills)}`);
+          }
+          if (leonHeart.record.MaxLevel !== 10) {
+            throw new Error(`Leon HeartFetter MaxLevel mismatch: ${leonHeart.record.MaxLevel}`);
+          }
 
-          const fetterRecords = load('ConfigDataHeroFetterInfo.json');
-          const fetters = leonInfo.record.HeroFetters_ID.map((id) => uniqueById(fetterRecords, id, 'ConfigDataHeroFetterInfo'));
-          console.log('=== F3_LEON_FETTER_META_START ===');
-          console.log(JSON.stringify(fetters.map((hit, i) => ({
-            sourceField: 'HeroFetters_ID',
-            sourceValue: leonInfo.record.HeroFetters_ID[i],
-            targetFile: 'ConfigDataHeroFetterInfo.json',
-            targetRecordIndex: hit.recordIndex,
-            targetID: hit.record.ID,
-          })), null, 2));
-          console.log('=== F3_LEON_FETTER_META_END ===');
-          for (const hit of fetters) {
-            console.log(`=== F3_LEON_FETTER_${hit.record.ID}_RECORD_START ===`);
+          const skillRecords = load('ConfigDataSkillInfo.json');
+          const hits = expectedSkillIds.map((id) => uniqueById(skillRecords, id, 'ConfigDataSkillInfo'));
+
+          console.log('=== F3_LEON_HEART_FETTER_SKILL_META_START ===');
+          console.log(JSON.stringify({
+            sourceFile: 'ConfigDataHeroHeartFetterInfo.json',
+            sourceRecordIndex: leonHeart.recordIndex,
+            sourceID: leonHeart.record.ID,
+            sourceField: 'HeroHeartFetterSkills',
+            sourceValues: expectedSkillIds,
+            targetFile: 'ConfigDataSkillInfo.json',
+            targetKey: 'ID',
+            targets: hits.map((hit, index) => ({
+              heartFetterLevel: index + 1,
+              targetID: hit.record.ID,
+              targetRecordIndex: hit.recordIndex,
+            })),
+          }, null, 2));
+          console.log('=== F3_LEON_HEART_FETTER_SKILL_META_END ===');
+
+          for (let i = 0; i < hits.length; i++) {
+            const hit = hits[i];
+            const level = i + 1;
+            console.log(`=== F3_LEON_HEART_FETTER_LV${level}_SKILL_${hit.record.ID}_START ===`);
             console.log(JSON.stringify(hit.record, null, 2));
-            console.log(`=== F3_LEON_FETTER_${hit.record.ID}_RECORD_END ===`);
+            console.log(`=== F3_LEON_HEART_FETTER_LV${level}_SKILL_${hit.record.ID}_END ===`);
           }
           NODE
 
