@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-correction-stage11d-final/v1",
+  "stage": "HERO_SOLDIER_CORRECTION_11D",
+  "checkpoint": "HERO_SOLDIER_CORRECTION_STAGE11D_FREEZE",
+  "status": "PASS_HERO_SOLDIER_CORRECTION_STAGE11D_FREEZE",
+  "completion": "COMPLETE",
+  "freezeState": "FINAL_FROZEN",
+  "contract": "data/contracts/hero-soldier-correction-stage11d-freeze-contract.v1.json",
+  "predecessorHead": "f207b3e3fb666548e7ee44d875c3111ba067961b",
+  "authority": {
+    "normalPipeline": "COMPLETE_REUSED",
+    "stage11B": "COMPLETE_REUSED",
+    "stage11C": "COMPLETE_REUSED",
+    "runtimeInstallVersion": "1.1.113",
+    "runtimeCalculationOwner": "BlackJack.ProjectL.Battle.BattleProperty.ComputeSoldierProperties"
+  },
+  "frozenFormula": {
+    "normal": "NormalBase + Hero3BondContribution",
+    "sp": "SPBase + Hero3BondContribution",
+    "cmdNormalizationDivisor": 100,
+    "spBondPolicy": "REUSED_UNCHANGED"
+  },
+  "fixtureChecks": {
+    "leon": {
+      "heroId": 6,
+      "normalBase": [15, 15, 0, 0],
+      "spBase": [15, 15, 0, 0],
+      "bondContribution": [25, 25, 10, 10],
+      "normalFinal": [40, 40, 10, 10],
+      "spFinal": [40, 40, 10, 10],
+      "baseClassification": "SAME_BASE_CONFIRMED",
+      "status": "PASS"
+    }
+  },
+  "runtimeChecks": {
+    "spSelectorPresent": true,
+    "spCmdOffsetsConfirmed": true,
+    "computeSoldierPropertiesOwnerConfirmed": true,
+    "hero3ModifierIndicesConfirmed": true,
+    "modifierIndexAccessConfirmed": true,
+    "spBranchReusesCommonHero3Application": true,
+    "spSpecificHero3ExclusionObserved": false,
+    "spSpecificHero3ReplacementObserved": false
+  },
+  "boundaryChecks": {
+    "nameJoinCount": 0,
+    "idArithmeticSemanticMappingCount": 0,
+    "frontendSemanticRecomputeCount": 0,
+    "rawSourceMutationCount": 0,
+    "runtimeBinaryCommitted": false
+  },
+  "reviews": [],
+  "blockers": [],
+  "hardErrorCount": 0,
+  "nextOwner": "HERO_SOLDIER_CORRECTION_PRODUCTION_CONSUMER_INTEGRATION",
+  "nextStartPoint": "Consume the frozen Stage 11D contract without recomputing Normal/SP identity, base, or bond semantics.",
+  "reopenConditions": [
+    "new authoritative runtime contradiction",
+    "relevant source snapshot change",
+    "contract or schema change",
+    "canonical or parity damage",
+    "owning validator hard failure"
+  ]
+}
