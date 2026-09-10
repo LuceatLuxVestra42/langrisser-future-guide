@@ -1,0 +1,37 @@
+name: Hero Awakening Icon Official Package Inventory
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-3-package-inventory-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-package-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a6-3-package-inventory-20260910
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan and freeze official package inventory
+        run: python scripts/freeze-hero-awakening-icon-official-package-inventory.py --write
+      - name: Commit frozen package inventory when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-official-package-inventory.v1.json
+          if git diff --cached --quiet; then
+            echo 'Frozen package inventory already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze official installer package inventory'
+          git push origin HEAD:work/awakening-skill-icon-a6-3-package-inventory-20260910
