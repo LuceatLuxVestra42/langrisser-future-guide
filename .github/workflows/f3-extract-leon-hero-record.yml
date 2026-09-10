@@ -1,4 +1,4 @@
-name: F3 Extract Leon Heart Fetter Passive Buffs
+name: F3 Inspect Leon Heart Fetter Passive Buff Candidates
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  extract:
+  inspect:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Discover and extract Leon Heart Fetter passive buff records
+      - name: Extract all complete target candidates for Leon Heart Fetter passive IDs
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -32,9 +32,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const {
-            resolveConfigDataFile,
-          } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
           function load(name) {
             return JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
@@ -48,109 +46,63 @@ jobs:
                 hits.push({ recordIndex: i, record });
               }
             }
-            if (hits.length !== 1) {
-              throw new Error(`${label}: expected exactly one ID ${id}; found ${hits.length}`);
-            }
+            if (hits.length !== 1) throw new Error(`${label}: expected one ID ${id}; found ${hits.length}`);
             return hits[0];
           }
 
-          const heroRecords = load('ConfigDataHeroInfo.json');
-          const leonHero = uniqueById(heroRecords, 6, 'ConfigDataHeroInfo');
-          if (leonHero.record.HeroInformation_ID !== 6) {
-            throw new Error(`Leon HeroInformation_ID mismatch: ${leonHero.record.HeroInformation_ID}`);
-          }
-
-          const informationRecords = load('ConfigDataHeroInformationInfo.json');
-          const leonInfo = uniqueById(informationRecords, 6, 'ConfigDataHeroInformationInfo');
-          if (leonInfo.record.Name !== '利昂' || leonInfo.record.HeroHeartFetterId !== 6) {
-            throw new Error('Leon HeroInformation identity / HeroHeartFetterId mismatch');
-          }
-
-          const heartRecords = load('ConfigDataHeroHeartFetterInfo.json');
-          const leonHeart = uniqueById(heartRecords, 6, 'ConfigDataHeroHeartFetterInfo');
-          const expectedSkillIds = [70343,70344,70345,70346,70347,70348,70349,70350,70351,70352];
-          if (JSON.stringify(leonHeart.record.HeroHeartFetterSkills) !== JSON.stringify(expectedSkillIds)) {
-            throw new Error(`Leon HeroHeartFetterSkills mismatch: ${JSON.stringify(leonHeart.record.HeroHeartFetterSkills)}`);
-          }
+          const leonHero = uniqueById(load('ConfigDataHeroInfo.json'), 6, 'HeroInfo');
+          if (leonHero.record.HeroInformation_ID !== 6) throw new Error('HeroInformation_ID mismatch');
+          const leonInfo = uniqueById(load('ConfigDataHeroInformationInfo.json'), 6, 'HeroInformationInfo');
+          if (leonInfo.record.Name !== '利昂' || leonInfo.record.HeroHeartFetterId !== 6) throw new Error('HeroInformation identity mismatch');
+          const leonHeart = uniqueById(load('ConfigDataHeroHeartFetterInfo.json'), 6, 'HeroHeartFetterInfo');
+          const skillIds = [70343,70344,70345,70346,70347,70348,70349,70350,70351,70352];
+          if (JSON.stringify(leonHeart.record.HeroHeartFetterSkills) !== JSON.stringify(skillIds)) throw new Error('Heart skill sequence mismatch');
 
           const skillRecords = load('ConfigDataSkillInfo.json');
-          const skills = expectedSkillIds.map((id) => uniqueById(skillRecords, id, 'ConfigDataSkillInfo'));
-          const passiveIds = skills.map(({ record }) => {
-            if (!Array.isArray(record.PassiveBuffs_ID) || record.PassiveBuffs_ID.length !== 1 || record.PassiveBuffs_ID[0] !== record.ID) {
-              throw new Error(`Skill ${record.ID}: expected PassiveBuffs_ID=[${record.ID}], got ${JSON.stringify(record.PassiveBuffs_ID)}`);
-            }
-            return record.PassiveBuffs_ID[0];
+          const passiveIds = skillIds.map((id) => {
+            const hit = uniqueById(skillRecords, id, 'SkillInfo');
+            const refs = hit.record.PassiveBuffs_ID;
+            if (!Array.isArray(refs) || refs.length !== 1 || refs[0] !== id) throw new Error(`PassiveBuffs_ID mismatch for ${id}`);
+            return refs[0];
           });
 
           const sourceDir = path.dirname(resolveConfigDataFile('ConfigDataHeroInfo.json'));
-          const jsonFiles = fs.readdirSync(sourceDir).filter((name) => name.endsWith('.json')).sort();
           const candidates = [];
-
-          for (const file of jsonFiles) {
+          for (const file of fs.readdirSync(sourceDir).filter((x) => x.endsWith('.json')).sort()) {
             if (file === 'ConfigDataSkillInfo.json') continue;
             let records;
-            try {
-              records = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8'));
-            } catch {
-              continue;
-            }
+            try { records = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8')); } catch { continue; }
             if (!Array.isArray(records)) continue;
-
-            const byId = new Map();
-            for (let i = 0; i < records.length; i++) {
-              const record = records[i];
-              if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
-              if (!passiveIds.includes(record.ID)) continue;
-              if (!byId.has(record.ID)) byId.set(record.ID, []);
-              byId.get(record.ID).push({ recordIndex: i, record });
+            const hits = [];
+            let complete = true;
+            for (const id of passiveIds) {
+              const found = [];
+              for (let i = 0; i < records.length; i++) {
+                const record = records[i];
+                if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) found.push({ recordIndex: i, record });
+              }
+              if (found.length !== 1) { complete = false; break; }
+              hits.push(found[0]);
             }
-
-            const complete = passiveIds.every((id) => byId.has(id) && byId.get(id).length === 1);
-            if (!complete) continue;
-            candidates.push({
-              file,
-              hits: passiveIds.map((id) => byId.get(id)[0]),
-            });
+            if (complete) candidates.push({ file, hits });
           }
 
-          console.log('=== F3_LEON_PASSIVE_BUFF_TARGET_CANDIDATES_START ===');
+          if (candidates.length < 1) throw new Error('No complete non-Skill target candidates found');
+
+          console.log('=== F3_PASSIVE_CANDIDATE_META_START ===');
           console.log(JSON.stringify(candidates.map((candidate) => ({
             file: candidate.file,
-            targets: candidate.hits.map((hit) => ({
-              ID: hit.record.ID,
-              recordIndex: hit.recordIndex,
-              keys: Object.keys(hit.record),
-            })),
+            targets: candidate.hits.map((hit) => ({ ID: hit.record.ID, recordIndex: hit.recordIndex }))
           })), null, 2));
-          console.log('=== F3_LEON_PASSIVE_BUFF_TARGET_CANDIDATES_END ===');
+          console.log('=== F3_PASSIVE_CANDIDATE_META_END ===');
 
-          if (candidates.length !== 1) {
-            throw new Error(`Expected exactly one non-Skill ConfigData table containing all passive IDs; found ${candidates.length}`);
-          }
-
-          const target = candidates[0];
-          console.log('=== F3_LEON_PASSIVE_BUFF_META_START ===');
-          console.log(JSON.stringify({
-            sourceFile: 'ConfigDataSkillInfo.json',
-            sourceField: 'PassiveBuffs_ID',
-            sourceSkillIds: expectedSkillIds,
-            passiveBuffIds: passiveIds,
-            targetFile: target.file,
-            targetKey: 'ID',
-            targets: target.hits.map((hit, index) => ({
-              heartFetterLevel: index + 1,
-              targetID: hit.record.ID,
-              targetRecordIndex: hit.recordIndex,
-            })),
-          }, null, 2));
-          console.log('=== F3_LEON_PASSIVE_BUFF_META_END ===');
-
-          for (let i = 0; i < target.hits.length; i++) {
-            const hit = target.hits[i];
-            const level = i + 1;
-            console.log(`=== F3_LEON_PASSIVE_BUFF_LV${level}_${hit.record.ID}_START ===`);
-            console.log(JSON.stringify(hit.record, null, 2));
-            console.log(`=== F3_LEON_PASSIVE_BUFF_LV${level}_${hit.record.ID}_END ===`);
+          for (const candidate of candidates) {
+            for (let i = 0; i < candidate.hits.length; i++) {
+              const hit = candidate.hits[i];
+              console.log(`=== F3_PASSIVE_CANDIDATE_${candidate.file}_LV${i + 1}_${hit.record.ID}_START ===`);
+              console.log(JSON.stringify(hit.record, null, 2));
+              console.log(`=== F3_PASSIVE_CANDIDATE_${candidate.file}_LV${i + 1}_${hit.record.ID}_END ===`);
+            }
           }
           NODE
 
