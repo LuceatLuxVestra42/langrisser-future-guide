@@ -9,11 +9,7 @@ import cardUpdate from "@/assets/card-update.jpg";
 import cardGacha from "@/assets/card-gacha.jpg";
 import cardCharacter from "@/assets/card-character.png";
 import cardEquip from "@/assets/card-equip.jpg";
-import cardSkin from "@/assets/card-skin.jpg";
 import cardMerc from "@/assets/card-merc.jpg";
-import cardEvent from "@/assets/card-event-regular.jpg";
-import cardRift from "@/assets/card-rift.jpg";
-import cardSummit from "@/assets/card-summit.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,21 +45,6 @@ const categories: Category[] = [
   { title: "영웅", image: cardCharacter, status: "LIVE", to: "/heroes" },
   { title: "장비", image: cardEquip, status: "LIVE", to: "/equipment" },
   { title: "용병", image: cardMerc, status: "LIVE", to: "/soldiers" },
-  { title: "스킨", image: cardSkin, status: "COMING_SOON" },
-  { title: "PVE 던전", image: cardRift, status: "COMING_SOON" },
-  {
-    title: "이벤트",
-    image: cardEvent,
-    status: "COMING_SOON",
-    imageClassName: "h-[116px] w-[116px] sm:h-[132px] sm:w-[132px]",
-  },
-  {
-    title: "서밋",
-    image: cardSummit,
-    status: "COMING_SOON",
-    imageClassName: "h-[116px] w-[116px] sm:h-[132px] sm:w-[132px]",
-  },
-  { title: "뉴비 가이드", status: "COMING_SOON" },
 ];
 
 function resolveCategoryHref(to: string) {
@@ -258,22 +239,6 @@ function UpdatesSection() {
   );
 }
 
-function ReportSection() {
-  return (
-    <section
-      aria-labelledby="home-report-title"
-      className="rounded-2xl border border-border bg-card px-5 py-5 text-center sm:px-6"
-    >
-      <h2 id="home-report-title" className="text-base font-semibold text-foreground sm:text-lg">
-        오탈자 · 정보 수정 제보
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        검증된 제보 접수 경로를 연결하기 전까지는 이 영역에서 외부 링크를 제공하지 않습니다.
-      </p>
-    </section>
-  );
-}
-
 function Index() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -303,10 +268,6 @@ function Index() {
             <CategoryCard key={category.title} category={category} />
           ))}
         </nav>
-
-        <div className="mt-5 sm:mt-6 lg:mt-7">
-          <ReportSection />
-        </div>
       </main>
 
       <footer className="border-t border-border bg-card">
