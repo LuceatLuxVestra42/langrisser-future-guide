@@ -1,0 +1,35 @@
+name: Temporary Stage12 producer source locate
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate structured skill/buff/property sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== generated candidates ==='
+          find data/generated data/validation data/contracts -maxdepth 2 -type f | grep -Ei 'skill|buff|passive|property|combat|fetter|bond' | sort | head -300 || true
+          echo '=== script candidates ==='
+          find scripts tools -maxdepth 4 -type f | grep -Ei 'skill|buff|passive|property|combat|fetter|bond' | sort | head -300 || true
+          echo '=== literal Hero3 references tracked ==='
+          git grep -n -E 'Hero3_(HP|AT|DF|MagicDF)CmdAdd|PropertyModifyType_Hero3' -- ':!data/configdata/**' ':!*.md' | head -200 || true
+          echo '=== skill 70000 references tracked ==='
+          git grep -n '70000' -- ':!data/configdata/**' | head -100 || true
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-stage12-producer-source-locate.yml
+          git commit -m "Remove temporary Stage12 source locate"
+          git push origin HEAD:${GITHUB_REF_NAME}
