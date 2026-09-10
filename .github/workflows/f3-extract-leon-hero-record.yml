@@ -1,4 +1,4 @@
-name: F3 Extract Leon Heart Lv10 Effect Skills
+name: F3 Extract Leon SP Stat Inputs
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Extract exact SkillInfo records 70110 and 70111
+      - name: Extract exact Leon SP/job inputs
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -27,15 +27,19 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
-          const rows = JSON.parse(fs.readFileSync(resolveConfigDataFile('ConfigDataSkillInfo.json'), 'utf8'));
-          for (const id of [70110,70111]) {
-            const hits=[];
-            rows.forEach((record,recordIndex)=>{if(record&&record.ID===id)hits.push({recordIndex,record});});
-            if(hits.length!==1) throw new Error(`SkillInfo ${id}: expected 1 hit, got ${hits.length}`);
-            console.log(`=== SKILL_${id}_START ===`);
-            console.log(JSON.stringify(hits[0],null,2));
-            console.log(`=== SKILL_${id}_END ===`);
-          }
+          const load = name => JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
+          const one = (rows,id,label) => {
+            const hits=[]; rows.forEach((record,recordIndex)=>{if(record&&record.ID===id)hits.push({recordIndex,record});});
+            if(hits.length!==1) throw new Error(`${label} ${id}: expected 1 hit, got ${hits.length}`); return hits[0];
+          };
+          const sp=one(load('ConfigDataSPHeroInfo.json'),6,'SPHeroInfo');
+          const jc=one(load('ConfigDataJobConnectionInfo.json'),Number(sp.record.JobConnection_ID),'JobConnectionInfo');
+          const job=one(load('ConfigDataJobInfo.json'),Number(jc.record.Job_ID),'JobInfo');
+          const levels=load('ConfigDataJobLevelInfo.json');
+          const levelHits=(jc.record.JobLevels_ID||[]).map(id=>one(levels,Number(id),'JobLevelInfo'));
+          console.log('=== LEON_SP_INPUTS_START ===');
+          console.log(JSON.stringify({sp,jc,job,levels:levelHits},null,2));
+          console.log('=== LEON_SP_INPUTS_END ===');
           NODE
       - name: Verify repository unchanged
         run: |
