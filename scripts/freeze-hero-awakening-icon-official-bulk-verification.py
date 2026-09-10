@@ -256,6 +256,7 @@ def main():
         'status': expected['status'],
         'completion': expected['completion'],
         **expected['summary'],
+        'reviewPaths': [r['sourcePath'] for r in expected['results'] if r['status'] == 'REVIEW'],
         'bulkResultSha256': expected['bulkResultSha256'],
         'semanticReopen': False,
     }, ensure_ascii=False, indent=2))
