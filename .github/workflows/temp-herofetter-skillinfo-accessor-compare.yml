@@ -1,0 +1,104 @@
+name: Temporary HeroFetter SkillInfo accessor compare
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract official IL2CPP pair and partial dump
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hfgs out/herofetter-skillinfo-compare
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib
+          D=pathlib.Path('/tmp/hfgs'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          targets={1:('Client/GameAssembly.dll','GameAssembly.dll'),66:('Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat','global-metadata.dat')}
+          def rq(u,a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          def hs(u):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:return int(r.headers['Content-Length'])
+          def ent(u,t):
+            n=min(131072,t); x=rq(u,t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(u,o,o+s-1); i=0; out=[]
+            while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+              fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace'); out.append((nm,me,cr,co,un,lo)); i+=46+fn+ex+cm
+            return out
+          def get(u,e):
+            nm,me,cr,co,un,lo=e; h=rq(u,lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; d=rq(u,st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; return raw
+          for part,(target,out) in targets.items():
+            u=f'{B}/InstallPage_{V}_{part}.zip'; e=next(e for e in ent(u,hs(u)) if e[0]==target); (D/out).write_bytes(get(u,e))
+          PY
+          git clone --depth 1 https://github.com/Perfare/Il2CppDumper.git /tmp/Il2CppDumper >/dev/null 2>&1
+          dotnet build /tmp/Il2CppDumper/Il2CppDumper.sln -c Release >/dev/null 2>&1
+          DLL=$(find /tmp/Il2CppDumper -path '*/bin/Release/*/Il2CppDumper.dll' | head -1)
+          mkdir -p /tmp/hfgs/dump
+          set +e
+          dotnet "$DLL" /tmp/hfgs/GameAssembly.dll /tmp/hfgs/global-metadata.dat /tmp/hfgs/dump > out/herofetter-skillinfo-compare/dumper.log 2>&1
+          set -e
+          test -f /tmp/hfgs/dump/script.json
+      - name: Compare native lookup paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          import json,pathlib,re,subprocess
+          D=pathlib.Path('/tmp/hfgs/dump'); O=pathlib.Path('out/herofetter-skillinfo-compare'); EXE='/tmp/hfgs/GameAssembly.dll'
+          script=json.loads((D/'script.json').read_text(errors='replace'))
+          rows=[]
+          def walk(x):
+            if isinstance(x,dict):
+              n=x.get('Name'); a=x.get('Address'); s=x.get('Signature')
+              if isinstance(n,str) and isinstance(a,(int,float)): rows.append((int(a),n,s or ''))
+              for v in x.values(): walk(v)
+            elif isinstance(x,list):
+              for v in x: walk(v)
+          walk(script); rows=sorted(set(rows),key=lambda x:x[0]); by={}
+          for r in rows: by.setdefault(r[0],[]).append(r)
+          names=['BlackJack.ProjectL.UI.FettersConfessionUIController$$SetUnlockStateInfo','BlackJack.ConfigData.ClientConfigDataLoader$$GetConfigDataSkillInfo']
+          found={n:next((r for r in rows if r[1]==n),None) for n in names}
+          if any(v is None for v in found.values()): raise SystemExit(str(found))
+          def dis(r,span):
+            a=r[0]; p=subprocess.run(['objdump','-d','-Mintel',f'--start-address={0x180000000+a}',f'--stop-address={0x180000000+a+span}',EXE],capture_output=True,text=True,errors='replace').stdout
+            return p
+          unlock=dis(found[names[0]],0x1200); typed=dis(found[names[1]],0x600)
+          (O/'set-unlock.disasm.txt').write_text(unlock); (O/'typed-get-skillinfo.disasm.txt').write_text(typed)
+          def calls(text):
+            out=[]
+            for l in text.splitlines():
+              m=re.search(r'\bcall\s+([0-9a-fA-Fx]+)',l)
+              if not m: continue
+              raw=int(m.group(1),16); rva=raw-0x180000000 if raw>=0x180000000 else raw
+              out.append({'line':l.strip(),'rva':hex(rva),'matches':[{'name':x[1],'signature':x[2]} for x in by.get(rva,[])[:20]]})
+            return out
+          uc=calls(unlock); tc=calls(typed)
+          shared=sorted(set(c['rva'] for c in uc)&set(c['rva'] for c in tc))
+          # Explicit GotSkills extraction window around +0x48 and immediately following helper call.
+          ul=unlock.splitlines(); windows=[]
+          for i,l in enumerate(ul):
+            if re.search(r'\[[^\]]+\+0x48\]',l): windows.append('\n'.join(ul[max(0,i-8):min(len(ul),i+35)]))
+          result={'status':'TRACE_COMPLETE','methods':{k:{'address':hex(v[0]),'signature':v[2]} for k,v in found.items()},'unlockCalls':uc,'typedAccessorCalls':tc,'sharedCallTargets':shared,'gotSkillsWindows':windows}
+          (O/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: herofetter-skillinfo-accessor-compare
+          path: out/herofetter-skillinfo-compare
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-herofetter-skillinfo-accessor-compare.yml
+          git commit -m "Remove temporary HeroFetter SkillInfo accessor compare"
+          git push origin HEAD:${GITHUB_REF_NAME}
