@@ -267,10 +267,7 @@ def verify_one(args):
                 continue
             try:
                 reader = reader_of(value)
-                raw_obj = reader.get_raw_data()
-                data = reader.read()
                 object_type = getattr(getattr(reader, "type", None), "name", None)
-                image = data.image.convert("RGBA") if object_type == "Sprite" else None
                 if object_type != "Sprite":
                     result["hits"].append({
                         "packagePart": part,
@@ -279,10 +276,13 @@ def verify_one(args):
                         "bundleSha256": bundle_sha,
                         "runtimeContainerPath": str(container_path).replace("\\", "/"),
                         "objectType": object_type,
-                        "status": "BLOCKER",
-                        "reason": "TYPE_MISMATCH",
+                        "status": "COMPANION",
+                        "reason": None,
                     })
                     continue
+                raw_obj = reader.get_raw_data()
+                data = reader.read()
+                image = data.image.convert("RGBA")
                 rgba = image.tobytes()
                 alpha_bbox = image.getchannel("A").getbbox()
                 result["hits"].append({
@@ -314,15 +314,20 @@ def verify_one(args):
                 })
 
     if result["hits"]:
-        invalid = [hit for hit in result["hits"] if hit.get("status") != "VERIFIED"]
-        if invalid:
+        blockers = [hit for hit in result["hits"] if hit.get("status") == "BLOCKER"]
+        verified = [hit for hit in result["hits"] if hit.get("status") == "VERIFIED"]
+        if blockers:
             result["status"] = "BLOCKER"
-            result["reason"] = invalid[0].get("reason") or "UNITY_DECODE_FAIL"
+            result["reason"] = blockers[0].get("reason") or "UNITY_DECODE_FAIL"
             return result, 2
-        render_keys = {(hit["width"], hit["height"], hit["rgbaSha256"]) for hit in result["hits"]}
+        if not verified:
+            result["status"] = "BLOCKER"
+            result["reason"] = "TYPE_MISMATCH_NO_SPRITE_EXACT_HIT"
+            return result, 2
+        render_keys = {(hit["width"], hit["height"], hit["rgbaSha256"]) for hit in verified}
         if len(render_keys) != 1:
             result["status"] = "BLOCKER"
-            result["reason"] = "AMBIGUOUS_NON_EQUIVALENT_EXACT_SOURCES"
+            result["reason"] = "AMBIGUOUS_NON_EQUIVALENT_EXACT_SPRITES"
             return result, 2
         result["status"] = "VERIFIED"
         result["reason"] = None
