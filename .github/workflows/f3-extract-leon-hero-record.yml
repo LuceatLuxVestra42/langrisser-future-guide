@@ -1,4 +1,4 @@
-name: F3 Extract Skill ID 90085 Record
+name: F3 Discover HeroID 6 Reverse References
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  extract:
+  discover:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,47 +24,79 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Skill ID 90085 record
+      - name: Discover explicit HeroID 6 reverse references
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
+          const path = require('path');
           const {
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const sourcePath = resolveConfigDataFile('ConfigDataSkillInfo.json');
-          const records = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
-          const matches = [];
+          const sourceDir = path.dirname(resolveConfigDataFile('ConfigDataHeroInfo.json'));
+          const files = fs.readdirSync(sourceDir).filter((name) => name.endsWith('.json')).sort();
+          const semanticNameRx = /(fetter|bond|heart|favor|affection|intimacy|friend|relation)/i;
+          const semanticFiles = [];
+          const heroIdRefs = [];
 
-          for (let i = 0; i < records.length; i++) {
-            const record = records[i];
-            if (record && typeof record === 'object' && record.ID === 90085) {
-              matches.push({ recordIndex: i, record });
+          const valueContainsSix = (value) => value === 6 || (Array.isArray(value) && value.includes(6));
+          const isHeroIdField = (key) => {
+            const normalized = key.replace(/[^A-Za-z0-9]/g, '');
+            return /hero/i.test(normalized) && /ids?$/i.test(normalized);
+          };
+
+          for (const file of files) {
+            const fullPath = path.join(sourceDir, file);
+            let data;
+            try {
+              data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+            } catch {
+              continue;
+            }
+            if (!Array.isArray(data)) continue;
+
+            if (semanticNameRx.test(file)) {
+              const first = data.find((record) => record && typeof record === 'object' && !Array.isArray(record));
+              semanticFiles.push({
+                file,
+                recordCount: data.length,
+                sampleKeys: first ? Object.keys(first) : [],
+              });
+            }
+
+            for (let recordIndex = 0; recordIndex < data.length; recordIndex++) {
+              const record = data[recordIndex];
+              if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+
+              for (const [field, value] of Object.entries(record)) {
+                if (!isHeroIdField(field) || !valueContainsSix(value)) continue;
+                heroIdRefs.push({
+                  file,
+                  recordIndex,
+                  recordID: Object.prototype.hasOwnProperty.call(record, 'ID') ? record.ID : null,
+                  recordName: Object.prototype.hasOwnProperty.call(record, 'Name') ? record.Name : null,
+                  field,
+                  value,
+                  keys: Object.keys(record),
+                });
+              }
             }
           }
 
-          if (matches.length !== 1) {
-            throw new Error(`expected exactly one Skill record with ID 90085; found ${matches.length}`);
-          }
-
-          const hit = matches[0];
-          if (hit.record.ID !== 90085) {
-            throw new Error(`identity mismatch: expected ID 90085, got ${hit.record.ID}`);
-          }
-
-          console.log('=== F3_SKILL_90085_META_START ===');
+          console.log('=== F3_SEMANTIC_FILENAME_CANDIDATES_START ===');
+          console.log(JSON.stringify(semanticFiles, null, 2));
+          console.log('=== F3_SEMANTIC_FILENAME_CANDIDATES_END ===');
+          console.log('=== F3_HEROID6_EXPLICIT_REVERSE_REFS_START ===');
+          console.log(JSON.stringify(heroIdRefs, null, 2));
+          console.log('=== F3_HEROID6_EXPLICIT_REVERSE_REFS_END ===');
           console.log(JSON.stringify({
-            file: 'ConfigDataSkillInfo.json',
-            recordIndex: hit.recordIndex,
-            ID: hit.record.ID,
+            scannedJsonFiles: files.length,
+            semanticFilenameCandidateCount: semanticFiles.length,
+            explicitHeroId6ReferenceCount: heroIdRefs.length,
           }, null, 2));
-          console.log('=== F3_SKILL_90085_META_END ===');
-          console.log('=== F3_SKILL_90085_RECORD_START ===');
-          console.log(JSON.stringify(hit.record, null, 2));
-          console.log('=== F3_SKILL_90085_RECORD_END ===');
           NODE
 
       - name: Verify repository unchanged
