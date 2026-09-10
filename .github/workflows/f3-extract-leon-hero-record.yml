@@ -1,4 +1,4 @@
-name: F3 Extract Soldier ID 300 Record
+name: F3 Extract Skill ID 10301 Record
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Soldier ID 300 record
+      - name: Extract Skill ID 10301 record
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -35,21 +35,21 @@ jobs:
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const soldierPath = resolveConfigDataFile('ConfigDataSoldierInfo.json');
-          const soldiers = JSON.parse(fs.readFileSync(soldierPath, 'utf8'));
-          const record = soldiers[54];
+          const skillPath = resolveConfigDataFile('ConfigDataSkillInfo.json');
+          const skills = JSON.parse(fs.readFileSync(skillPath, 'utf8'));
+          const record = skills[1841];
 
           if (!record) {
-            throw new Error('recordIndex 54 missing');
+            throw new Error('recordIndex 1841 missing');
           }
 
-          if (record.ID !== 300) {
-            throw new Error(`identity mismatch: expected ID 300, got ${record.ID}`);
+          if (record.ID !== 10301) {
+            throw new Error(`identity mismatch: expected ID 10301, got ${record.ID}`);
           }
 
-          console.log('=== F3_SOLDIER_300_RECORD_START ===');
+          console.log('=== F3_SKILL_10301_RECORD_START ===');
           console.log(JSON.stringify(record, null, 2));
-          console.log('=== F3_SOLDIER_300_RECORD_END ===');
+          console.log('=== F3_SKILL_10301_RECORD_END ===');
           NODE
 
       - name: Verify repository unchanged
