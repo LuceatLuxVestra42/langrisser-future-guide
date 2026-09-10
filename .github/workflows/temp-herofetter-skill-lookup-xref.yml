@@ -1,0 +1,107 @@
+name: Temporary HeroFetter skill lookup xref
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract IL2CPP pair and partial metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hfsx out/herofetter-skill-xref
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib,hashlib,json
+          D=pathlib.Path('/tmp/hfsx'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          targets={1:('Client/GameAssembly.dll','GameAssembly.dll'),66:('Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat','global-metadata.dat')}
+          def rq(u,a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          def hs(u):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:return int(r.headers['Content-Length'])
+          def ent(u,t):
+            n=min(131072,t); x=rq(u,t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(u,o,o+s-1); i=0; out=[]
+            while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+              fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace'); out.append((nm,me,cr,co,un,lo)); i+=46+fn+ex+cm
+            return out
+          def get(u,e):
+            nm,me,cr,co,un,lo=e; h=rq(u,lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; d=rq(u,st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; return raw
+          src={'installVersion':V,'files':{}}
+          for part,(target,out) in targets.items():
+            u=f'{B}/InstallPage_{V}_{part}.zip'; e=next(e for e in ent(u,hs(u)) if e[0]==target); raw=get(u,e); (D/out).write_bytes(raw); src['files'][out]={'sha256':hashlib.sha256(raw).hexdigest(),'size':len(raw)}
+          pathlib.Path('out/herofetter-skill-xref/source.json').write_text(json.dumps(src,indent=2)+'\n')
+          PY
+          git clone --depth 1 https://github.com/Perfare/Il2CppDumper.git /tmp/Il2CppDumper >/dev/null 2>&1
+          dotnet build /tmp/Il2CppDumper/Il2CppDumper.sln -c Release >/dev/null 2>&1
+          DLL=$(find /tmp/Il2CppDumper -path '*/bin/Release/*/Il2CppDumper.dll' | head -1)
+          mkdir -p /tmp/hfsx/dump
+          set +e
+          dotnet "$DLL" /tmp/hfsx/GameAssembly.dll /tmp/hfsx/global-metadata.dat /tmp/hfsx/dump > out/herofetter-skill-xref/dumper.log 2>&1
+          echo $? > out/herofetter-skill-xref/dumper-exit.txt
+          set -e
+          test -f /tmp/hfsx/dump/script.json
+          test -f /tmp/hfsx/dump/dump.cs
+      - name: Disassemble SetSkillInfoGroup and map callees
+        shell: bash
+        run: |
+          set -euo pipefail
+          objdump -D -Mintel --start-address=0x183B67660 --stop-address=0x183B67CA0 /tmp/hfsx/GameAssembly.dll > out/herofetter-skill-xref/set-skill-info-group-disasm.txt
+          python <<'PY'
+          import json,pathlib,re,bisect
+          D=pathlib.Path('/tmp/hfsx/dump'); O=pathlib.Path('out/herofetter-skill-xref')
+          script=json.loads((D/'script.json').read_text(errors='replace'))
+          methods=[]
+          def walk(x):
+            if isinstance(x,dict):
+              if 'Address' in x and ('Name' in x or 'Signature' in x):
+                try:
+                  a=x['Address']; a=int(a,16) if isinstance(a,str) else int(a)
+                  if a < 0x180000000: a += 0x180000000
+                  methods.append((a,x.get('Name',''),x.get('Signature','')))
+                except: pass
+              for v in x.values(): walk(v)
+            elif isinstance(x,list):
+              for v in x: walk(v)
+          walk(script)
+          methods=sorted(set(methods)); addrs=[m[0] for m in methods]
+          asm=(O/'set-skill-info-group-disasm.txt').read_text(errors='replace')
+          targets=[]
+          for line in asm.splitlines():
+            m=re.search(r'\bcall\s+([0-9a-fx]+)',line,re.I)
+            if not m: continue
+            try:t=int(m.group(1),16)
+            except:continue
+            i=bisect.bisect_right(addrs,t)-1
+            owner=methods[i] if i>=0 else None
+            targets.append({'line':line.strip(),'target':hex(t),'owner':owner})
+          dump=(D/'dump.cs').read_text(errors='replace')
+          lookup=[]
+          for m in re.finditer(r'[^\n]*(?:ConfigDataSkillInfo)[^\n]*\([^\n]*(?:int|int32_t)[^\n]*\)',dump):
+            s=m.group(0).strip()
+            if any(k.lower() in s.lower() for k in ['get','find','skill','config']): lookup.append(s)
+            if len(lookup)>=300: break
+          result={'method':'FettersConfessionUIController.SetSkillInfoGroup','range':['0x183B67660','0x183B67CA0'],'callCount':len(targets),'calls':targets,'skillLookupCandidates':lookup}
+          (O/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: herofetter-skill-xref
+          path: out/herofetter-skill-xref
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-herofetter-skill-lookup-xref.yml
+          git commit -m "Remove temporary HeroFetter skill lookup xref"
+          git push origin HEAD:${GITHUB_REF_NAME}
