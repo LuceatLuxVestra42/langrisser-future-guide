@@ -1,0 +1,62 @@
+name: Hero Awakening Icon A9 Hosted Browser Gates
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a9-hosted-browser-20260910
+  pull_request:
+    branches:
+      - work/awakening-skill-icon-a8-frontend-integration-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-baseline-and-candidate-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Record worktree state before validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a9-before.txt"
+      - name: Probe current deployed GitHub Pages surface
+        run: node tools/route-hosted-qa/cli/check.mjs --probe-current
+      - name: Classify candidate freshness without mutating deployment
+        env:
+          EXPECTED_SOURCE_SHA: 547f42ad8f3d5827432f6ba798c16b7f21b22727
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const expected = process.env.EXPECTED_SOURCE_SHA.toLowerCase();
+          const url = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/branches/gh-pages?qa=${Date.now()}`;
+          const response = await fetch(url, { headers: { 'cache-control': 'no-store', 'user-agent': 'awakening-icon-a9-readiness/1' } });
+          if (!response.ok) throw new Error(`gh-pages branch API ${response.status}`);
+          const branch = await response.json();
+          const message = String(branch?.commit?.commit?.message ?? '');
+          const match = message.trim().match(/([0-9a-f]{40})$/i);
+          const deployed = match?.[1]?.toLowerCase() ?? null;
+          const candidateFresh = deployed === expected;
+          console.log(JSON.stringify({
+            checkpoint: 'AWAKENING_ICON_A9_CANDIDATE_HOSTED_READINESS',
+            expectedSourceSha: expected,
+            deployedSourceSha: deployed,
+            candidateFresh,
+            hostedCandidateStatus: candidateFresh ? 'READY_FOR_STRICT_CANDIDATE' : 'REVIEW_CANDIDATE_NOT_DEPLOYED',
+            browserGateEligible: candidateFresh,
+            semanticReopen: false,
+          }, null, 2));
+          NODE
+      - name: Require no repository mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a9-after.txt"
+          diff -u "$RUNNER_TEMP/a9-before.txt" "$RUNNER_TEMP/a9-after.txt"
