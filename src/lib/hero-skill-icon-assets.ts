@@ -13,8 +13,11 @@ function resolvePublicAssetUrl(publicPath: string) {
   return `${basePrefix}${normalizedPath}`;
 }
 
-export function getHeroSkillIconUrl(heroId: number, sourcePath: string | null | undefined) {
-  if (heroId !== manifest.scope.heroId || !sourcePath) return null;
+export function getHeroSkillIconUrl(_heroId: number, sourcePath: string | null | undefined) {
+  if (!sourcePath) return null;
+  // Verified skill-icon admission is keyed by exact sourcePath. The manifest's current
+  // Hero 6 scope describes the materialized seed set; it must not prevent another Hero
+  // from reusing an already admitted asset with the same exact sourcePath.
   const record = bySourcePath.get(sourcePath);
   if (!record) return null;
   return resolvePublicAssetUrl(record.publicPath);
