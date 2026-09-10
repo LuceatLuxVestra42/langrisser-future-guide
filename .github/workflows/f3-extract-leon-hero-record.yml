@@ -1,4 +1,4 @@
-name: F3 Extract Leon Hero Record
+name: F3 Extract Soldier ID 300 Record
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Hero ID 6 record
+      - name: Extract Soldier ID 300 record
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -35,21 +35,21 @@ jobs:
             resolveConfigDataFile,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const heroPath = resolveConfigDataFile('ConfigDataHeroInfo.json');
-          const heroes = JSON.parse(fs.readFileSync(heroPath, 'utf8'));
-          const record = heroes[5];
+          const soldierPath = resolveConfigDataFile('ConfigDataSoldierInfo.json');
+          const soldiers = JSON.parse(fs.readFileSync(soldierPath, 'utf8'));
+          const record = soldiers[54];
 
           if (!record) {
-            throw new Error('recordIndex 5 missing');
+            throw new Error('recordIndex 54 missing');
           }
 
-          if (record.ID !== 6) {
-            throw new Error(`identity mismatch: expected ID 6, got ${record.ID}`);
+          if (record.ID !== 300) {
+            throw new Error(`identity mismatch: expected ID 300, got ${record.ID}`);
           }
 
-          console.log('=== F3_LEON_RECORD_START ===');
+          console.log('=== F3_SOLDIER_300_RECORD_START ===');
           console.log(JSON.stringify(record, null, 2));
-          console.log('=== F3_LEON_RECORD_END ===');
+          console.log('=== F3_SOLDIER_300_RECORD_END ===');
           NODE
 
       - name: Verify repository unchanged
