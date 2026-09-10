@@ -148,6 +148,7 @@ jobs:
           fi
           grep -q 'readHeroCardIconIndex' src/lib/hero-card-icon-assets.static.ts
           test -f scripts/validate-soldier-detail-hero-cards-hosted.mjs
+          test -f scripts/validate-hero-awakening-icons-hosted.mjs
           cp dist/client/index.html dist/client/404.html
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
@@ -230,6 +231,8 @@ jobs:
             fi
           }
 
+          run_hosted_validator route-hosted-qa-strict \
+            node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SOURCE_SHA"
           run_hosted_validator authoritative-pages \
             node scripts/validate-authoritative-pages-hosted.mjs
           run_hosted_validator hero-central-discipline \
@@ -238,6 +241,8 @@ jobs:
             node scripts/validate-hero-soldier-cards-hosted.mjs
           run_hosted_validator hero-card-icons \
             node scripts/validate-hero-card-icons-hosted.mjs
+          run_hosted_validator hero-awakening-icons \
+            node scripts/validate-hero-awakening-icons-hosted.mjs
 
       - name: Print authoritative deployment source
         if: always()
