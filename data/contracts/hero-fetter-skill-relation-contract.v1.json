@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "schemaId": "hero-fetter-skill-relation-contract/v1",
+  "stage": "HERO_FETTER_SKILL_RELATION_PROOF",
+  "status": "PASS_TYPED_RELATION",
+  "purpose": "Freeze the runtime-typed relation used by the Hero3 contribution producer: ConfigDataHeroFetterInfo.GotSkills_ID elements are ConfigDataSkillInfo lookup keys.",
+  "scope": {
+    "inScope": [
+      "ConfigDataHeroFetterInfo.GotSkills_ID field identity",
+      "BattleUtility.GetHeroFetterSkillInfos runtime consumer",
+      "GotSkills_ID element to ConfigDataSkillInfo keyed lookup value flow"
+    ],
+    "outOfScope": [
+      "Hero3 contribution aggregation",
+      "full Hero population materialization",
+      "Normal or SP base recomputation",
+      "final soldier correction",
+      "frontend integration"
+    ]
+  },
+  "runtimeAuthority": {
+    "sourceKind": "OFFICIAL_CN_CLIENT_INSTALLER",
+    "installVersion": "1.1.113",
+    "gameAssemblySha256": "c7f803939dce955991a8e21611b79cbc4005d1152ee7934b903332150e1e8795",
+    "globalMetadataSha256": "589b1684b17525edbec53b85c7bf13a05a8da0e38d360a05bee2f2950b76f6a2",
+    "fieldGetter": {
+      "method": "BlackJack.ConfigData.ConfigDataHeroFetterInfo.get_GotSkills_ID",
+      "rva": "0x387660",
+      "nativeContract": "returns QWORD PTR [this+0x48]",
+      "fieldOffset": "0x48",
+      "returnType": "Google.Protobuf.Collections.RepeatedField<int>"
+    },
+    "consumer": {
+      "method": "BlackJack.ProjectL.Common.BattleUtility.GetHeroFetterSkillInfos",
+      "rva": "0x1875D90",
+      "signature": "List<ConfigDataSkillInfo> GetHeroFetterSkillInfos(Dictionary<int, int> heroFetters)",
+      "nativeValueFlow": "load HeroFetter +0x48 -> index RepeatedField<int> -> move selected int to lookup key argument -> typed SkillInfo shared lookup -> add returned object to List<ConfigDataSkillInfo>"
+    },
+    "skillLookup": {
+      "typedAccessor": "BlackJack.ConfigData.ClientConfigDataLoader.GetConfigDataSkillInfo(int key)",
+      "typedAccessorRva": "0x1C6F0B0",
+      "returnType": "ConfigDataSkillInfo",
+      "methodInfoPointer": "0x186370ed8",
+      "sharedLookupHelper": "0x18018d820",
+      "keyType": "int"
+    },
+    "evidence": [
+      {
+        "workflowRunId": 34486458651,
+        "artifact": "herofetter-field-xref",
+        "artifactDigest": "sha256:7cc6dfd3e076fa78a0e2592e9fae25b2c21c394d1dbc2aa162cec61d30882c5a"
+      },
+      {
+        "workflowRunId": 34486923828,
+        "artifact": "herofetter-skillinfo-accessor-compare",
+        "artifactDigest": "sha256:c91832936bef68b1041c1359109c152796a57e12b6045f74f256b18d2b52f0fd"
+      },
+      {
+        "workflowRunId": 34487231018,
+        "artifact": "herofetter-skillinfo-methodinfo-xref",
+        "artifactDigest": "sha256:11786f30b3f3781ca6d375e8a1db2d6b0ec8d1bc4fc14e903597cbc3eb756a26"
+      },
+      {
+        "workflowRunId": 34532782903,
+        "artifact": "battleutility-herofetter-skillinfos",
+        "artifactDigest": "sha256:11ccd086b5f6adf9eeb8a5d9bafee2384394344c6e6b1f8b8e4d8ac7be20c6c4"
+      }
+    ]
+  },
+  "typedRelation": {
+    "sourceType": "ConfigDataHeroFetterInfo",
+    "sourceField": "GotSkills_ID",
+    "sourceElementType": "int",
+    "targetType": "ConfigDataSkillInfo",
+    "targetKey": "ID",
+    "relation": "GotSkills_ID element is consumed as the int key of the ConfigDataSkillInfo lookup",
+    "status": "PASS_TYPED_RELATION"
+  },
+  "boundary": {
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "arrayOrderSemanticMappingAllowed": false,
+    "numericCoincidenceAsProofAllowed": false,
+    "runtimeBinaryCommitted": false
+  },
+  "completionCriteria": {
+    "fieldIdentityConfirmed": true,
+    "typedConsumerConfirmed": true,
+    "typedSkillLookupConfirmed": true,
+    "valueFlowConfirmed": true,
+    "producerImplementationStarted": false
+  },
+  "reopenConditions": [
+    "new authoritative runtime contradiction",
+    "relevant source snapshot change",
+    "contract or schema change",
+    "owning validator hard failure"
+  ]
+}
