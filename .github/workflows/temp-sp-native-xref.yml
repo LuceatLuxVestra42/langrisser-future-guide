@@ -1,0 +1,221 @@
+name: Temporary SP native xref
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  xref:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Extract official IL2CPP pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sp-native out/sp-native-xref
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib
+          D=pathlib.Path('/tmp/sp-native'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          targets={1:('Client/GameAssembly.dll','GameAssembly.dll'),66:('Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat','global-metadata.dat')}
+          def rq(u,a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          def hs(u):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:return int(r.headers['Content-Length'])
+          def ent(u,t):
+            n=min(131072,t); x=rq(u,t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(u,o,o+s-1); i=0; out=[]
+            while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+              fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace'); out.append((nm,me,cr,co,un,lo)); i+=46+fn+ex+cm
+            return out
+          def get(u,e):
+            nm,me,cr,co,un,lo=e; h=rq(u,lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; d=rq(u,st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; return raw
+          for part,(target,out) in targets.items():
+            u=f'{B}/InstallPage_{V}_{part}.zip'; e=next(e for e in ent(u,hs(u)) if e[0]==target); (D/out).write_bytes(get(u,e))
+          PY
+      - name: Build Il2CppDumper and recover method map
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/Perfare/Il2CppDumper.git /tmp/Il2CppDumper
+          dotnet build /tmp/Il2CppDumper/Il2CppDumper.sln -c Release > out/sp-native-xref/dumper-build.log 2>&1
+          DLL=$(find /tmp/Il2CppDumper -path '*/bin/Release/*/Il2CppDumper.dll' | head -1)
+          mkdir -p /tmp/spdump
+          dotnet "$DLL" /tmp/sp-native/GameAssembly.dll /tmp/sp-native/global-metadata.dat /tmp/spdump > out/sp-native-xref/dumper.log 2>&1
+      - name: Native xref and field-offset probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check capstone pefile
+          python <<'PY'
+          import json,re,struct,pathlib,hashlib
+          import pefile
+          from capstone import Cs,CS_ARCH_X86,CS_MODE_64
+          from capstone.x86 import X86_OP_MEM,X86_OP_IMM
+
+          EXE=pathlib.Path('/tmp/sp-native/GameAssembly.dll')
+          DUMP=pathlib.Path('/tmp/spdump')
+          OUT=pathlib.Path('out/sp-native-xref')
+          TARGET_NAME='GetSPHeroInfoIfJobIsSP'
+          TARGET_RVA=0x187B960
+          INTEREST_NAMES=['GetSPHeroInfoIfJobIsSP','GetConfigDataSPHeroInfo','ComputeHeroProperties','ComputeSoldierProperties','UpdateHeroInfo','SetArmyInfo','ResetHeroJob','InitHero','AddSPHeroSecondStageSkillAndSoldier']
+          FIELD_NAMES=['HPCmd_INI','ATCmd_INI','DFCmd_INI','MagicDFCmd_INI']
+
+          pe=pefile.PE(str(EXE),fast_load=False)
+          image_base=pe.OPTIONAL_HEADER.ImageBase
+          data=EXE.read_bytes()
+
+          def rva_to_off(rva):
+            for s in pe.sections:
+              start=s.VirtualAddress; end=start+max(s.Misc_VirtualSize,s.SizeOfRawData)
+              if start<=rva<end:
+                return s.PointerToRawData+(rva-start)
+            return None
+
+          script=json.loads((DUMP/'script.json').read_text(encoding='utf-8',errors='replace'))
+          methods=[]
+          def walk(x):
+            if isinstance(x,dict):
+              if 'Address' in x and ('Name' in x or 'Signature' in x):
+                try:
+                  a=x['Address']; addr=int(a,16) if isinstance(a,str) else int(a)
+                  rva=addr-image_base if addr>=image_base else addr
+                  methods.append({'rva':rva,'name':x.get('Name') or x.get('Signature') or '', 'signature':x.get('Signature') or ''})
+                except Exception: pass
+              for v in x.values(): walk(v)
+            elif isinstance(x,list):
+              for v in x: walk(v)
+          walk(script)
+          uniq={}
+          for m in methods:
+            if m['rva']>=0: uniq[(m['rva'],m['name'],m['signature'])]=m
+          methods=sorted(uniq.values(),key=lambda m:m['rva'])
+
+          def containing(rva):
+            lo=0; hi=len(methods)
+            while lo<hi:
+              mid=(lo+hi)//2
+              if methods[mid]['rva']<=rva: lo=mid+1
+              else: hi=mid
+            return methods[lo-1] if lo else None
+
+          target_methods=[m for m in methods if TARGET_NAME in (m['name']+' '+m['signature'])]
+          if target_methods:
+            TARGET_RVA=target_methods[0]['rva']
+
+          # parse ConfigDataSPHeroInfo field offsets from dump.cs
+          dump=(DUMP/'dump.cs').read_text(encoding='utf-8',errors='replace')
+          field_offsets={}
+          cls_pos=dump.find('class ConfigDataSPHeroInfo')
+          if cls_pos<0: cls_pos=dump.find('ConfigDataSPHeroInfo')
+          segment=dump[cls_pos:cls_pos+50000] if cls_pos>=0 else dump
+          for f in FIELD_NAMES:
+            # common Il2CppDumper formats: public int HPCmd_INI; // 0xNN or property backing field
+            mm=re.search(rf'(?m)^.*\b{re.escape(f)}\b.*//\s*0x([0-9A-Fa-f]+)',segment)
+            if mm: field_offsets[f]=int(mm.group(1),16)
+
+          # executable section bytes
+          text_sections=[]
+          for s in pe.sections:
+            if s.Characteristics & 0x20000000:
+              text_sections.append((s.VirtualAddress,s.get_data()))
+
+          # scan direct E8 rel32 xrefs to target RVA
+          xrefs=[]
+          for sec_rva,raw in text_sections:
+            for i in range(0,len(raw)-5):
+              if raw[i]!=0xE8: continue
+              rel=struct.unpack_from('<i',raw,i+1)[0]
+              src=sec_rva+i
+              dst=(src+5+rel)&0xffffffffffffffff
+              if dst==TARGET_RVA:
+                cm=containing(src)
+                xrefs.append({'callRva':hex(src),'targetRva':hex(dst),'caller':cm})
+
+          md=Cs(CS_ARCH_X86,CS_MODE_64); md.detail=True
+          def disasm_window(center,before=160,after=320):
+            start=max(0,center-before); off=rva_to_off(start)
+            if off is None:return []
+            raw=data[off:off+(before+after)]
+            rows=[]
+            for ins in md.disasm(raw,image_base+start):
+              rva=ins.address-image_base
+              rows.append({'rva':hex(rva),'mnemonic':ins.mnemonic,'opStr':ins.op_str})
+            return rows
+
+          # annotate calls inside callers and look for field-offset memory operands
+          caller_details=[]
+          for xr in xrefs:
+            call_rva=int(xr['callRva'],16); cm=xr['caller']
+            rows=disasm_window(call_rva,256,768)
+            field_hits=[]; calls=[]
+            for row in rows:
+              rr=int(row['rva'],16)
+              # decode one instruction again to inspect operands
+              off=rva_to_off(rr)
+              if off is None: continue
+              ins=next(md.disasm(data[off:off+16],image_base+rr),None)
+              if not ins: continue
+              if ins.mnemonic=='call' and ins.operands and ins.operands[0].type==X86_OP_IMM:
+                dst=ins.operands[0].imm-image_base
+                mm=containing(dst)
+                calls.append({'rva':hex(rr),'targetRva':hex(dst),'target':mm})
+              for op in ins.operands:
+                if op.type==X86_OP_MEM:
+                  disp=op.mem.disp & 0xffffffff
+                  for f,fo in field_offsets.items():
+                    if disp==fo:
+                      field_hits.append({'rva':hex(rr),'field':f,'fieldOffset':hex(fo),'mnemonic':ins.mnemonic,'opStr':ins.op_str})
+            caller_details.append({'xref':xr,'nearbyCalls':calls[:80],'fieldOffsetHits':field_hits,'disassembly':rows})
+
+          named={}
+          for n in INTEREST_NAMES:
+            named[n]=[m for m in methods if n in (m['name']+' '+m['signature'])][:20]
+
+          result={
+            'version':1,
+            'schemaId':'sp-native-xref/v1',
+            'status':'PASS',
+            'source':{
+              'kind':'OFFICIAL_INSTALLER','installVersion':'1.1.113',
+              'gameAssemblySha256':hashlib.sha256(data).hexdigest(),
+              'imageBase':hex(image_base)
+            },
+            'target':{'name':TARGET_NAME,'rva':hex(TARGET_RVA),'methodCandidates':target_methods[:10]},
+            'fieldOffsets':{k:hex(v) for k,v in field_offsets.items()},
+            'directCallXrefs':xrefs,
+            'callerDetails':caller_details,
+            'namedMethods':named,
+            'decision':{'directXrefCount':len(xrefs),'fieldOffsetCount':len(field_offsets)},
+            'blockers':[]
+          }
+          if not xrefs:
+            result['status']='REVIEW'; result['blockers'].append('NO_DIRECT_REL32_XREF_TO_TARGET_RVA')
+          (OUT/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({
+            'status':result['status'],
+            'target':result['target'],
+            'fieldOffsets':result['fieldOffsets'],
+            'directCallXrefs':result['directCallXrefs'],
+            'callerFieldHits':[{'caller':x['xref']['caller'],'fieldOffsetHits':x['fieldOffsetHits'],'nearbyCalls':[c for c in x['nearbyCalls'] if any(n in ((c['target'] or {}).get('name','')+' '+(c['target'] or {}).get('signature','')) for n in INTEREST_NAMES)]} for x in caller_details],
+            'blockers':result['blockers']
+          },ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sp-native-xref
+          path: out/sp-native-xref
+          retention-days: 7
+      - name: Remove temporary native xref workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-sp-native-xref.yml
+          git commit -m "Remove temporary SP native xref workflow"
+          git push origin HEAD:${GITHUB_REF_NAME}
