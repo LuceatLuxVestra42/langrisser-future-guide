@@ -1,0 +1,95 @@
+name: Temporary A6 Official PC Bootstrapper Probe
+
+on:
+  push:
+    branches:
+      - diag/awakening-icon-a6-1113-coverage-20260910
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Probe official PC bootstrapper metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/awakening-icon-a6-pc-bootstrapper-probe
+          python <<'PY'
+          import hashlib, json, pathlib, re, urllib.request, traceback
+
+          OUT=pathlib.Path('out/awakening-icon-a6-pc-bootstrapper-probe')
+          URL='https://mhmnzdownload.zlongame.com/MHMNZ/Clientdown/Langrisser_DownLoad_PC.exe'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'
+          result={'version':1,'schemaId':'official-pc-bootstrapper-metadata-probe/v1','status':'RUNNING','source':{'kind':'OFFICIAL_PC_BOOTSTRAPPER','url':URL},'asciiMatches':[],'utf16Matches':[],'errors':[]}
+          try:
+            req=urllib.request.Request(URL,headers={'User-Agent':UA,'Accept-Encoding':'identity'})
+            with urllib.request.urlopen(req,timeout=120) as r:
+              data=r.read()
+              result['source'].update({'finalUrl':r.geturl(),'httpStatus':getattr(r,'status',None),'contentType':r.headers.get('Content-Type'),'contentLengthHeader':r.headers.get('Content-Length')})
+            result['source'].update({'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'mzHeader':data[:2].hex()})
+
+            def ascii_strings(blob,minlen=5):
+              out=[];buf=[]
+              for b in blob:
+                if 32<=b<=126:buf.append(chr(b))
+                else:
+                  if len(buf)>=minlen:out.append(''.join(buf))
+                  buf=[]
+              if len(buf)>=minlen:out.append(''.join(buf))
+              return out
+            def utf16le_strings(blob,minlen=5):
+              out=[];buf=[];i=0
+              while i+1<len(blob):
+                lo,hi=blob[i],blob[i+1]
+                if hi==0 and 32<=lo<=126:
+                  buf.append(chr(lo));i+=2;continue
+                if len(buf)>=minlen:out.append(''.join(buf))
+                buf=[];i+=2
+              if len(buf)>=minlen:out.append(''.join(buf))
+              return out
+            keywords=('http','zlongame','mhmnz','installpage','installversion','version','update','patch','clientdown','.xml','.json','.txt','.ini')
+            def select(strings):
+              seen=set();out=[]
+              for s in strings:
+                low=s.lower()
+                if any(k in low for k in keywords) and s not in seen:
+                  seen.add(s);out.append(s)
+              return out
+            ascii_sel=select(ascii_strings(data));utf16_sel=select(utf16le_strings(data))
+            result['asciiMatches']=ascii_sel[:1000];result['utf16Matches']=utf16_sel[:1000]
+            combined='\n'.join(ascii_sel+utf16_sel)
+            urls=sorted(set(re.findall(r'https?://[^\s\x00"\'<>]+',combined,re.I)))
+            install_versions=sorted(set(re.findall(r'InstallPage[_/\-]?(\d+\.\d+\.\d+)',combined,re.I)))
+            dotted=sorted(set(re.findall(r'\b\d+\.\d+\.\d+\b',combined)))
+            result['urls']=urls
+            result['installPageVersions']=install_versions
+            result['dottedVersions']=dotted[:200]
+            result['status']='PASS'
+          except Exception as exc:
+            result['status']='DIAGNOSTIC_ERROR';result['errors']=[{'type':type(exc).__name__,'message':str(exc),'traceback':traceback.format_exc()}]
+          (OUT/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'status':result['status'],'source':result['source'],'urls':result.get('urls',[]),'installPageVersions':result.get('installPageVersions',[]),'dottedVersions':result.get('dottedVersions',[])[:50],'asciiMatchCount':len(result['asciiMatches']),'utf16MatchCount':len(result['utf16Matches']),'errors':result['errors']},ensure_ascii=False,indent=2))
+          if result['status']!='PASS': raise SystemExit(2)
+          PY
+      - name: Upload metadata evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: awakening-icon-a6-pc-bootstrapper-probe
+          path: out/awakening-icon-a6-pc-bootstrapper-probe
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove temporary diagnostic workflow
+        if: always()
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-awakening-icon-a6-pc-bootstrapper-probe.yml
+          git commit -m "Remove temporary A6 PC bootstrapper probe"
+          git push origin HEAD:${GITHUB_REF_NAME}
