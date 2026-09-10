@@ -1,0 +1,41 @@
+name: Hero Awakening Icon Materialize
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a7-1-materialize-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a7-1-materialize-20260910
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install materializer dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - name: Materialize 256 verified awakening icons
+        run: python scripts/materialize-hero-awakening-icon-assets.py --write
+      - name: Commit materialized assets and frozen index when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add public/images/heroes/skill-icons/awakening data/generated/hero-awakening-icon-materialization.v1.json
+          if git diff --cached --quiet; then
+            echo 'A7-1 materialization already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Materialize verified awakening skill icons'
+          git push origin HEAD:work/awakening-skill-icon-a7-1-materialize-20260910
