@@ -79,7 +79,7 @@ def verify_canaries(targets, locator, by_path, by_prefix):
                 reader = verifier.reader_of(value)
                 object_type = getattr(getattr(reader, 'type', None), 'name', None)
                 if object_type != 'Sprite':
-                    hits.append({'status':'BLOCKER','reason':'TYPE_MISMATCH','objectType':object_type,'runtimeContainerPath':str(container_path).replace('\\','/')})
+                    hits.append({'status':'COMPANION','reason':None,'objectType':object_type,'runtimeContainerPath':str(container_path).replace('\\','/')})
                     continue
                 raw_obj = reader.get_raw_data()
                 image = reader.read().image.convert('RGBA')
@@ -98,12 +98,16 @@ def verify_canaries(targets, locator, by_path, by_prefix):
                 })
             except Exception as exc:
                 hits.append({'status':'BLOCKER','reason':f'UNITY_DECODE_FAIL:{type(exc).__name__}:{exc}','runtimeContainerPath':str(container_path).replace('\\','/')})
+        verified_hits = [h for h in hits if h.get('status') == 'VERIFIED']
+        hard_fail_hits = [h for h in hits if h.get('status') == 'BLOCKER']
         if not hits:
             status, reason = 'REVIEW', 'NO_EXACT_RUNTIME_PATH_HIT_IN_CANDIDATE_BUNDLE'
-        elif any(h['status'] != 'VERIFIED' for h in hits):
-            status, reason = 'BLOCKER', next(h['reason'] for h in hits if h['status'] != 'VERIFIED')
-        elif len({(h['width'],h['height'],h['rgbaSha256']) for h in hits}) != 1:
-            status, reason = 'BLOCKER', 'AMBIGUOUS_NON_EQUIVALENT_EXACT_SOURCES'
+        elif hard_fail_hits:
+            status, reason = 'BLOCKER', hard_fail_hits[0]['reason']
+        elif not verified_hits:
+            status, reason = 'BLOCKER', 'TYPE_MISMATCH_NO_SPRITE_EXACT_HIT'
+        elif len({(h['width'],h['height'],h['rgbaSha256']) for h in verified_hits}) != 1:
+            status, reason = 'BLOCKER', 'AMBIGUOUS_NON_EQUIVALENT_EXACT_SPRITES'
         else:
             status, reason = 'VERIFIED', None
         results.append({
@@ -137,7 +141,7 @@ def build_result(targets, locator, results):
         'targetInput': {'targetSetSha256':EXPECTED_TARGET_HASH,'targetCount':256},
         'source': {'kind':'OFFICIAL_INSTALLER','installVersion':'1.1.113','unityParser':'UnityPy 1.25.3'},
         'selectionPolicy': 'one explicit frozen pending sourcePath from each A6-4 locator group',
-        'proofRequirement': 'full normalized runtime relative path equality + Sprite + decoded RGBA + non-empty alpha',
+        'proofRequirement': 'full normalized runtime relative path equality + at least one Sprite exact hit + decoded RGBA + non-empty alpha; non-Sprite exact-path companions are recorded but do not invalidate a verified Sprite',
         'summary': {'canaryCount':len(CANARIES),'verifiedCount':verified,'reviewCount':reviews,'blockerCount':blockers},
         'results': results,
     }
