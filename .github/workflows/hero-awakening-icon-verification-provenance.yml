@@ -1,0 +1,39 @@
+name: Hero Awakening Icon Verification Provenance
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-9-provenance-freeze-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a6-9-provenance-freeze-20260910
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze consolidated verification provenance
+        run: python scripts/freeze-hero-awakening-icon-verification-provenance.py --write
+      - name: Commit frozen provenance when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-verification-provenance.v1.json
+          if git diff --cached --quiet; then
+            echo 'Frozen provenance already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze awakening icon verification provenance'
+          git push origin HEAD:work/awakening-skill-icon-a6-9-provenance-freeze-20260910
