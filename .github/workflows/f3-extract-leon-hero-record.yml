@@ -31,13 +31,19 @@ jobs:
           const one = (rows,id,label) => { const h=rows.filter(r=>r&&r.ID===id); if(h.length!==1)throw new Error(`${label} ${id}: ${h.length}`); return h[0]; };
           const sp=one(load('ConfigDataSPHeroInfo.json'),6,'SPHeroInfo');
           const jc=one(load('ConfigDataJobConnectionInfo.json'),Number(sp.JobConnection_ID),'JobConnectionInfo');
+          if(!Array.isArray(jc.JobLevels_ID)||jc.JobLevels_ID.length!==1) throw new Error('Leon SP JobConnection expected one JobLevel');
           const level=one(load('ConfigDataJobLevelInfo.json'),Number(jc.JobLevels_ID[0]),'JobLevelInfo');
           const info=one(load('ConfigDataHeroInformationInfo.json'),6,'HeroInformationInfo');
           const heart=one(load('ConfigDataHeroHeartFetterInfo.json'),Number(info.HeroHeartFetterId),'HeroHeartFetterInfo');
+          if(!Array.isArray(heart.HeroHeartFetterSkills)||heart.HeroHeartFetterSkills.length!==10) throw new Error('HeartFetterSkills expected 10 levels');
+          if(!Array.isArray(heart.UnlockSkills_ID)) throw new Error('UnlockSkills_ID missing');
+          const lv10Unlocks=heart.UnlockSkills_ID.filter(x=>Number(x?.HeartFetterLevel)===10);
+          if(lv10Unlocks.length!==1) throw new Error(`expected one Lv10 unlock skill; got ${lv10Unlocks.length}`);
           const skills=load('ConfigDataSkillInfo.json');
           const lv10HeartSkill=one(skills,Number(heart.HeroHeartFetterSkills[9]),'HeartLv10Skill');
-          const allStatSkillId=heart.HeartFetterUnlockSkills.find(x=>Number(x.HeartFetterLevelUnlock)===10)?.SkillId;
-          const allStatSkill=one(skills,Number(allStatSkillId),'HeartUnlockLv10Skill');
+          const allStatSkill=one(skills,Number(lv10Unlocks[0].SkillId),'HeartUnlockLv10Skill');
+          if(lv10HeartSkill.ID!==70352) throw new Error(`unexpected Heart Lv10 skill ${lv10HeartSkill.ID}`);
+          if(allStatSkill.ID!==70110) throw new Error(`unexpected Heart Lv10 unlock skill ${allStatSkill.ID}`);
           if(!/生命\+750/.test(lv10HeartSkill.Desc)||!/防御\+30/.test(lv10HeartSkill.Desc)||!/魔防\+40/.test(lv10HeartSkill.Desc)) throw new Error('flat semantic mismatch');
           if(!/全属性/.test(allStatSkill.Desc)||!/\+5%/.test(allStatSkill.Desc)) throw new Error('5% semantic mismatch');
 
@@ -61,12 +67,14 @@ jobs:
             rows.push({stat,progressionBase,starCorrection,starAdjustedRaw,heartPercentDelta,flat:d.flat,current:d.current,corrected,target:d.target,exact:corrected===d.target,combinedCandidate,combinedExact:combinedCandidate===d.target});
             if(corrected!==d.target) throw new Error(`${stat}: corrected ${corrected} != target ${d.target}`);
           }
-          if(rows.find(x=>x.stat==='df').combinedExact) throw new Error('DEF discriminator unexpectedly failed');
+          const defRow=rows.find(x=>x.stat==='df');
+          if(defRow.combinedCandidate!==299 || defRow.combinedExact) throw new Error(`DEF discriminator unexpected: ${JSON.stringify(defRow)}`);
           console.log('=== LEON_CENTRAL_BOND_FORMULA_PROOF_START ===');
           console.log(JSON.stringify({heroId:6,spJobConnectionId:sp.JobConnection_ID,spJobLevelId:jc.JobLevels_ID[0],heartFetterId:info.HeroHeartFetterId,heartFlatSkillId:lv10HeartSkill.ID,heartPercentSkillId:allStatSkill.ID,formula:'corrected = legacyCurrent + round(starAdjustedRaw * 0.05) + heartFlat',rows},null,2));
           console.log('=== LEON_CENTRAL_BOND_FORMULA_PROOF_END ===');
           NODE
       - name: Verify repository unchanged
+        if: always()
         run: |
           set -euo pipefail
           git diff --exit-code
