@@ -55,7 +55,8 @@ if (iconPathMissingCount !== 0) fail(`awakening iconPath missing count ${iconPat
 
 const inventory = [...referencesBySourcePath.entries()].map(([sourcePath, references]) => {
   const admitted = admittedBySourcePath.get(sourcePath) ?? null;
-  const publicExists = admitted ? fs.existsSync(path.join(repoRoot, admitted.publicPath.replace(/^\//, ""))) : false;
+  const publicRepoPath = admitted?.publicPath ? path.join("public", admitted.publicPath.replace(/^\//, "")) : null;
+  const publicExists = publicRepoPath ? fs.existsSync(path.join(repoRoot, publicRepoPath)) : false;
   return {
     sourcePath,
     heroReferenceCount: references.heroIds.length,
