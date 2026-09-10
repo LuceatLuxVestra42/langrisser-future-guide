@@ -1,65 +1,40 @@
 name: Hero Awakening Icon Official Canary
 
 on:
-  push:
+  pull_request:
     branches:
-      - work/awakening-skill-icon-a6-5-small-canary-20260910
+      - main
+      - work/awakening-skill-icon-a6-4-bundle-locator-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-official-canary.yml'
+      - 'scripts/freeze-hero-awakening-icon-official-canary.py'
+      - 'scripts/verify-hero-awakening-icon-official.py'
+      - 'data/contracts/hero-awakening-icon-official-verifier.v1.json'
+      - 'data/generated/hero-awakening-icon-official-canary.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bundle-locator.v1.json'
+      - 'data/generated/hero-awakening-icon-verification-targets.v1.json'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  freeze-canary:
+  validate-canary:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: work/awakening-skill-icon-a6-5-small-canary-20260910
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install verifier dependencies
         run: pip install UnityPy==1.25.3 Pillow
-      - name: Verify and freeze three locator-group canaries
-        shell: bash
-        run: |
-          set +e
-          python scripts/freeze-hero-awakening-icon-official-canary.py --write
-          rc=$?
-          python - <<'PY'
-          import json
-          p='data/generated/hero-awakening-icon-official-canary.v1.json'
-          data=json.load(open(p,encoding='utf-8'))
-          print(json.dumps([
-            {
-              'sourcePath': r['target']['sourcePath'],
-              'status': r['status'],
-              'reason': r['reason'],
-              'exactHits': [
-                {
-                  'status': h.get('status'),
-                  'reason': h.get('reason'),
-                  'objectType': h.get('objectType'),
-                  'pathId': h.get('pathId'),
-                  'runtimeContainerPath': h.get('runtimeContainerPath')
-                } for h in r['exactHits']
-              ]
-            } for r in data['results']
-          ], ensure_ascii=False, indent=2))
-          PY
-          exit "$rc"
-      - name: Commit frozen canary when changed
+      - name: Validate frozen three-group canary and verifier contract
         shell: bash
         run: |
           set -euo pipefail
-          git add data/generated/hero-awakening-icon-official-canary.v1.json
-          if git diff --cached --quiet; then
-            echo 'Frozen canary already current.'
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m 'Freeze official awakening icon canary'
-          git push origin HEAD:work/awakening-skill-icon-a6-5-small-canary-20260910
+          before="$(git status --porcelain=v1 --untracked-files=all)"
+          python scripts/verify-hero-awakening-icon-official.py --contract-check
+          python scripts/freeze-hero-awakening-icon-official-canary.py
+          after="$(git status --porcelain=v1 --untracked-files=all)"
+          test "$before" = "$after"
