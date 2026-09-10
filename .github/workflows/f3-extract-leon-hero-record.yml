@@ -1,4 +1,4 @@
-name: F3 Inspect Leon Heart Fetter Passive Buff Candidates
+name: F3 Extract Leon Normal Fetter Lv10 Skills
 
 on:
   workflow_dispatch:
@@ -12,9 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  extract:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,14 +23,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract all complete target candidates for Leon Heart Fetter passive IDs
+      - name: Extract Leon normal Fetter Lv10 skill records
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const path = require('path');
           const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
           function load(name) {
@@ -42,67 +40,56 @@ jobs:
             const hits = [];
             for (let i = 0; i < records.length; i++) {
               const record = records[i];
-              if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) {
-                hits.push({ recordIndex: i, record });
-              }
+              if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) hits.push({ recordIndex: i, record });
             }
             if (hits.length !== 1) throw new Error(`${label}: expected one ID ${id}; found ${hits.length}`);
             return hits[0];
           }
 
-          const leonHero = uniqueById(load('ConfigDataHeroInfo.json'), 6, 'HeroInfo');
-          if (leonHero.record.HeroInformation_ID !== 6) throw new Error('HeroInformation_ID mismatch');
-          const leonInfo = uniqueById(load('ConfigDataHeroInformationInfo.json'), 6, 'HeroInformationInfo');
-          if (leonInfo.record.Name !== '利昂' || leonInfo.record.HeroHeartFetterId !== 6) throw new Error('HeroInformation identity mismatch');
-          const leonHeart = uniqueById(load('ConfigDataHeroHeartFetterInfo.json'), 6, 'HeroHeartFetterInfo');
-          const skillIds = [70343,70344,70345,70346,70347,70348,70349,70350,70351,70352];
-          if (JSON.stringify(leonHeart.record.HeroHeartFetterSkills) !== JSON.stringify(skillIds)) throw new Error('Heart skill sequence mismatch');
+          const hero = uniqueById(load('ConfigDataHeroInfo.json'), 6, 'HeroInfo');
+          if (hero.record.HeroInformation_ID !== 6) throw new Error('HeroInformation_ID mismatch');
+          const info = uniqueById(load('ConfigDataHeroInformationInfo.json'), 6, 'HeroInformationInfo');
+          if (info.record.Name !== '利昂') throw new Error('Leon identity mismatch');
+          const expectedFetterIds = [21,22,23,24,25];
+          if (JSON.stringify(info.record.HeroFetters_ID) !== JSON.stringify(expectedFetterIds)) throw new Error('HeroFetters_ID mismatch');
 
+          const fetterRecords = load('ConfigDataHeroFetterInfo.json');
           const skillRecords = load('ConfigDataSkillInfo.json');
-          const passiveIds = skillIds.map((id) => {
-            const hit = uniqueById(skillRecords, id, 'SkillInfo');
-            const refs = hit.record.PassiveBuffs_ID;
-            if (!Array.isArray(refs) || refs.length !== 1 || refs[0] !== id) throw new Error(`PassiveBuffs_ID mismatch for ${id}`);
-            return refs[0];
-          });
+          const out = [];
 
-          const sourceDir = path.dirname(resolveConfigDataFile('ConfigDataHeroInfo.json'));
-          const candidates = [];
-          for (const file of fs.readdirSync(sourceDir).filter((x) => x.endsWith('.json')).sort()) {
-            if (file === 'ConfigDataSkillInfo.json') continue;
-            let records;
-            try { records = JSON.parse(fs.readFileSync(path.join(sourceDir, file), 'utf8')); } catch { continue; }
-            if (!Array.isArray(records)) continue;
-            const hits = [];
-            let complete = true;
-            for (const id of passiveIds) {
-              const found = [];
-              for (let i = 0; i < records.length; i++) {
-                const record = records[i];
-                if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) found.push({ recordIndex: i, record });
-              }
-              if (found.length !== 1) { complete = false; break; }
-              hits.push(found[0]);
+          for (const fetterId of expectedFetterIds) {
+            const fetter = uniqueById(fetterRecords, fetterId, 'HeroFetterInfo');
+            if (fetter.record.MaxLevel !== 10) throw new Error(`Fetter ${fetterId}: MaxLevel mismatch`);
+            if (!Array.isArray(fetter.record.GotSkills_ID) || fetter.record.GotSkills_ID.length !== 10) {
+              throw new Error(`Fetter ${fetterId}: GotSkills_ID must contain 10 levels`);
             }
-            if (complete) candidates.push({ file, hits });
+            const lv10SkillId = fetter.record.GotSkills_ID[9];
+            const skill = uniqueById(skillRecords, lv10SkillId, 'SkillInfo');
+            out.push({
+              fetterId,
+              fetterName: fetter.record.Name,
+              fetterRecordIndex: fetter.recordIndex,
+              lv10SkillId,
+              skillRecordIndex: skill.recordIndex,
+              skill: skill.record,
+            });
           }
 
-          if (candidates.length < 1) throw new Error('No complete non-Skill target candidates found');
-
-          console.log('=== F3_PASSIVE_CANDIDATE_META_START ===');
-          console.log(JSON.stringify(candidates.map((candidate) => ({
-            file: candidate.file,
-            targets: candidate.hits.map((hit) => ({ ID: hit.record.ID, recordIndex: hit.recordIndex }))
+          console.log('=== F3_LEON_NORMAL_FETTER_LV10_META_START ===');
+          console.log(JSON.stringify(out.map((x) => ({
+            fetterId: x.fetterId,
+            fetterName: x.fetterName,
+            fetterRecordIndex: x.fetterRecordIndex,
+            lv10SkillId: x.lv10SkillId,
+            skillRecordIndex: x.skillRecordIndex,
+            PassiveBuffs_ID: x.skill.PassiveBuffs_ID ?? null,
           })), null, 2));
-          console.log('=== F3_PASSIVE_CANDIDATE_META_END ===');
+          console.log('=== F3_LEON_NORMAL_FETTER_LV10_META_END ===');
 
-          for (const candidate of candidates) {
-            for (let i = 0; i < candidate.hits.length; i++) {
-              const hit = candidate.hits[i];
-              console.log(`=== F3_PASSIVE_CANDIDATE_${candidate.file}_LV${i + 1}_${hit.record.ID}_START ===`);
-              console.log(JSON.stringify(hit.record, null, 2));
-              console.log(`=== F3_PASSIVE_CANDIDATE_${candidate.file}_LV${i + 1}_${hit.record.ID}_END ===`);
-            }
+          for (const x of out) {
+            console.log(`=== F3_LEON_NORMAL_FETTER_${x.fetterId}_LV10_SKILL_${x.lv10SkillId}_START ===`);
+            console.log(JSON.stringify(x.skill, null, 2));
+            console.log(`=== F3_LEON_NORMAL_FETTER_${x.fetterId}_LV10_SKILL_${x.lv10SkillId}_END ===`);
           }
           NODE
 
