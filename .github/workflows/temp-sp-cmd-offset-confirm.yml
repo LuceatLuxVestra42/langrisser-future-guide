@@ -1,0 +1,66 @@
+name: Temporary SP Cmd offset confirm
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  confirm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract GameAssembly and disassemble SP Cmd getters
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/sp-offset out/sp-cmd-offset-confirm
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib,hashlib,json
+          D=pathlib.Path('/tmp/sp-offset'); O=pathlib.Path('out/sp-cmd-offset-confirm'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'; u=f'{B}/InstallPage_{V}_1.zip'; target='Client/GameAssembly.dll'
+          def rq(a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:t=int(r.headers['Content-Length'])
+          n=min(131072,t); x=rq(t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(o,o+s-1); i=0; hit=None
+          while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+            fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace')
+            if nm==target: hit=(nm,me,cr,co,un,lo)
+            i+=46+fn+ex+cm
+          nm,me,cr,co,un,lo=hit; h=rq(lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; zz=rq(st,st+co-1); raw=zz if me==0 else zlib.decompress(zz,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr
+          (D/'GameAssembly.dll').write_bytes(raw); (O/'source.json').write_text(json.dumps({'version':V,'sha256':hashlib.sha256(raw).hexdigest()},indent=2)+'\n')
+          PY
+          E=/tmp/sp-offset/GameAssembly.dll
+          objdump -d -M intel --start-address=0x1804040e0 --stop-address=0x180404110 "$E" > out/sp-cmd-offset-confirm/hp.txt
+          objdump -d -M intel --start-address=0x180342d00 --stop-address=0x180342d30 "$E" > out/sp-cmd-offset-confirm/atk-mdef.txt
+          objdump -d -M intel --start-address=0x1803875b0 --stop-address=0x1803875e0 "$E" > out/sp-cmd-offset-confirm/def.txt
+          objdump -d -M intel --start-address=0x1817a0cc0 --stop-address=0x1817a0d80 "$E" > out/sp-cmd-offset-confirm/application.txt
+          python <<'PY'
+          import json,re,pathlib
+          O=pathlib.Path('out/sp-cmd-offset-confirm')
+          files={'HP':'hp.txt','ATK_MDEF':'atk-mdef.txt','DEF':'def.txt','APPLICATION':'application.txt'}
+          texts={k:(O/v).read_text() for k,v in files.items()}
+          # Getter bodies are expected to expose object field displacement directly; record, do not infer missing values.
+          def disps(text):
+            return sorted(set('0x'+x.lower() for x in re.findall(r'\[(?:r|e)cx\+0x([0-9a-f]+)\]',text,re.I)))
+          result={'status':'PASS','source':'OFFICIAL_INSTALLER_1.1.113','getterDisplacements':{k:disps(v) for k,v in texts.items() if k!='APPLICATION'},'applicationContains':{x:(x in texts['APPLICATION'].lower()) for x in ['[rbx+0x40]','[rbx+0x44]','[rbx+0x48]','[rbx+0x4c]']},'files':files,'blockers':[]}
+          required=[result['getterDisplacements'].get('HP'),result['getterDisplacements'].get('ATK_MDEF'),result['getterDisplacements'].get('DEF')]
+          if not all(required): result['status']='REVIEW'; result['blockers'].append('GETTER_DISPLACEMENT_NOT_DECODED')
+          (O/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sp-cmd-offset-confirm
+          path: out/sp-cmd-offset-confirm
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-sp-cmd-offset-confirm.yml
+          git commit -m "Remove temporary SP Cmd offset confirm"
+          git push origin HEAD:${GITHUB_REF_NAME}
