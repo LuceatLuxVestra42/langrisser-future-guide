@@ -16,29 +16,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: 6475e63ee23d18adf733756c26a14fa9e3ed662c
-      - name: Verify pinned SkillInfo bytes and selected records
+      - name: Resolve SkillInfo PassiveBuffs_ID target rows
         run: |
           python3 <<'PY'
-          import json, os
-          p='data/configdata/ConfigDataSkillInfo.json'
-          print('FILE_SIZE='+str(os.path.getsize(p)))
-          raw=open(p,'rb').read(128)
-          print('HEAD_BYTES='+repr(raw))
-          for enc in ('utf-8','utf-8-sig'):
-              try:
-                  data=json.load(open(p,encoding=enc))
-                  print('PARSE_OK='+enc+';TYPE='+type(data).__name__)
-                  if isinstance(data,list): rows=data
-                  elif isinstance(data,dict):
-                      print('TOP_KEYS='+json.dumps(list(data.keys())[:20],ensure_ascii=False))
-                      rows=data.get('records') or data.get('data') or data.get('list') or []
-                  else: rows=[]
-                  print('ROW_COUNT='+str(len(rows) if hasattr(rows,'__len__') else -1))
-                  if isinstance(rows,dict): rows=list(rows.values())
-                  for r in rows:
-                      if isinstance(r,dict) and r.get('ID') in (70009,70069):
-                          print('SELECTED_SKILL_ROW='+json.dumps(r,ensure_ascii=False,separators=(',',':')))
-                  break
-              except Exception as e:
-                  print('PARSE_FAIL='+enc+':'+repr(e))
+          import json
+          skills=json.load(open('data/configdata/ConfigDataSkillInfo.json',encoding='utf-8'))
+          buffs=json.load(open('data/configdata/ConfigDataBuffInfo.json',encoding='utf-8'))
+          skill_ids=(70009,70069)
+          selected=[r for r in skills if isinstance(r,dict) and r.get('ID') in skill_ids]
+          target_ids=sorted({x for r in selected for x in r.get('PassiveBuffs_ID',[])})
+          print('TARGET_BUFF_IDS='+json.dumps(target_ids))
+          for r in selected:
+              print('SKILL_ROW='+json.dumps(r,ensure_ascii=False,separators=(',',':')))
+          hit=[r for r in buffs if isinstance(r,dict) and r.get('ID') in target_ids]
+          print('BUFF_HIT_COUNT='+str(len(hit)))
+          for r in hit:
+              print('BUFF_ROW='+json.dumps(r,ensure_ascii=False,separators=(',',':')))
+          missing=sorted(set(target_ids)-{r.get('ID') for r in hit})
+          print('MISSING_BUFF_IDS='+json.dumps(missing))
+          if missing: raise SystemExit(1)
           PY
