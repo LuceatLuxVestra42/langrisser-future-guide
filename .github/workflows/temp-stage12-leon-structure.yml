@@ -1,0 +1,40 @@
+name: Temporary Stage12 Leon correction structures
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print Leon correction source blocks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          import fs from 'node:fs';
+          const combat=JSON.parse(fs.readFileSync('data/generated/hero-basic-combat.v1.json','utf8'));
+          const bonds=JSON.parse(fs.readFileSync('data/generated/hero-page-stage5-1-bonds-final.v1.json','utf8'));
+          const sp=JSON.parse(fs.readFileSync('data/generated/hero-page-stage5-4-sp.v1.json','utf8'));
+          const c=combat.records.find(r=>Number(r.heroId)===6);
+          const b=bonds.records.find(r=>Number(r.heroId)===6);
+          const s=sp.records.find(r=>Number(r.heroId)===6);
+          console.log('=== COMBAT soldierModifiers ==='); console.log(JSON.stringify(c?.soldierModifiers,null,2));
+          console.log('=== COMBAT heroMeta ==='); console.log(JSON.stringify(c?.heroMeta,null,2));
+          console.log('=== BONDS 21/23 ==='); console.log(JSON.stringify(b?.bonds?.filter(x=>[21,23].includes(Number(x.fetterId))),null,2));
+          console.log('=== SP stats ==='); console.log(JSON.stringify(s?.sp?.stats,null,2));
+          NODE
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-stage12-leon-structure.yml
+          git commit -m "Remove temporary Stage12 Leon probe"
+          git push origin HEAD:${GITHUB_REF_NAME}
