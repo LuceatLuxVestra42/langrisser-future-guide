@@ -1,0 +1,30 @@
+name: Hero Awakening Icon Target Freeze
+
+on:
+  pull_request:
+    branches:
+      - main
+      - work/awakening-skill-icon-a5-inventory-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-target-freeze.yml'
+      - 'scripts/freeze-hero-awakening-icon-verification-targets.mjs'
+      - 'data/generated/hero-awakening-icon-verification-targets.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'public/images/heroes/skill-icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-target-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Validate frozen A6-1 target set
+        run: node scripts/freeze-hero-awakening-icon-verification-targets.mjs
