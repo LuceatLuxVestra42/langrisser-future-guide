@@ -44,8 +44,10 @@ jobs:
           const allStatSkill=one(skills,Number(lv10Unlocks[0].SkillId),'HeartUnlockLv10Skill');
           if(lv10HeartSkill.ID!==70352) throw new Error(`unexpected Heart Lv10 skill ${lv10HeartSkill.ID}`);
           if(allStatSkill.ID!==70110) throw new Error(`unexpected Heart Lv10 unlock skill ${allStatSkill.ID}`);
-          if(!/生命\+750/.test(lv10HeartSkill.Desc)||!/防御\+30/.test(lv10HeartSkill.Desc)||!/魔防\+40/.test(lv10HeartSkill.Desc)) throw new Error('flat semantic mismatch');
-          if(!/全属性/.test(allStatSkill.Desc)||!/\+5%/.test(allStatSkill.Desc)) throw new Error('5% semantic mismatch');
+          const flatDesc=String(lv10HeartSkill.Desc||'');
+          const pctDesc=String(allStatSkill.Desc||'');
+          if(!flatDesc.includes('生命')||!flatDesc.includes('+750')||!flatDesc.includes('防御')||!flatDesc.includes('+30')||!flatDesc.includes('魔防')||!flatDesc.includes('+40')) throw new Error(`flat semantic mismatch: ${flatDesc}`);
+          if(!pctDesc.includes('全属性')||!pctDesc.includes('+5%')) throw new Error(`5% semantic mismatch: ${pctDesc}`);
 
           const defs={
             hp:{ini:'HP_INI',up:'HP_UP',star:'HPStar',current:4041,target:4929,flat:750},
