@@ -1,4 +1,4 @@
-name: F3 Probe Leon Heart Fetter Stat Formula
+name: F3 Probe Leon Heart Fetter Buff Effects
 
 on:
   workflow_dispatch:
@@ -17,70 +17,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Probe Leon Heart Fetter unlock skills and current stat owner
+      - name: Locate exact buff records for proven Leon bond skills
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
-
-          const load = (name) => JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
-          const uniqueById = (rows, id, label) => {
-            const hits = [];
+          const path = require('path');
+          const { resolveConfigDataSourceRoot } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const root = resolveConfigDataSourceRoot();
+          const names = fs.readdirSync(root).filter(n => /^ConfigData.*Buff.*\.json$/i.test(n)).sort();
+          console.log('=== BUFF_TABLE_CANDIDATES ===');
+          console.log(JSON.stringify(names, null, 2));
+          const ids = new Set([70088,70089,70099,70109,70110,70111,70352]);
+          const hits = [];
+          for (const name of names) {
+            let rows;
+            try { rows = JSON.parse(fs.readFileSync(path.join(root, name), 'utf8')); } catch { continue; }
+            if (!Array.isArray(rows)) continue;
             rows.forEach((record, recordIndex) => {
-              if (record && typeof record === 'object' && !Array.isArray(record) && record.ID === id) hits.push({recordIndex, record});
+              if (record && typeof record === 'object' && !Array.isArray(record) && ids.has(Number(record.ID))) {
+                hits.push({table:name, recordIndex, record});
+              }
             });
-            if (hits.length !== 1) throw new Error(`${label}: expected one ID ${id}; found ${hits.length}`);
-            return hits[0];
-          };
-
-          const hero = uniqueById(load('ConfigDataHeroInfo.json'), 6, 'HeroInfo');
-          if (hero.record.Name !== '利昂' || hero.record.HeroInformation_ID !== 6) throw new Error('Leon HeroInfo identity mismatch');
-          const info = uniqueById(load('ConfigDataHeroInformationInfo.json'), 6, 'HeroInformationInfo');
-          if (info.record.Name !== '利昂' || info.record.HeroHeartFetterId !== 6) throw new Error('Leon HeroInformation identity/heart mismatch');
-          const heart = uniqueById(load('ConfigDataHeroHeartFetterInfo.json'), 6, 'HeroHeartFetterInfo');
-          if (heart.record.Name !== '利昂' || heart.record.MaxLevel !== 10) throw new Error('Leon HeartFetter identity/max mismatch');
-
-          const unlockRows = Array.isArray(heart.record.UnlockSkills_ID) ? heart.record.UnlockSkills_ID : [];
-          console.log('=== HEART_RECORD_START ===');
-          console.log(JSON.stringify(heart, null, 2));
-          console.log('=== HEART_RECORD_END ===');
-
-          const skillRows = load('ConfigDataSkillInfo.json');
-          const unlockSkillIds = [...new Set(unlockRows.map(x => Number(x?.Skill_ID ?? x?.SkillId ?? x?.ID ?? x)).filter(Number.isInteger))];
-          console.log('=== HEART_UNLOCK_SKILLS_START ===');
-          for (const id of unlockSkillIds) {
-            const hit = uniqueById(skillRows, id, 'SkillInfo');
-            console.log(JSON.stringify({id, recordIndex: hit.recordIndex, record: hit.record}, null, 2));
           }
-          console.log('=== HEART_UNLOCK_SKILLS_END ===');
-
-          const stage4 = JSON.parse(fs.readFileSync('data/generated/hero-basic-combat.v1.json', 'utf8'));
-          const leon = (stage4.records || []).find(r => Number(r.heroId) === 6);
-          if (!leon) throw new Error('Stage4 Leon record missing');
-          console.log('=== STAGE4_LEON_DISPLAY_STATS_START ===');
-          console.log(JSON.stringify({
-            heroId: leon.heroId,
-            nameKr: leon.nameKr,
-            nameCn: leon.nameCn,
-            connections: (leon.jobTree?.connections || []).map(c => ({
-              jobConnectionId: c.jobConnectionId,
-              jobId: c.jobId,
-              jobNameCn: c.job?.nameCn ?? null,
-              finalDisplayStats: c.finalDisplayStats ?? null
-            }))
-          }, null, 2));
-          console.log('=== STAGE4_LEON_DISPLAY_STATS_END ===');
+          console.log('=== TARGET_BUFF_HITS_START ===');
+          console.log(JSON.stringify(hits, null, 2));
+          console.log('=== TARGET_BUFF_HITS_END ===');
           NODE
-
       - name: Verify repository unchanged
         run: |
           set -euo pipefail
