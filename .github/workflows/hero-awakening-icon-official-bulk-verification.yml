@@ -1,0 +1,42 @@
+name: Hero Awakening Icon Official Bulk Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+      - work/awakening-skill-icon-a6-5-small-canary-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-official-bulk-verification.yml'
+      - 'scripts/freeze-hero-awakening-icon-official-bulk-verification.py'
+      - 'scripts/verify-hero-awakening-icon-official.py'
+      - 'data/contracts/hero-awakening-icon-official-verifier.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bulk-verification.v1.json'
+      - 'data/generated/hero-awakening-icon-official-bundle-locator.v1.json'
+      - 'data/generated/hero-awakening-icon-verification-targets.v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-bulk-verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install verifier dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - name: Validate frozen 256-target bulk verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          before="$(git status --porcelain=v1 --untracked-files=all)"
+          python scripts/verify-hero-awakening-icon-official.py --contract-check
+          python scripts/freeze-hero-awakening-icon-official-bulk-verification.py
+          after="$(git status --porcelain=v1 --untracked-files=all)"
+          test "$before" = "$after"
