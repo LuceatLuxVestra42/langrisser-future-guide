@@ -1,0 +1,39 @@
+name: Hero Awakening Icon Official Canary
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-5-small-canary-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a6-5-small-canary-20260910
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install verifier dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - name: Verify and freeze three locator-group canaries
+        run: python scripts/freeze-hero-awakening-icon-official-canary.py --write
+      - name: Commit frozen canary when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-official-canary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Frozen canary already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze official awakening icon canary'
+          git push origin HEAD:work/awakening-skill-icon-a6-5-small-canary-20260910
