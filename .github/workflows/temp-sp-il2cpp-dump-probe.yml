@@ -1,0 +1,78 @@
+name: Temporary SP IL2CPP dump probe
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract official IL2CPP pair
+        shell: bash
+        run: |
+          mkdir -p /tmp/sp-il2cpp out/sp-il2cpp-dump-probe
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib
+          D=pathlib.Path('/tmp/sp-il2cpp'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          targets={1:('Client/GameAssembly.dll','GameAssembly.dll'),66:('Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat','global-metadata.dat')}
+          def rq(u,a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          def hs(u):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:return int(r.headers['Content-Length'])
+          def ent(u,t):
+            n=min(131072,t); x=rq(u,t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(u,o,o+s-1); i=0; out=[]
+            while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+              fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace'); out.append((nm,me,cr,co,un,lo)); i+=46+fn+ex+cm
+            return out
+          def get(u,e):
+            nm,me,cr,co,un,lo=e; h=rq(u,lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; d=rq(u,st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; return raw
+          for part,(target,out) in targets.items():
+            u=f'{B}/InstallPage_{V}_{part}.zip'; e=next(e for e in ent(u,hs(u)) if e[0]==target); (D/out).write_bytes(get(u,e))
+          PY
+      - name: Build and run Il2CppDumper
+        shell: bash
+        run: |
+          set +e
+          git clone --depth 1 https://github.com/Perfare/Il2CppDumper.git /tmp/Il2CppDumper
+          dotnet build /tmp/Il2CppDumper/Il2CppDumper.sln -c Release > out/sp-il2cpp-dump-probe/build.log 2>&1
+          DLL=$(find /tmp/Il2CppDumper -path '*/bin/Release/*/Il2CppDumper.dll' | head -1)
+          echo "dumper=$DLL" >> out/sp-il2cpp-dump-probe/build.log
+          mkdir -p /tmp/spdump
+          dotnet "$DLL" /tmp/sp-il2cpp/GameAssembly.dll /tmp/sp-il2cpp/global-metadata.dat /tmp/spdump > out/sp-il2cpp-dump-probe/dumper.log 2>&1
+          code=$?
+          echo "$code" > out/sp-il2cpp-dump-probe/dumper-exit.txt
+          python <<'PY'
+          import json,pathlib,re
+          d=pathlib.Path('/tmp/spdump'); out=pathlib.Path('out/sp-il2cpp-dump-probe')
+          terms=['ConfigDataSPHeroInfo','GetConfigDataSPHeroInfo','GetConfigDataHeroInfo','UpdateHeroInfo','ComputeSoldierProperties','ComputeHeroProperties','HPCmd_INI','Hero3_HPCmdAdd']
+          result={'status':'PASS','files':[p.name for p in d.glob('*')],'hits':{},'blockers':[]}
+          for term in terms:
+            hits=[]
+            for fn in ['dump.cs','script.json','stringliteral.json']:
+              p=d/fn
+              if not p.exists(): continue
+              text=p.read_text(encoding='utf-8',errors='replace')
+              for m in list(re.finditer(re.escape(term),text))[:20]: hits.append({'file':fn,'offset':m.start(),'context':text[max(0,m.start()-220):m.start()+320].replace('\r','')})
+            result['hits'][term]=hits
+          if not (d/'dump.cs').exists(): result={'status':'BLOCKER','files':[p.name for p in d.glob('*')],'hits':result['hits'],'blockers':['DUMP_CS_NOT_PRODUCED']}
+          (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sp-il2cpp-dump-probe
+          path: out/sp-il2cpp-dump-probe
+          retention-days: 7
+      - name: Remove temporary diagnostic workflow
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-sp-il2cpp-dump-probe.yml
+          git commit -m "Remove temporary SP IL2CPP dump probe"
+          git push origin HEAD:${GITHUB_REF_NAME}
