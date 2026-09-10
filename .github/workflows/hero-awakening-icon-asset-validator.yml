@@ -4,33 +4,42 @@ on:
   push:
     branches:
       - work/awakening-skill-icon-a7-3-asset-validator-20260910
+  pull_request:
+    branches:
+      - main
+      - work/awakening-skill-icon-a7-2-manifest-admission-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-asset-validator.yml'
+      - 'scripts/validate-hero-awakening-icon-assets-readonly.mjs'
+      - 'data/generated/hero-awakening-icon-asset-validation.v1.json'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'data/generated/hero-awakening-icon-materialization.v1.json'
+      - 'public/images/heroes/skill-icons/**'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  freeze-asset-validation:
+  validate-asset-parity:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       NODE_OPTIONS: '--no-warnings'
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: work/awakening-skill-icon-a7-3-asset-validator-20260910
-      - name: Freeze A7-3 independent asset validation
-        run: node scripts/validate-hero-awakening-icon-assets-readonly.mjs --write
-      - name: Commit frozen validation checkpoint when changed
+      - name: Record worktree state before validation
         shell: bash
         run: |
           set -euo pipefail
-          git add data/generated/hero-awakening-icon-asset-validation.v1.json
-          if git diff --cached --quiet; then
-            echo 'A7-3 validation checkpoint already current.'
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m 'Freeze awakening icon asset validation'
-          git push origin HEAD:work/awakening-skill-icon-a7-3-asset-validator-20260910
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a7-3-before.txt"
+      - name: Validate frozen A7-3 asset parity read-only
+        run: node scripts/validate-hero-awening-icon-assets-readonly.mjs
+      - name: Validate legacy Hero 6 manifest contract
+        run: node scripts/validate-hero-skill-icon-assets-readonly.mjs
+      - name: Require no repository mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a7-3-after.txt"
+          diff -u "$RUNNER_TEMP/a7-3-before.txt" "$RUNNER_TEMP/a7-3-after.txt"
