@@ -1,4 +1,4 @@
-name: F3 Extract Skill ID 10301 Record
+name: F3 Extract JobConnection ID 60 Record
 
 on:
   workflow_dispatch:
@@ -24,32 +24,69 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract Skill ID 10301 record
+      - name: Locate and extract JobConnection ID 60 record
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
+          const path = require('path');
           const {
-            resolveConfigDataFile,
+            resolveConfigDataDir,
           } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
 
-          const skillPath = resolveConfigDataFile('ConfigDataSkillInfo.json');
-          const skills = JSON.parse(fs.readFileSync(skillPath, 'utf8'));
-          const record = skills[1841];
+          const dir = resolveConfigDataDir();
+          const files = fs.readdirSync(dir).filter((name) => name.endsWith('.json')).sort();
+          const requiredIds = new Set([60, 61, 62, 63, 64, 65]);
+          const candidates = [];
 
-          if (!record) {
-            throw new Error('recordIndex 1841 missing');
+          for (const file of files) {
+            const fullPath = path.join(dir, file);
+            let data;
+            try {
+              data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+            } catch {
+              continue;
+            }
+            if (!Array.isArray(data)) continue;
+
+            const matches = new Map();
+            for (let i = 0; i < data.length; i++) {
+              const record = data[i];
+              if (record && typeof record === 'object' && requiredIds.has(record.ID)) {
+                matches.set(record.ID, { index: i, record });
+              }
+            }
+
+            if ([...requiredIds].every((id) => matches.has(id))) {
+              candidates.push({ file, matches });
+            }
           }
 
-          if (record.ID !== 10301) {
-            throw new Error(`identity mismatch: expected ID 10301, got ${record.ID}`);
+          console.log('=== F3_JOBCONNECTION_CANDIDATES_START ===');
+          console.log(JSON.stringify(candidates.map(({ file, matches }) => ({
+            file,
+            ids: [...requiredIds].map((id) => ({ id, recordIndex: matches.get(id).index }))
+          })), null, 2));
+          console.log('=== F3_JOBCONNECTION_CANDIDATES_END ===');
+
+          if (candidates.length !== 1) {
+            throw new Error(`expected exactly one raw table containing IDs 60..65; found ${candidates.length}`);
           }
 
-          console.log('=== F3_SKILL_10301_RECORD_START ===');
-          console.log(JSON.stringify(record, null, 2));
-          console.log('=== F3_SKILL_10301_RECORD_END ===');
+          const candidate = candidates[0];
+          const hit = candidate.matches.get(60);
+          if (!hit || hit.record.ID !== 60) {
+            throw new Error('JobConnection target ID 60 identity mismatch');
+          }
+
+          console.log('=== F3_JOBCONNECTION_60_META_START ===');
+          console.log(JSON.stringify({ file: candidate.file, recordIndex: hit.index, ID: hit.record.ID }, null, 2));
+          console.log('=== F3_JOBCONNECTION_60_META_END ===');
+          console.log('=== F3_JOBCONNECTION_60_RECORD_START ===');
+          console.log(JSON.stringify(hit.record, null, 2));
+          console.log('=== F3_JOBCONNECTION_60_RECORD_END ===');
           NODE
 
       - name: Verify repository unchanged
