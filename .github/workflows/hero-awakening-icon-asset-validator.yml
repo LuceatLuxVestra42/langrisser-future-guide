@@ -34,7 +34,7 @@ jobs:
           set -euo pipefail
           git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a7-3-before.txt"
       - name: Validate frozen A7-3 asset parity read-only
-        run: node scripts/validate-hero-awening-icon-assets-readonly.mjs
+        run: node scripts/validate-hero-awakening-icon-assets-readonly.mjs
       - name: Validate legacy Hero 6 manifest contract
         run: node scripts/validate-hero-skill-icon-assets-readonly.mjs
       - name: Require no repository mutation
