@@ -24,6 +24,7 @@ const expected = new Map([
   ["UI/Icon/Skill_ABS/Skill_KnightCrash.png", { skillIds: [10301], part: 27, bundle: "5ca1962b06355b48fe0ca6531e002a13a63a1d35e42f558471aace39d4298adf", raw: "c5cf77092c21f2272d68aa9b4860373f8f138d8540d3a0bc8a673238324b6ba7", rgba: "1f83bf5a89236e4c85eae587d9f51e34685dd686a6c8c79d8f6876632676c953", width: 170, height: 170 }],
   ["UI/Icon/Skill_ABS/Skill_SPLeon1.png", { skillIds: [12527], part: 62, bundle: "14c4fe918356f47f0e9f5a59e77dae31e4eb4a0d19e30d898c9d8c1085b8eb12", raw: "c9d8155df7099f97128895e1967ae5a13b2053ae878c10423171b980f8e0f491", rgba: "06e178222d76039de9eedab352665dfa727f1f8e62c6de82fae8c68128d9b6b0", width: 172, height: 172 }],
   ["UI/Icon/Skill_ABS/Skill_SPLeon2.png", { skillIds: [12528], part: 62, bundle: "14c4fe918356f47f0e9f5a59e77dae31e4eb4a0d19e30d898c9d8c1085b8eb12", raw: "154fb93aa05f63c9fd9209f6c9d656d0741fdaa2d86d2ce44613a2169d7bbcd5", rgba: "2cb351ff3ca777a334742320fd50eaf0246993a0fde36adba06989432df8f5c3", width: 172, height: 172 }],
+  ["UI/Icon/Skill_ABS/Skill_Super4.png", { skillIds: [12079], part: 62, bundle: "14c4fe918356f47f0e9f5a59e77dae31e4eb4a0d19e30d898c9d8c1085b8eb12", raw: "8bd9fea67f998b20e5cb8f2440d3b5f0e022466305ea8f802edd63b74ddabaef", rgba: "bd61b5dd9929182ef9a235e10c3b7940468cfdb86a95d93788ea8a08f70bc808", width: 170, height: 170 }],
 ]);
 
 function paeth(a, b, c) {
@@ -86,12 +87,12 @@ function decodeRgbaPng(buffer) {
 }
 
 if (manifest.schemaId !== "hero-skill-icon-assets/v1" || manifest.status !== "FROZEN") fail("manifest contract mismatch");
-if (manifest.scope?.heroId !== 6 || manifest.scope?.targetUniqueIconCount !== 12) fail("manifest scope mismatch");
+if (manifest.scope?.heroId !== 6 || manifest.scope?.targetUniqueIconCount !== 13) fail("manifest scope mismatch");
 if (manifest.scope?.centralDisciplineIncluded !== false) fail("central discipline scope mismatch");
 if (manifest.source?.kind !== "OFFICIAL_INSTALLER" || manifest.source?.installVersion !== "1.1.113") fail("source baseline mismatch");
 if (manifest.source?.verificationArtifactDigest !== "sha256:25c1b2dfdec1887c38c56fa2d0ea7d98636effff2be62af9350fe1292cbb249d") fail("verification artifact digest mismatch");
 if (manifest.source?.unityContainerRootPrefix !== "assets/gameproject/runtimeassets") fail("container root mismatch");
-if (!Array.isArray(manifest.records) || manifest.records.length !== 12) fail("record count mismatch");
+if (!Array.isArray(manifest.records) || manifest.records.length !== 13) fail("record count mismatch");
 
 const current = new Map();
 const addCurrent = (sourcePath, skillId) => {
@@ -103,10 +104,11 @@ for (const row of hero.normal?.talent?.starProgression ?? []) addCurrent(row.ski
 for (const row of hero.normal?.skills?.heroDirectSkills ?? []) addCurrent(row.iconPath, row.skillId);
 for (const row of hero.normal?.skills?.jobLevelAcquisitions ?? []) addCurrent(row.skill?.iconPath, row.skillId);
 for (const row of hero.sp?.secondStageRewards?.skills ?? []) addCurrent(row.icon, row.skillId);
+addCurrent(hero.normal?.awakening?.skill?.iconPath, hero.normal?.awakening?.level2SkillId);
 
 if (current.size !== expected.size) fail(`Hero 6 current icon set mismatch ${current.size}/${expected.size}`);
 for (const sourcePath of current.keys()) if (!expected.has(sourcePath)) fail(`unexpected Hero 6 sourcePath ${sourcePath}`);
-if (hero.centralDiscipline?.icon && current.has(hero.centralDiscipline.icon)) fail("central discipline icon leaked into 12-icon scope");
+if (hero.centralDiscipline?.icon && current.has(hero.centralDiscipline.icon)) fail("central discipline icon leaked into 13-icon scope");
 
 const seenPublic = new Set();
 for (const record of manifest.records) {
