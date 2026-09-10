@@ -16,37 +16,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: 6475e63ee23d18adf733756c26a14fa9e3ed662c
-      - name: Inspect PassiveBuff candidate tables and explicit references
+      - name: Trace 5111 and 5181 through semantic-looking fields
         run: |
           python3 <<'PY'
           import glob, json, os
+          TARGETS={5111,5181}
+          KEYWORDS=('buff','passive','property','skill','modify')
+          out=[]
 
-          TARGETS = {5111, 5181}
-          files = sorted(glob.glob('data/configdata/*.json'))
-          candidates = [p for p in files if 'buff' in os.path.basename(p).lower()]
-          print('BUFF_NAMED_FILES=' + json.dumps([os.path.basename(p) for p in candidates], ensure_ascii=False))
+          def contains_target(v):
+              if isinstance(v,int): return v in TARGETS
+              if isinstance(v,list): return any(contains_target(x) for x in v)
+              return False
 
-          for p in candidates:
-              try:
-                  data = json.load(open(p, encoding='utf-8'))
-              except Exception as e:
-                  print('PARSE_FAIL=' + os.path.basename(p) + ':' + repr(e))
-                  continue
-              rows = data if isinstance(data, list) else data.get('records', []) if isinstance(data, dict) else []
-              keys = sorted({k for r in rows[:100] if isinstance(r, dict) for k in r.keys()})
-              hits = [r for r in rows if isinstance(r, dict) and r.get('ID') in TARGETS]
-              print('BUFF_TABLE=' + json.dumps({'file':os.path.basename(p),'count':len(rows),'keys':keys,'targetRows':hits}, ensure_ascii=False, separators=(',',':')))
-
-          # Locate every explicit field named PassiveBuffs and report its containing table/record shape.
-          for p in files:
-              try:
-                  data = json.load(open(p, encoding='utf-8'))
-              except Exception:
-                  continue
-              rows = data if isinstance(data, list) else data.get('records', []) if isinstance(data, dict) else []
-              for i, r in enumerate(rows):
-                  if isinstance(r, dict) and 'PassiveBuffs' in r:
-                      vals = r.get('PassiveBuffs')
-                      if vals and any(v in TARGETS for v in vals if isinstance(v, int)):
-                          print('PASSIVEBUFF_SOURCE=' + json.dumps({'file':os.path.basename(p),'index':i,'ID':r.get('ID'),'PassiveBuffs':vals,'keys':sorted(r.keys())}, ensure_ascii=False, separators=(',',':')))
+          for p in sorted(glob.glob('data/configdata/*.json')):
+              try: data=json.load(open(p,encoding='utf-8'))
+              except Exception: continue
+              rows=data if isinstance(data,list) else data.get('records',[]) if isinstance(data,dict) else []
+              for i,r in enumerate(rows):
+                  if not isinstance(r,dict): continue
+                  for k,v in r.items():
+                      if contains_target(v) and any(q in k.lower() for q in KEYWORDS):
+                          out.append({'file':os.path.basename(p),'index':i,'recordID':r.get('ID'),'field':k,'value':v,'keys':sorted(r.keys())})
+          print('SEMANTIC_FIELD_HIT_COUNT='+str(len(out)))
+          for x in out:
+              print('SEMANTIC_FIELD_HIT='+json.dumps(x,ensure_ascii=False,separators=(',',':')))
           PY
