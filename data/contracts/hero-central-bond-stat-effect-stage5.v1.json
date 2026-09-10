@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "stage": "hero-central-bond-stat-effect-stage5",
+  "status": "PROPOSED",
+  "purpose": "Own only the numeric central-bond stat effect that is missing after the existing normal-bond max calculation.",
+  "authoritativePredecessor": {
+    "mainCommit": "3dee6060b794f69dfcd8ee369118c8711ddf7dc9",
+    "configDataReleaseTag": "source-configdata-v1-6475e63e",
+    "configDataCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "archiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "inventorySha256": "ea7c6381e0901a55fe11014d14bb82862d9474c418e89d11869e03ba876dcade"
+  },
+  "relation": {
+    "chain": [
+      "ConfigDataHeroInfo.HeroInformation_ID -> ConfigDataHeroInformationInfo.ID",
+      "ConfigDataHeroInformationInfo.HeroHeartFetterId -> ConfigDataHeroHeartFetterInfo.ID",
+      "ConfigDataHeroHeartFetterInfo.HeroHeartFetterSkills[9] -> ConfigDataSkillInfo.ID",
+      "ConfigDataHeroHeartFetterInfo.UnlockSkills_ID[HeartFetterLevel=10].SkillId -> ConfigDataSkillInfo.ID"
+    ],
+    "populationValidation": {
+      "canonicalUsableHeroes": 267,
+      "pass": 267,
+      "review": 0,
+      "broken": 0,
+      "none": 0,
+      "commonPercentSkillId": 70110
+    }
+  },
+  "effect": {
+    "heartLevel": 10,
+    "percent": {
+      "skillId": 70110,
+      "rate": 0.05,
+      "scope": ["hp", "at", "magic", "df", "magicDf", "dex"],
+      "base": "starAdjustedRaw = (INI + UP * (heroLevel - 1) / 10) * (1 + StatStar[star - 1] / 10000)",
+      "delta": "round(starAdjustedRaw * 0.05)",
+      "rounding": "separate from the existing normal-bond percentage calculation"
+    },
+    "flat": {
+      "source": "the hero-specific HeartFetter Lv10 Skill description reached by HeroHeartFetterSkills[9]",
+      "scope": ["hp", "df", "magicDf"],
+      "policy": "parse only the explicit Hero HP/DEF/MDEF flat text; fail closed on any unrecognized shape",
+      "globalConstantForbidden": true
+    },
+    "application": "corrected = legacyNormalBondMax + round(starAdjustedRaw * 0.05) + heroSpecificHeartFlat"
+  },
+  "fixtures": {
+    "exactParity": {
+      "heroId": 6,
+      "form": "SP",
+      "target": {"hp":4929,"at":623,"magic":233,"df":300,"magicDf":280,"dex":130},
+      "tolerance": 0
+    },
+    "sourceDerivedRounding": [
+      {"heroId":1,"nameCn":"马修","expectedPercentDeltas":{"hp":136,"at":19,"magic":9,"df":10,"magicDf":8,"dex":6}},
+      {"heroId":3,"nameCn":"格尼尔","expectedPercentDeltas":{"hp":129,"at":17,"magic":10,"df":10,"magicDf":10,"dex":7}},
+      {"heroId":4,"nameCn":"艾梅达","expectedPercentDeltas":{"hp":116,"at":10,"magic":18,"df":9,"magicDf":11,"dex":4}},
+      {"heroId":7,"nameCn":"巴恩哈特","expectedPercentDeltas":{"hp":143,"at":20,"magic":10,"df":10,"magicDf":9,"dex":5}}
+    ]
+  },
+  "scope": {
+    "changes": [
+      "central-bond Lv10 flat parsing",
+      "central-bond +5% numeric delta",
+      "application to a caller-supplied legacy normal-bond-max value"
+    ],
+    "nonScope": [
+      "Stage4 base growth or mastery recomputation",
+      "normal Fetter +25% recomputation",
+      "frontend integration",
+      "final Hero pipeline regeneration",
+      "ConfigData raw-source mutation"
+    ]
+  },
+  "forbidden": [
+    "name JOIN",
+    "ID arithmetic",
+    "filename similarity mapping",
+    "order-based semantic mapping outside the explicit HeartFetter Lv1-Lv10 skill array",
+    "silent fallback on malformed flat descriptions",
+    "merging the temporary F3 transport PR"
+  ],
+  "validator": "node scripts/validate_hero_central_bond_stat_effect_stage5.cjs",
+  "completion": "The pure consumer and validator pass with Leon tolerance 0, four independent non-Leon source-derived rounding fixtures, strict flat parsing, and no downstream generated/frontend mutation."
+}
