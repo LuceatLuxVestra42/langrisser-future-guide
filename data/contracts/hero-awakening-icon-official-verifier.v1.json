@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "schemaId": "hero-awakening-icon-official-verifier/v1",
+  "status": "FROZEN",
+  "completion": "COMPLETE",
+  "semanticReopen": false,
+  "stage": "A6_2_OFFICIAL_VERIFIER_CONTRACT",
+  "predecessor": {
+    "stage": "A6_1_TARGET_SET_FREEZE",
+    "commit": "447e6b4a51269cdeae42dd04b33ac3ce76dae8e4",
+    "artifact": "data/generated/hero-awakening-icon-verification-targets.v1.json",
+    "targetSetSha256": "78e566b736e3b5b13a4c29186a283a05951383ba6ac84739f296b91c740a4723",
+    "targetCount": 256
+  },
+  "recoveredPrecedent": {
+    "workflowCommit": "6c94b64050f4890328a0b5863d62571a85e2e82c",
+    "workflowPath": ".github/workflows/temp-awakening-skill-super4-official-verify.yml",
+    "runId": 34416831883,
+    "installVersion": "1.1.113",
+    "unityParser": "UnityPy==1.25.3",
+    "positiveFixture": {
+      "heroId": 6,
+      "skillId": 12079,
+      "sourcePath": "UI/Icon/Skill_ABS/Skill_Super4.png"
+    }
+  },
+  "authorityBoundary": {
+    "lookupKey": "sourcePath",
+    "heroIdRole": "provenance_only",
+    "skillIdRole": "provenance_only",
+    "semanticRecomputation": false,
+    "allowedLocatorOptimization": "package or bundle filtering may reduce search work, but cannot establish semantic identity or absence",
+    "proofRule": "official installer package -> ZIP entry -> Unity bundle -> normalized runtime container path exact match -> Sprite decode",
+    "forbidden": [
+      "name JOIN",
+      "ID arithmetic",
+      "basename match",
+      "filename similarity",
+      "case-insensitive basename fallback",
+      "Hero ID to icon inference",
+      "skill ID to filename inference",
+      "historical output silent fallback"
+    ]
+  },
+  "runtimePathNormalization": {
+    "rootPrefix": "assets/gameproject/runtimeassets",
+    "separator": "/",
+    "stripOuterSlash": true,
+    "comparisonCase": "lowercase",
+    "match": "full normalized relative path equality"
+  },
+  "sourceSnapshot": {
+    "kind": "OFFICIAL_INSTALLER",
+    "defaultInstallVersion": "1.1.113",
+    "packageUrlTemplate": "http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{version}/InstallPage_{version}_{part}.zip",
+    "packageDiscovery": {
+      "maxPart": 90,
+      "missBreakAfterFirstHit": 8
+    }
+  },
+  "verificationRecordRequiredFields": [
+    "sourcePath",
+    "installVersion",
+    "packagePart",
+    "packageName",
+    "bundleEntry",
+    "runtimeContainerPath",
+    "objectType",
+    "width",
+    "height",
+    "rawObjectSha256",
+    "rgbaSha256",
+    "nonEmptyAlpha",
+    "status",
+    "reason"
+  ],
+  "classifications": {
+    "VERIFIED": "one or more exact normalized runtime-path hits decode as non-empty Sprite and all observed exact hits are render-equivalent",
+    "NOT_IN_SOURCE_SNAPSHOT": "no exact hit after successful exhaustive package discovery and exhaustive bundle coverage for the source snapshot",
+    "REVIEW": "no exact hit under non-exhaustive locator filtering; absence is not proven",
+    "BLOCKER": "the official source could not be searched or exact hits could not be safely decoded/validated"
+  },
+  "blockerReasons": [
+    "PACKAGE_UNAVAILABLE",
+    "PACKAGE_CATALOG_INCOMPLETE",
+    "BUNDLE_READ_FAIL",
+    "UNITY_DECODE_FAIL",
+    "TYPE_MISMATCH",
+    "EMPTY_ALPHA",
+    "AMBIGUOUS_NON_EQUIVALENT_EXACT_SOURCES",
+    "TARGET_CONTRACT_MISMATCH"
+  ],
+  "reviewReasons": [
+    "NON_EXHAUSTIVE_NO_HIT"
+  ],
+  "absenceRule": "NOT_IN_SOURCE_SNAPSHOT is allowed only when searchCoverage is EXHAUSTIVE_ALL_BUNDLES and no source-read/decode gap remains.",
+  "mutationPolicy": "read-only; verifier must not modify tracked repository files",
+  "nextStage": "A6_3_OFFICIAL_PACKAGE_INVENTORY"
+}
