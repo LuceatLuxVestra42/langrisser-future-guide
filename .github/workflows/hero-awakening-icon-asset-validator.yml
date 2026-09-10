@@ -1,0 +1,36 @@
+name: Hero Awakening Icon Asset Validator
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a7-3-asset-validator-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-asset-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_OPTIONS: '--no-warnings'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a7-3-asset-validator-20260910
+      - name: Freeze A7-3 independent asset validation
+        run: node scripts/validate-hero-awakening-icon-assets-readonly.mjs --write
+      - name: Commit frozen validation checkpoint when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-asset-validation.v1.json
+          if git diff --cached --quiet; then
+            echo 'A7-3 validation checkpoint already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze awakening icon asset validation'
+          git push origin HEAD:work/awakening-skill-icon-a7-3-asset-validator-20260910
