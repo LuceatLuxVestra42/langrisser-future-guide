@@ -1,0 +1,132 @@
+name: Temporary HeroFetter semantic relation probe
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract official IL2CPP pair and partial metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/hfsr out/herofetter-semantic-relation
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib,hashlib,json
+          D=pathlib.Path('/tmp/hfsr'); V='1.1.113'; B=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{V}'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          targets={1:('Client/GameAssembly.dll','GameAssembly.dll'),66:('Client/Langrisser_Data/il2cpp_data/Metadata/global-metadata.dat','global-metadata.dat')}
+          def rq(u,a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          def hs(u):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:return int(r.headers['Content-Length'])
+          def ent(u,t):
+            n=min(131072,t); x=rq(u,t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(u,o,o+s-1); i=0; out=[]
+            while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+              fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace'); out.append((nm,me,cr,co,un,lo)); i+=46+fn+ex+cm
+            return out
+          def get(u,e):
+            nm,me,cr,co,un,lo=e; h=rq(u,lo,lo+4095); fn,ex=struct.unpack_from('<HH',h,26); st=lo+30+fn+ex; d=rq(u,st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; return raw
+          src={'installVersion':V,'files':{}}
+          for part,(target,out) in targets.items():
+            u=f'{B}/InstallPage_{V}_{part}.zip'; e=next(e for e in ent(u,hs(u)) if e[0]==target); raw=get(u,e); (D/out).write_bytes(raw); src['files'][out]={'sha256':hashlib.sha256(raw).hexdigest(),'size':len(raw)}
+          pathlib.Path('out/herofetter-semantic-relation/source.json').write_text(json.dumps(src,indent=2)+'\n')
+          PY
+          git clone --depth 1 https://github.com/Perfare/Il2CppDumper.git /tmp/Il2CppDumper >/dev/null 2>&1
+          dotnet build /tmp/Il2CppDumper/Il2CppDumper.sln -c Release >/dev/null 2>&1
+          DLL=$(find /tmp/Il2CppDumper -path '*/bin/Release/*/Il2CppDumper.dll' | head -1)
+          mkdir -p /tmp/hfsr/dump
+          set +e
+          dotnet "$DLL" /tmp/hfsr/GameAssembly.dll /tmp/hfsr/global-metadata.dat /tmp/hfsr/dump > out/herofetter-semantic-relation/dumper.log 2>&1
+          echo $? > out/herofetter-semantic-relation/dumper-exit.txt
+          set -e
+          test -f /tmp/hfsr/dump/script.json
+          test -f /tmp/hfsr/dump/dump.cs
+      - name: Locate exact helper and semantic lookup methods
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          import pathlib,re,json
+          dump=pathlib.Path('/tmp/hfsr/dump/dump.cs').read_text(errors='replace')
+          out=pathlib.Path('out/herofetter-semantic-relation')
+          names=['GetHeroFetterSkillInfos','GetConfigDataSkillInfo']
+          records=[]
+          for name in names:
+            for m in re.finditer(r'(?m)^.*\b'+re.escape(name)+r'\s*\([^\n]*$',dump):
+              pre=dump[max(0,m.start()-6000):m.start()]
+              cls=list(re.finditer(r'(?m)^(?:public|private|internal|protected|sealed|abstract|static|partial|\s)+(?:class|struct)\s+([\w<>.`]+)',pre))
+              owner=cls[-1].group(1) if cls else None
+              rva=None
+              before=dump[max(0,m.start()-300):m.start()]
+              rv=list(re.finditer(r'RVA:\s*(0x[0-9A-Fa-f]+)',before))
+              if rv:rva=rv[-1].group(1)
+              records.append({'name':name,'owner':owner,'rva':rva,'signature':m.group(0).strip(),'context':dump[max(0,m.start()-1000):min(len(dump),m.end()+1600)]})
+          out.joinpath('located.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(records,ensure_ascii=False,indent=2))
+          PY
+      - name: Disassemble exact helper and map calls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          import json,pathlib,re,bisect,subprocess
+          D=pathlib.Path('/tmp/hfsr/dump'); O=pathlib.Path('out/herofetter-semantic-relation')
+          loc=json.loads((O/'located.json').read_text())
+          helper=next((x for x in loc if x['name']=='GetHeroFetterSkillInfos' and x['rva']),None)
+          if not helper: raise SystemExit('helper RVA not found')
+          start=int(helper['rva'],16)+0x180000000
+          script=json.loads((D/'script.json').read_text(errors='replace'))
+          methods=[]
+          def walk(x):
+            if isinstance(x,dict):
+              if 'Address' in x and ('Name' in x or 'Signature' in x):
+                try:
+                  a=x['Address']; a=int(a,16) if isinstance(a,str) else int(a)
+                  if a<0x180000000:a+=0x180000000
+                  methods.append((a,x.get('Name',''),x.get('Signature','')))
+                except: pass
+              for v in x.values(): walk(v)
+            elif isinstance(x,list):
+              for v in x: walk(v)
+          walk(script); methods=sorted(set(methods)); addrs=[m[0] for m in methods]
+          idx=bisect.bisect_right(addrs,start)
+          end=addrs[idx] if idx<len(addrs) and addrs[idx]>start else start+0x1800
+          if end-start>0x4000:end=start+0x4000
+          asm=subprocess.check_output(['objdump','-D','-Mintel',f'--start-address={hex(start)}',f'--stop-address={hex(end)}','/tmp/hfsr/GameAssembly.dll'],text=True,errors='replace')
+          (O/'helper-disasm.txt').write_text(asm)
+          calls=[]
+          for line in asm.splitlines():
+            m=re.search(r'\bcall\s+([0-9a-fx]+)',line,re.I)
+            if not m: continue
+            try:t=int(m.group(1),16)
+            except:continue
+            j=bisect.bisect_right(addrs,t)-1
+            owner=methods[j] if j>=0 and methods[j][0]<=t else None
+            calls.append({'line':line.strip(),'target':hex(t),'owner':owner})
+          exact_lookup=[m for m in methods if 'GetConfigDataSkillInfo' in (m[1]+' '+m[2])]
+          exact_got=[m for m in methods if 'get_GotSkills_ID' in (m[1]+' '+m[2])]
+          result={'helper':helper,'start':hex(start),'end':hex(end),'calls':calls,'exactConfigDataSkillLookups':exact_lookup,'exactGotSkillsGetters':exact_got,'mentionsGotSkillsOffset48':bool(re.search(r'\[r[a-z0-9]+\+0x48\]',asm,re.I))}
+          (O/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: herofetter-semantic-relation
+          path: out/herofetter-semantic-relation
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/temp-herofetter-semantic-relation-probe.yml
+          git commit -m "Remove temporary HeroFetter semantic relation probe"
+          git push origin HEAD:${GITHUB_REF_NAME}
