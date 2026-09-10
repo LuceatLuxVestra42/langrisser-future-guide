@@ -70,9 +70,28 @@ def build_expected():
         prov = prov_by_path.get(source)
         if prov is None:
             raise RuntimeError(f'A7-2 missing provenance row: {source}')
-        for key in ('packagePart','packageName','bundleEntry','bundleSha256','rawObjectSha256','rgbaSha256','width','height'):
+
+        for key in ('packagePart','packageName','bundleEntry','bundleSha256'):
             if row.get(key) != prov.get(key):
                 raise RuntimeError(f'A7-2 provenance/materialization mismatch {source} {key}')
+        hits = prov.get('spriteHits') or []
+        valid_hits = [h for h in hits if h.get('objectType') == 'Sprite' and h.get('nonEmptyAlpha') is True]
+        if not valid_hits:
+            raise RuntimeError(f'A7-2 missing valid Sprite hit: {source}')
+        render_keys = {(h.get('runtimeContainerPath'), h.get('rawObjectSha256'), h.get('rgbaSha256'), h.get('width'), h.get('height')) for h in valid_hits}
+        if len(render_keys) != 1:
+            raise RuntimeError(f'A7-2 ambiguous Sprite proof: {source}')
+        runtime_path, raw_sha, rgba_sha, width, height = next(iter(render_keys))
+        expected_sprite = {
+            'rawObjectSha256': raw_sha,
+            'rgbaSha256': rgba_sha,
+            'width': width,
+            'height': height,
+        }
+        for key, value in expected_sprite.items():
+            if row.get(key) != value:
+                raise RuntimeError(f'A7-2 Sprite/materialization mismatch {source} {key}')
+
         public_path = row['publicPath']
         if public_path in seen_public:
             raise RuntimeError(f'A7-2 publicPath collision: {public_path}')
@@ -82,12 +101,7 @@ def build_expected():
             raise RuntimeError(f'A7-2 public asset missing: {fs_path}')
         if fs_path.stat().st_size != row.get('pngBytes') or file_sha(fs_path) != row.get('pngSha256'):
             raise RuntimeError(f'A7-2 PNG proof mismatch: {source}')
-        hits = prov.get('spriteHits') or []
-        if not hits:
-            raise RuntimeError(f'A7-2 missing Sprite hit: {source}')
-        runtime_paths = {h.get('runtimeContainerPath') for h in hits}
-        if len(runtime_paths) != 1:
-            raise RuntimeError(f'A7-2 ambiguous runtime path: {source}')
+
         new_records.append({
             'role': 'awakening',
             'sourcePath': source,
@@ -97,7 +111,7 @@ def build_expected():
             'packageName': row['packageName'],
             'bundleEntry': row['bundleEntry'],
             'bundleSha256': row['bundleSha256'],
-            'containerPath': next(iter(runtime_paths)),
+            'containerPath': runtime_path,
             'objectType': 'Sprite',
             'rawObjectSha256': row['rawObjectSha256'],
             'rgbaSha256': row['rgbaSha256'],
