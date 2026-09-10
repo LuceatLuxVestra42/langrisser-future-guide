@@ -1,4 +1,4 @@
-name: F3 Locate Proven Leon Bond Effect Records
+name: F3 Extract Leon Heart Lv10 Effect Skills
 
 on:
   workflow_dispatch:
@@ -7,10 +7,8 @@ on:
       - main
     paths:
       - .github/workflows/f3-extract-leon-hero-record.yml
-
 permissions:
   contents: read
-
 jobs:
   probe:
     runs-on: ubuntu-latest
@@ -21,30 +19,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Locate exact records by proven IDs
+      - name: Extract exact SkillInfo records 70110 and 70111
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('fs');
-          const path = require('path');
-          const { resolveConfigDataSourceRoot } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
-          const root = resolveConfigDataSourceRoot();
-          const ids = new Set([70088,70089,70099,70109,70110,70111,70352]);
-          const hits = [];
-          for (const name of fs.readdirSync(root).filter(n => /^ConfigData.*\.json$/i.test(n)).sort()) {
-            let rows;
-            try { rows = JSON.parse(fs.readFileSync(path.join(root, name), 'utf8')); } catch { continue; }
-            if (!Array.isArray(rows)) continue;
-            rows.forEach((record, recordIndex) => {
-              if (!record || typeof record !== 'object' || Array.isArray(record) || !ids.has(Number(record.ID))) return;
-              hits.push({table:name, recordIndex, id:Number(record.ID), keys:Object.keys(record), record});
-            });
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const rows = JSON.parse(fs.readFileSync(resolveConfigDataFile('ConfigDataSkillInfo.json'), 'utf8'));
+          for (const id of [70110,70111]) {
+            const hits=[];
+            rows.forEach((record,recordIndex)=>{if(record&&record.ID===id)hits.push({recordIndex,record});});
+            if(hits.length!==1) throw new Error(`SkillInfo ${id}: expected 1 hit, got ${hits.length}`);
+            console.log(`=== SKILL_${id}_START ===`);
+            console.log(JSON.stringify(hits[0],null,2));
+            console.log(`=== SKILL_${id}_END ===`);
           }
-          console.log('=== EXACT_ID_HITS_START ===');
-          console.log(JSON.stringify(hits, null, 2));
-          console.log('=== EXACT_ID_HITS_END ===');
           NODE
       - name: Verify repository unchanged
         run: |
