@@ -15,6 +15,7 @@ UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Sa
 
 PREFIX_TO_BUNDLE_LEAF = {
     "UI/Icon/Skill_ABS/": "ui_icon_skill_abs.b",
+    "UI/Icon/Skill2_ABS/": "ui_icon_skill2_abs.b",
     "UI/Icon/Item05_ABS/": "ui_icon_item05_abs.b",
 }
 
