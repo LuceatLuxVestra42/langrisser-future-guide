@@ -1,0 +1,36 @@
+name: Hero Awakening Icon Target Freeze
+
+on:
+  push:
+    branches:
+      - work/awakening-skill-icon-a6-1-target-freeze-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-targets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: work/awakening-skill-icon-a6-1-target-freeze-20260910
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Generate and validate frozen target set
+        run: node scripts/freeze-hero-awakening-icon-verification-targets.mjs --write
+      - name: Commit frozen target set when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-awakening-icon-verification-targets.v1.json
+          if git diff --cached --quiet; then
+            echo 'Frozen target set already current.'
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Freeze awakening icon verification target set'
+          git push origin HEAD:work/awakening-skill-icon-a6-1-target-freeze-20260910
