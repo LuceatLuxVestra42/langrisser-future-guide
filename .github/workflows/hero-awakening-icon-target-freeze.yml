@@ -1,36 +1,30 @@
 name: Hero Awakening Icon Target Freeze
 
 on:
-  push:
+  pull_request:
     branches:
-      - work/awakening-skill-icon-a6-1-target-freeze-20260910
+      - main
+      - work/awakening-skill-icon-a5-inventory-20260910
+    paths:
+      - '.github/workflows/hero-awakening-icon-target-freeze.yml'
+      - 'scripts/freeze-hero-awakening-icon-verification-targets.mjs'
+      - 'data/generated/hero-awakening-icon-verification-targets.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'public/images/heroes/skill-icons/**'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  freeze-targets:
+  validate-target-freeze:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: work/awakening-skill-icon-a6-1-target-freeze-20260910
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Generate and validate frozen target set
-        run: node scripts/freeze-hero-awakening-icon-verification-targets.mjs --write
-      - name: Commit frozen target set when changed
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add data/generated/hero-awakening-icon-verification-targets.v1.json
-          if git diff --cached --quiet; then
-            echo 'Frozen target set already current.'
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m 'Freeze awakening icon verification target set'
-          git push origin HEAD:work/awakening-skill-icon-a6-1-target-freeze-20260910
+      - name: Validate frozen A6-1 target set
+        run: node scripts/freeze-hero-awakening-icon-verification-targets.mjs
