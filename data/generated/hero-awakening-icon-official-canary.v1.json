@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "schemaId": "hero-awakening-icon-official-canary/v1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "semanticReopen": false,
+  "predecessor": {
+    "stage": "A6_4_GENERIC_BUNDLE_LOCATOR",
+    "commit": "1e832b6d895425a363f0dd1ee39030d93fe782b7",
+    "bundleLocatorSha256": "acca558af1d48524e0f03094f0d760e1ecf312c55c9390d50f162e6484ff86e3"
+  },
+  "targetInput": {
+    "targetSetSha256": "78e566b736e3b5b13a4c29186a283a05951383ba6ac84739f296b91c740a4723",
+    "targetCount": 256
+  },
+  "source": {
+    "kind": "OFFICIAL_INSTALLER",
+    "installVersion": "1.1.113",
+    "unityParser": "UnityPy 1.25.3"
+  },
+  "selectionPolicy": "one explicit frozen pending sourcePath from each A6-4 locator group",
+  "proofRequirement": "full normalized runtime relative path equality + at least one Sprite exact hit + decoded RGBA + non-empty alpha; non-Sprite exact-path companions are recorded but do not invalidate a verified Sprite",
+  "summary": {
+    "canaryCount": 3,
+    "verifiedCount": 3,
+    "reviewCount": 0,
+    "blockerCount": 0
+  },
+  "results": [
+    {
+      "sourcePathPrefix": "UI/Icon/Skill_ABS/",
+      "target": {
+        "sourcePath": "UI/Icon/Skill_ABS/Skill_Super1.png",
+        "heroReferenceCount": 1,
+        "heroIds": [
+          14
+        ],
+        "skillIds": [
+          12076
+        ]
+      },
+      "candidate": {
+        "packagePart": 62,
+        "packageName": "InstallPage_1.1.113_62.zip",
+        "bundleEntry": "Client/Langrisser_Data/StreamingAssets/ExportAssetBundle/ui_icon_skill_abs.b",
+        "bundleSha256": "14c4fe918356f47f0e9f5a59e77dae31e4eb4a0d19e30d898c9d8c1085b8eb12"
+      },
+      "status": "VERIFIED",
+      "reason": null,
+      "exactHits": [
+        {
+          "status": "VERIFIED",
+          "reason": null,
+          "runtimeContainerPath": "assets/gameproject/runtimeassets/ui/icon/skill_abs/skill_super1.png",
+          "objectType": "Sprite",
+          "pathId": 7713304139622803279,
+          "width": 170,
+          "height": 170,
+          "rawObjectSha256": "81e9257febe34ab2882b691e20d4df45a2186e6582bbfeb5b23409ad71232739",
+          "rgbaSha256": "47411a64d9c7cb015276e8f3c603bc8a6e60af253958aaeca87e66459d1baf93",
+          "nonEmptyAlpha": true
+        }
+      ]
+    },
+    {
+      "sourcePathPrefix": "UI/Icon/Skill2_ABS/",
+      "target": {
+        "sourcePath": "UI/Icon/Skill2_ABS/Skil_Klaudia_4.png",
+        "heroReferenceCount": 1,
+        "heroIds": [
+          99269
+        ],
+        "skillIds": [
+          13099
+        ]
+      },
+      "candidate": {
+        "packagePart": 62,
+        "packageName": "InstallPage_1.1.113_62.zip",
+        "bundleEntry": "Client/Langrisser_Data/StreamingAssets/ExportAssetBundle/ui_icon_skill2_abs.b",
+        "bundleSha256": "62fca219764a6dda53201776dd076da0d46f3191da5c6d07289c1006858ac641"
+      },
+      "status": "VERIFIED",
+      "reason": null,
+      "exactHits": [
+        {
+          "status": "COMPANION",
+          "reason": null,
+          "objectType": "Texture2D",
+          "runtimeContainerPath": "assets/gameproject/runtimeassets/ui/icon/skill2_abs/skil_klaudia_4.png"
+        },
+        {
+          "status": "VERIFIED",
+          "reason": null,
+          "runtimeContainerPath": "assets/gameproject/runtimeassets/ui/icon/skill2_abs/skil_klaudia_4.png",
+          "objectType": "Sprite",
+          "pathId": 3824273861304864415,
+          "width": 172,
+          "height": 172,
+          "rawObjectSha256": "0f4c06a9cfb883267e0742eaba5d5416118cded0be6113ad22289979fa67d830",
+          "rgbaSha256": "cd0a3b226299b350bb0ddd9d0c3b806959bdc30460355f1b93eb78ba2242e33d",
+          "nonEmptyAlpha": true
+        }
+      ]
+    },
+    {
+      "sourcePathPrefix": "UI/Icon/Item05_ABS/",
+      "target": {
+        "sourcePath": "UI/Icon/Item05_ABS/Skill_HeavenDefier_3_1.png",
+        "heroReferenceCount": 1,
+        "heroIds": [
+          99264
+        ],
+        "skillIds": [
+          13083
+        ]
+      },
+      "candidate": {
+        "packagePart": 61,
+        "packageName": "InstallPage_1.1.113_61.zip",
+        "bundleEntry": "Client/Langrisser_Data/StreamingAssets/ExportAssetBundle/ui_icon_item05_abs.b",
+        "bundleSha256": "b5fc7cd74e643e390951564d62de901aeae5f56c896bc16a26c8fda7edc4573e"
+      },
+      "status": "VERIFIED",
+      "reason": null,
+      "exactHits": [
+        {
+          "status": "COMPANION",
+          "reason": null,
+          "objectType": "Texture2D",
+          "runtimeContainerPath": "assets/gameproject/runtimeassets/ui/icon/item05_abs/skill_heavendefier_3_1.png"
+        },
+        {
+          "status": "VERIFIED",
+          "reason": null,
+          "runtimeContainerPath": "assets/gameproject/runtimeassets/ui/icon/item05_abs/skill_heavendefier_3_1.png",
+          "objectType": "Sprite",
+          "pathId": -2276685831903457254,
+          "width": 172,
+          "height": 172,
+          "rawObjectSha256": "b888186077f71d10fce31d52cb5438c63675921e77c81a69b8b1bd97c187cca9",
+          "rgbaSha256": "adb1c6ab820320ef24e77a58b9c24a9df9101c94feb210a1d08a94ddc34e0009",
+          "nonEmptyAlpha": true
+        }
+      ]
+    }
+  ],
+  "canaryResultSha256": "b321f6fdbc5ab780033749c19ed8530b73d231d106e5728e513cadda84f15f27"
+}
