@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "stage": "R5-E",
+  "checkpoint": "population-invariants",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "semanticOwner": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "purpose": "Lock output-level population invariants after independent R5-D source recomputation.",
+  "validatedArtifact": {
+    "path": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "gitBlobSha1": "7999cc42be629edbf9e8755699dd969cb7b9ac8a",
+    "sha256": "9238a7ad73caaec3081ce0bcfa93caabd8b8fd776662b81473466e889b946cd6"
+  },
+  "authorityBoundary": {
+    "semanticRecomputationPerformed": false,
+    "rawConfigDataRead": false,
+    "producerExecuted": false,
+    "basis": "R5-D exact parity already proved source semantics; R5-E validates stable output invariants only."
+  },
+  "invariants": {
+    "canonicalHeroSet": {
+      "expectedCount": 267,
+      "actualCount": 267,
+      "uniqueHeroIdCount": 267,
+      "exactSetPass": true
+    },
+    "populationCounts": {
+      "totalBondCount": 1335,
+      "skillBuffEdgeCount": 1602
+    },
+    "perHeroRaw": {
+      "exactlyTwo1000AndTwo2500PassCount": 267,
+      "rawSum7000PassCount": 267
+    },
+    "normalization": {
+      "rawDiv100ExactPassCount": 267,
+      "exactlyTwo10AndTwo25PassCount": 267,
+      "contributionSum70PassCount": 267
+    },
+    "rawVectorDistribution": {
+      "1000,2500,2500,1000": 50,
+      "1000,1000,2500,2500": 30,
+      "2500,2500,1000,1000": 95,
+      "1000,2500,1000,2500": 50,
+      "2500,1000,1000,2500": 13,
+      "2500,1000,2500,1000": 29
+    },
+    "aggregateRaw": {
+      "hp": 472500,
+      "at": 559500,
+      "df": 430500,
+      "magicDf": 406500
+    },
+    "aggregateContribution": {
+      "hp": 4725,
+      "at": 5595,
+      "df": 4305,
+      "magicDf": 4065
+    },
+    "leonFixture": {
+      "heroId": 6,
+      "raw": {
+        "hp": 2500,
+        "at": 2500,
+        "df": 1000,
+        "magicDf": 1000
+      },
+      "contribution": {
+        "hp": 25,
+        "at": 25,
+        "df": 10,
+        "magicDf": 10
+      },
+      "status": "PASS"
+    }
+  },
+  "errors": [],
+  "blocker": "NONE",
+  "nextStart": "R5-F_FREEZE_CHECKPOINT_HANDOFF"
+}
