@@ -1,0 +1,48 @@
+name: Temporary R5 authority probe
+on:
+  push:
+    paths: ['.github/workflows/tmp-r5-authority-probe.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe current authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo HEAD=$(git rev-parse HEAD)
+          for f in \
+            data/contracts/hero-canonical-set-contract.v1.json \
+            data/validation/hero-canonical-set-validation.v1.json \
+            data/hero/hero-authoritative-records.v1.json \
+            data/contracts/hero-fetter-skill-relation-contract.v1.json \
+            data/validation/hero-fetter-skill-relation-final.v1.json \
+            data/contracts/soldier-base-correction-unified-contract.v1.json \
+            data/validation/soldier-base-correction-unified-validation.v1.json; do
+            echo ===$f===
+            test -f "$f" || { echo MISSING; continue; }
+            node - "$f" <<'NODE'
+          const fs=require('fs'); const f=process.argv[2]; const j=JSON.parse(fs.readFileSync(f));
+          console.log('keys',Object.keys(j));
+          for (const k of ['status','stage','expectedHeroCount','actualHeroCount','expectedMappingCount','actualMappingCount','canonicalIdMapping','records','heroes','entries','source','predecessor','predecessors']) {
+            if(!(k in j)) continue;
+            let v=j[k];
+            if(Array.isArray(v)) console.log(k,'ARRAY',v.length,'sample',JSON.stringify(v.slice(0,3)));
+            else if(v && typeof v==='object') console.log(k,'OBJECT_KEYS',Object.keys(v).slice(0,20),'size',Object.keys(v).length);
+            else console.log(k,JSON.stringify(v));
+          }
+          NODE
+          done
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/tmp-r5-authority-probe.yml
+          git commit -m 'Remove temporary R5 authority probe'
+          git push origin HEAD:${GITHUB_REF_NAME}
