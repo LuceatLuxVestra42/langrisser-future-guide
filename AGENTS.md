@@ -222,6 +222,23 @@ A preflight result may be recorded using the diagnostic schema. For example:
 
 Do not create a new shared preflight framework, workflow, or dependency solely to satisfy this rule. Add durable automation only when a recurring repository-owned capability has an explicit owner and a demonstrated regression or contract need.
 
+#### Narrow orchestration fail-fast
+
+Do not infer stop/continue behavior from raw workflow, job, or process conclusions alone. Orchestration must consume the owning validator result or the diagnostic result projected through the existing Project Check contract.
+
+- Stop the current work unit on `BLOCKER` when the blocker belongs to the current owner and prevents the explicit completion condition.
+- Stop or hand off on `TOOLING_UNAVAILABLE` only when the unavailable capability is required and no authoritative alternate evidence path can satisfy the completion condition.
+- Continue on `PASS`.
+- Continue the current owner on `REVIEW` when the issue is explicitly non-blocking; record the review item without reopening completed upstream semantics.
+- `EXPECTED_MISS` is not a stop signal by itself. Follow its projected `PASS` or `REVIEW` result and use `nextAction` to continue or select alternate evidence.
+- `CLEANUP_RACE` is not a stop signal after required evidence was successfully produced unless the cleanup failure prevents a required repository state or deliverable.
+- `PROBE_IMPLEMENTATION_ERROR` stops only when that probe is required for completion and no reusable or authoritative alternate evidence exists. Otherwise preserve existing evidence and continue through retry or alternate evidence.
+- `MANUAL_REVIEW` means ownership or routing is unresolved. Do not guess an owner or silently continue as if the path were validated.
+- A red GitHub Actions conclusion, nonzero diagnostic exit code, or failed cleanup step is not sufficient by itself to classify the owning work unit as `BLOCKER`.
+- An owning validator hard failure remains fail-closed and must not be downgraded by these diagnostic routing rules.
+
+Do not add broad owner propagation or result reinterpretation to implement this policy. The orchestration boundary remains `changed path → explicit owner → independent validator → PASS / REVIEW / BLOCKER`, with `MANUAL_REVIEW` for unmatched ownership.
+
 For frontend-related work, distinguish the gates:
 
 ```text
