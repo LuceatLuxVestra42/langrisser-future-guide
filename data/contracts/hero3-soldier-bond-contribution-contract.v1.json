@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "schemaId": "hero3-soldier-bond-contribution-contract/v1",
+  "stage": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "status": "ACTIVE_MATERIALIZATION_CONTRACT",
+  "purpose": "Materialize the Hero3 soldier command contribution by canonical Hero ID only. Normal/SP base values and final soldier correction are explicitly out of scope.",
+  "authority": {
+    "canonicalHeroSource": "data/hero-name-master.v1.json",
+    "canonicalHeroSourceBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f",
+    "expectedCanonicalHeroCount": 267,
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "sourceTreeGitSha1": "b18983f60cb054c2e6e094d64cdb98979211d7fc",
+    "archiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84",
+    "r0Contract": "data/contracts/hero-fetter-skill-relation-contract.v1.json",
+    "r0Checkpoint": "data/validation/hero-fetter-skill-relation-final.v1.json"
+  },
+  "explicitRelationChain": [
+    "canonical HeroID -> ConfigDataHeroInfo.ID",
+    "ConfigDataHeroInfo.HeroInformation_ID -> ConfigDataHeroInformationInfo.ID",
+    "ConfigDataHeroInformationInfo.HeroFetters_ID element -> ConfigDataHeroFetterInfo.ID",
+    "ConfigDataHeroFetterInfo.GotSkills_ID[MaxLevel - 1] -> ConfigDataSkillInfo.ID",
+    "ConfigDataSkillInfo.PassiveBuffs_ID element -> ConfigDataBuffInfo.ID",
+    "ConfigDataBuffInfo.PropertyN_ID -> PropertyModifyType"
+  ],
+  "commandPropertyTypes": {
+    "93": "Hero3_HPCmdAdd",
+    "94": "Hero3_ATCmdAdd",
+    "95": "Hero3_DFCmdAdd",
+    "96": "Hero3_MagicDFCmdAdd"
+  },
+  "materializationRule": {
+    "selection": "For every HeroFetters_ID relation, select GotSkills_ID[MaxLevel - 1].",
+    "aggregation": "For all selected max skills, all PassiveBuffs_ID rows, and Property1..Property4 pairs, add PropertyN_Value into the matching 93..96 raw accumulator. Do not deduplicate or replace values.",
+    "normalization": "Aggregate raw values first, then divide each final raw accumulator by 100 to produce percentage points.",
+    "output": "One record per canonical Hero ID with raw and percentagePoints vectors only plus relation-audit IDs. No Normal/SP base or final correction fields."
+  },
+  "outputs": {
+    "generated": "data/generated/hero3-soldier-bond-contribution.v1.json",
+    "validation": "data/validation/hero3-soldier-bond-contribution-final.v1.json",
+    "producer": "scripts/materialize-hero3-soldier-bond-contribution.mjs",
+    "validator": "scripts/validate-hero3-soldier-bond-contribution.mjs"
+  },
+  "boundary": {
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "arrayOrderSemanticMappingAllowed": false,
+    "missingReferenceFallbackAllowed": false,
+    "normalBaseIncluded": false,
+    "spBaseIncluded": false,
+    "finalSoldierCorrectionIncluded": false,
+    "productionRuntimeReadsRawConfigData": false
+  },
+  "leonRegression": {
+    "heroId": 6,
+    "heroFetterIds": [21, 22, 23, 24, 25],
+    "selectedMaxSkillIds": [70009, 70088, 70069, 70099, 70109],
+    "nonContributingSelectedSkillIdsForCommand93To96": [70088, 70099, 70109],
+    "expectedRaw": {"hp": 2500, "attack": 2500, "defense": 1000, "magicDefense": 1000},
+    "expectedPercentagePoints": {"hp": 25, "attack": 25, "defense": 10, "magicDefense": 10}
+  },
+  "completionCriteria": [
+    "exact canonical HeroID population parity",
+    "all explicit keyed references resolve",
+    "independent validator recomputation matches every generated record",
+    "Leon regression passes including absence of extra 93..96 contribution from 70088/70099/70109",
+    "no base/final composition fields in generated artifact",
+    "validation checkpoint is PASS COMPLETE FINAL_FROZEN"
+  ],
+  "reopenConditions": [
+    "canonical hero population source changes",
+    "pinned ConfigData source snapshot changes",
+    "R0-R4 relation or normalization contract changes",
+    "generated parity damage",
+    "owning validator hard failure"
+  ]
+}
