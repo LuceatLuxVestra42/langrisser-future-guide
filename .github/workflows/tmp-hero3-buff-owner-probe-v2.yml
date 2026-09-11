@@ -18,28 +18,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir /tmp/langrisser-configdata-source
-      - name: Identify exact relation shape inside BuffInfo
+      - name: Resolve actual PassiveBuff IDs into BuffInfo
         run: |
           node <<'NODE'
           const fs=require('fs');
           const root='/tmp/langrisser-configdata-source/data/configdata';
           const read=p=>JSON.parse(fs.readFileSync(`${root}/${p}`,'utf8'));
           const rows=x=>Array.isArray(x)?x:(x.records||[]);
-          const targets=new Set([5111,5181]);
-          const contains=(v)=>{
-            if(typeof v==='number') return targets.has(v);
-            if(typeof v==='string' && /^\d+$/.test(v)) return targets.has(Number(v));
-            if(Array.isArray(v)) return v.some(contains);
-            if(v && typeof v==='object') return Object.values(v).some(contains);
-            return false;
-          };
-          const skills=rows(read('ConfigDataSkillInfo.json'));
-          for(const id of [70009,70069]){
-            const r=skills.find(x=>Number(x.ID)===id);
-            console.log('SKILL_ROW='+JSON.stringify(r));
-          }
           const buffs=rows(read('ConfigDataBuffInfo.json'));
-          const hits=buffs.filter(contains);
-          console.log('BUFFINFO_VALUE_HIT_COUNT='+hits.length);
-          for(const r of hits.slice(0,50)) console.log('BUFFINFO_VALUE_HIT='+JSON.stringify(r));
+          for(const id of [70009,70069]){
+            const hits=buffs.filter(r=>Number(r.ID)===id);
+            console.log(`BUFF_ID=${id};HIT_COUNT=${hits.length}`);
+            for(const r of hits) console.log('BUFF_ROW='+JSON.stringify(r));
+          }
           NODE
