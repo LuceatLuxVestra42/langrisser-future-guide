@@ -1,0 +1,55 @@
+name: R5-C Materialize Hero Soldier Bond Contribution
+
+on:
+  push:
+    branches:
+      - r5-c-hero-soldier-bond-contribution
+    paths:
+      - scripts/build_hero_soldier_bond_command_contribution.cjs
+      - .github/workflows/r5-c-materialize.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Hydrate pinned external ConfigData snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
+
+      - name: Materialize R5-C artifact
+        run: |
+          set -euo pipefail
+          node scripts/build_hero_soldier_bond_command_contribution.cjs \
+            --configdata-root "$RUNNER_TEMP/configdata-hydrated/data/configdata"
+
+      - name: Assert only expected generated mutation
+        run: |
+          set -euo pipefail
+          git status --short
+          test "$(git status --short | wc -l | tr -d ' ')" = "1"
+          test "$(git status --short | sed -E 's/^.. //')" = "data/generated/hero-soldier-bond-command-contribution.v1.json"
+
+      - name: Upload generated artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-c-hero-soldier-bond-command-contribution
+          path: data/generated/hero-soldier-bond-command-contribution.v1.json
+          if-no-files-found: error
