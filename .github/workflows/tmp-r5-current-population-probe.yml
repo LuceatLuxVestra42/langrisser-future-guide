@@ -1,0 +1,32 @@
+name: Temporary R5 current population probe
+on:
+  push:
+    paths: ['.github/workflows/tmp-r5-current-population-probe.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate live hero population authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo HEAD=$(git rev-parse HEAD)
+          echo '=== likely files ==='
+          find data scripts -type f | sort | grep -Ei 'hero|fetter|bond|canonical|population' | head -800
+          echo '=== exact 267 references ==='
+          grep -RIn '267' data scripts --exclude-dir=node_modules | head -300 || true
+          echo '=== HeroID population/count schema references ==='
+          grep -RInE 'HeroID|heroId|heroIds|heroCount|canonical.*hero|hero.*canonical' data scripts --exclude-dir=node_modules | head -1000 || true
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/tmp-r5-current-population-probe.yml
+          git commit -m 'Remove temporary R5 current population probe'
+          git push origin HEAD:${GITHUB_REF_NAME}
