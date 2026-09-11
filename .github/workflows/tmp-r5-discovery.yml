@@ -1,0 +1,55 @@
+name: Temporary R5 discovery
+on:
+  push:
+    paths: ['.github/workflows/tmp-r5-discovery.yml']
+permissions:
+  contents: write
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect current R5 inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/r5-discovery
+          {
+            echo 'HEAD='
+            git rev-parse HEAD
+            echo '=== hero-related files ==='
+            find data scripts -type f \( -iname '*hero*' -o -iname '*fetter*' -o -iname '*bond*' -o -iname '*soldier*' \) | sort | head -300
+            echo '=== population/count references ==='
+            grep -RInE '267|canonical.*hero|hero.*population|ConfigDataHeroFetterInfo' data scripts --exclude-dir=node_modules | head -500 || true
+            echo '=== current contracts matching relation/source ==='
+            find data/contracts data/validation -type f 2>/dev/null | sort | grep -E 'hero-fetter|configdata-source|soldier|bond|hero' | head -300 || true
+          } | tee out/r5-discovery/repo.txt
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir /tmp/langrisser-configdata-source > out/r5-discovery/hydration.json
+          node <<'NODE' | tee out/r5-discovery/source.txt
+          const fs=require('fs'), path=require('path');
+          const root='/tmp/langrisser-configdata-source/data/configdata';
+          const names=fs.readdirSync(root).filter(x=>/Hero(Fetter|Info)|SkillInfo|BuffInfo/i.test(x)).sort();
+          console.log(names.join('\n'));
+          for(const f of names){
+            if(!/ConfigDataHero(Fetter)?Info\.json$|ConfigDataSkillInfo\.json$|ConfigDataBuffInfo\.json$/.test(f)) continue;
+            const j=JSON.parse(fs.readFileSync(path.join(root,f),'utf8')); const a=Array.isArray(j)?j:(j.records||[]);
+            console.log('FILE',f,'COUNT',a.length,'SAMPLE',JSON.stringify(a.slice(0,2)));
+          }
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r5-discovery
+          path: out/r5-discovery
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/tmp-r5-discovery.yml
+          git commit -m 'Remove temporary R5 discovery'
+          git push origin HEAD:${GITHUB_REF_NAME}
