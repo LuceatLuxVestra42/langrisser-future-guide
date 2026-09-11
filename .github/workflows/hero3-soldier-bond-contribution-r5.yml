@@ -1,0 +1,72 @@
+name: Hero3 Soldier Bond Contribution R5
+
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+    paths:
+      - .github/workflows/hero3-soldier-bond-contribution-r5.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero3-soldier-bond-contribution-r5
+  cancel-in-progress: false
+
+jobs:
+  materialize-and-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Re-attest input authority
+        run: |
+          set -euo pipefail
+          echo "HEAD=$(git rev-parse HEAD)"
+          test -z "$(git status --porcelain)"
+          node scripts/validate-hero-fetter-skill-relation.mjs
+      - name: Hydrate pinned ConfigData source pack
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+          test "$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          test -z "$(git status --porcelain)"
+      - name: Materialize R5 contribution-only artifact
+        run: |
+          set -euo pipefail
+          node scripts/materialize-hero3-soldier-bond-contribution.mjs \
+            --source-root "$RUNNER_TEMP/configdata-hydrated/data/configdata"
+      - name: Independently validate and freeze R5
+        run: |
+          set -euo pipefail
+          node scripts/validate-hero3-soldier-bond-contribution.mjs \
+            --source-root "$RUNNER_TEMP/configdata-hydrated/data/configdata"
+      - name: Fail closed on unexpected repository mutation
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed 's/^...//')
+          printf 'changed=%s\n' "${changed[*]-}"
+          test "${#changed[@]}" -eq 2
+          printf '%s\n' "${changed[@]}" | sort > "$RUNNER_TEMP/changed.txt"
+          printf '%s\n' \
+            data/generated/hero3-soldier-bond-contribution.v1.json \
+            data/validation/hero3-soldier-bond-contribution-final.v1.json | sort > "$RUNNER_TEMP/expected.txt"
+          diff -u "$RUNNER_TEMP/expected.txt" "$RUNNER_TEMP/changed.txt"
+      - name: Commit frozen R5 outputs
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero3-soldier-bond-contribution.v1.json data/validation/hero3-soldier-bond-contribution-final.v1.json
+          git commit -m "Freeze R5 Hero3 soldier bond contributions"
+          git push origin HEAD:diag/sp-runtime-code-asset-locate-20260910
