@@ -1,0 +1,66 @@
+name: R5-D Independent Hero Soldier Bond Contribution Validation
+
+on:
+  push:
+    branches:
+      - r5-c-hero-soldier-bond-contribution
+    paths:
+      - scripts/validate_hero_soldier_bond_command_contribution.cjs
+      - .github/workflows/r5-d-validate.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Hydrate pinned external ConfigData snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
+
+      - name: Run independent R5-D validator
+        run: |
+          set -euo pipefail
+          node scripts/validate_hero_soldier_bond_command_contribution.cjs \
+            --configdata-root "$RUNNER_TEMP/configdata-hydrated/data/configdata"
+
+      - name: Assert only expected validation mutation
+        run: |
+          set -euo pipefail
+          git status --short
+          test "$(git status --short | wc -l | tr -d ' ')" = "1"
+          test "$(git status --short | sed -E 's/^.. //')" = "data/validation/hero-soldier-bond-command-contribution-r5-d.v1.json"
+
+      - name: Commit validation artifact to feature branch
+        env:
+          BRANCH_NAME: r5-c-hero-soldier-bond-contribution
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-soldier-bond-command-contribution-r5-d.v1.json
+          git commit -m "R5-D record independent contribution validation"
+          git push origin "HEAD:${BRANCH_NAME}"
+
+      - name: Upload validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-d-hero-soldier-bond-command-contribution-validation
+          path: data/validation/hero-soldier-bond-command-contribution-r5-d.v1.json
+          if-no-files-found: error
