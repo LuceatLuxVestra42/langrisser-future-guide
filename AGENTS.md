@@ -140,6 +140,16 @@ Typical ownership boundaries include:
 - deployment/hosted failure → hosting/deployment/route owner;
 - interaction/responsive failure → browser/UI owner.
 
+### Diagnostic probe result classification
+
+Temporary or ad-hoc diagnostic probes are evidence-gathering tools, not owning validators. Keep their result semantics separate from Project Check's external `PASS / REVIEW / BLOCKER` contract.
+
+- If a diagnostic probe executes correctly and the queried candidate, key, relation, file, symbol, or record is absent, treat that as a valid negative observation. The probe may record an internal status such as `EXPECTED_MISS`, but it should not fail the workflow solely because the observation is negative unless presence was itself the explicit completion condition.
+- A probe execution failure, unavailable required tool/source, malformed input, or inability to collect the intended evidence is not an `EXPECTED_MISS`. Classify the actual tooling/evidence failure separately. If the missing capability is required for the current completion condition, it is a `BLOCKER`; otherwise keep it as non-blocking `REVIEW`.
+- Cleanup-only failures that occur after the required diagnostic evidence or artifact was successfully produced do not invalidate that evidence. Record them as tooling/cleanup `REVIEW` unless they prevent a required repository state or required deliverable.
+- An owning validator hard failure remains a `BLOCKER`. Never downgrade an owning validator failure merely because a temporary diagnostic probe would have treated the same observation as non-blocking.
+- When a diagnostic internal status must be projected through Project Check, preserve the existing contract: use `PASS` when the probe completed and its negative observation satisfies the diagnostic purpose, `REVIEW` for non-blocking tooling/cleanup uncertainty, `BLOCKER` only for failures that prevent the required completion condition, and `MANUAL_REVIEW` when no explicit owner rule exists.
+
 For frontend-related work, distinguish the gates:
 
 ```text
