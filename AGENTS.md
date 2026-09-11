@@ -191,6 +191,37 @@ Default projection guidance:
 
 Do not use this schema to soften invariant checks. If the workflow is an owning validator whose explicit contract requires an object, relation, parity condition, or repository state to exist, its hard failure remains a `BLOCKER` rather than an `EXPECTED_MISS`.
 
+#### Diagnostic capability preflight
+
+Before starting a diagnostic path that depends on repository, workflow, log, artifact, external-source, runtime-analysis, or similar capabilities, perform one narrow capability preflight for the capabilities that are actually required by that work unit.
+
+- Check capability availability before interpreting any lookup or probe result. A failed capability check is a tooling/evidence condition, never evidence that the queried semantic target is absent.
+- Do not add repository code that probes ChatGPT connectors, session state, or other caller-specific integrations. Those capabilities are outside repository ownership unless an explicit repository contract says otherwise.
+- Reuse a successful preflight for the same work unit while the relevant session, authority, source, and capability set have not materially changed. Do not repeatedly re-probe healthy capabilities before every lookup.
+- Keep the preflight minimal. Check only the capabilities required for the current path, such as repository read, workflow/job/log read, artifact access, source hydration, or runtime-analysis tool execution.
+- If a required capability is unavailable, emit `internalStatus: TOOLING_UNAVAILABLE`, `reason: REQUIRED_TOOL_UNAVAILABLE`, and project it to `BLOCKER`. If the capability is optional because an authoritative alternate evidence path exists, project it to `REVIEW` and continue through that alternate path.
+- A successful capability preflight does not imply the diagnostic target exists. Target absence after a successful probe remains `EXPECTED_MISS` when allowed by the probe contract.
+- A capability becoming unavailable after evidence was already produced does not invalidate that evidence by itself. Preserve the produced evidence and classify the later tooling failure separately.
+
+A preflight result may be recorded using the diagnostic schema. For example:
+
+```json
+{
+  "internalStatus": "PASS",
+  "projectCheckStatus": "PASS",
+  "owner": "tooling-or-explicit-probe-owner",
+  "stage": "preflight",
+  "reason": "REQUIRED_CAPABILITIES_AVAILABLE",
+  "completionRequired": true,
+  "evidence": {
+    "summary": "required diagnostic capabilities are available"
+  },
+  "nextAction": "continue"
+}
+```
+
+Do not create a new shared preflight framework, workflow, or dependency solely to satisfy this rule. Add durable automation only when a recurring repository-owned capability has an explicit owner and a demonstrated regression or contract need.
+
 For frontend-related work, distinguish the gates:
 
 ```text
