@@ -1,0 +1,22 @@
+'use strict';
+const fs=require('fs'),path=require('path');
+const {resolveConfigDataFile}=require('./configdata-source-pack-maintenance-root.cjs');
+const ROOT=path.resolve(__dirname,'..');
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const rows=d=>Array.isArray(d)?d:(d?.records||d?.rows||d?.data||[]);
+const load=n=>rows(read(resolveConfigDataFile(n+'.json')));
+const stage54=read(path.join(ROOT,'data/generated/hero-page-stage5-4-sp.v1.json'));
+const released=(stage54.records||[]).filter(r=>r?.sp?.status==='RELEASED');
+console.log('SP_SUMMARY',JSON.stringify({releasedCount:released.length,releasedHeroIds:released.map(r=>r.heroId)},null,2));
+const sp=load('ConfigDataSPHeroInfo'), jc=load('ConfigDataJobConnectionInfo'), jobs=load('ConfigDataJobInfo'), levels=load('ConfigDataJobLevelInfo');
+const s6=sp.find(x=>Number(x.ID)===6), j66=jc.find(x=>Number(x.ID)===66), job377=jobs.find(x=>Number(x.ID)===377);
+console.log('RAW_SP6',JSON.stringify(s6,null,2));
+console.log('RAW_JC66',JSON.stringify(j66,null,2));
+console.log('RAW_JOB377',JSON.stringify(job377,null,2));
+console.log('JOBLEVEL_KEYS',JSON.stringify(Object.keys(levels[0]||{})));
+const ids=new Set(); for(const v of Object.values(j66||{})){if(Number.isInteger(Number(v))&&Number(v)>0)ids.add(Number(v)); if(Array.isArray(v))for(const z of v)if(Number.isInteger(Number(z))&&Number(z)>0)ids.add(Number(z));}
+const levelHits=levels.filter(x=>ids.has(Number(x.ID))||Object.values(x).some(v=>Number(v)===377||Number(v)===66));
+console.log('JC66_REFERENCED_IDS',JSON.stringify([...ids].sort((a,b)=>a-b)));
+console.log('JOBLEVEL_HITS',JSON.stringify(levelHits,null,2));
+const releasedRows=released.map(r=>{const raw=sp.find(x=>Number(x.ID)===Number(r.heroId)); const c=jc.find(x=>Number(x.ID)===Number(raw?.JobConnection_ID)); const job=jobs.find(x=>Number(x.ID)===Number(c?.Job_ID)); return {heroId:r.heroId,jobConnectionId:raw?.JobConnection_ID,jobId:c?.Job_ID,jobKeys:Object.keys(job||{}),jcKeys:Object.keys(c||{}),spStatKeys:Object.keys(raw||{}).filter(k=>/(?:_INI|_UP|Star)$/.test(k)).sort()};});
+console.log('RELEASED_SOURCE_SHAPES',JSON.stringify(releasedRows,null,2));
