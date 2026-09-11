@@ -1,0 +1,55 @@
+name: Temporary R4 exact disassembly
+on:
+  push:
+    paths: ['.github/workflows/tmp-r4-exact-disasm.yml']
+permissions:
+  contents: write
+jobs:
+  trace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract official GameAssembly
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/r4x out/r4-exact
+          python <<'PY'
+          import binascii,pathlib,struct,urllib.request,zlib,hashlib
+          u='http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_1.1.113/InstallPage_1.1.113_1.zip'; UA='Mozilla/5.0 Chrome/140 Safari/537.36'
+          def rq(a,b):
+            with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity','Range':f'bytes={a}-{b}'}),timeout=120) as r:return r.read()
+          with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD'),timeout=60) as r:t=int(r.headers['Content-Length'])
+          n=min(131072,t); x=rq(t-n,t-1); p=x.rfind(b'PK\x05\x06'); _,_,_,_,s,o,_=struct.unpack_from('<HHHHIIH',x,p+4); c=rq(o,o+s-1); i=0
+          while i+46<=len(c) and c[i:i+4]==b'PK\x01\x02':
+            fl,me=struct.unpack_from('<HH',c,i+8); cr,co,un=struct.unpack_from('<III',c,i+16); fn,ex,cm=struct.unpack_from('<HHH',c,i+28); lo=struct.unpack_from('<I',c,i+42)[0]; nm=c[i+46:i+46+fn].decode('utf-8' if fl&0x800 else 'cp437','replace')
+            if nm=='Client/GameAssembly.dll':
+              h=rq(lo,lo+4095); lfn,lex=struct.unpack_from('<HH',h,26); st=lo+30+lfn+lex; d=rq(st,st+co-1); raw=d if me==0 else zlib.decompress(d,-15); assert len(raw)==un and (binascii.crc32(raw)&0xffffffff)==cr; pathlib.Path('/tmp/r4x/GameAssembly.dll').write_bytes(raw); print(hashlib.sha256(raw).hexdigest(),len(raw)); break
+            i+=46+fn+ex+cm
+          PY
+      - name: Disassemble exact R4 methods
+        shell: bash
+        run: |
+          set -euo pipefail
+          for spec in 'CollectStatic:1832b31d0:1832b3270' 'CollectBuff:1832b3270:1832b3430' 'CollectBuffs:1832b3430:1832b3640' 'CollectPassiveOne:1832b3640:1832b3680' 'CollectPassiveMany:1832b3680:1832b3890'; do
+            IFS=: read -r n a b <<< "$spec"
+            objdump -D -Mintel --start-address=0x$a --stop-address=0x$b /tmp/r4x/GameAssembly.dll > out/r4-exact/$n.txt
+          done
+          cat out/r4-exact/*.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r4-exact-disasm
+          path: out/r4-exact
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/tmp-r4-exact-disasm.yml
+          git commit -m 'Remove temporary R4 exact disassembly'
+          git push origin HEAD:${GITHUB_REF_NAME}
