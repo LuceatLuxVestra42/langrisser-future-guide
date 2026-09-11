@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "stage": "R5-D",
+  "checkpoint": "independent-validator",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "semanticOwner": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "purpose": "Independent exact-ID recomputation of the R5-C Hero3 soldier command bond contribution artifact.",
+  "validator": "scripts/validate_hero_soldier_bond_command_contribution.cjs",
+  "independence": {
+    "producerImported": false,
+    "producerExecuted": false,
+    "recomputation": "INDEPENDENT_FROM_AUTHORITATIVE_INPUTS",
+    "nameJoinUsed": false,
+    "idArithmeticUsed": false,
+    "repositoryRawConfigDataFallbackUsed": false
+  },
+  "sources": {
+    "canonicalHeroMaster": "data/hero-name-master.v1.json",
+    "bondPredecessor": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+    "bondPredecessorGitBlobSha1": "5be989e9d0723782f491dc3005a11c0ad3143c43",
+    "configDataSourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "configDataLogicalSourceRoot": "data/configdata",
+    "configDataTransport": "VERIFIED_EXTERNAL_SOURCE_PACK_HYDRATION",
+    "skillTable": "ConfigDataSkillInfo.json",
+    "buffTable": "ConfigDataBuffInfo.json"
+  },
+  "validatedArtifact": {
+    "path": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "status": "GENERATED_PENDING_R5_D",
+    "gitBlobSha1": "7999cc42be629edbf9e8755699dd969cb7b9ac8a",
+    "sha256": "9238a7ad73caaec3081ce0bcfa93caabd8b8fd776662b81473466e889b946cd6"
+  },
+  "coverage": {
+    "canonicalHeroCount": 267,
+    "predecessorHeroCount": 267,
+    "generatedHeroCount": 267,
+    "bondCount": 1335,
+    "gotSkillIdsLengthEqualsMaxLevelChecked": 1335,
+    "maxSkillDistinctCount": 10,
+    "passiveBuffDistinctCount": 11,
+    "skillBuffEdgeCount": 1602
+  },
+  "population": {
+    "maxSkillCounts": {
+      "70009": 267,
+      "70019": 29,
+      "70029": 50,
+      "70039": 13,
+      "70049": 50,
+      "70059": 30,
+      "70069": 95,
+      "70088": 267,
+      "70099": 267,
+      "70109": 267
+    },
+    "passiveBuffIds": [
+      70009,
+      70019,
+      70029,
+      70039,
+      70049,
+      70059,
+      70069,
+      70088,
+      70089,
+      70099,
+      70109
+    ],
+    "rawVectorCounts": {
+      "1000,1000,2500,2500": 30,
+      "1000,2500,1000,2500": 50,
+      "1000,2500,2500,1000": 50,
+      "2500,1000,1000,2500": 13,
+      "2500,1000,2500,1000": 29,
+      "2500,2500,1000,1000": 95
+    }
+  },
+  "parity": {
+    "canonicalToPredecessorHeroIdSet": "PASS",
+    "canonicalToGeneratedHeroIdSet": "PASS",
+    "exactRawVectorMismatchCount": 0,
+    "exactContributionMismatchCount": 0,
+    "unresolvedMaxSkillCount": 0,
+    "unresolvedPassiveBuffCount": 0,
+    "gotSkillIdsLengthVsMaxLevelMismatchCount": 0
+  },
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "raw": {
+        "hp": 2500,
+        "at": 2500,
+        "df": 1000,
+        "magicDf": 1000
+      },
+      "contribution": {
+        "hp": 25,
+        "at": 25,
+        "df": 10,
+        "magicDf": 10
+      },
+      "status": "PASS"
+    }
+  },
+  "inheritedReviewClosure": {
+    "r5A4GotSkillIdsLengthEqualsMaxLevel": {
+      "checked": 1335,
+      "mismatchCount": 0,
+      "status": "CLOSED_PASS"
+    }
+  },
+  "blocker": "NONE",
+  "nextStart": "R5-E_INVARIANTS"
+}
