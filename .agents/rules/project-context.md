@@ -14,6 +14,18 @@ This file supplies project context and complementary development rules. If a con
 
 Do not reactivate retired Project Doctor runtime or legacy orchestration merely to rediscover authority or resume work. Resume from the current authority chain and the last incomplete owning layer.
 
+### Diagnostic routing contract owner
+
+Changes to the diagnostic probe classification, diagnostic result schema, diagnostic capability preflight, or narrow orchestration fail-fast sections in `AGENTS.md` are owned by tooling/orchestration maintenance.
+
+For those changes, the independent contract validator is:
+
+```bash
+node scripts/validate-diagnostic-routing-contract.mjs
+```
+
+The validator is limited to the diagnostic routing contract and its regression fixtures. It must not recompute semantic relations, inspect raw ConfigData meaning, propagate ownership, or fan out frontend/hosted validation. A validator failure is a tooling/orchestration `BLOCKER`; unrelated semantic, localization, asset, frontend, or hosted checks are outside this route unless their own changed paths require them.
+
 ## Repository roles
 
 - `LuceatLuxVestra42/langrisser-future-guide`: production website source code and final web-ready assets.
