@@ -1,0 +1,53 @@
+name: Temporary PassiveBuff key verify
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+    paths:
+      - '.github/workflows/tmp-passivebuff-key-verify.yml'
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hydrate pinned ConfigData source pack
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir /tmp/langrisser-configdata-source
+      - name: Verify only ConfigDataBuffInfo keys 5111 and 5181
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/passivebuff-key-verify
+          node <<'NODE' | tee out/passivebuff-key-verify/result.txt
+          const fs=require('fs');
+          const p='/tmp/langrisser-configdata-source/data/configdata/ConfigDataBuffInfo.json';
+          const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          const rows=Array.isArray(x)?x:(Array.isArray(x.records)?x.records:[]);
+          const out={source:'ConfigDataBuffInfo.json',recordCount:rows.length,keys:{}};
+          for(const id of [5111,5181]){
+            const hits=rows.filter(r=>Number(r.ID)===id);
+            out.keys[id]={hitCount:hits.length,rows:hits};
+          }
+          console.log(JSON.stringify(out,null,2));
+          if(out.keys[5111].hitCount!==1 || out.keys[5181].hitCount!==1) process.exitCode=2;
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: passivebuff-key-verify
+          path: out/passivebuff-key-verify
+          retention-days: 7
+      - name: Remove temporary workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/tmp-passivebuff-key-verify.yml
+          git commit -m 'Remove temporary PassiveBuff key verify'
+          git push origin HEAD:${GITHUB_REF_NAME}
