@@ -1,0 +1,38 @@
+name: Temporary Hero3 Buff owner probe v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/tmp-hero3-buff-owner-probe-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hydrate pinned ConfigData source pack outside repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir /tmp/langrisser-configdata-source
+      - name: Identify Buff owner and explicit property fields
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const root='/tmp/langrisser-configdata-source/data/configdata';
+          const read=p=>JSON.parse(fs.readFileSync(`${root}/${p}`,'utf8'));
+          const rows=x=>Array.isArray(x)?x:(x.records||[]);
+          const buffs=rows(read('ConfigDataBuffInfo.json'));
+          const ids=new Set([5111,5181]);
+          for(const id of ids){
+            const hits=buffs.filter(r=>Number(r.ID)===id);
+            console.log(`BUFF_ID=${id};HIT_COUNT=${hits.length}`);
+            for(const r of hits) console.log('BUFF_ROW='+JSON.stringify(r));
+          }
+          const prop=rows(read('ConfigDataPropertyModifyInfo.json'));
+          console.log('PROPERTY_MODIFY_SCHEMA_KEYS='+JSON.stringify(Object.keys(prop.find(r=>r.ID)||{})));
+          for(const r of prop.filter(r=>[57,58,59,60,65,66,67,68].includes(Number(r.ID)))) console.log('PROPERTY_MODIFY_ROW='+JSON.stringify(r));
+          NODE
