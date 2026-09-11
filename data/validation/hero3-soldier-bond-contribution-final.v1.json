@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "stage": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "freezeState": "FINAL_FROZEN",
+  "contract": "data/contracts/hero3-soldier-bond-contribution-contract.v1.json",
+  "generatedArtifact": "data/generated/hero3-soldier-bond-contribution.v1.json",
+  "authority": {
+    "canonicalHeroSource": "data/hero-name-master.v1.json",
+    "canonicalHeroCount": 267,
+    "sourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "sourceTreeGitSha1": "b18983f60cb054c2e6e094d64cdb98979211d7fc",
+    "archiveSha256": "65855321776cba9523669a2d486c2edbd2908006cf854572b7a87b0b63405c84"
+  },
+  "validation": {
+    "independentRecomputation": true,
+    "exactCanonicalParity": true,
+    "explicitIdRelationsOnly": true,
+    "nameJoinCount": 0,
+    "idArithmeticSemanticMappingCount": 0,
+    "arrayOrderSemanticMappingCount": 0,
+    "normalOrSpBaseCompositionCount": 0,
+    "finalCorrectionCompositionCount": 0
+  },
+  "leonRegression": {
+    "passed": true,
+    "heroId": 6,
+    "heroFetterIds": [
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "selectedMaxSkillIds": [
+      70009,
+      70088,
+      70069,
+      70099,
+      70109
+    ],
+    "raw": {
+      "hp": 2500,
+      "attack": 2500,
+      "defense": 1000,
+      "magicDefense": 1000
+    },
+    "percentagePoints": {
+      "hp": 25,
+      "attack": 25,
+      "defense": 10,
+      "magicDefense": 10
+    },
+    "verifiedNonContributingSkillIds": [
+      70088,
+      70099,
+      70109
+    ]
+  },
+  "hardErrorCount": 0,
+  "blockers": [],
+  "nextOwner": "HERO_SOLDIER_CORRECTION_COMPOSER",
+  "reopenConditions": [
+    "canonical hero population source changes",
+    "pinned ConfigData source snapshot changes",
+    "R0-R4 relation or normalization contract changes",
+    "generated parity damage",
+    "owning validator hard failure"
+  ]
+}
