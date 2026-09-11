@@ -150,6 +150,47 @@ Temporary or ad-hoc diagnostic probes are evidence-gathering tools, not owning v
 - An owning validator hard failure remains a `BLOCKER`. Never downgrade an owning validator failure merely because a temporary diagnostic probe would have treated the same observation as non-blocking.
 - When a diagnostic internal status must be projected through Project Check, preserve the existing contract: use `PASS` when the probe completed and its negative observation satisfies the diagnostic purpose, `REVIEW` for non-blocking tooling/cleanup uncertainty, `BLOCKER` only for failures that prevent the required completion condition, and `MANUAL_REVIEW` when no explicit owner rule exists.
 
+#### Diagnostic probe result schema
+
+When a temporary or ad-hoc diagnostic probe emits a machine-readable result, use a two-level schema so internal diagnostic detail never expands or replaces Project Check's external status contract.
+
+```json
+{
+  "internalStatus": "PASS | EXPECTED_MISS | TOOLING_UNAVAILABLE | CLEANUP_RACE | PROBE_IMPLEMENTATION_ERROR",
+  "projectCheckStatus": "PASS | REVIEW | BLOCKER | MANUAL_REVIEW",
+  "owner": "tooling-or-explicit-probe-owner",
+  "stage": "probe-or-discovery-stage",
+  "reason": "STABLE_MACHINE_READABLE_REASON",
+  "completionRequired": true,
+  "evidence": {
+    "artifact": "optional-artifact-or-path",
+    "summary": "short factual observation"
+  },
+  "nextAction": "continue | alternate_evidence | retry_probe | cleanup_handoff | stop | manual_review"
+}
+```
+
+Rules for this schema:
+
+- `internalStatus` describes what happened inside the diagnostic probe. It does not by itself decide whether the owning task stops.
+- `projectCheckStatus` is the only status projected into orchestration. It must remain one of the existing Project Check outcomes plus `MANUAL_REVIEW` for unmatched ownership.
+- `completionRequired` states whether this evidence path is required for the current work unit's completion condition. The same tooling failure may therefore project to `BLOCKER` when required and `REVIEW` when optional.
+- `reason` should be a stable machine-readable code such as `TARGET_NOT_PRESENT`, `REQUIRED_TOOL_UNAVAILABLE`, `PROBE_SCRIPT_ERROR`, or `POST_RESULT_CLEANUP_CONFLICT`; do not encode semantic conclusions into the reason field.
+- `evidence` must record only evidence actually produced by the probe. Do not synthesize missing relations or meanings in this result object.
+- `nextAction` is advisory routing for the current owner. It must not perform owner propagation or semantic recomputation.
+
+Default projection guidance:
+
+| Internal diagnostic result | Default Project Check projection | Default next action |
+| --- | --- | --- |
+| `PASS` | `PASS` | `continue` |
+| `EXPECTED_MISS` | `PASS` when the negative observation completes the probe purpose; otherwise `REVIEW` | `alternate_evidence` or `continue` |
+| `TOOLING_UNAVAILABLE` | `BLOCKER` if required, otherwise `REVIEW` | `stop` or `alternate_evidence` |
+| `CLEANUP_RACE` | `REVIEW` unless required repository state was not achieved | `cleanup_handoff` |
+| `PROBE_IMPLEMENTATION_ERROR` | `BLOCKER` if the probe is required and no reusable evidence exists; otherwise `REVIEW` | `retry_probe` or `alternate_evidence` |
+
+Do not use this schema to soften invariant checks. If the workflow is an owning validator whose explicit contract requires an object, relation, parity condition, or repository state to exist, its hard failure remains a `BLOCKER` rather than an `EXPECTED_MISS`.
+
 For frontend-related work, distinguish the gates:
 
 ```text
