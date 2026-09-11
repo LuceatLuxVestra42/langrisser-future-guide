@@ -16,7 +16,7 @@ Do not reactivate retired Project Doctor runtime or legacy orchestration merely 
 
 ### Diagnostic routing contract owner
 
-Changes to the diagnostic probe classification, diagnostic result schema, diagnostic capability preflight, or narrow orchestration fail-fast sections in `AGENTS.md` are owned by tooling/orchestration maintenance.
+Changes to the diagnostic probe classification, diagnostic result schema, diagnostic capability preflight, or narrow orchestration fail-fast sections in `AGENTS.md` are owned by tooling/orchestration maintenance. The same owner applies to this `Diagnostic routing contract owner` section and to `scripts/validate-diagnostic-routing-contract.mjs`.
 
 For those changes, the independent contract validator is:
 
