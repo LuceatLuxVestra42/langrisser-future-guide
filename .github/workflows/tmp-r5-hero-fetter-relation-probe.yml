@@ -1,0 +1,59 @@
+name: tmp R5 hero fetter relation probe
+
+on:
+  push:
+    branches:
+      - diag/sp-runtime-code-asset-locate-20260910
+    paths:
+      - .github/workflows/tmp-r5-hero-fetter-relation-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Hydrate pinned ConfigData and locate explicit Hero to Fetter relation
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+          ROOT="$RUNNER_TEMP/configdata-hydrated/data/configdata"
+          node <<'NODE'
+          const fs=require('fs'), path=require('path');
+          const root=process.env.RUNNER_TEMP+'/configdata-hydrated/data/configdata';
+          const names=fs.readdirSync(root).filter(n=>n.endsWith('.json'));
+          const hits=[];
+          function walk(v,p,out){
+            if(Array.isArray(v)){ for(let i=0;i<Math.min(v.length,10);i++) walk(v[i],p+'[]',out); return; }
+            if(!v||typeof v!=='object') return;
+            for(const [k,x] of Object.entries(v)){
+              const kp=p?`${p}.${k}`:k;
+              if(/fetter|hero/i.test(k)) out.add(kp);
+              if(x&&typeof x==='object') walk(x,kp,out);
+            }
+          }
+          for(const n of names){
+            let j; try{j=JSON.parse(fs.readFileSync(path.join(root,n),'utf8'));}catch{continue}
+            const out=new Set(); walk(j,'',out);
+            const s=[...out].filter(x=>/fetter/i.test(x));
+            if(s.length) hits.push([n,s.slice(0,40)]);
+          }
+          console.log('FILES_WITH_FETTER_FIELDS');
+          for(const h of hits) console.log(JSON.stringify(h));
+          for(const n of names.filter(n=>/Fetter|Hero/i.test(n))){
+            let j; try{j=JSON.parse(fs.readFileSync(path.join(root,n),'utf8'));}catch{continue}
+            const arr=Array.isArray(j)?j:(j.data||j.Data||j.rows||j.Rows||j.list||j.List||[]);
+            if(!Array.isArray(arr)) continue;
+            const leon=arr.filter(r=>r&&typeof r==='object'&&(r.HeroID===6||r.Hero_ID===6||r.HeroId===6||r.ID===6));
+            if(leon.length) console.log('LEON_CANDIDATE',n,JSON.stringify(leon.slice(0,10)));
+            if(/HeroFetterInfo/.test(n)) console.log('HERO_FETTER_SAMPLE',n,JSON.stringify(arr.slice(0,8)));
+          }
+          NODE
