@@ -1,0 +1,57 @@
+name: R5-E Hero Soldier Bond Contribution Invariants
+
+on:
+  push:
+    branches:
+      - r5-c-hero-soldier-bond-contribution
+    paths:
+      - scripts/validate_hero_soldier_bond_command_contribution_invariants.cjs
+      - .github/workflows/r5-e-validate.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run R5-E invariant validator
+        run: |
+          set -euo pipefail
+          node scripts/validate_hero_soldier_bond_command_contribution_invariants.cjs
+
+      - name: Assert only expected validation mutation
+        run: |
+          set -euo pipefail
+          git status --short
+          test "$(git status --short | wc -l | tr -d ' ')" = "1"
+          test "$(git status --short | sed -E 's/^.. //')" = "data/validation/hero-soldier-bond-command-contribution-r5-e.v1.json"
+
+      - name: Commit validation artifact to feature branch
+        env:
+          BRANCH_NAME: r5-c-hero-soldier-bond-contribution
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-soldier-bond-command-contribution-r5-e.v1.json
+          git commit -m "R5-E record contribution invariants"
+          git push origin "HEAD:${BRANCH_NAME}"
+
+      - name: Upload validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-e-hero-soldier-bond-command-contribution-invariants
+          path: data/validation/hero-soldier-bond-command-contribution-r5-e.v1.json
+          if-no-files-found: error
