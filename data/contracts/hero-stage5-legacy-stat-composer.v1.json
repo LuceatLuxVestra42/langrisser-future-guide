@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "stage": "hero-stage5-legacy-stat-composer",
+  "status": "PROPOSED",
+  "purpose": "Own only the pure numeric composition that turns caller-supplied verified stat inputs, normal-bond rate, SP stat-bonus rates, and frozen global mastery flats into the pre-central legacyValues consumed by the central-bond numeric layer.",
+  "authorityBoundary": {
+    "heroCanonicalStatusSource": "data/validation/hero-stage6-4-final.v1.json",
+    "stage4FormulaContract": "data/hero-basic-combat-stage4-5.v1.json",
+    "stage4FrozenInput": "data/generated/hero-basic-combat.v1.json",
+    "stage5SpFrozenInput": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "productionHeroShard": "data/generated/hero-detail/by-id/<heroId>.json",
+    "rawConfigDataRead": false,
+    "sourceSelection": false,
+    "relationRecomputation": false,
+    "stage4Mutation": false,
+    "stage5SemanticMutation": false,
+    "stage6Mutation": false
+  },
+  "inputContract": {
+    "statInputs": "Exact caller-supplied {ini,up,starCorrection} per hp/at/magic/df/magicDf/dex from an already-validated selected form.",
+    "masteryFlats": "Frozen Stage 4 globalJobMastery.totals. SP does not replace or infer this value inside the composer.",
+    "normalBondRate": "Caller-supplied verified normal-Fetter rate. The composer does not discover or infer bond semantics.",
+    "spBonusRates": "Caller-supplied verified per-stat SP bonus rates; omitted stats are zero. The composer does not parse descriptions or map property IDs."
+  },
+  "formula": {
+    "starAdjustedRaw": "(INI + UP * 69 / 10) * (1 + starCorrection / 10000)",
+    "percentAdjusted": "round(starAdjustedRaw * (1 + normalBondRate + spBonusRate))",
+    "legacyValue": "percentAdjusted + masteryFlat",
+    "roundingBoundary": "Normal Fetter and same-stage SP stat bonus are combined before the integer round. Central-bond +5% is explicitly excluded and must remain a later separate rounded delta."
+  },
+  "fixtures": {
+    "leonSp": {
+      "heroId": 6,
+      "frozenGlobalMastery": { "hp": 452, "at": 73, "magic": 0, "df": 10, "magicDf": 10, "dex": 5 },
+      "normalBondRate": 0.25,
+      "spBonusRates": { "hp": 0.05, "df": 0.05 },
+      "expectedLegacyValues": { "hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125 },
+      "roundingDiscriminator": "Leon DEF must be 260; splitting the SP +5% into its own rounded delta would incorrectly produce 261."
+    }
+  },
+  "forbidden": [
+    "name JOIN",
+    "ID arithmetic",
+    "raw ConfigData reads",
+    "SP relation discovery",
+    "normal Fetter semantic discovery",
+    "central-bond application",
+    "Stage 6 regeneration or mutation",
+    "silent fallback for missing stat inputs or mastery flats"
+  ],
+  "validator": "node scripts/validate_hero_stage5_legacy_stat_composer.cjs",
+  "completion": "The pure composer validates Leon pre-central parity at tolerance 0, proves the combined normal-Fetter/SP rounding boundary with a discriminator, rejects invalid rates, and introduces no generated/frontend mutation."
+}
