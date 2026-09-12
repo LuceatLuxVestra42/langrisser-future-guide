@@ -1,0 +1,68 @@
+name: Hero Stage 5-6 Stat Composition
+
+on:
+  push:
+    branches:
+      - 'work/**'
+    paths:
+      - 'scripts/build_hero_stage5_6_stat_composition.cjs'
+      - 'scripts/validate_hero_stage5_6_stat_composition.cjs'
+      - 'scripts/hero-stage5-legacy-stat-composer.cjs'
+      - 'scripts/hero-central-bond-stat-effect.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'data/contracts/hero-stage5-6-stat-composition.v1.json'
+      - '.github/workflows/hero-stage5-6-stat-composition.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-stage5-6-stat-composition-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate-validate-writeback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Stage 5-6 stat composition
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build_hero_stage5_6_stat_composition.cjs
+
+      - name: Validate Stage 5-6 stat composition
+        run: node scripts/validate_hero_stage5_6_stat_composition.cjs
+
+      - name: Verify mutation scope
+        run: |
+          set -euo pipefail
+          changed="$(git status --porcelain | awk '{print $2}')"
+          test -n "$changed"
+          while IFS= read -r path; do
+            case "$path" in
+              data/generated/hero-page-stage5-6-stat-composition.v1.json|data/validation/hero-page-stage5-6-stat-composition.v1.json) ;;
+              *) echo "unexpected generated mutation: $path" >&2; exit 1 ;;
+            esac
+          done <<< "$changed"
+
+      - name: Commit generated candidate and validation
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-page-stage5-6-stat-composition.v1.json data/validation/hero-page-stage5-6-stat-composition.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(hero): materialize stage5 stat composition"
+          git push origin HEAD:${{ github.ref_name }}
