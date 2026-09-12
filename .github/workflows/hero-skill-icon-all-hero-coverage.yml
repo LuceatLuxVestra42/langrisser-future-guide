@@ -1,0 +1,29 @@
+name: Hero Skill Icon All-Hero Coverage
+
+on:
+  push:
+    branches:
+      - work/hero-skill-icon-all-hero-coverage-20260912
+    paths:
+      - scripts/validate-hero-skill-icon-all-hero-coverage.mjs
+      - .github/workflows/hero-skill-icon-all-hero-coverage.yml
+      - data/generated/hero-detail/by-id/**
+      - data/generated/hero-skill-icon-assets.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect all-hero skill icon coverage
+        run: node scripts/validate-hero-skill-icon-all-hero-coverage.mjs --output="$RUNNER_TEMP/hero-skill-icon-all-hero-coverage.v1.json"
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-skill-icon-all-hero-coverage
+          path: ${{ runner.temp }}/hero-skill-icon-all-hero-coverage.v1.json
+          if-no-files-found: error
