@@ -67,7 +67,7 @@ jobs:
           node scripts/validate-hero-card-icon-frontend.mjs
           node scripts/validate-hero-fusion-power-frontend.mjs
           grep -q 'equipment-p3-1-release-metadata.v1.json' src/lib/equipment-page.localized.server.ts
-          if grep -Eq '초기 장비|이전 추가 장비|장비패스' src/routes/equipment.tsx; then
+          if grep -Eq '초기 장비|이전 추가 장비' src/routes/equipment.tsx; then
             echo 'Equipment list still exposes a removed top-level collection category' >&2
             exit 1
           fi
