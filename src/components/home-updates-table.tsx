@@ -17,7 +17,7 @@ type SingleEntry = {
 };
 
 type LawEntry = { id: number; name: string };
-type SpSoldierEntry = { name: string; soldierId?: number };
+type SoldierEntry = { name: string; soldierId?: number };
 
 type UpdateRow = {
   date: string;
@@ -27,8 +27,8 @@ type UpdateRow = {
   heroes: HeroEntry[];
   singles?: SingleEntry[];
   law?: LawEntry[];
-  newSoldiers?: string[];
-  spSoldiers?: SpSoldierEntry[];
+  newSoldiers?: SoldierEntry[];
+  spSoldiers?: SoldierEntry[];
   patches: string[];
 };
 
@@ -215,7 +215,10 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99197, name: "각성자" },
       { id: 99221, name: "군" },
     ],
-    newSoldiers: ["창병", "마족"],
+    newSoldiers: [
+      { name: "잿빛 호위대", soldierId: 136 },
+      { name: "단죄의 수녀", soldierId: 1039 },
+    ],
     spSoldiers: [
       { name: "거대 랍스터", soldierId: 5504 },
       { name: "수정 마도사", soldierId: 5636 },
@@ -324,7 +327,7 @@ function SoldierCell({
   kind,
 }: {
   title: string;
-  entries: string[] | SpSoldierEntry[];
+  entries: SoldierEntry[];
   kind: "new" | "sp";
 }) {
   return (
@@ -332,16 +335,15 @@ function SoldierCell({
       <div className="hut-head">{title}</div>
       <div className="hut-soldier-list">
         {entries.map((entry) => {
-          const name = typeof entry === "string" ? entry : entry.name;
-          const soldierId = typeof entry === "string" ? undefined : entry.soldierId;
-          if (kind === "sp" && soldierId) {
+          const { name, soldierId } = entry;
+          if (soldierId) {
             return (
               <Link
                 key={name}
                 reloadDocument
                 to="/soldiers/$soldierId"
                 params={{ soldierId: String(soldierId) }}
-                aria-label={`${name} SP용병 상세 보기`}
+                aria-label={`${name} 용병 상세 보기`}
                 className="hut-soldier-link"
               >
                 {name}
