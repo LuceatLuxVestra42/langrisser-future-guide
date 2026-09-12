@@ -357,8 +357,8 @@ const TABLE_CSS = `
 .home-update-table .hut-soldier-list{display:grid;grid-template-columns:1fr;flex:1;align-content:center;gap:3px}
 .home-update-table .hut-soldier-list span{display:block;border:1px solid #cfd9d4;border-radius:6px;background:#fff;padding:4px 1px;text-align:center;font-size:9px;font-weight:850;white-space:nowrap}
 .home-update-table .hut-patch{display:flex;min-width:0;flex-direction:column;background:#f5e8ee;padding-right:18px}
-.home-update-table .hut-patch ul{min-width:0;flex:1;align-content:center;margin:0;padding-left:15px;font-size:10.5px;line-height:1.52;word-break:keep-all;overflow-wrap:break-word;line-break:strict;text-wrap:pretty}
-.home-update-table .hut-patch li{max-width:100%}.home-update-table .hut-patch li+li{margin-top:2px}
+.home-update-table .hut-patch ul{min-width:0;flex:1;align-content:center;margin:0;padding-left:18px;list-style-type:disc;list-style-position:outside;font-size:10.5px;line-height:1.52;word-break:keep-all;overflow-wrap:break-word;line-break:strict;text-wrap:pretty}
+.home-update-table .hut-patch li{max-width:100%}.home-update-table .hut-patch li::marker{color:#697386}.home-update-table .hut-patch li+li{margin-top:2px}
 @media(max-width:820px){.home-update-table .hut-list,.home-update-table .hut-row,.home-update-table .hut-grid{width:1160px}.home-update-table .hut-grid{min-height:114px}.home-update-table .hut-cell{padding:7px 5px}}
 `;
 
