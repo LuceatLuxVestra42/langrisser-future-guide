@@ -1,9 +1,10 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { resolveHeroDisplayNameKr } from "@/lib/hero-display-name";
+import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 type HeroEntry = {
@@ -12,6 +13,20 @@ type HeroEntry = {
   factions: number[];
   bond4: string;
   bond5: string;
+};
+
+type FusionPowerRecord = {
+  heroId: number;
+  targetType: "FACTION" | "CLASS";
+  targetIds: number[];
+  targetLabel: string;
+  markKind: "SINGLE" | "COMPOSITE";
+  markAssets: Array<{
+    webAssetPath: string;
+    width?: number;
+    height?: number;
+  }>;
+  assetStatus: string;
 };
 
 type SingleEntry = {
@@ -254,7 +269,62 @@ function factionImage(id: number) {
   return publicAsset(`images/factions/${id}.png`);
 }
 
-function HeroCard({ hero }: { hero: HeroEntry }) {
+function FusionPowerMark({ fusionPower }: { fusionPower: FusionPowerRecord }) {
+  if (fusionPower.assetStatus !== "RESOLVED" || fusionPower.markAssets.length === 0) return null;
+
+  const primaryMarkAsset = fusionPower.markAssets[0];
+  const secondaryMarkAsset = fusionPower.markAssets[1];
+  if (!primaryMarkAsset) return null;
+
+  const fusionLabel = fusionPower.targetType === "CLASS"
+    ? `직업 초절강화: ${fusionPower.targetLabel}`
+    : `초절강화 진영: ${fusionPower.targetLabel}`;
+
+  return (
+    <span
+      className="hut-fusion-mark"
+      title={fusionLabel}
+      aria-label={fusionLabel}
+      data-hero-fusion-power-mark="true"
+      data-target-type={fusionPower.targetType}
+      data-target-faction-id={fusionPower.targetType === "FACTION" ? fusionPower.targetIds[0] : undefined}
+      data-target-class-ids={fusionPower.targetType === "CLASS" ? fusionPower.targetIds.join(",") : undefined}
+      data-mark-kind={fusionPower.markKind}
+    >
+      {fusionPower.markKind === "COMPOSITE" && secondaryMarkAsset ? (
+        <span className="hut-fusion-composite">
+          <img
+            src={publicAsset(primaryMarkAsset.webAssetPath)}
+            alt=""
+            className="hut-fusion-image hut-fusion-primary"
+          />
+          <img
+            src={publicAsset(secondaryMarkAsset.webAssetPath)}
+            alt=""
+            className="hut-fusion-image hut-fusion-secondary"
+          />
+          <span aria-hidden="true" className="hut-fusion-divider" />
+        </span>
+      ) : (
+        <img
+          src={publicAsset(primaryMarkAsset.webAssetPath)}
+          alt=""
+          width={primaryMarkAsset.width}
+          height={primaryMarkAsset.height}
+          className="hut-fusion-image"
+        />
+      )}
+    </span>
+  );
+}
+
+function HeroCard({
+  hero,
+  fusionPower,
+}: {
+  hero: HeroEntry;
+  fusionPower?: FusionPowerRecord;
+}) {
   return (
     <Link
       reloadDocument
@@ -266,6 +336,7 @@ function HeroCard({ hero }: { hero: HeroEntry }) {
       <div className="hut-hero-card">
         <div className="hut-portrait">
           <img src={heroImage(hero.id)} alt="" />
+          {fusionPower ? <FusionPowerMark fusionPower={fusionPower} /> : null}
           <strong>{hero.name}</strong>
         </div>
         <div className="hut-hero-meta">
@@ -297,7 +368,13 @@ function MiniCard({ id, name }: { id: number; name: string }) {
   );
 }
 
-function HeroCell({ row }: { row: UpdateRow }) {
+function HeroCell({
+  row,
+  fusionPowerByHeroId,
+}: {
+  row: UpdateRow;
+  fusionPowerByHeroId: Map<number, FusionPowerRecord>;
+}) {
   return (
     <section className="hut-cell hut-hero-cell">
       <div className={`hut-head ${row.acquireNote ? "hut-hero-head-grid" : ""}`}>
@@ -305,7 +382,13 @@ function HeroCell({ row }: { row: UpdateRow }) {
         {row.acquireNote ? <span>{row.acquireNote}</span> : null}
       </div>
       <div className="hut-hero-pair">
-        {row.heroes.map((hero) => <HeroCard key={hero.id} hero={hero} />)}
+        {row.heroes.map((hero) => (
+          <HeroCard
+            key={hero.id}
+            hero={hero}
+            fusionPower={fusionPowerByHeroId.get(hero.id)}
+          />
+        ))}
         {row.heroes.length === 1 ? <div aria-hidden="true" /> : null}
       </div>
     </section>
@@ -412,9 +495,16 @@ const TABLE_CSS = `
 .home-update-table .hut-hero-link:focus-visible{box-shadow:0 0 0 2px rgba(23,32,51,.24)}
 .home-update-table .hut-hero-card{display:grid;grid-template-columns:78px minmax(0,1fr);gap:6px;min-width:0;overflow:hidden;border:1px solid #d7dee7;border-radius:8px;background:#fff;padding:7px 5px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .home-update-table .hut-hero-link:hover .hut-hero-card{transform:translateY(-1px);border-color:#aeb8c6;box-shadow:0 3px 8px rgba(23,32,51,.10)}
-.home-update-table .hut-portrait{text-align:center;min-width:0}
-.home-update-table .hut-portrait img{display:block;width:76px;height:76px;max-width:100%;margin:auto;border-radius:7px;object-fit:contain}
+.home-update-table .hut-portrait{position:relative;text-align:center;min-width:0}
+.home-update-table .hut-portrait>img{display:block;width:76px;height:76px;max-width:100%;margin:auto;border-radius:7px;object-fit:contain}
 .home-update-table .hut-portrait strong{display:block;margin-top:3px;font-size:10.5px;line-height:1.15;white-space:normal}
+.home-update-table .hut-fusion-mark{position:absolute;right:2px;top:2px;display:block;width:25px;height:25px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));z-index:1}
+.home-update-table .hut-fusion-image{display:block;width:100%;height:100%;object-fit:contain}
+.home-update-table .hut-fusion-composite{position:relative;display:block;width:100%;height:100%;overflow:hidden;border-radius:999px}
+.home-update-table .hut-fusion-composite .hut-fusion-image{position:absolute;inset:0}
+.home-update-table .hut-fusion-primary{clip-path:polygon(0 0,100% 0,0 100%)}
+.home-update-table .hut-fusion-secondary{clip-path:polygon(100% 0,100% 100%,0 100%)}
+.home-update-table .hut-fusion-divider{pointer-events:none;position:absolute;left:50%;top:50%;width:1px;height:135%;transform:translate(-50%,-50%) rotate(45deg);background:rgba(255,255,255,.9);box-shadow:0 0 1px rgba(0,0,0,.8)}
 .home-update-table .hut-hero-meta{min-width:0;padding-top:2px}
 .home-update-table .hut-factions{display:flex;flex-wrap:nowrap;gap:3px;margin-bottom:7px}
 .home-update-table .hut-factions img{width:19px;height:19px;flex:0 0 19px;object-fit:contain}
@@ -445,6 +535,10 @@ const TABLE_CSS = `
 
 export function HomeUpdatesTable() {
   const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
+  const [fusionPowerByHeroId, setFusionPowerByHeroId] = useState<Map<number, FusionPowerRecord>>(
+    () => new Map(),
+  );
+  const [fusionPowerError, setFusionPowerError] = useState<Error | null>(null);
   const soldierPage = useMemo(() => getSoldierPrototypePageData(), []);
   const soldierById = useMemo(
     () => new Map(soldierPage.records.map((record) => [record.soldierId, record])),
@@ -466,6 +560,39 @@ export function HomeUpdatesTable() {
       nameKr: resolveHeroDisplayNameKr(card.heroId, card.nameKr, card.nameCn),
     }));
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    getHeroFusionPowerIndex()
+      .then((index) => {
+        if (
+          index.summary.total !== 43 ||
+          index.summary.factionTargets !== 41 ||
+          index.summary.classTargets !== 2 ||
+          index.summary.factionAssets !== 12 ||
+          index.summary.classAssets !== 3 ||
+          index.summary.pending !== 0 ||
+          index.summary.hardErrors !== 0 ||
+          index.records.length !== 43
+        ) {
+          throw new Error("Hero expanded fusion-power mark index is not production-ready.");
+        }
+        if (!active) return;
+        setFusionPowerByHeroId(new Map(index.records.map((record) => [record.heroId, record])));
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setFusionPowerError(error instanceof Error ? error : new Error(String(error)));
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (fusionPowerError) throw fusionPowerError;
+
   const selectedSoldier = selectedSoldierId === null
     ? null
     : soldierById.get(selectedSoldierId) ?? null;
@@ -479,7 +606,7 @@ export function HomeUpdatesTable() {
             <article key={row.date} className="hut-row">
               <div className="hut-grid" style={{ gridTemplateColumns: rowColumns(row) } as CSSProperties}>
                 <div className="hut-date">{row.date}<small>{row.season}</small></div>
-                <HeroCell row={row} />
+                <HeroCell row={row} fusionPowerByHeroId={fusionPowerByHeroId} />
                 {row.singles?.map((entry) => <SingleCell key={`${row.date}-${entry.title}`} entry={entry} />)}
                 {row.law?.length ? <LawCell entries={row.law} /> : null}
                 {row.newSoldiers?.length ? (
