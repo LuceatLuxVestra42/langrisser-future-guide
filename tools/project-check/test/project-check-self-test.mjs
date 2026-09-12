@@ -144,6 +144,19 @@ expectOwners(
   ['shared-build'],
   ['production-build'],
 );
+
+for (const s0Path of [
+  '.github/workflows/sp-soldier-command-semantics-s0.yml',
+  'data/contracts/sp-soldier-command-semantics.v1.json',
+  'data/validation/sp-soldier-command-semantics-s0.v1.json',
+  'data/validation/sp-soldier-command-semantics-s0-f.v1.json',
+]) {
+  expectOwners(
+    s0Path,
+    ['soldier-canonical'],
+    ['soldier-canonical'],
+  );
+}
 expectOwners(
   'src/routes/heroes.tsx',
   ['hero-frontend'],
