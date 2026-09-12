@@ -1,0 +1,107 @@
+name: F3 Central Bond Multi Fixture Probe
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/f3-central-bond-multifixture-probe.yml
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Extract four non-Leon SP central-bond source fixtures
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const load = name => JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
+          const indexById = (rows,label) => {
+            const m = new Map();
+            rows.forEach((r,i) => {
+              if (!r || typeof r !== 'object' || Array.isArray(r) || !Number.isInteger(Number(r.ID))) return;
+              const id = Number(r.ID);
+              if (m.has(id)) throw new Error(`${label}: duplicate ID ${id}`);
+              m.set(id,{recordIndex:i,record:r});
+            });
+            return m;
+          };
+          const stage54 = JSON.parse(fs.readFileSync('data/generated/hero-page-stage5-4-sp.v1.json','utf8'));
+          const selected = (stage54.records || []).filter(r => r?.sp?.status === 'RELEASED' && Number(r.heroId) !== 6).slice(0,4);
+          if (selected.length !== 4) throw new Error(`expected four released non-Leon SP fixtures; got ${selected.length}`);
+          const spBy = indexById(load('ConfigDataSPHeroInfo.json'),'SPHeroInfo');
+          const jcBy = indexById(load('ConfigDataJobConnectionInfo.json'),'JobConnectionInfo');
+          const jlBy = indexById(load('ConfigDataJobLevelInfo.json'),'JobLevelInfo');
+          const heroBy = indexById(load('ConfigDataHeroInfo.json'),'HeroInfo');
+          const infoBy = indexById(load('ConfigDataHeroInformationInfo.json'),'HeroInformationInfo');
+          const heartBy = indexById(load('ConfigDataHeroHeartFetterInfo.json'),'HeroHeartFetterInfo');
+          const skillBy = indexById(load('ConfigDataSkillInfo.json'),'SkillInfo');
+          const defs = {
+            hp:['HP_INI','HP_UP','HPStar'], at:['AT_INI','AT_UP','ATStar'], magic:['Magic_INI','Magic_UP','MagicStar'],
+            df:['DF_INI','DF_UP','DFStar'], magicDf:['MagicDF_INI','MagicDF_UP','MagicDFStar'], dex:['DEX_INI','DEX_UP','DEXStar']
+          };
+          const fixtures = [];
+          for (const selectedRow of selected) {
+            const heroId = Number(selectedRow.heroId);
+            if (!spBy.has(heroId) || !heroBy.has(heroId)) throw new Error(`hero ${heroId}: SP/Hero source missing`);
+            const sp = spBy.get(heroId).record;
+            const jcId = Number(sp.JobConnection_ID);
+            if (!jcBy.has(jcId)) throw new Error(`hero ${heroId}: JobConnection ${jcId} missing`);
+            const jc = jcBy.get(jcId).record;
+            if (!Array.isArray(jc.JobLevels_ID) || jc.JobLevels_ID.length !== 1) throw new Error(`hero ${heroId}: expected one SP JobLevel`);
+            const jobLevelId = Number(jc.JobLevels_ID[0]);
+            if (!jlBy.has(jobLevelId)) throw new Error(`hero ${heroId}: JobLevel ${jobLevelId} missing`);
+            const level = jlBy.get(jobLevelId).record;
+            const hero = heroBy.get(heroId).record;
+            const infoId = Number(hero.HeroInformation_ID);
+            if (!infoBy.has(infoId)) throw new Error(`hero ${heroId}: HeroInformation ${infoId} missing`);
+            const info = infoBy.get(infoId).record;
+            const heartId = Number(info.HeroHeartFetterId);
+            if (!heartBy.has(heartId)) throw new Error(`hero ${heroId}: HeartFetter ${heartId} missing`);
+            const heart = heartBy.get(heartId).record;
+            if (Number(heart.MaxLevel) !== 10 || !Array.isArray(heart.HeroHeartFetterSkills) || heart.HeroHeartFetterSkills.length !== 10) throw new Error(`hero ${heroId}: invalid HeartFetter levels`);
+            const flatSkillId = Number(heart.HeroHeartFetterSkills[9]);
+            const lv10Unlocks = (Array.isArray(heart.UnlockSkills_ID) ? heart.UnlockSkills_ID : []).filter(x => Number(x?.HeartFetterLevel) === 10);
+            if (lv10Unlocks.length !== 1) throw new Error(`hero ${heroId}: expected one Lv10 unlock`);
+            const percentSkillId = Number(lv10Unlocks[0].SkillId);
+            if (!skillBy.has(flatSkillId) || !skillBy.has(percentSkillId)) throw new Error(`hero ${heroId}: Heart skill missing`);
+            const statInputs = {};
+            for (const [stat,[ini,up,star]] of Object.entries(defs)) {
+              if (!Array.isArray(sp[star]) || sp[star].length < 6) throw new Error(`hero ${heroId}: ${star} missing 6-star value`);
+              statInputs[stat] = { ini:Number(level[ini] || 0), up:Number(level[up] || 0), starCorrection:Number(sp[star][5]) };
+            }
+            fixtures.push({
+              heroId,
+              nameCn:hero.Name,
+              spJobConnectionId:jcId,
+              spJobLevelId:jobLevelId,
+              heartFetterId:heartId,
+              heartFlatSkillId:flatSkillId,
+              heartFlatDesc:String(skillBy.get(flatSkillId).record.Desc || ''),
+              heartPercentSkillId:percentSkillId,
+              heartPercentDesc:String(skillBy.get(percentSkillId).record.Desc || ''),
+              statInputs
+            });
+          }
+          console.log('=== CENTRAL_BOND_MULTI_FIXTURE_RAW_START ===');
+          console.log(JSON.stringify(fixtures,null,2));
+          console.log('=== CENTRAL_BOND_MULTI_FIXTURE_RAW_END ===');
+          NODE
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"

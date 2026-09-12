@@ -1,0 +1,123 @@
+name: F3 Validate All Hero Central Bond Semantics
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/f3-extract-leon-hero-record.yml
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate all Hero central-bond relation and Lv10 semantics
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const load = name => JSON.parse(fs.readFileSync(resolveConfigDataFile(name), 'utf8'));
+          const indexById = (rows,label) => {
+            const m=new Map();
+            rows.forEach((r,i)=>{
+              if(!r||typeof r!=='object'||Array.isArray(r)||!Number.isInteger(Number(r.ID))) return;
+              const id=Number(r.ID);
+              if(m.has(id)) throw new Error(`${label}: duplicate ID ${id}`);
+              m.set(id,{recordIndex:i,record:r});
+            });
+            return m;
+          };
+          const heroes=load('ConfigDataHeroInfo.json');
+          const infos=load('ConfigDataHeroInformationInfo.json');
+          const hearts=load('ConfigDataHeroHeartFetterInfo.json');
+          const skills=load('ConfigDataSkillInfo.json');
+          const infoBy=indexById(infos,'HeroInformationInfo');
+          const heartBy=indexById(hearts,'HeroHeartFetterInfo');
+          const skillBy=indexById(skills,'SkillInfo');
+          const canonical=heroes.filter(r=>r&&r.Useable===true&&Number.isInteger(Number(r.ID)));
+          const results=[];
+          const issues=[];
+          const pctSkillCounts=new Map();
+          const flatPatterns=new Map();
+          for(const h of canonical){
+            const heroId=Number(h.ID);
+            const infoId=Number(h.HeroInformation_ID);
+            const row={heroId,name:h.Name??null,heroInformationId:Number.isInteger(infoId)?infoId:null,status:'PASS'};
+            if(!Number.isInteger(infoId)||!infoBy.has(infoId)){
+              row.status='BROKEN'; row.reason='HeroInformation unresolved'; results.push(row); issues.push(row); continue;
+            }
+            const info=infoBy.get(infoId).record;
+            const heartId=Number(info.HeroHeartFetterId);
+            row.heartFetterId=Number.isInteger(heartId)?heartId:null;
+            if(!Number.isInteger(heartId)||!heartBy.has(heartId)){
+              row.status='NONE'; row.reason='HeroHeartFetterId absent/unresolved'; results.push(row); continue;
+            }
+            const heart=heartBy.get(heartId).record;
+            row.heartRecordIndex=heartBy.get(heartId).recordIndex;
+            if(Number(heart.MaxLevel)!==10 || !Array.isArray(heart.HeroHeartFetterSkills) || heart.HeroHeartFetterSkills.length!==10){
+              row.status='BROKEN'; row.reason='HeartFetter level structure mismatch'; results.push(row); issues.push(row); continue;
+            }
+            const flatSkillId=Number(heart.HeroHeartFetterSkills[9]);
+            const unlocks=Array.isArray(heart.UnlockSkills_ID)?heart.UnlockSkills_ID:[];
+            const lv10=unlocks.filter(x=>Number(x?.HeartFetterLevel)===10);
+            if(!skillBy.has(flatSkillId) || lv10.length!==1 || !skillBy.has(Number(lv10[0]?.SkillId))){
+              row.status='BROKEN'; row.reason='Lv10 skill relation unresolved'; row.flatSkillId=flatSkillId; row.lv10UnlockCount=lv10.length; results.push(row); issues.push(row); continue;
+            }
+            const flatSkill=skillBy.get(flatSkillId).record;
+            const pctSkillId=Number(lv10[0].SkillId);
+            const pctSkill=skillBy.get(pctSkillId).record;
+            const flatDesc=String(flatSkill.Desc||'');
+            const pctDesc=String(pctSkill.Desc||'');
+            row.flatSkillId=flatSkillId;
+            row.percentSkillId=pctSkillId;
+            row.flatDesc=flatDesc;
+            row.percentDesc=pctDesc;
+            if(!pctDesc.includes('全属性') || !pctDesc.includes('+5%')){
+              row.status='REVIEW'; row.reason='Lv10 unlock is not explicit all-stat +5%'; issues.push(row);
+            }
+            if(!flatDesc.includes('英雄') || !/[+＋]\d+/.test(flatDesc)){
+              if(row.status==='PASS') row.status='REVIEW';
+              row.reason=(row.reason?row.reason+'; ':'')+'Lv10 Heart skill lacks explicit Hero flat-stat text'; issues.push(row);
+            }
+            pctSkillCounts.set(pctSkillId,(pctSkillCounts.get(pctSkillId)||0)+1);
+            const normalized=flatDesc.replace(/<[^>]+>/g,'');
+            flatPatterns.set(normalized,(flatPatterns.get(normalized)||0)+1);
+            results.push(row);
+          }
+          const counts=results.reduce((a,r)=>(a[r.status]=(a[r.status]||0)+1,a),{});
+          const summary={
+            canonicalHeroCount:canonical.length,
+            linkedHeartCount:results.filter(r=>Number.isInteger(r.heartFetterId)&&r.status!=='NONE').length,
+            statusCounts:counts,
+            percentSkillCounts:Object.fromEntries([...pctSkillCounts.entries()].sort((a,b)=>a[0]-b[0])),
+            uniqueFlatLv10Descriptions:flatPatterns.size,
+            issueCount:issues.length,
+          };
+          console.log('=== ALL_HERO_CENTRAL_BOND_VALIDATION_SUMMARY_START ===');
+          console.log(JSON.stringify(summary,null,2));
+          console.log('=== ALL_HERO_CENTRAL_BOND_VALIDATION_SUMMARY_END ===');
+          console.log('=== ALL_HERO_CENTRAL_BOND_ISSUES_START ===');
+          console.log(JSON.stringify(issues.slice(0,200),null,2));
+          console.log('=== ALL_HERO_CENTRAL_BOND_ISSUES_END ===');
+          console.log('=== ALL_HERO_CENTRAL_BOND_SAMPLE_START ===');
+          console.log(JSON.stringify(results.filter(r=>r.status==='PASS').slice(0,20),null,2));
+          console.log('=== ALL_HERO_CENTRAL_BOND_SAMPLE_END ===');
+          if((counts.BROKEN||0)>0) process.exitCode=1;
+          NODE
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
