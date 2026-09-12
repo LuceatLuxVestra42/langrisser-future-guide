@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "stage": "F0",
+  "status": "PASS",
+  "completion": "FRONTEND_HERO_SOLDIER_COMMAND_CONSUMER_COMPLETE",
+  "owner": "FRONTEND_HERO_SOLDIER_COMMAND_CONSUMER",
+  "predecessor": {
+    "semanticHead": "dc99b8aab60ec3465e8a5b0194df03278aaaecfe",
+    "artifact": "data/generated/hero-soldier-command-modifiers.v1.json",
+    "semanticCheckpoint": "data/validation/hero-soldier-command-modifiers-i3-f.v1.json"
+  },
+  "gates": {
+    "preflight": "PASS",
+    "build": "PASS"
+  },
+  "changes": [
+    "src/lib/hero-soldier-command.server.ts",
+    "src/lib/hero-list.functions.ts",
+    "src/components/hero-soldier-command-section.tsx",
+    "src/routes/heroes_.$heroId.tsx"
+  ],
+  "semanticRecomputation": false,
+  "rawConfigDataJoin": false,
+  "blockers": [],
+  "review": [],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextOwner": "HOSTED_DEPLOYMENT",
+    "nextStage": "F1",
+    "nextStart": "Merge/deploy the frontend consumer lineage, then run hosted route and browser/UI verification without reopening frozen semantic authority."
+  }
+}

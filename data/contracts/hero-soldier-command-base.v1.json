@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "contract": "hero-soldier-command-base",
+  "stage": "N2",
+  "status": "ACTIVE",
+  "owner": "HERO_SOLDIER_COMMAND_BASE_PROJECTION",
+  "purpose": "Separate the already-verified HeroInfo-owned troop command modifier projection from the broad Hero Stage 4-5 combat artifact without deriving new class, SP, Soldier-membership, or bond semantics.",
+  "authority": {
+    "canonicalHeroMaster": "data/hero-name-master.v1.json",
+    "canonicalHeroMasterBlobSha": "12eaf4f84a3e91477c80fbccd78c949b79c3829f",
+    "verifiedPredecessor": "data/generated/hero-basic-combat.v1.json",
+    "verifiedPredecessorBlobSha": "01246ee5da8e988f0e95b6a29d20e6e5caa2c1e6",
+    "verifiedPredecessorValidation": "data/validation/hero-basic-combat-stage4-5-summary.v1.json",
+    "verifiedPredecessorValidationBlobSha": "1ea45f081238ff41995c4e444bc6f953c73c5e64",
+    "requiredSemanticGate": "heroSoldierModifiers",
+    "requiredSemanticGateStatus": "VERIFIED",
+    "r5FrozenPredecessor": "data/validation/hero-soldier-bond-command-contribution-r5-f.v1.json",
+    "r5FrozenPredecessorCommit": "a490ba76da27095f3ef9dfe6ad66b0450cc7b24d"
+  },
+  "projection": {
+    "sourceField": "hero-basic-combat.records[].soldierModifiers",
+    "key": "heroId",
+    "recordCount": 267,
+    "components": ["hp", "at", "df", "magicDf"],
+    "rawField": "raw",
+    "normalizedField": "base",
+    "normalization": "raw / 100",
+    "occurrencePolicy": "EXACT_ONE_RECORD_PER_CANONICAL_HERO"
+  },
+  "semanticBoundary": {
+    "meaning": "Hero-owned troop stat modifier base",
+    "normalCurrentClassSelection": "NOT_DERIVED",
+    "normalJobConnectionDependency": false,
+    "spOverrideOrInheritance": "OUT_OF_SCOPE_UNTIL_S0",
+    "hero3BondContribution": "OUT_OF_SCOPE_REUSE_R5_FROZEN_ARTIFACT",
+    "soldierMembership": "OUT_OF_SCOPE",
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "rawConfigDataReinterpretationAllowed": false
+  },
+  "output": {
+    "artifact": "data/generated/hero-soldier-command-base.v1.json",
+    "validator": "scripts/validate_hero_soldier_command_base.cjs",
+    "validation": "data/validation/hero-soldier-command-base-n2.v1.json",
+    "checkpoint": "data/validation/hero-soldier-command-base-n2-f.v1.json"
+  },
+  "completionCriteria": [
+    "canonical Hero count is exactly 267",
+    "source Hero set equals canonical Hero set by exact heroId",
+    "every source soldierModifiers record is VERIFIED",
+    "raw and normalized four-component values project exactly with normalized=raw/100",
+    "independent validator reports zero mismatches and zero hard errors",
+    "Leon heroId=6 remains raw 1500/1500/0/0 and base 15/15/0/0",
+    "no class/SP/membership/bond relation is introduced"
+  ]
+}

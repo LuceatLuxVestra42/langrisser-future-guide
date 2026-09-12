@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "contract": "sp-soldier-command-semantics",
+  "stage": "S0",
+  "status": "ACTIVE",
+  "owner": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS",
+  "purpose": "Define how SPHeroInfo troop command fields relate to the frozen Hero-owned command base without recomputing Hero3 bond contribution or deriving class-specific Normal command values.",
+  "authority": {
+    "n2Checkpoint": "data/validation/hero-soldier-command-base-n2-f.v1.json",
+    "n2ExpectedStatus": "FINAL_FROZEN",
+    "n2Artifact": "data/generated/hero-soldier-command-base.v1.json",
+    "r5Checkpoint": "data/validation/hero-soldier-bond-command-contribution-r5-f.v1.json",
+    "r5ExpectedStatus": "PASS",
+    "r5ExpectedCompletion": "FINAL_FROZEN",
+    "r5Artifact": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "spPredecessor": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "spPredecessorBlobSha": "c93c37770f5e6678ec397764da289a538518f35f",
+    "spExpectedStatus": "COMPLETE",
+    "spReleasedCount": 25,
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c"
+  },
+  "fieldMapping": {
+    "HPCmd_INI": "hp",
+    "ATCmd_INI": "at",
+    "DFCmd_INI": "df",
+    "MagicDFCmd_INI": "magicDf"
+  },
+  "semantics": {
+    "spRecordIdentity": "SPHeroInfo.ID == canonical heroId",
+    "spBaseMeaning": "SP-form Hero-owned troop stat modifier base",
+    "selectionRule": "When SP form is selected and SPHeroInfo is RELEASED, use the SPHeroInfo command vector instead of the N2 HeroInfo command vector.",
+    "combinationWithN2": "REPLACEMENT_NOT_ADDITION",
+    "missingCommandField": "ZERO",
+    "normalization": "raw / 100",
+    "hero3Combination": "ADD_FROZEN_R5_CONTRIBUTION_AFTER_SELECTING_EFFECTIVE_BASE",
+    "hero3Recomputed": false
+  },
+  "evidence": {
+    "directSource": [
+      "Stage5-4 COMPLETE establishes SPHeroInfo.ID as canonical heroId and preserves same-named *Cmd_INI fields from the pinned ConfigDataSPHeroInfo source.",
+      "N2 FINAL_FROZEN establishes the same command field family on HeroInfo as Hero-owned troop stat modifier base."
+    ],
+    "behavioralCrossCheck": {
+      "role": "CORROBORATION_ONLY_NOT_CANONICAL_AUTHORITY",
+      "fixtures": [
+        {
+          "heroId": 6,
+          "name": "Leon",
+          "publishedFinal": {"hp":40,"at":40,"df":10,"magicDf":10},
+          "expectedSpRaw": {"hp":1500,"at":1500,"df":0,"magicDf":0},
+          "expectedR5": {"hp":25,"at":25,"df":10,"magicDf":10}
+        },
+        {
+          "heroId": 8,
+          "name": "Lana",
+          "publishedFinal": {"hp":20,"at":40,"df":15,"magicDf":25},
+          "expectedSpRaw": {"hp":1000,"at":1500,"df":500,"magicDf":0},
+          "expectedR5": {"hp":10,"at":25,"df":10,"magicDf":25}
+        }
+      ],
+      "interpretation": "For both fixtures, SP-base replacement plus frozen R5 exactly matches published final Soldier bonuses; adding the N2 HeroInfo base again does not. Missing SP command fields behave as zero in these fixtures."
+    }
+  },
+  "forbidden": [
+    "N2 HeroInfo base + SPHeroInfo base additive stacking",
+    "Normal JobConnection-specific command derivation",
+    "name JOIN",
+    "ID arithmetic",
+    "Hero3 recomputation",
+    "SP command fallback to historical outputs"
+  ],
+  "completionCriteria": [
+    "N2 checkpoint status remains FINAL_FROZEN",
+    "R5 checkpoint remains PASS with completion FINAL_FROZEN",
+    "Stage5-4 SP predecessor remains COMPLETE with 25 RELEASED records",
+    "Leon and Lana SP raw command fixtures match Stage5-4 source fields with absent command fields normalized to zero",
+    "Leon and Lana replacement+R5 totals equal the corroborating published totals",
+    "Leon and Lana additive(N2+SP+R5) totals do not equal the published totals",
+    "zero hard errors"
+  ],
+  "output": {
+    "validator": "scripts/validate_sp_soldier_command_semantics_s0.cjs",
+    "validation": "data/validation/sp-soldier-command-semantics-s0.v1.json",
+    "checkpoint": "data/validation/sp-soldier-command-semantics-s0-f.v1.json"
+  }
+}

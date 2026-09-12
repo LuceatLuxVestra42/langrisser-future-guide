@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "stage": "N2-F",
+  "status": "FINAL_FROZEN",
+  "completion": "HERO_SOLDIER_COMMAND_BASE_PROJECTION_COMPLETE",
+  "owner": "HERO_SOLDIER_COMMAND_BASE_PROJECTION",
+  "predecessor": {
+    "r5FrozenCommit": "a490ba76da27095f3ef9dfe6ad66b0450cc7b24d",
+    "stage4Combat": "data/generated/hero-basic-combat.v1.json",
+    "stage4CombatBlobSha": "01246ee5da8e988f0e95b6a29d20e6e5caa2c1e6",
+    "stage4Validation": "data/validation/hero-basic-combat-stage4-5-summary.v1.json",
+    "stage4ValidationBlobSha": "1ea45f081238ff41995c4e444bc6f953c73c5e64"
+  },
+  "artifact": {
+    "path": "data/generated/hero-soldier-command-base.v1.json",
+    "gitBlobSha1": "60b1ccd183825966342d596574a41c41749f2303",
+    "sha256": "c6cfab8b2d7cbf09cd279ae5f09198776e3a84bacdb97af4a8ce3ddae251772d",
+    "recordCount": 267,
+    "meaning": "Hero-owned troop stat modifier base"
+  },
+  "validation": {
+    "path": "data/validation/hero-soldier-command-base-n2.v1.json",
+    "gitBlobSha1": "73135c8fe29895faeaafd0c8b49ae8ff973a2588",
+    "sha256": "f2c8c6b9c5a5339f3b017913298292ec4770d8f35069337041dbffef440a14e3",
+    "status": "PASS",
+    "rawMismatchCount": 0,
+    "normalizedMismatchCount": 0,
+    "meaningMismatchCount": 0,
+    "leonFixturePass": true,
+    "hardErrorCount": 0
+  },
+  "semanticBoundary": {
+    "meaning": "Hero-owned troop stat modifier base",
+    "normalCurrentClassSelection": "NOT_DERIVED",
+    "normalJobConnectionDependency": false,
+    "spOverrideOrInheritance": "OUT_OF_SCOPE_UNTIL_S0",
+    "hero3BondContribution": "OUT_OF_SCOPE_REUSE_R5_FROZEN_ARTIFACT",
+    "soldierMembership": "OUT_OF_SCOPE",
+    "nameJoinAllowed": false,
+    "idArithmeticAllowed": false,
+    "rawConfigDataReinterpretationAllowed": false
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "hero-basic-combat Stage4-5 predecessor or its heroSoldierModifiers semantic gate changes",
+    "canonical Hero population changes",
+    "independent N2 validator hard failure",
+    "artifact or validation hash mismatch",
+    "authoritative contradiction to HeroInfo-owned command-base meaning"
+  ],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextOwner": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS",
+    "nextStage": "S0",
+    "nextStart": "Determine explicit SP command override/inheritance semantics from the current frozen SP relation/source. Reuse this N2 base directly; do not reinterpret HeroInfo or derive class-specific Normal command values."
+  }
+}

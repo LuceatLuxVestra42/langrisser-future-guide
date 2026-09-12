@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { applyHeroDungeonBondPresentation } from "./hero-dungeon-presentation.server";
 import { readHeroDetailRouteStage5Data } from "./hero-detail-stage5.server";
+import { readHeroSoldierCommand } from "./hero-soldier-command.server";
 import { resolveHeroNameLocalization } from "./hero-display-name";
 import {
   readHeroDetailRouteStage4Data,
@@ -246,6 +247,7 @@ export const getHeroDetailRouteStage5Data = createServerFn({ method: "GET" })
     return {
       ...routeData,
       hero: projectSharedHeroNameLocalization(routeData.hero),
+      soldierCommand: readHeroSoldierCommand(data.heroId),
       detail: applyHeroDungeonBondPresentation(data.heroId, {
         ...routeData.detail,
         skills,

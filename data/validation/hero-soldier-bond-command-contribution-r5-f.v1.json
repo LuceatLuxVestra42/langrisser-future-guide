@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "stage": "R5-F",
+  "checkpoint": "freeze-checkpoint-handoff",
+  "status": "PASS",
+  "completion": "FINAL_FROZEN",
+  "semanticOwner": "HERO_SOLDIER_BOND_CMD_CONTRIBUTION_MATERIALIZATION",
+  "purpose": "Freeze the independently validated Hero3 soldier command bond contribution and hand off without composing it with current-class soldier command base values.",
+  "freezeCandidateHead": "d89d1754586ba2848343c1ff3f5590802cfc53e7",
+  "authoritativePredecessors": {
+    "canonicalHeroMaster": "data/hero-name-master.v1.json",
+    "bondArtifact": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+    "bondArtifactGitBlobSha1": "5be989e9d0723782f491dc3005a11c0ad3143c43",
+    "configDataSourceCommitSha": "6475e63ee23d18adf733756c26a14fa9e3ed662c",
+    "configDataLogicalSourceRoot": "data/configdata"
+  },
+  "frozenArtifact": {
+    "path": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "gitBlobSha1": "7999cc42be629edbf9e8755699dd969cb7b9ac8a",
+    "sha256": "9238a7ad73caaec3081ce0bcfa93caabd8b8fd776662b81473466e889b946cd6",
+    "recordCount": 267
+  },
+  "validationChain": {
+    "r5D": {
+      "path": "data/validation/hero-soldier-bond-command-contribution-r5-d.v1.json",
+      "gitBlobSha1": "00d0a82761b63847f464f4f66a26ffead6775eb1",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "independentSourceRecomputation": true,
+      "exactRawVectorMismatchCount": 0,
+      "exactContributionMismatchCount": 0,
+      "gotSkillIdsLengthVsMaxLevelMismatchCount": 0
+    },
+    "r5E": {
+      "path": "data/validation/hero-soldier-bond-command-contribution-r5-e.v1.json",
+      "gitBlobSha1": "9043bac8e00449a028efb51ba2ec5ea7fa429381",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "semanticRecomputationPerformed": false,
+      "populationInvariantValidation": true,
+      "errors": 0
+    }
+  },
+  "frozenSemantics": {
+    "relation": "Hero -> HeroFetter -> MAX selected Skill -> Skill.PassiveBuffs_ID[] -> Buff -> Property93-96 -> additive raw aggregation -> raw/100",
+    "propertyProjection": {
+      "hp": 93,
+      "at": 94,
+      "df": 95,
+      "magicDf": 96
+    },
+    "aggregation": "ADD_ALL_MATCHING_PROPERTY_OCCURRENCES",
+    "normalization": "SUM_RAW_THEN_DIVIDE_BY_100",
+    "canonicalHeroCount": 267,
+    "bondCount": 1335,
+    "skillBuffEdgeCount": 1602,
+    "leonFixture": {
+      "heroId": 6,
+      "raw": {"hp": 2500, "at": 2500, "df": 1000, "magicDf": 1000},
+      "contribution": {"hp": 25, "at": 25, "df": 10, "magicDf": 10},
+      "status": "PASS"
+    }
+  },
+  "scopeBoundary": {
+    "included": [
+      "HeroID-wise Hero3 bond soldier command contribution"
+    ],
+    "excluded": [
+      "current-class Normal/SP soldier command base",
+      "data/generated/hero-basic-combat.v1.json modification",
+      "base plus Hero3 contribution final soldier correction",
+      "frontend or presentation eligibility",
+      "localization",
+      "asset resolution"
+    ]
+  },
+  "prohibitedRecomputation": [
+    "name JOIN",
+    "ID arithmetic",
+    "filename similarity inference",
+    "display or sort order mapping",
+    "Buff name or ID-family filtering",
+    "dedupe before per-Hero additive aggregation",
+    "historical output silent fallback"
+  ],
+  "ciAtFreezeCandidateHead": {
+    "projectCheck": "SUCCESS",
+    "hostedQaRouting": "SUCCESS",
+    "localizationAudit": "SUCCESS"
+  },
+  "blocker": "NONE",
+  "review": [],
+  "reopenConditions": [
+    "authoritative source snapshot changes",
+    "contract or schema changes",
+    "canonical population or relation parity is damaged",
+    "frozen artifact hash no longer matches the recorded artifact",
+    "owning validator reports a hard failure",
+    "new authoritative evidence contradicts the frozen semantics"
+  ],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextScope": "Compose a separately owned current-class Normal/SP soldier command base with this frozen Hero3 contribution only after that owner's authority and contract are resolved.",
+    "nextOwner": "MANUAL_REVIEW_UNTIL_EXPLICIT_OWNER_RULE_IS_CONFIRMED",
+    "reuse": "Consume this frozen artifact directly; do not re-derive Hero3 contribution in the downstream layer."
+  }
+}

@@ -1,0 +1,49 @@
+name: hero-soldier-command-final-i1-i3
+
+on:
+  push:
+    branches: [i1-hero-soldier-command-final]
+    paths:
+      - data/contracts/hero-soldier-command-final.v1.json
+      - scripts/build_hero_soldier_command_modifiers.cjs
+      - scripts/validate_hero_soldier_command_modifiers.cjs
+      - scripts/freeze_hero_soldier_command_modifiers_i3.cjs
+      - .github/workflows/hero-soldier-command-final-i1-i3.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  materialize-validate-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: i1-hero-soldier-command-final, fetch-depth: 0}
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD 420bba5e6065d14b4b0c0afccfe8acfb89b6227d)" = "420bba5e6065d14b4b0c0afccfe8acfb89b6227d"
+          git diff --name-only 420bba5e6065d14b4b0c0afccfe8acfb89b6227d...HEAD | sort > /tmp/i1-start.txt
+          while IFS= read -r p; do case "$p" in data/contracts/hero-soldier-command-final.v1.json|scripts/build_hero_soldier_command_modifiers.cjs|scripts/validate_hero_soldier_command_modifiers.cjs|scripts/freeze_hero_soldier_command_modifiers_i3.cjs|.github/workflows/hero-soldier-command-final-i1-i3.yml) ;; *) echo "Unexpected I1-I3 path: $p" >&2; exit 1;; esac; done < /tmp/i1-start.txt
+      - name: I1 materialize final command view
+        run: node scripts/build_hero_soldier_command_modifiers.cjs
+      - name: I2 independently validate
+        run: node scripts/validate_hero_soldier_command_modifiers.cjs
+      - name: I3 freeze
+        run: node scripts/freeze_hero_soldier_command_modifiers_i3.cjs
+      - name: Verify bounded generated mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^.. //' | sort)
+          for p in "${changed[@]}"; do case "$p" in data/generated/hero-soldier-command-modifiers.v1.json|data/validation/hero-soldier-command-modifiers-i2.v1.json|data/validation/hero-soldier-command-modifiers-i3-f.v1.json) ;; *) echo "Unexpected I1-I3 mutation: $p" >&2; exit 1;; esac; done
+      - name: Commit I3 freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-soldier-command-modifiers.v1.json data/validation/hero-soldier-command-modifiers-i2.v1.json data/validation/hero-soldier-command-modifiers-i3-f.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "I3-F freeze final soldier command modifiers"
+          git push origin HEAD:i1-hero-soldier-command-final

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "contract": "hero-soldier-command-final",
+  "stage": "I1-I3",
+  "status": "ACTIVE",
+  "owner": "HERO_SOLDIER_COMMAND_FINAL_MATERIALIZATION",
+  "purpose": "Materialize the final Soldier command modifier view while preserving the frozen base and Hero3 contribution as separate semantic components.",
+  "authority": {
+    "integrationCheckpoint": "data/validation/hero-soldier-command-integration-i0-f.v1.json",
+    "integrationExpectedStatus": "FINAL_FROZEN",
+    "normalBase": "data/generated/hero-soldier-command-base.v1.json",
+    "normalBaseCount": 267,
+    "spBase": "data/generated/hero-sp-soldier-command-base.v1.json",
+    "spBaseCount": 25,
+    "hero3": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "hero3Count": 267
+  },
+  "output": {
+    "artifact": "data/generated/hero-soldier-command-modifiers.v1.json",
+    "producer": "scripts/build_hero_soldier_command_modifiers.cjs",
+    "validator": "scripts/validate_hero_soldier_command_modifiers.cjs",
+    "validation": "data/validation/hero-soldier-command-modifiers-i2.v1.json",
+    "checkpoint": "data/validation/hero-soldier-command-modifiers-i3-f.v1.json"
+  },
+  "schema": {
+    "recordKey": "heroId",
+    "normal": {
+      "baseSource": "N2_HEROINFO_HERO_OWNED_BASE",
+      "fields": ["base","hero3Contribution","final"]
+    },
+    "sp": {
+      "presence": "only when an S1 RELEASED SP base exists",
+      "baseSource": "S1_SPHEROINFO_REPLACEMENT_BASE",
+      "fields": ["base","hero3Contribution","final"]
+    }
+  },
+  "composition": {
+    "components": ["hp","at","df","magicDf"],
+    "normalFinal": "normal.base + hero3Contribution",
+    "spFinal": "sp.base + hero3Contribution",
+    "rounding": "NONE",
+    "hero3ApplicationCount": 1
+  },
+  "fixtures": {
+    "leon": {"heroId":6,"normalFinal":{"hp":40,"at":40,"df":10,"magicDf":10},"spFinal":{"hp":40,"at":40,"df":10,"magicDf":10}},
+    "lana": {"heroId":8,"normalFinal":{"hp":10,"at":40,"df":10,"magicDf":40},"spFinal":{"hp":20,"at":40,"df":15,"magicDf":25}}
+  },
+  "forbidden": [
+    "raw ConfigData access",
+    "N2+S1 base stacking",
+    "Hero3 recomputation or double application",
+    "name JOIN",
+    "ID arithmetic",
+    "Normal JobConnection command derivation"
+  ],
+  "completionCriteria": [
+    "I0 integration checkpoint remains FINAL_FROZEN",
+    "267 final records with exact N2/R5 heroId parity",
+    "exactly 25 records expose an SP variant with exact S1 heroId parity",
+    "normal and SP final vectors equal component-wise base + frozen Hero3 exactly once",
+    "producer preserves explicit base source and component provenance",
+    "independent I2 validator reports zero mismatches and zero hard errors",
+    "Leon and Lana final fixtures pass",
+    "I3 checkpoint is FINAL_FROZEN"
+  ]
+}

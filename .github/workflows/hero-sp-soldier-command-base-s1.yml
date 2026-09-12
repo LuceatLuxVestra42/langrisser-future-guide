@@ -1,0 +1,67 @@
+name: hero-sp-soldier-command-base-s1
+
+on:
+  push:
+    branches:
+      - s1-sp-soldier-command-base
+    paths:
+      - data/contracts/hero-sp-soldier-command-base.v1.json
+      - scripts/build_hero_sp_soldier_command_base.cjs
+      - scripts/validate_hero_sp_soldier_command_base.cjs
+      - scripts/freeze_hero_sp_soldier_command_base_s1.cjs
+      - .github/workflows/hero-sp-soldier-command-base-s1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-validate-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: s1-sp-soldier-command-base
+          fetch-depth: 0
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD f74621681065a4fb8140b3f24a40651e32538195)" = "f74621681065a4fb8140b3f24a40651e32538195"
+          git diff --name-only f74621681065a4fb8140b3f24a40651e32538195...HEAD | sort > /tmp/s1-start.txt
+          while IFS= read -r p; do
+            case "$p" in
+              data/contracts/hero-sp-soldier-command-base.v1.json|scripts/build_hero_sp_soldier_command_base.cjs|scripts/validate_hero_sp_soldier_command_base.cjs|scripts/freeze_hero_sp_soldier_command_base_s1.cjs|.github/workflows/hero-sp-soldier-command-base-s1.yml) ;;
+              *) echo "Unexpected S1 starting path: $p" >&2; exit 1 ;;
+            esac
+          done < /tmp/s1-start.txt
+      - name: Materialize SP command base
+        run: node scripts/build_hero_sp_soldier_command_base.cjs
+      - name: Independently validate S1
+        run: node scripts/validate_hero_sp_soldier_command_base.cjs
+      - name: Freeze S1
+        run: node scripts/freeze_hero_sp_soldier_command_base_s1.cjs
+      - name: Verify bounded generated mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^.. //' | sort)
+          for p in "${changed[@]}"; do
+            case "$p" in
+              data/generated/hero-sp-soldier-command-base.v1.json|data/validation/hero-sp-soldier-command-base-s1.v1.json|data/validation/hero-sp-soldier-command-base-s1-f.v1.json) ;;
+              *) echo "Unexpected S1 mutation: $p" >&2; exit 1 ;;
+            esac
+          done
+          test -f data/generated/hero-sp-soldier-command-base.v1.json
+          test -f data/validation/hero-sp-soldier-command-base-s1.v1.json
+          test -f data/validation/hero-sp-soldier-command-base-s1-f.v1.json
+      - name: Commit S1 freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-sp-soldier-command-base.v1.json data/validation/hero-sp-soldier-command-base-s1.v1.json data/validation/hero-sp-soldier-command-base-s1-f.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "S1-F freeze SP soldier command base"
+          git push origin HEAD:s1-sp-soldier-command-base

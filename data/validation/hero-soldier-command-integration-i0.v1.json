@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "stage": "I0",
+  "status": "PASS",
+  "owner": "HERO_SOLDIER_COMMAND_INTEGRATION_CONTRACT",
+  "normalBaseCount": 267,
+  "spBaseCount": 25,
+  "hero3Count": 267,
+  "fixtureResults": {
+    "leon": {
+      "normalPass": true,
+      "spPass": true
+    },
+    "lana": {
+      "normalPass": true,
+      "spPass": true
+    }
+  },
+  "composition": {
+    "components": [
+      "hp",
+      "at",
+      "df",
+      "magicDf"
+    ],
+    "normal": {
+      "baseSource": "N2_HEROINFO_HERO_OWNED_BASE",
+      "baseSelection": "Use N2 base for every canonical hero.",
+      "final": "base + R5 Hero3 contribution"
+    },
+    "sp": {
+      "eligibility": "Hero must have a frozen S1 RELEASED SP command-base record.",
+      "baseSource": "S1_SPHEROINFO_REPLACEMENT_BASE",
+      "baseSelection": "Replace, do not add, the N2 base when SP form is selected.",
+      "final": "SP replacement base + R5 Hero3 contribution"
+    },
+    "hero3Occurrence": "EXACTLY_ONCE_AFTER_BASE_SELECTION",
+    "arithmetic": "component-wise numeric addition of already-normalized percentages",
+    "rounding": "NONE"
+  },
+  "hardErrors": [],
+  "blockers": [],
+  "review": []
+}

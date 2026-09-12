@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "contract": "hero-sp-soldier-command-base",
+  "stage": "S1",
+  "status": "ACTIVE",
+  "owner": "SP_SOLDIER_COMMAND_BASE_MATERIALIZATION",
+  "purpose": "Materialize the frozen S0 SP-form Hero-owned troop command base as a complete four-component vector for every RELEASED SP hero, without composing N2 or R5 values.",
+  "authority": {
+    "s0Checkpoint": "data/validation/sp-soldier-command-semantics-s0-f.v1.json",
+    "s0ExpectedStatus": "FINAL_FROZEN",
+    "s0ExpectedCompletion": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS_COMPLETE",
+    "spPredecessor": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "spPredecessorBlobSha": "c93c37770f5e6678ec397764da289a538518f35f",
+    "spExpectedStatus": "COMPLETE",
+    "releasedCount": 25
+  },
+  "fieldMapping": {
+    "HPCmd_INI": "hp",
+    "ATCmd_INI": "at",
+    "DFCmd_INI": "df",
+    "MagicDFCmd_INI": "magicDf"
+  },
+  "materialization": {
+    "identity": "exact heroId from Stage5-4 RELEASED records",
+    "missingSourceField": "ZERO",
+    "normalization": "raw / 100",
+    "components": ["hp", "at", "df", "magicDf"],
+    "n2Combination": "NONE",
+    "r5Combination": "NONE"
+  },
+  "fixtures": {
+    "leon": {"heroId":6,"raw":{"hp":1500,"at":1500,"df":0,"magicDf":0},"base":{"hp":15,"at":15,"df":0,"magicDf":0}},
+    "lana": {"heroId":8,"raw":{"hp":1000,"at":1500,"df":500,"magicDf":0},"base":{"hp":10,"at":15,"df":5,"magicDf":0}}
+  },
+  "output": {
+    "artifact": "data/generated/hero-sp-soldier-command-base.v1.json",
+    "producer": "scripts/build_hero_sp_soldier_command_base.cjs",
+    "validator": "scripts/validate_hero_sp_soldier_command_base.cjs",
+    "validation": "data/validation/hero-sp-soldier-command-base-s1.v1.json",
+    "checkpoint": "data/validation/hero-sp-soldier-command-base-s1-f.v1.json"
+  },
+  "completionCriteria": [
+    "S0 remains FINAL_FROZEN and Stage5-4 remains COMPLETE",
+    "exactly 25 RELEASED SP heroes are materialized with exact heroId set parity",
+    "each record contains all four raw/base components",
+    "absent Stage5-4 command fields materialize as zero",
+    "base equals raw/100 exactly",
+    "Leon and Lana fixtures pass",
+    "independent validator reports zero mismatches and zero hard errors",
+    "N2 and R5 values are not copied or combined"
+  ]
+}
