@@ -80,6 +80,30 @@ function isPathActive(pathname: string, target: ExistingRoute) {
   return pathname === target;
 }
 
+function resolveNavHref(to: ExistingRoute) {
+  const base = import.meta.env.BASE_URL || "/";
+  const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+  const normalizedPath = to.replace(/^\/+|\/+$/g, "");
+  return normalizedPath ? `${normalizedBase}${normalizedPath}/` : normalizedBase;
+}
+
+function navigateWithFreshDocument(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  const separator = href.includes("?") ? "&" : "?";
+  window.location.assign(`${href}${separator}fresh=${Date.now()}`);
+}
+
 export function SiteSectionNav() {
   const location = useLocation();
 
@@ -171,6 +195,7 @@ export function SiteSectionNav() {
                     }
 
                     const itemActive = isPathActive(location.pathname, item.to);
+                    const href = resolveNavHref(item.to);
 
                     return (
                       <DropdownMenuItem
@@ -178,12 +203,13 @@ export function SiteSectionNav() {
                         asChild
                         className="px-4 py-3 text-sm"
                       >
-                        <Link
-                          to={item.to}
+                        <a
+                          href={href}
+                          onClick={(event) => navigateWithFreshDocument(event, href)}
                           className={cn(itemActive && "bg-accent font-semibold text-accent-foreground")}
                         >
                           {item.label}
-                        </Link>
+                        </a>
                       </DropdownMenuItem>
                     );
                   })}
