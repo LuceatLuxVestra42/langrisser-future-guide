@@ -192,7 +192,7 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99284, name: "야차왕 가이", factions: [5, 12, 10], bond4: "X", bond5: "X" },
     ],
     singles: [
-      { title: "배포", id: 99286, name: "가루다왕 레이가", tone: "dist" },
+      { title: "배포", id: 99286, name: "가루다왕\n레이가", tone: "dist" },
       { title: "전용장비", id: 99259, name: "레이피어", tone: "equip" },
     ],
     patches: [
