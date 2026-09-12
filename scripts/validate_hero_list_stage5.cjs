@@ -82,6 +82,9 @@ for (const heroId of manifestIds) {
     const rewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)
       ? shard.sp.secondStageRewards.skills
       : [];
+    if (rewardSkills.length !== 2) {
+      mismatches.push(`Hero ${heroId}: expected 2 SP second-stage reward Skills, got ${rewardSkills.length}`);
+    }
     const rewardSkillIds = rewardSkills.map((skill) => Number(skill?.skillId));
     if (rewardSkillIds.some((skillId) => !Number.isInteger(skillId))) {
       mismatches.push(`Hero ${heroId}: SP reward SkillID missing or invalid`);
@@ -115,6 +118,11 @@ if (!serverSource.includes("fullDatasetRuntimeRead: false")) fail("Stage 5 must 
 if (!serverSource.includes("secondStageRewards")) fail("Stage 5 frontend projection must preserve frozen SP second-stage reward skills.");
 if (!functionsSource.includes("getHeroDetailRouteStage5Data")) fail("Stage 5 server function is not exposed.");
 if (!routeSource.includes("getHeroDetailRouteStage5Data")) fail("Hero detail route is not consuming Stage 5.");
+if (
+  !routeSource.includes('data-hero-sp-reward-skills="true"') ||
+  !routeSource.includes("detail.sp.secondStageRewards.skills") ||
+  !routeSource.includes("SP 2차 보상 스킬")
+) fail("Hero detail route is not rendering frozen SP second-stage reward Skills.");
 if (
   !routeSource.includes("최종 직업 스탯") ||
   !routeSource.includes('data-hero-final-job-stats="true"') ||
