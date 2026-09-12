@@ -143,64 +143,65 @@ function HeroSection() {
     setIndex((i) => (i + delta + heroImages.length) % heroImages.length);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-      <section className="relative isolate overflow-hidden" aria-label="히어로 이미지 미리보기">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src={hero.url}
-            alt={hero.alt}
-            className="h-full w-full object-cover object-[center_28%]"
-          />
-          <div className="absolute inset-0 bg-hero-scrim" />
-          <div className="absolute inset-0 bg-hero-fade" />
-        </div>
+    <section
+      className="relative isolate mx-auto w-[calc(100%-2rem)] max-w-[68rem] overflow-hidden sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]"
+      aria-label="히어로 이미지 미리보기"
+    >
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={hero.url}
+          alt={hero.alt}
+          className="h-full w-full object-cover object-[center_28%]"
+        />
+        <div className="absolute inset-0 bg-hero-scrim" />
+        <div className="absolute inset-0 bg-hero-fade" />
+      </div>
 
-        <div className="mx-auto max-w-6xl px-12 pb-28 pt-16 text-center sm:px-16 sm:pb-32 sm:pt-20 lg:px-8 lg:pb-36 lg:pt-24">
-          <h1 className="text-3xl font-bold tracking-tight text-hero-foreground drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-4xl">
-            랑그릿사 모바일 <span className="text-hero-accent">미래 정보</span>를 한 곳에서
-          </h1>
-          <p className="mt-3 text-sm text-hero-foreground/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)] sm:mt-4 sm:text-base">
-            원하는 정보를 아래에서 눌러 바로 확인하세요.
-          </p>
-        </div>
+      <div className="mx-auto max-w-6xl px-12 pb-28 pt-16 text-center sm:px-16 sm:pb-32 sm:pt-20 lg:px-8 lg:pb-36 lg:pt-24">
+        <h1 className="text-3xl font-bold tracking-tight text-hero-foreground drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] sm:text-4xl">
+          랑그릿사 모바일 <span className="text-hero-accent">미래 정보</span>를 한 곳에서
+        </h1>
+        <p className="mt-3 text-sm text-hero-foreground/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)] sm:mt-4 sm:text-base">
+          원하는 정보를 아래에서 눌러 바로 확인하세요.
+        </p>
+      </div>
 
-        <button
-          type="button"
-          onClick={() => step(-1)}
-          aria-label="이전 히어로 이미지"
-          className="absolute left-2 top-[42%] flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-full p-2.5 text-hero-foreground/70 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 sm:left-4"
-        >
-          <ChevronLeft size={22} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={() => step(1)}
-          aria-label="다음 히어로 이미지"
-          className="absolute right-2 top-[42%] flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-full p-2.5 text-hero-foreground/70 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 sm:right-4"
-        >
-          <ChevronRight size={22} aria-hidden="true" />
-        </button>
-        <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-1 sm:bottom-16 lg:bottom-20">
-          {heroImages.map((image, i) => (
-            <button
-              key={image.url}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`${i + 1}번 히어로 이미지 보기`}
-              aria-current={i === index ? "true" : undefined}
-              className="flex h-11 w-8 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-            >
-              <span
-                aria-hidden="true"
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-5 bg-hero-foreground/75" : "w-1.5 bg-hero-foreground/35"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      </section>
-    </div>
+      <button
+        type="button"
+        onClick={() => step(-1)}
+        aria-label="이전 히어로 이미지"
+        className="absolute left-2 top-[42%] flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-full p-2.5 text-hero-foreground/70 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 sm:left-4"
+      >
+        <ChevronLeft size={22} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={() => step(1)}
+        aria-label="다음 히어로 이미지"
+        className="absolute right-2 top-[42%] flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-full p-2.5 text-hero-foreground/70 transition hover:bg-white/10 hover:text-hero-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 sm:right-4"
+      >
+        <ChevronRight size={22} aria-hidden="true" />
+      </button>
+      <div className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-1 sm:bottom-16 lg:bottom-20">
+        {heroImages.map((image, i) => (
+          <button
+            key={image.url}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`${i + 1}번 히어로 이미지 보기`}
+            aria-current={i === index ? "true" : undefined}
+            className="flex h-11 w-8 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          >
+            <span
+              aria-hidden="true"
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-5 bg-hero-foreground/75" : "w-1.5 bg-hero-foreground/35"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 
