@@ -23,9 +23,9 @@ patchFile('src/lib/hero-list.functions.ts', [
     to: 'import { readHeroDetailRouteStage5Data } from "./hero-detail-stage5.server";\nimport { readHeroSoldierCommand } from "./hero-soldier-command.server";\n',
   },
   {
-    label: 'command loader projection',
-    from: '    return {\n      ...routeData,\n      hero: projectSharedHeroNameLocalization(routeData.hero),\n',
-    to: '    return {\n      ...routeData,\n      hero: projectSharedHeroNameLocalization(routeData.hero),\n      soldierCommand: readHeroSoldierCommand(data.heroId),\n',
+    label: 'Stage5 command loader projection',
+    from: '      : routeData.detail.talent;\n\n    return {\n      ...routeData,\n      hero: projectSharedHeroNameLocalization(routeData.hero),\n',
+    to: '      : routeData.detail.talent;\n\n    return {\n      ...routeData,\n      hero: projectSharedHeroNameLocalization(routeData.hero),\n      soldierCommand: readHeroSoldierCommand(data.heroId),\n',
   },
 ]);
 
