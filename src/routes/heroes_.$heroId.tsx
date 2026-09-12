@@ -401,6 +401,25 @@ function HeroDetailPage() {
               <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 데이터 확인 필요</p>
             )}
           </div>
+
+          {detail.sp.released ? (
+            <div
+              className="mt-7 border-t border-border pt-5"
+              data-hero-sp-reward-skills="true"
+              data-sp-reward-skill-count={detail.sp.secondStageRewards.skills.length}
+            >
+              <h3 className="mb-3 text-sm font-bold text-foreground">SP 2차 보상 스킬</h3>
+              {detail.sp.secondStageRewards.skills.length > 0 ? (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {detail.sp.secondStageRewards.skills.map((skill) => (
+                    <SkillCard key={`sp-reward-${skill.skillId}`} heroId={hero.heroId} skill={skill} />
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">SP 2차 보상 스킬 확인 필요</p>
+              )}
+            </div>
+          ) : null}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">

@@ -126,6 +126,13 @@ type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
 
+type Stage6Sp = {
+  status?: string | null;
+  secondStageRewards?: {
+    skills?: Stage6Skill[] | null;
+  } | null;
+} | null | undefined;
+
 type Stage6CentralDiscipline = {
   status?: string | null;
   skillId?: number | null;
@@ -175,7 +182,7 @@ type Stage6HeroShard = {
   exclusiveEquipment?: FeatureBlock;
   centralDiscipline?: Stage6CentralDiscipline;
   soldiers?: { ids?: number[] } | null;
-  sp?: FeatureBlock;
+  sp?: Stage6Sp;
   validation?: {
     structuralStatus?: string | null;
     publicationStatus?: string | null;
@@ -390,6 +397,11 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectEquipableSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const spRewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)
+    ? shard.sp.secondStageRewards.skills
+        .map(projectSkill)
+        .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
+    : [];
   const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);
   const awakening = {
     status: shard.normal?.awakening?.status ?? "NONE",
@@ -450,6 +462,13 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     },
     centralDiscipline,
     soldiers: { count: soldierIds.length, ids: soldierIds },
+    sp: {
+      status: shard.sp?.status ?? null,
+      released: isReleased(shard.sp),
+      secondStageRewards: {
+        skills: spRewardSkills,
+      },
+    },
     systems: {
       bondRowCount: bonds.length,
       exclusiveEquipmentStatus: shard.exclusiveEquipment?.status ?? null,
