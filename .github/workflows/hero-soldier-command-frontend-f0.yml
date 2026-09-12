@@ -1,0 +1,102 @@
+name: hero-soldier-command-frontend-f0
+
+on:
+  push:
+    branches:
+      - frontend/hero-soldier-command-f0
+
+permissions:
+  contents: write
+
+jobs:
+  preflight-build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=dc99b8aab60ec3465e8a5b0194df03278aaaecfe
+          mapfile -t changed < <(git diff --name-only "$base"...HEAD)
+          allowed='^(src/lib/hero-soldier-command\.server\.ts|src/components/hero-soldier-command-section\.tsx|scripts/apply_hero_soldier_command_frontend_f0\.cjs|scripts/validate_hero_soldier_command_frontend_f0\.cjs|\.github/workflows/hero-soldier-command-frontend-f0\.yml)$'
+          for path in "${changed[@]}"; do
+            [[ "$path" =~ $allowed ]] || { echo "Unexpected starting diff: $path"; exit 1; }
+          done
+
+      - name: Apply bounded frontend integration
+        run: node scripts/apply_hero_soldier_command_frontend_f0.cjs
+
+      - name: Validate frontend consumer contract
+        run: node scripts/validate_hero_soldier_command_frontend_f0.cjs
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Write F0 checkpoint
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'data/validation/hero-soldier-command-frontend-f0.v1.json';
+          const value = {
+            version: 1,
+            stage: 'F0',
+            status: 'PASS',
+            completion: 'FRONTEND_HERO_SOLDIER_COMMAND_CONSUMER_COMPLETE',
+            owner: 'FRONTEND_HERO_SOLDIER_COMMAND_CONSUMER',
+            predecessor: {
+              semanticHead: 'dc99b8aab60ec3465e8a5b0194df03278aaaecfe',
+              artifact: 'data/generated/hero-soldier-command-modifiers.v1.json',
+              semanticCheckpoint: 'data/validation/hero-soldier-command-modifiers-i3-f.v1.json'
+            },
+            gates: { preflight: 'PASS', build: 'PASS' },
+            changes: [
+              'src/lib/hero-soldier-command.server.ts',
+              'src/lib/hero-list.functions.ts',
+              'src/components/hero-soldier-command-section.tsx',
+              'src/routes/heroes_.$heroId.tsx'
+            ],
+            semanticRecomputation: false,
+            rawConfigDataJoin: false,
+            blockers: [],
+            review: [],
+            handoff: {
+              currentOwnerClosed: true,
+              nextOwner: 'HOSTED_DEPLOYMENT',
+              nextStage: 'F1',
+              nextStart: 'Merge/deploy the frontend consumer lineage, then run hosted route and browser/UI verification without reopening frozen semantic authority.'
+            }
+          };
+          fs.mkdirSync('data/validation', { recursive: true });
+          fs.writeFileSync(path, JSON.stringify(value, null, 2) + '\n');
+          NODE
+
+      - name: Verify bounded mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --short | sed -E 's/^...//')
+          allowed='^(src/lib/hero-list\.functions\.ts|src/routes/heroes_\.\$heroId\.tsx|data/validation/hero-soldier-command-frontend-f0\.v1\.json)$'
+          for path in "${changed[@]}"; do
+            [[ "$path" =~ $allowed ]] || { echo "Unexpected generated mutation: $path"; exit 1; }
+          done
+
+      - name: Commit F0 integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/lib/hero-list.functions.ts 'src/routes/heroes_.$heroId.tsx' data/validation/hero-soldier-command-frontend-f0.v1.json
+          git commit -m 'F0: integrate frozen Soldier command on Hero detail page'
+          git push
