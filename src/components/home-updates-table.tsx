@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { Link } from "@tanstack/react-router";
 
 type HeroEntry = {
   id: number;
@@ -226,21 +227,29 @@ function factionImage(id: number) {
 
 function HeroCard({ hero }: { hero: HeroEntry }) {
   return (
-    <div className="hut-hero-card">
-      <div className="hut-portrait">
-        <img src={heroImage(hero.id)} alt="" />
-        <strong>{hero.name}</strong>
-      </div>
-      <div className="hut-hero-meta">
-        <div className="hut-factions">
-          {hero.factions.map((id) => (
-            <img key={id} src={factionImage(id)} alt={FACTION_NAMES[id] ?? ""} title={FACTION_NAMES[id]} />
-          ))}
+    <Link
+      reloadDocument
+      to="/heroes/$heroId"
+      params={{ heroId: String(hero.id) }}
+      aria-label={`${hero.name} 상세 보기`}
+      className="hut-hero-link group"
+    >
+      <div className="hut-hero-card">
+        <div className="hut-portrait">
+          <img src={heroImage(hero.id)} alt="" />
+          <strong>{hero.name}</strong>
         </div>
-        <div className="hut-bond"><b>4번</b><span>{hero.bond4}</span></div>
-        <div className="hut-bond"><b>5번</b><span>{hero.bond5}</span></div>
+        <div className="hut-hero-meta">
+          <div className="hut-factions">
+            {hero.factions.map((id) => (
+              <img key={id} src={factionImage(id)} alt={FACTION_NAMES[id] ?? ""} title={FACTION_NAMES[id]} />
+            ))}
+          </div>
+          <div className="hut-bond"><b>4번</b><span>{hero.bond4}</span></div>
+          <div className="hut-bond"><b>5번</b><span>{hero.bond5}</span></div>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -336,7 +345,10 @@ const TABLE_CSS = `
 .home-update-table .hut-hero-head-grid span{text-align:left;color:inherit}
 .home-update-table .hut-hero-cell{overflow:hidden;background:#fafbfd}
 .home-update-table .hut-hero-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-.home-update-table .hut-hero-card{display:grid;grid-template-columns:78px minmax(0,1fr);gap:6px;min-width:0;overflow:hidden;border:1px solid #d7dee7;border-radius:8px;background:#fff;padding:7px 5px}
+.home-update-table .hut-hero-link{display:block;min-width:0;color:inherit;text-decoration:none;cursor:pointer;border-radius:8px;outline:none}
+.home-update-table .hut-hero-link:focus-visible{box-shadow:0 0 0 2px rgba(23,32,51,.24)}
+.home-update-table .hut-hero-card{display:grid;grid-template-columns:78px minmax(0,1fr);gap:6px;min-width:0;overflow:hidden;border:1px solid #d7dee7;border-radius:8px;background:#fff;padding:7px 5px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.home-update-table .hut-hero-link:hover .hut-hero-card{transform:translateY(-1px);border-color:#aeb8c6;box-shadow:0 3px 8px rgba(23,32,51,.10)}
 .home-update-table .hut-portrait{text-align:center;min-width:0}
 .home-update-table .hut-portrait img{display:block;width:76px;height:76px;max-width:100%;margin:auto;border-radius:7px;object-fit:contain}
 .home-update-table .hut-portrait strong{display:block;margin-top:3px;font-size:10.5px;line-height:1.15;white-space:normal}
