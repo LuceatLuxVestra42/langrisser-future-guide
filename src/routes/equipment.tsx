@@ -22,14 +22,13 @@ export const Route = createFileRoute("/equipment")({
 type EquipmentSortMode = "release" | "name";
 
 type EquipmentListUiState = {
-  passOnly: boolean;
   group: string | null;
   subtype: string | null;
   query: string;
   sort: EquipmentSortMode;
 };
 
-const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v3";
+const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v2";
 
 const EQUIPMENT_PASS_PRESENTATION_IDS = new Set([
   553, 554, 555, 556,
@@ -46,7 +45,6 @@ const EQUIPMENT_PASS_PRESENTATION_IDS = new Set([
 ]);
 
 const DEFAULT_UI_STATE: EquipmentListUiState = {
-  passOnly: false,
   group: null,
   subtype: null,
   query: "",
@@ -65,6 +63,7 @@ function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
 function EquipmentGeneralListPage() {
   const data = Route.useLoaderData();
   const [uiState, setUiState] = useState<EquipmentListUiState>(DEFAULT_UI_STATE);
+  const [passOnly, setPassOnly] = useState(false);
   const [persistenceReady, setPersistenceReady] = useState(false);
 
   useEffect(() => {
@@ -76,7 +75,6 @@ function EquipmentGeneralListPage() {
       }
 
       const parsed = JSON.parse(stored) as Partial<EquipmentListUiState>;
-      const passOnly = parsed.passOnly === true;
       const selectedGroup =
         typeof parsed.group === "string"
           ? data.filters.find((filter) => filter.group === parsed.group)
@@ -91,7 +89,7 @@ function EquipmentGeneralListPage() {
       const query = typeof parsed.query === "string" ? parsed.query.slice(0, 80) : "";
       const sort = isEquipmentSortMode(parsed.sort) ? parsed.sort : DEFAULT_UI_STATE.sort;
 
-      setUiState({ passOnly, group, subtype, query, sort });
+      setUiState({ group, subtype, query, sort });
     } catch {
       setUiState(DEFAULT_UI_STATE);
     } finally {
@@ -114,7 +112,7 @@ function EquipmentGeneralListPage() {
   const filteredRecords = useMemo(() => {
     const normalizedQuery = uiState.query.trim().toLocaleLowerCase();
     const records = data.records.filter((record) => {
-      if (uiState.passOnly && !EQUIPMENT_PASS_PRESENTATION_IDS.has(record.equipmentId)) return false;
+      if (passOnly && !EQUIPMENT_PASS_PRESENTATION_IDS.has(record.equipmentId)) return false;
       if (uiState.group && record.group !== uiState.group) return false;
       if (uiState.subtype && record.subtype !== uiState.subtype) return false;
 
@@ -146,7 +144,7 @@ function EquipmentGeneralListPage() {
     }
 
     return records.sort((left, right) => right.equipmentId - left.equipmentId);
-  }, [data.records, uiState]);
+  }, [data.records, passOnly, uiState]);
 
   const selectGroup = (group: string) => {
     setUiState((current) =>
@@ -168,9 +166,9 @@ function EquipmentGeneralListPage() {
   };
 
   const resetDiscovery = () => {
+    setPassOnly(false);
     setUiState((current) => ({
       ...current,
-      passOnly: false,
       group: null,
       subtype: null,
       query: "",
@@ -262,12 +260,10 @@ function EquipmentGeneralListPage() {
             <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
               <button
                 type="button"
-                aria-pressed={uiState.passOnly}
-                onClick={() =>
-                  setUiState((current) => ({ ...current, passOnly: !current.passOnly }))
-                }
+                aria-pressed={passOnly}
+                onClick={() => setPassOnly((current) => !current)}
                 className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-                  uiState.passOnly
+                  passOnly
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
                 }`}
