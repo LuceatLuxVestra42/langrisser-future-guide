@@ -1,0 +1,68 @@
+name: sp-soldier-command-semantics-s0
+
+on:
+  push:
+    branches:
+      - s0-sp-soldier-command-semantics
+    paths:
+      - data/contracts/sp-soldier-command-semantics.v1.json
+      - scripts/validate_sp_soldier_command_semantics_s0.cjs
+      - scripts/freeze_sp_soldier_command_semantics_s0.cjs
+      - .github/workflows/sp-soldier-command-semantics-s0.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: s0-sp-soldier-command-semantics
+          fetch-depth: 0
+
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD ae03b7a969d09648adfbfd28a871964a9e8ad0b5)" = "ae03b7a969d09648adfbfd28a871964a9e8ad0b5"
+          git diff --name-only ae03b7a969d09648adfbfd28a871964a9e8ad0b5...HEAD | sort > /tmp/s0-start.txt
+          while IFS= read -r p; do
+            case "$p" in
+              data/contracts/sp-soldier-command-semantics.v1.json|scripts/validate_sp_soldier_command_semantics_s0.cjs|scripts/freeze_sp_soldier_command_semantics_s0.cjs|.github/workflows/sp-soldier-command-semantics-s0.yml) ;;
+              *) echo "Unexpected S0 starting path: $p" >&2; exit 1 ;;
+            esac
+          done < /tmp/s0-start.txt
+
+      - name: Validate SP command semantics
+        run: node scripts/validate_sp_soldier_command_semantics_s0.cjs
+
+      - name: Freeze S0
+        run: node scripts/freeze_sp_soldier_command_semantics_s0.cjs
+
+      - name: Verify bounded generated mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^.. //' | sort)
+          for p in "${changed[@]}"; do
+            case "$p" in
+              data/validation/sp-soldier-command-semantics-s0.v1.json|data/validation/sp-soldier-command-semantics-s0-f.v1.json) ;;
+              *) echo "Unexpected S0 mutation: $p" >&2; exit 1 ;;
+            esac
+          done
+          test -f data/validation/sp-soldier-command-semantics-s0.v1.json
+          test -f data/validation/sp-soldier-command-semantics-s0-f.v1.json
+
+      - name: Commit S0 freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/sp-soldier-command-semantics-s0.v1.json data/validation/sp-soldier-command-semantics-s0-f.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "S0-F freeze SP soldier command semantics"
+          git push origin HEAD:s0-sp-soldier-command-semantics
