@@ -194,6 +194,36 @@ jobs:
           git commit -m "Authoritative Pages deploy ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
 
+      - name: Wait for authoritative Pages source to become live
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          HOSTED_BASE_URL: ${{ env.HOSTED_BASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=/tmp/authoritative-pages-source.json
+          for attempt in $(seq 1 36); do
+            probe="${HOSTED_BASE_URL}authoritative-pages-source.json?readiness=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${attempt}-$(date +%s)"
+            if curl --silent --show-error --fail --location --max-time 20 "$probe" -o "$manifest"; then
+              live_sha="$(node -e "const fs=require('fs');try{const value=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(value.sourceSha||''))}catch{}" "$manifest")"
+              printf 'PAGES_READINESS attempt=%s expected=%s live=%s timestamp=%s\n' \
+                "$attempt" "$EXPECTED_SOURCE_SHA" "${live_sha:-<missing>}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              if [[ "$live_sha" == "$EXPECTED_SOURCE_SHA" ]]; then
+                printf 'PAGES_READINESS_PASS expected=%s timestamp=%s\n' \
+                  "$EXPECTED_SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                exit 0
+              fi
+            else
+              printf 'PAGES_READINESS_RETRY attempt=%s expected=%s timestamp=%s\n' \
+                "$attempt" "$EXPECTED_SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+            fi
+            sleep 10
+          done
+          printf 'PAGES_READINESS_FAIL expected=%s baseUrl=%s timestamp=%s\n' \
+            "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+          cat "$manifest" >&2 2>/dev/null || true
+          exit 1
+
       - name: Install Chromium QA runtime
         run: |
           bun add --no-save playwright@1.55.0
