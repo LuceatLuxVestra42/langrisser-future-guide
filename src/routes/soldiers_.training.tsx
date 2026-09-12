@@ -407,7 +407,7 @@ function TrainingTechGroupList({
       {statRows.length > 0 ? (
         <div className="space-y-1.5 py-1">
           {statRows.map((row) => (
-            <div key={row.key} className="grid grid-cols-1 gap-1.5">
+            <div key={row.key} className="grid grid-cols-3 gap-1.5">
               {row.techs.map((tech) => (
                 <TrainingTechButton
                   key={tech.techId}
@@ -439,7 +439,7 @@ function TrainingTechGroupList({
 
       {ultimateStatTechs.length > 0 ? (
         <div>
-          <div className="grid grid-cols-1 gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5">
             {ultimateStatTechs.map((tech) => (
               <TrainingTechButton
                 key={tech.techId}
