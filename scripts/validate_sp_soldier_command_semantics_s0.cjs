@@ -22,8 +22,10 @@ function equal(a,b) { return JSON.stringify(a) === JSON.stringify(b); }
 function main() {
   const c = readJson(CONTRACT), n2c = readJson(N2_CHECKPOINT), n2 = readJson(N2_ARTIFACT), r5c = readJson(R5_CHECKPOINT), r5 = readJson(R5_ARTIFACT), sp = readJson(SP);
   const hardErrors=[];
-  if (n2c.status !== c.authority.n2ExpectedStatus) hardErrors.push(`N2 checkpoint=${n2c.status}`);
-  if (r5c.status !== c.authority.r5ExpectedStatus) hardErrors.push(`R5 checkpoint=${r5c.status}`);
+  if (n2c.status !== c.authority.n2ExpectedStatus) hardErrors.push(`N2 checkpoint status=${n2c.status}`);
+  if (r5c.status !== c.authority.r5ExpectedStatus || r5c.completion !== c.authority.r5ExpectedCompletion) {
+    hardErrors.push(`R5 checkpoint status/completion=${r5c.status}/${r5c.completion}`);
+  }
   if (sp.status !== c.authority.spExpectedStatus) hardErrors.push(`SP predecessor=${sp.status}`);
   const released=(sp.records||[]).filter(x=>x?.sp?.status==='RELEASED');
   if (released.length !== c.authority.spReleasedCount) hardErrors.push(`SP released=${released.length}`);
