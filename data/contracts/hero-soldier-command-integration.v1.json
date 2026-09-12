@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "contract": "hero-soldier-command-integration",
+  "stage": "I0",
+  "status": "ACTIVE",
+  "owner": "HERO_SOLDIER_COMMAND_INTEGRATION_CONTRACT",
+  "purpose": "Define one fail-closed composition contract for Hero-owned command base selection and frozen Hero3 contribution without recomputing any predecessor semantics.",
+  "authority": {
+    "normalBaseCheckpoint": "data/validation/hero-soldier-command-base-n2-f.v1.json",
+    "normalBaseExpectedStatus": "FINAL_FROZEN",
+    "normalBaseArtifact": "data/generated/hero-soldier-command-base.v1.json",
+    "normalBaseRecordCount": 267,
+    "spBaseCheckpoint": "data/validation/hero-sp-soldier-command-base-s1-f.v1.json",
+    "spBaseExpectedStatus": "FINAL_FROZEN",
+    "spBaseArtifact": "data/generated/hero-sp-soldier-command-base.v1.json",
+    "spBaseRecordCount": 25,
+    "hero3Checkpoint": "data/validation/hero-soldier-bond-command-contribution-r5-f.v1.json",
+    "hero3ExpectedStatus": "PASS",
+    "hero3ExpectedCompletion": "FINAL_FROZEN",
+    "hero3Artifact": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "hero3RecordCount": 267
+  },
+  "composition": {
+    "components": ["hp", "at", "df", "magicDf"],
+    "normal": {
+      "baseSource": "N2_HEROINFO_HERO_OWNED_BASE",
+      "baseSelection": "Use N2 base for every canonical hero.",
+      "final": "base + R5 Hero3 contribution"
+    },
+    "sp": {
+      "eligibility": "Hero must have a frozen S1 RELEASED SP command-base record.",
+      "baseSource": "S1_SPHEROINFO_REPLACEMENT_BASE",
+      "baseSelection": "Replace, do not add, the N2 base when SP form is selected.",
+      "final": "SP replacement base + R5 Hero3 contribution"
+    },
+    "hero3Occurrence": "EXACTLY_ONCE_AFTER_BASE_SELECTION",
+    "arithmetic": "component-wise numeric addition of already-normalized percentages",
+    "rounding": "NONE"
+  },
+  "provenanceRequirements": {
+    "preserveBaseSource": true,
+    "preserveBaseVector": true,
+    "preserveHero3Vector": true,
+    "preserveFinalVector": true,
+    "preserveSpEligibility": true
+  },
+  "forbidden": [
+    "raw ConfigData re-read or reinterpretation in integration",
+    "N2 + S1 base stacking",
+    "Hero3 recomputation",
+    "Hero3 double application",
+    "Normal JobConnection-specific command derivation",
+    "name JOIN",
+    "ID arithmetic",
+    "missing-SP heuristic fallback other than absence of an S1 record meaning no SP variant"
+  ],
+  "fixtures": {
+    "leon": {
+      "heroId": 6,
+      "normal": {"base":{"hp":15,"at":15,"df":0,"magicDf":0},"hero3":{"hp":25,"at":25,"df":10,"magicDf":10},"final":{"hp":40,"at":40,"df":10,"magicDf":10}},
+      "sp": {"base":{"hp":15,"at":15,"df":0,"magicDf":0},"hero3":{"hp":25,"at":25,"df":10,"magicDf":10},"final":{"hp":40,"at":40,"df":10,"magicDf":10}}
+    },
+    "lana": {
+      "heroId": 8,
+      "normal": {"base":{"hp":0,"at":15,"df":0,"magicDf":15},"hero3":{"hp":10,"at":25,"df":10,"magicDf":25},"final":{"hp":10,"at":40,"df":10,"magicDf":40}},
+      "sp": {"base":{"hp":10,"at":15,"df":5,"magicDf":0},"hero3":{"hp":10,"at":25,"df":10,"magicDf":25},"final":{"hp":20,"at":40,"df":15,"magicDf":25}}
+    }
+  },
+  "output": {
+    "validator": "scripts/validate_hero_soldier_command_integration_contract.cjs",
+    "validation": "data/validation/hero-soldier-command-integration-i0.v1.json",
+    "checkpoint": "data/validation/hero-soldier-command-integration-i0-f.v1.json"
+  },
+  "completionCriteria": [
+    "N2 and S1 checkpoints remain FINAL_FROZEN",
+    "R5 checkpoint remains PASS with completion FINAL_FROZEN",
+    "N2 and R5 heroId sets are exact 267 canonical parity",
+    "S1 heroId set is an exact 25-record subset of the 267 set",
+    "Leon and Lana normal/SP composition fixtures pass",
+    "no predecessor values are recomputed",
+    "zero hard errors"
+  ]
+}
