@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { SiteSectionNav } from "../components/site-section-nav";
 import appCss from "../styles.css?url";
 import { EquipmentDetailModalBridge } from "../lib/equipment-detail-modal-bridge";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -241,6 +242,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SiteVersionGuard />
+      <SiteSectionNav />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <EquipmentDetailModalBridge />
