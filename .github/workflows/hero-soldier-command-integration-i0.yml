@@ -1,0 +1,44 @@
+name: hero-soldier-command-integration-i0
+
+on:
+  push:
+    branches: [i0-hero-soldier-command-integration-contract]
+    paths:
+      - data/contracts/hero-soldier-command-integration.v1.json
+      - scripts/validate_hero_soldier_command_integration_contract.cjs
+      - scripts/freeze_hero_soldier_command_integration_i0.cjs
+      - .github/workflows/hero-soldier-command-integration-i0.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  validate-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: i0-hero-soldier-command-integration-contract, fetch-depth: 0}
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD 8c4ba889972a2d6e623cf534e201a19d8dc2aa60)" = "8c4ba889972a2d6e623cf534e201a19d8dc2aa60"
+          git diff --name-only 8c4ba889972a2d6e623cf534e201a19d8dc2aa60...HEAD | sort > /tmp/i0-start.txt
+          while IFS= read -r p; do case "$p" in data/contracts/hero-soldier-command-integration.v1.json|scripts/validate_hero_soldier_command_integration_contract.cjs|scripts/freeze_hero_soldier_command_integration_i0.cjs|.github/workflows/hero-soldier-command-integration-i0.yml) ;; *) echo "Unexpected I0 path: $p" >&2; exit 1;; esac; done < /tmp/i0-start.txt
+      - run: node scripts/validate_hero_soldier_command_integration_contract.cjs
+      - run: node scripts/freeze_hero_soldier_command_integration_i0.cjs
+      - name: Verify mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^.. //' | sort)
+          for p in "${changed[@]}"; do case "$p" in data/validation/hero-soldier-command-integration-i0.v1.json|data/validation/hero-soldier-command-integration-i0-f.v1.json) ;; *) echo "Unexpected I0 mutation: $p" >&2; exit 1;; esac; done
+      - name: Commit freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/validation/hero-soldier-command-integration-i0.v1.json data/validation/hero-soldier-command-integration-i0-f.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "I0-F freeze soldier command integration contract"
+          git push origin HEAD:i0-hero-soldier-command-integration-contract
