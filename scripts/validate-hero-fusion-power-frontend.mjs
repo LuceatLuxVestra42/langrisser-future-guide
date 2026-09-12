@@ -9,6 +9,7 @@ const armyIcons = JSON.parse(fs.readFileSync('data/generated/army-icon-manifest.
 const route = fs.readFileSync('src/routes/heroes.tsx', 'utf8');
 const server = fs.readFileSync('src/lib/hero-fusion-power.server.ts', 'utf8');
 const functions = fs.readFileSync('src/lib/hero-fusion-power.functions.ts', 'utf8');
+const staticProjection = fs.readFileSync('src/lib/hero-fusion-power.static.ts', 'utf8');
 
 check(baseline.status === 'PASS' && baseline.completion === 'COMPLETE', 'baseline fusion presentation must be complete');
 check(baseline.freezeState === 'HERO_FUSION_POWER_PRESENTATION_FROZEN', 'baseline fusion presentation freeze mismatch');
@@ -110,7 +111,14 @@ for (const row of exceptions.records) {
 }
 check(exceptionHeroIds.size === expectedExceptions.size, 'not all expanded fusion Heroes are present');
 
-check(functions.includes('readHeroFusionPowerIndex'), 'server function must expose fusion-power index');
+check(functions.includes('getStaticHeroFusionPowerIndex'), 'client function must expose the static fusion-power index');
+check(!functions.includes('createServerFn'), 'static Pages fusion-power consumer must not call createServerFn');
+check(!functions.includes('hero-fusion-power.server'), 'static Pages fusion-power consumer must not import the server module');
+check(staticProjection.includes('hero-fusion-power-presentation.v1.json'), 'static projection must preserve frozen baseline fusion projection');
+check(staticProjection.includes('hero-fusion-power-exceptions.v1.json'), 'static projection must consume frozen fusion exceptions');
+check(staticProjection.includes('hero-fusion-faction-assets.v1.json'), 'static projection must consume frozen faction assets');
+check(staticProjection.includes('army-icon-manifest.v1.json'), 'static projection must consume frozen official class icons');
+check(staticProjection.includes('HERO_FUSION_POWER_EXPANDED_FROZEN'), 'static projection must expose expanded fusion freeze state');
 check(server.includes('hero-fusion-power-presentation.v1.json'), 'server must preserve frozen baseline fusion projection');
 check(server.includes('hero-fusion-power-exceptions.v1.json'), 'server must consume frozen fusion exceptions');
 check(server.includes('army-icon-manifest.v1.json'), 'server must consume frozen official class icons');
