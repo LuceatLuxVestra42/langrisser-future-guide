@@ -32,6 +32,7 @@ let capstoneCount = 0;
 let verifiedCapstoneStatCount = 0;
 let soldierEdgeCount = 0;
 let releasedSpHeroCount = 0;
+let spRewardSkillCount = 0;
 let releasedExclusiveEquipmentHeroCount = 0;
 let releasedCentralDisciplineHeroCount = 0;
 let bondHeroCount = 0;
@@ -76,7 +77,20 @@ for (const heroId of manifestIds) {
   bondRowCount += bonds.length;
   if (bonds.length) bondHeroCount += 1;
   skinCount += Array.isArray(shard.presentation?.skins) ? shard.presentation.skins.length : 0;
-  if (shard.sp?.status === "RELEASED") releasedSpHeroCount += 1;
+  if (shard.sp?.status === "RELEASED") {
+    releasedSpHeroCount += 1;
+    const rewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)
+      ? shard.sp.secondStageRewards.skills
+      : [];
+    const rewardSkillIds = rewardSkills.map((skill) => Number(skill?.skillId));
+    if (rewardSkillIds.some((skillId) => !Number.isInteger(skillId))) {
+      mismatches.push(`Hero ${heroId}: SP reward SkillID missing or invalid`);
+    }
+    if (new Set(rewardSkillIds).size !== rewardSkillIds.length) {
+      mismatches.push(`Hero ${heroId}: duplicate SP reward SkillIDs`);
+    }
+    spRewardSkillCount += rewardSkills.length;
+  }
   if (shard.exclusiveEquipment?.status === "RELEASED") releasedExclusiveEquipmentHeroCount += 1;
   if (shard.centralDiscipline?.status === "RELEASED") releasedCentralDisciplineHeroCount += 1;
 }
@@ -87,6 +101,7 @@ if (parsedShardCount !== 267) fail(`Expected 267 parsed shards, got ${parsedShar
 if (structuralFailureCount !== 0) fail(`Expected zero structurally unusable shards, got ${structuralFailureCount}.`);
 if (soldierEdgeCount !== 5977 || Number(manifest?.summary?.heroSoldierRelationCount) !== 5977) fail(`Hero-Soldier relation mismatch: ${soldierEdgeCount}.`);
 if (releasedSpHeroCount !== Number(manifest?.summary?.releasedSpCount) || releasedSpHeroCount !== 25) fail(`SP release population mismatch: ${releasedSpHeroCount}.`);
+if (spRewardSkillCount !== 50) fail(`SP reward Skill projection population mismatch: ${spRewardSkillCount}.`);
 if (releasedExclusiveEquipmentHeroCount !== Number(manifest?.summary?.exclusiveEquipmentRelationCount) || releasedExclusiveEquipmentHeroCount !== 167) fail(`Exclusive equipment population mismatch: ${releasedExclusiveEquipmentHeroCount}.`);
 if (capstoneCount !== jobBranchCount || verifiedCapstoneStatCount !== capstoneCount) fail(`Capstone/stat parity mismatch branches=${jobBranchCount} capstones=${capstoneCount} verified=${verifiedCapstoneStatCount}.`);
 
@@ -97,6 +112,7 @@ if (!serverSource.includes("import.meta.glob<Stage6HeroShard>")) fail("Stage 5 s
 if (!serverSource.includes("eager: false")) fail("Stage 5 shard glob must remain lazy.");
 if (serverSource.includes("ConfigData")) fail("Stage 5 server must not read raw ConfigData.");
 if (!serverSource.includes("fullDatasetRuntimeRead: false")) fail("Stage 5 must declare no full Stage 6 dataset runtime read.");
+if (!serverSource.includes("secondStageRewards")) fail("Stage 5 frontend projection must preserve frozen SP second-stage reward skills.");
 if (!functionsSource.includes("getHeroDetailRouteStage5Data")) fail("Stage 5 server function is not exposed.");
 if (!routeSource.includes("getHeroDetailRouteStage5Data")) fail("Hero detail route is not consuming Stage 5.");
 if (
@@ -135,6 +151,7 @@ const report = {
     verifiedCapstoneStatCount,
     soldierEdgeCount,
     releasedSpHeroCount,
+    spRewardSkillCount,
     releasedExclusiveEquipmentHeroCount,
     releasedCentralDisciplineHeroCount,
     bondHeroCount,
