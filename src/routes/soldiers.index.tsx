@@ -10,7 +10,7 @@ function SoldierIndexAction() {
     <Link
       reloadDocument
       to="/soldiers/training"
-      className="absolute top-6 z-20 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent lg:top-10"
+      className="absolute top-[4.75rem] z-20 inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent lg:top-[5.75rem]"
       style={{ right: "max(1rem, calc((100vw - 80rem) / 2 + 2rem))" }}
       aria-label="훈련장"
     >

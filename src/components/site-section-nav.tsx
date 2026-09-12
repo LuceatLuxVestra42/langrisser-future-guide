@@ -86,9 +86,9 @@ export function SiteSectionNav() {
   return (
     <nav
       aria-label="주요 정보 페이지"
-      className="sticky top-0 z-50 border-b border-border bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85"
+      className="relative z-50 border-b border-border bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85"
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 sm:gap-2 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 overflow-x-auto px-3 py-2 sm:gap-2 sm:px-6 lg:px-8">
         {NAV_GROUPS.map((group) => {
           const groupActive = group.matchPrefixes.some((prefix) =>
             location.pathname.startsWith(prefix),
@@ -111,7 +111,7 @@ export function SiteSectionNav() {
                 </button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="start" className="min-w-44">
+              <DropdownMenuContent align="end" className="min-w-44">
                 {group.items.map((item) => {
                   if (!item.to) {
                     return (
