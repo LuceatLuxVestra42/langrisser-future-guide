@@ -275,3 +275,17 @@ main[data-name-kr-status] .text-5xl { font-size: 49px !important; }
   main[data-name-kr-status] .sm\:text-lg { font-size: 19px !important; }
   main[data-name-kr-status] .sm\:text-5xl { font-size: 49px !important; }
 }
+
+/* Hero detail skill icons: circular frame with the verified icon filling the frame. */
+main[data-name-kr-status] .h-16.w-16.overflow-hidden:has(> img[src*="/images/heroes/skill-icons/"]) {
+  border-radius: 9999px !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+main[data-name-kr-status] .h-16.w-16.overflow-hidden > img[src*="/images/heroes/skill-icons/"] {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover !important;
+}
