@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
+import { HomeUpdatesTable } from "@/components/home-updates-table";
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
 import clockIcon from "@/assets/clock_of_forgiveness.png";
 
@@ -206,17 +207,32 @@ function HeroSection() {
 }
 
 function UpdatesSection() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <section
-      aria-labelledby="home-updates-title"
-      className="rounded-2xl border border-border bg-card px-5 py-4 sm:px-6"
-    >
-      <div className="flex items-center justify-center gap-2 text-center">
+    <section aria-labelledby="home-updates-title" className="overflow-hidden rounded-2xl border border-border bg-card">
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        aria-controls="home-updates-table"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex w-full items-center justify-center gap-2 px-5 py-4 text-center transition hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset sm:px-6"
+      >
         <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
           업데이트 정리표
         </h2>
-        <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-muted-foreground sm:h-6 sm:w-6" />
-      </div>
+        <ChevronDown
+          size={20}
+          aria-hidden="true"
+          className={`shrink-0 text-muted-foreground transition-transform sm:h-6 sm:w-6 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen ? (
+        <div id="home-updates-table" className="border-t border-border px-2 py-3 sm:px-3 sm:py-4">
+          <HomeUpdatesTable />
+        </div>
+      ) : null}
     </section>
   );
 }
