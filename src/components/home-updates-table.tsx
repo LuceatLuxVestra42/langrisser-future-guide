@@ -1,5 +1,10 @@
-import type { CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
+
+import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
+import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { resolveHeroDisplayNameKr } from "@/lib/hero-display-name";
+import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
 
 type HeroEntry = {
   id: number;
@@ -331,10 +336,12 @@ function SoldierCell({
   title,
   entries,
   kind,
+  onSelectSoldier,
 }: {
   title: string;
   entries: SoldierEntry[];
   kind: "new" | "sp";
+  onSelectSoldier: (soldierId: number) => void;
 }) {
   return (
     <section className={`hut-cell hut-soldier ${kind === "new" ? "hut-new-soldier" : ""}`}>
@@ -344,16 +351,15 @@ function SoldierCell({
           const { name, soldierId } = entry;
           if (soldierId) {
             return (
-              <Link
+              <button
                 key={name}
-                reloadDocument
-                to="/soldiers/$soldierId"
-                params={{ soldierId: String(soldierId) }}
+                type="button"
+                onClick={() => onSelectSoldier(soldierId)}
                 aria-label={`${name} 용병 상세 보기`}
                 className="hut-soldier-link"
               >
                 {name}
-              </Link>
+              </button>
             );
           }
           return <span key={name}>{name}</span>;
@@ -427,7 +433,7 @@ const TABLE_CSS = `
 .home-update-table .hut-law .hut-mini-card{gap:1px;font-size:9px}.home-update-table .hut-law .hut-mini-card img{width:40px;height:40px}
 .home-update-table .hut-soldier{display:flex;flex-direction:column;background:#e6effc;text-align:center}.home-update-table .hut-new-soldier{background:#eaf3fa}
 .home-update-table .hut-soldier-list{display:grid;grid-template-columns:1fr;flex:1;align-content:center;gap:3px}
-.home-update-table .hut-soldier-list span,.home-update-table .hut-soldier-list .hut-soldier-link{display:block;border:1px solid #cfd9d4;border-radius:6px;background:#fff;padding:4px 1px;text-align:center;font-size:9px;font-weight:850;white-space:nowrap;color:inherit;text-decoration:none}
+.home-update-table .hut-soldier-list span,.home-update-table .hut-soldier-list .hut-soldier-link{display:block;width:100%;border:1px solid #cfd9d4;border-radius:6px;background:#fff;padding:4px 1px;text-align:center;font-family:inherit;font-size:9px;font-weight:850;white-space:nowrap;color:inherit;text-decoration:none}
 .home-update-table .hut-soldier-list .hut-soldier-link{cursor:pointer;outline:none;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
 .home-update-table .hut-soldier-list .hut-soldier-link:hover{border-color:#aeb8c6;background:#f8fafc;box-shadow:0 1px 4px rgba(23,32,51,.12)}
 .home-update-table .hut-soldier-list .hut-soldier-link:focus-visible{box-shadow:0 0 0 2px rgba(23,32,51,.24)}
@@ -438,6 +444,32 @@ const TABLE_CSS = `
 `;
 
 export function HomeUpdatesTable() {
+  const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
+  const soldierPage = useMemo(() => getSoldierPrototypePageData(), []);
+  const soldierById = useMemo(
+    () => new Map(soldierPage.records.map((record) => [record.soldierId, record])),
+    [soldierPage],
+  );
+  const heroCardIcons = useMemo(() => {
+    const index = getStaticHeroCardIconIndex();
+    if (
+      index.summary.total !== 267 ||
+      index.summary.resolved !== 267 ||
+      index.summary.pending !== 0 ||
+      index.summary.hardErrors !== 0 ||
+      index.records.length !== 267
+    ) {
+      throw new Error("Hero card icon frozen index is not production-ready.");
+    }
+    return index.records.map((card) => ({
+      ...card,
+      nameKr: resolveHeroDisplayNameKr(card.heroId, card.nameKr, card.nameCn),
+    }));
+  }, []);
+  const selectedSoldier = selectedSoldierId === null
+    ? null
+    : soldierById.get(selectedSoldierId) ?? null;
+
   return (
     <div className="home-update-table">
       <style>{TABLE_CSS}</style>
@@ -450,14 +482,35 @@ export function HomeUpdatesTable() {
                 <HeroCell row={row} />
                 {row.singles?.map((entry) => <SingleCell key={`${row.date}-${entry.title}`} entry={entry} />)}
                 {row.law?.length ? <LawCell entries={row.law} /> : null}
-                {row.newSoldiers?.length ? <SoldierCell title="신규용병" entries={row.newSoldiers} kind="new" /> : null}
-                {row.spSoldiers?.length ? <SoldierCell title="SP용병" entries={row.spSoldiers} kind="sp" /> : null}
+                {row.newSoldiers?.length ? (
+                  <SoldierCell
+                    title="신규용병"
+                    entries={row.newSoldiers}
+                    kind="new"
+                    onSelectSoldier={setSelectedSoldierId}
+                  />
+                ) : null}
+                {row.spSoldiers?.length ? (
+                  <SoldierCell
+                    title="SP용병"
+                    entries={row.spSoldiers}
+                    kind="sp"
+                    onSelectSoldier={setSelectedSoldierId}
+                  />
+                ) : null}
                 <PatchCell entries={row.patches} />
               </div>
             </article>
           ))}
         </div>
       </div>
+      {selectedSoldier ? (
+        <SoldierDetailDialog
+          record={selectedSoldier}
+          heroCardIcons={heroCardIcons}
+          onClose={() => setSelectedSoldierId(null)}
+        />
+      ) : null}
     </div>
   );
 }
