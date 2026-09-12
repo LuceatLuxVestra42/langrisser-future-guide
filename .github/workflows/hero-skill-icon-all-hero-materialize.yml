@@ -3,7 +3,7 @@ name: Hero Skill Icon All-Hero Materialize
 on:
   push:
     branches:
-      - work/hero-skill-icon-all-hero-coverage-20260912
+      - work/hero-skill-icon-all-hero-coverage-current-20260912
     paths:
       - scripts/materialize-hero-skill-icon-all-hero-assets.py
       - .github/workflows/hero-skill-icon-all-hero-materialize.yml
@@ -12,6 +12,9 @@ on:
 permissions:
   actions: read
   contents: write
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
 
 jobs:
   materialize:
@@ -44,7 +47,6 @@ jobs:
             -o "$RUNNER_TEMP/gap.zip" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10287724486/zip"
           unzip -q "$RUNNER_TEMP/gap.zip" -d "$RUNNER_TEMP/gap"
-          sha256sum "$RUNNER_TEMP/direct.zip" "$RUNNER_TEMP/gap.zip"
       - name: Materialize exact verified PNGs
         run: >-
           python scripts/materialize-hero-skill-icon-all-hero-assets.py
@@ -55,7 +57,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bad="$(git status --porcelain | awk '{print $2}' | grep -Ev '^(data/generated/hero-skill-icon-all-hero-materialization\.v1\.json|public/images/heroes/skill-icons/[^/]+\.png)$' || true)"
+          bad="$(git status --porcelain | awk '{print $2}' | grep -Ev '^(data/generated/hero-skill-icon-all-hero-materialization\.v1\.json|public/images/heroes/skill-icons/[^/]+\.[Pp][Nn][Gg])$' || true)"
           if [ -n "$bad" ]; then
             echo "Unexpected changed paths:"
             echo "$bad"
