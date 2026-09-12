@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 type ExistingRoute =
   | "/banners"
-  | "/banners/single-log"
   | "/heroes"
   | "/equipment"
   | "/equipment/exclusive"
@@ -22,6 +21,7 @@ type ExistingRoute =
 type NavItem = {
   label: string;
   to?: ExistingRoute;
+  bannerView?: "single-log";
   unavailableLabel?: string;
 };
 
@@ -37,7 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
     matchPrefixes: ["/banners"],
     items: [
       { label: "배너표", to: "/banners" },
-      { label: "1인 배너 log", to: "/banners/single-log" },
+      { label: "1인 배너 log", bannerView: "single-log" },
     ],
   },
   {
@@ -85,6 +85,8 @@ export function SiteSectionNav() {
 
   if (location.pathname === "/") return null;
 
+  const singlePickupHref = `${import.meta.env.BASE_URL}banners?view=single-log`;
+
   return (
     <nav
       aria-label="주요 정보 페이지"
@@ -129,6 +131,14 @@ export function SiteSectionNav() {
 
                 <DropdownMenuContent align="end" className="min-w-44">
                   {group.items.map((item) => {
+                    if (item.bannerView === "single-log") {
+                      return (
+                        <DropdownMenuItem key={item.label} asChild>
+                          <a href={singlePickupHref}>{item.label}</a>
+                        </DropdownMenuItem>
+                      );
+                    }
+
                     if (!item.to) {
                       return (
                         <DropdownMenuItem key={item.label} disabled>
