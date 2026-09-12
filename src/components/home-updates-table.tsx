@@ -279,10 +279,16 @@ function HeroCard({ hero }: { hero: HeroEntry }) {
 
 function MiniCard({ id, name }: { id: number; name: string }) {
   return (
-    <div className="hut-mini-card">
+    <Link
+      reloadDocument
+      to="/heroes/$heroId"
+      params={{ heroId: String(id) }}
+      aria-label={`${name} 상세 보기`}
+      className="hut-mini-card hut-mini-link"
+    >
       <img src={heroImage(id)} alt="" />
       <span>{name}</span>
-    </div>
+    </Link>
   );
 }
 
@@ -411,6 +417,9 @@ const TABLE_CSS = `
 .home-update-table .hut-single{display:flex;flex-direction:column;text-align:center;background:#fce7cf}
 .home-update-table .hut-dist{background:#f4deda}.home-update-table .hut-sp,.home-update-table .hut-upgrade{background:#eef6ea}
 .home-update-table .hut-mini-card{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;font-size:9.5px;font-weight:900}
+.home-update-table .hut-mini-link{min-width:0;color:inherit;text-decoration:none;cursor:pointer;border-radius:7px;outline:none;transition:background .15s ease,box-shadow .15s ease}
+.home-update-table .hut-mini-link:hover{background:rgba(255,255,255,.42);box-shadow:0 1px 4px rgba(23,32,51,.10)}
+.home-update-table .hut-mini-link:focus-visible{box-shadow:0 0 0 2px rgba(23,32,51,.24)}
 .home-update-table .hut-mini-card img{width:62px;height:62px;max-width:100%;border-radius:7px;object-fit:contain}
 .home-update-table .hut-mini-card span{white-space:pre-line}
 .home-update-table .hut-law{display:flex;flex-direction:column;background:#fff8dd;text-align:center}
