@@ -490,7 +490,7 @@ function TrainingTechButton({
         type="button"
         onClick={() => onSelect(tech)}
         title={tech.nameKr}
-        className={`min-h-[58px] w-full min-w-0 rounded-lg px-3 py-2 text-left transition ${
+        className={`min-h-[58px] w-full min-w-0 rounded-lg px-3 py-2 text-center transition ${
           selected ? "bg-foreground text-background" : "bg-background hover:bg-muted"
         }`}
       >
