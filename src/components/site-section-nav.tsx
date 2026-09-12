@@ -93,7 +93,11 @@ export function SiteSectionNav() {
       className="relative z-50 border-b border-border bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85"
     >
       <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 py-1 sm:px-8">
-        <div className="flex shrink-0 items-center gap-2.5">
+        <Link
+          to="/"
+          aria-label="미래시 시트 메인으로 이동"
+          className="flex shrink-0 items-center gap-2.5 rounded-lg outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
           <img
             src={clockIcon}
             alt="용서의 시계"
@@ -104,7 +108,7 @@ export function SiteSectionNav() {
           <span className="whitespace-nowrap text-base font-bold tracking-tight text-foreground sm:text-lg">
             미래시 시트
           </span>
-        </div>
+        </Link>
 
         <div className="ml-auto flex min-w-0 items-center justify-end gap-1 overflow-x-auto py-1 sm:gap-2">
           {NAV_GROUPS.map((group) => {
