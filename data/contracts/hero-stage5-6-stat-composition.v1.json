@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-6-stat-composition",
+  "status": "CANDIDATE",
+  "owner": "hero-canonical",
+  "purpose": "Materialize final Hero job display stats after Stage 4 base stats by applying explicit Hero Fetter percentage effects, SP second-stage Hero-stat percentage effects where released, and HeartFetter level-10 percentage/flat effects. Stage 6 consumes this artifact without semantic recomputation.",
+  "predecessors": {
+    "stage4BaseStats": "data/generated/hero-basic-combat.v1.json",
+    "stage51Bonds": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
+    "stage54Sp": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "centralBondRule": "data/contracts/hero-central-bond-stat-effect-stage5.v1.json"
+  },
+  "semanticRules": {
+    "stage4BaseMeaningUnchanged": true,
+    "stage4BaseExcludesBondEffects": true,
+    "normalBondSource": "Stage 5-1 gotSkillId -> ConfigDataSkillInfo.ID -> PassiveBuffs_ID -> ConfigDataBuffInfo.ID -> explicit Property1..4_ID/Value",
+    "heroStatPropertyModifyIds": {
+      "99": "hp",
+      "100": "at",
+      "101": "df",
+      "102": "magic",
+      "103": "magicDf",
+      "104": "dex"
+    },
+    "buffPercentScale": 10000,
+    "soldierCommandPropertyIdsExcludedFromHeroStats": [93, 94, 95, 96],
+    "heartFetterRelation": "HeroInfo.HeroInformation_ID -> HeroInformationInfo.ID -> HeroInformationInfo.HeroHeartFetterId -> HeroHeartFetterInfo.ID",
+    "heartFetterLv10Flat": "HeroHeartFetterSkills[9] -> SkillInfo.ID; parse only the already-validated Hero HP/DEF/MDEF flat description shape",
+    "heartFetterLv10Percent": "UnlockSkills_ID entry with HeartFetterLevel=10 -> SkillInfo.ID; require the already-validated Hero all-stat +5% description",
+    "spJobRelation": "Stage 5-4 sp.job.jobConnectionId -> ConfigDataJobConnectionInfo.ID -> JobLevels_ID -> ConfigDataJobLevelInfo.ID; choose the final level by JobLevelUpHeroLevel then ID",
+    "spStarCorrection": "Stage 5-4 SPHero-derived six-star arrays, index 5",
+    "globalMasteryFlat": "Reuse the Stage 4 materialized finalDisplayStats.components.*.masteryFlat; do not rederive mastery ownership",
+    "preCentralFormula": "round(starAdjustedRaw * (1 + normalBondRate + spBonusRate)) + globalJobMasteryFlat",
+    "centralPercentFormula": "round(starAdjustedRaw * 0.05) separately per stat, then add to the pre-central value",
+    "centralFlatOrder": "Add explicit HeartFetter level-10 HP/DEF/MDEF flat values after percentage terms"
+  },
+  "boundaries": {
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "stage4Recomputation": false,
+    "stage6SemanticRecomputation": false,
+    "runtimeRawConfigDataRead": false,
+    "sourcePackAccess": "maintenance-only through scripts/lib/configdata-direct.cjs and the pinned ConfigData source-pack contract"
+  },
+  "outputs": {
+    "generated": "data/generated/hero-page-stage5-6-stat-composition.v1.json",
+    "validation": "data/validation/hero-page-stage5-6-stat-composition.v1.json"
+  },
+  "producer": "scripts/build_hero_stage5_6_stat_composition.cjs",
+  "validator": "scripts/validate_hero_stage5_6_stat_composition.cjs",
+  "completionCriteria": [
+    "267 canonical Hero records are composed",
+    "SP release parity is exactly 25 released Heroes",
+    "all normal and SP values are non-negative integers",
+    "Leon SP Job 377 equals hp=4929, at=623, magic=233, df=300, magicDf=280, dex=130 with zero tolerance",
+    "Leon normal Hero bond rate resolves to 25% for all six Hero stats",
+    "Leon SP second-stage bonus resolves to HP +5% and DEF +5%",
+    "no Stage 4 semantic mutation, name JOIN, ID arithmetic, or runtime raw ConfigData dependency is introduced"
+  ],
+  "promotionRule": "Promote from CANDIDATE only after the owning validator passes on repository-generated output. Stage 6 and frontend wiring remain non-scope until promotion."
+}
