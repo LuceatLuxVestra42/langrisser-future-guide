@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "stage": "S1-F",
+  "status": "FINAL_FROZEN",
+  "completion": "SP_SOLDIER_COMMAND_BASE_MATERIALIZATION_COMPLETE",
+  "owner": "SP_SOLDIER_COMMAND_BASE_MATERIALIZATION",
+  "predecessor": {
+    "s0Checkpoint": "data/validation/sp-soldier-command-semantics-s0-f.v1.json",
+    "spPredecessor": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "spPredecessorBlobSha": "c93c37770f5e6678ec397764da289a538518f35f"
+  },
+  "artifact": {
+    "path": "data/generated/hero-sp-soldier-command-base.v1.json",
+    "gitBlobSha1": "a0f6b9c9c05c19893ac4ab7e0f2badde70e2d54f",
+    "sha256": "22a6a55ea8574926c0484adeb66992fd17055ac8c6f6922fbeb237208a55fe64",
+    "recordCount": 25,
+    "meaning": "SP-form Hero-owned troop stat modifier base"
+  },
+  "validation": {
+    "path": "data/validation/hero-sp-soldier-command-base-s1.v1.json",
+    "gitBlobSha1": "da596f9cda9aedc08fc010df0d4ab4773c5facd0",
+    "sha256": "ff7011d1f4aaef8e57916c51cda33b448955c91102ed44415d6addc14002a921",
+    "status": "PASS",
+    "rawMismatchCount": 0,
+    "normalizedMismatchCount": 0,
+    "missingFieldMismatchCount": 0,
+    "fixtureResults": {
+      "leon": true,
+      "lana": true
+    },
+    "hardErrorCount": 0
+  },
+  "semanticBoundary": {
+    "n2Combination": "NONE",
+    "r5Combination": "NONE",
+    "missingSourceField": "ZERO",
+    "normalization": "raw / 100"
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "S0 frozen semantics change",
+    "Stage5-4 SP predecessor/source changes",
+    "SP RELEASED population changes",
+    "independent S1 validator hard failure",
+    "artifact hash mismatch",
+    "actual canonical/parity damage"
+  ],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextOwner": "HERO_SOLDIER_COMMAND_INTEGRATION_CONTRACT",
+    "nextStage": "I0",
+    "nextStart": "Define effective-base selection without recomputation: non-SP uses frozen N2 Hero-owned base; RELEASED SP uses frozen S1 replacement base; then add frozen R5 Hero3 contribution exactly once. Keep provenance of each component explicit."
+  }
+}
