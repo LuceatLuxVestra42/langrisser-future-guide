@@ -216,15 +216,15 @@ function UpdatesSection() {
         aria-expanded={isOpen}
         aria-controls="home-updates-table"
         onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-center gap-2 px-5 py-4 text-center transition hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset sm:px-6"
+        className="group flex w-full cursor-pointer items-center justify-center gap-2 px-5 py-4 text-center transition-all duration-200 hover:bg-muted/70 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset active:bg-muted sm:px-6"
       >
-        <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+        <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary sm:text-xl">
           업데이트 정리표
         </h2>
         <ChevronDown
           size={20}
           aria-hidden="true"
-          className={`shrink-0 text-muted-foreground transition-transform sm:h-6 sm:w-6 ${isOpen ? "rotate-180" : ""}`}
+          className={`shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-y-0.5 group-hover:text-primary sm:h-6 sm:w-6 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
