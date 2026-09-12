@@ -257,21 +257,6 @@ function EquipmentGeneralListPage() {
               </label>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
-              <button
-                type="button"
-                aria-pressed={passOnly}
-                onClick={() => setPassOnly((current) => !current)}
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
-                  passOnly
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
-                }`}
-              >
-                장비패스
-              </button>
-            </div>
-
             <div className="flex flex-wrap items-center gap-2">
               <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 장비 종류
@@ -307,16 +292,30 @@ function EquipmentGeneralListPage() {
                 );
               })}
 
-              {uiState.group && (
+              <div className="ml-auto flex items-center gap-2">
+                {uiState.group && (
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  >
+                    <RotateCcw size={13} aria-hidden="true" />
+                    필터 초기화
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={resetFilters}
-                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  aria-pressed={passOnly}
+                  onClick={() => setPassOnly((current) => !current)}
+                  className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                    passOnly
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
+                  }`}
                 >
-                  <RotateCcw size={13} aria-hidden="true" />
-                  필터 초기화
+                  장비패스
                 </button>
-              )}
+              </div>
             </div>
 
             {activeFilter && (
