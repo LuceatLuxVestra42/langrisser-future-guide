@@ -196,7 +196,7 @@ function SoldierTrainingPage() {
           <Link
             reloadDocument
             to="/soldiers"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-sm font-bold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowLeft size={16} aria-hidden="true" />
             용병
@@ -407,7 +407,7 @@ function TrainingTechGroupList({
       {statRows.length > 0 ? (
         <div className="space-y-1.5 py-1">
           {statRows.map((row) => (
-            <div key={row.key} className="grid grid-cols-3 gap-1.5">
+            <div key={row.key} className="grid grid-cols-1 gap-1.5">
               {row.techs.map((tech) => (
                 <TrainingTechButton
                   key={tech.techId}
@@ -439,7 +439,7 @@ function TrainingTechGroupList({
 
       {ultimateStatTechs.length > 0 ? (
         <div>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-1 gap-1.5">
             {ultimateStatTechs.map((tech) => (
               <TrainingTechButton
                 key={tech.techId}
@@ -455,7 +455,7 @@ function TrainingTechGroupList({
       ) : null}
 
       {passiveTechs.length > 0 ? (
-        <div className={`${statTechs.length > 0 || ultimateStatTechs.length > 0 ? "mt-2 border-t border-border pt-2 " : ""}grid grid-cols-3 gap-1.5`}>
+        <div className={`${statTechs.length > 0 || ultimateStatTechs.length > 0 ? "mt-2 border-t border-border pt-2 " : ""}grid grid-cols-1 gap-1.5`}>
           {passiveTechs.map((tech) => (
             <TrainingTechButton
               key={tech.techId}
@@ -490,12 +490,12 @@ function TrainingTechButton({
         type="button"
         onClick={() => onSelect(tech)}
         title={tech.nameKr}
-        className={`min-h-[58px] min-w-0 rounded-lg px-2 py-2 text-center transition ${
+        className={`min-h-[58px] w-full min-w-0 rounded-lg px-3 py-2 text-left transition ${
           selected ? "bg-foreground text-background" : "bg-background hover:bg-muted"
         }`}
       >
-        <span className="block text-[11px] font-black leading-4 sm:text-xs">{tech.nameKr}</span>
-        <span className="mt-1 block text-[9px] font-semibold opacity-65">Lv.{tech.maxLevel}</span>
+        <span className="block break-keep text-sm font-black leading-5">{tech.nameKr}</span>
+        <span className="mt-1 block text-[10px] font-semibold opacity-65">Lv.{tech.maxLevel}</span>
       </button>
     );
   }
@@ -511,7 +511,7 @@ function TrainingTechButton({
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <TrainingPassiveIcon techId={tech.techId} className="h-8 w-8" />
-          <span className="truncate text-sm font-bold">{tech.nameKr}</span>
+          <span className="break-keep text-sm font-bold">{tech.nameKr}</span>
         </div>
       </div>
       {getPresentationKind(tech) === "COMMON_PASSIVE" ? null : (
