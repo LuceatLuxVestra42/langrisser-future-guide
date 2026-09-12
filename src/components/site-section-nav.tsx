@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 
+import clockIcon from "@/assets/clock_of_forgiveness.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 type ExistingRoute =
   | "/banners"
+  | "/banners/single-log"
   | "/heroes"
   | "/equipment"
   | "/equipment/exclusive"
@@ -35,7 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
     matchPrefixes: ["/banners"],
     items: [
       { label: "배너표", to: "/banners" },
-      { label: "1인배너 log", unavailableLabel: "직접 연결 준비" },
+      { label: "1인 배너 log", to: "/banners/single-log" },
     ],
   },
   {
@@ -88,59 +90,74 @@ export function SiteSectionNav() {
       aria-label="주요 정보 페이지"
       className="relative z-50 border-b border-border bg-background/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85"
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 overflow-x-auto px-3 py-2 sm:gap-2 sm:px-6 lg:px-8">
-        {NAV_GROUPS.map((group) => {
-          const groupActive = group.matchPrefixes.some((prefix) =>
-            location.pathname.startsWith(prefix),
-          );
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-5 py-1 sm:px-8">
+        <div className="flex shrink-0 items-center gap-2.5">
+          <img
+            src={clockIcon}
+            alt="용서의 시계"
+            width={36}
+            height={36}
+            className="h-9 w-auto object-contain"
+          />
+          <span className="whitespace-nowrap text-base font-bold tracking-tight text-foreground sm:text-lg">
+            미래시 시트
+          </span>
+        </div>
 
-          return (
-            <DropdownMenu key={group.label}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className={cn(
-                    "inline-flex shrink-0 items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring",
-                    groupActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {group.label}
-                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </DropdownMenuTrigger>
+        <div className="ml-auto flex min-w-0 items-center justify-end gap-1 overflow-x-auto py-1 sm:gap-2">
+          {NAV_GROUPS.map((group) => {
+            const groupActive = group.matchPrefixes.some((prefix) =>
+              location.pathname.startsWith(prefix),
+            );
 
-              <DropdownMenuContent align="end" className="min-w-44">
-                {group.items.map((item) => {
-                  if (!item.to) {
+            return (
+              <DropdownMenu key={group.label}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring",
+                      groupActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {group.label}
+                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="min-w-44">
+                  {group.items.map((item) => {
+                    if (!item.to) {
+                      return (
+                        <DropdownMenuItem key={item.label} disabled>
+                          <span>{item.label}</span>
+                          <span className="ml-auto text-[11px] text-muted-foreground">
+                            {item.unavailableLabel ?? "준비 중"}
+                          </span>
+                        </DropdownMenuItem>
+                      );
+                    }
+
+                    const itemActive = isPathActive(location.pathname, item.to);
+
                     return (
-                      <DropdownMenuItem key={item.label} disabled>
-                        <span>{item.label}</span>
-                        <span className="ml-auto text-[11px] text-muted-foreground">
-                          {item.unavailableLabel ?? "준비 중"}
-                        </span>
+                      <DropdownMenuItem key={item.label} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(itemActive && "bg-accent font-semibold text-accent-foreground")}
+                        >
+                          {item.label}
+                        </Link>
                       </DropdownMenuItem>
                     );
-                  }
-
-                  const itemActive = isPathActive(location.pathname, item.to);
-
-                  return (
-                    <DropdownMenuItem key={item.label} asChild>
-                      <Link
-                        to={item.to}
-                        className={cn(itemActive && "bg-accent font-semibold text-accent-foreground")}
-                      >
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        })}
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
