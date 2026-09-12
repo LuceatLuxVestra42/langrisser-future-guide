@@ -20,7 +20,7 @@ type ExistingRoute =
 type NavItem = {
   label: string;
   to?: ExistingRoute;
-  bannerView?: "single-log";
+  unavailableLabel?: string;
 };
 
 type NavGroup = {
@@ -35,7 +35,7 @@ const NAV_GROUPS: NavGroup[] = [
     matchPrefixes: ["/banners"],
     items: [
       { label: "배너표", to: "/banners" },
-      { label: "1인배너 log", to: "/banners", bannerView: "single-log" },
+      { label: "1인배너 log", unavailableLabel: "직접 연결 준비" },
     ],
   },
   {
@@ -67,8 +67,12 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 function isPathActive(pathname: string, target: ExistingRoute) {
-  if (target === "/equipment" || target === "/heroes" || target === "/soldiers") {
+  if (target === "/heroes" || target === "/soldiers") {
     return pathname === target || pathname.startsWith(`${target}/`);
+  }
+
+  if (target === "/equipment") {
+    return pathname === target || (pathname.startsWith("/equipment/") && pathname !== "/equipment/exclusive");
   }
 
   return pathname === target;
@@ -78,8 +82,6 @@ export function SiteSectionNav() {
   const location = useLocation();
 
   if (location.pathname === "/") return null;
-
-  const singlePickupHref = `${import.meta.env.BASE_URL}banners?view=single-log`;
 
   return (
     <nav
@@ -115,15 +117,9 @@ export function SiteSectionNav() {
                     return (
                       <DropdownMenuItem key={item.label} disabled>
                         <span>{item.label}</span>
-                        <span className="ml-auto text-[11px] text-muted-foreground">준비 중</span>
-                      </DropdownMenuItem>
-                    );
-                  }
-
-                  if (item.bannerView === "single-log") {
-                    return (
-                      <DropdownMenuItem key={item.label} asChild>
-                        <a href={singlePickupHref}>{item.label}</a>
+                        <span className="ml-auto text-[11px] text-muted-foreground">
+                          {item.unavailableLabel ?? "준비 중"}
+                        </span>
                       </DropdownMenuItem>
                     );
                   }
