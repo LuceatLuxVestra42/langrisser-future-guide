@@ -1,0 +1,78 @@
+name: hero-soldier-command-base-n2
+
+on:
+  push:
+    branches:
+      - n2-hero-soldier-command-base
+    paths:
+      - data/contracts/hero-soldier-command-base.v1.json
+      - scripts/build_hero_soldier_command_base.cjs
+      - scripts/validate_hero_soldier_command_base.cjs
+      - scripts/freeze_hero_soldier_command_base_n2.cjs
+      - .github/workflows/hero-soldier-command-base-n2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: n2-hero-soldier-command-base
+          fetch-depth: 0
+
+      - name: Verify bounded starting diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git merge-base HEAD a490ba76da27095f3ef9dfe6ad66b0450cc7b24d)" = "a490ba76da27095f3ef9dfe6ad66b0450cc7b24d"
+          git diff --name-only a490ba76da27095f3ef9dfe6ad66b0450cc7b24d...HEAD | sort > /tmp/n2-start-paths.txt
+          cat /tmp/n2-start-paths.txt
+          while IFS= read -r p; do
+            case "$p" in
+              data/contracts/hero-soldier-command-base.v1.json|scripts/build_hero_soldier_command_base.cjs|scripts/validate_hero_soldier_command_base.cjs|scripts/freeze_hero_soldier_command_base_n2.cjs|.github/workflows/hero-soldier-command-base-n2.yml) ;;
+              *) echo "Unexpected N2 starting path: $p" >&2; exit 1 ;;
+            esac
+          done < /tmp/n2-start-paths.txt
+
+      - name: Materialize hero-owned command base
+        run: node scripts/build_hero_soldier_command_base.cjs
+
+      - name: Independently validate N2
+        run: node scripts/validate_hero_soldier_command_base.cjs
+
+      - name: Freeze N2 checkpoint
+        run: node scripts/freeze_hero_soldier_command_base_n2.cjs
+
+      - name: Verify bounded generated mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git status --short
+          mapfile -t changed < <(git status --porcelain | sed -E 's/^.. //' | sort)
+          for p in "${changed[@]}"; do
+            case "$p" in
+              data/generated/hero-soldier-command-base.v1.json|data/validation/hero-soldier-command-base-n2.v1.json|data/validation/hero-soldier-command-base-n2-f.v1.json) ;;
+              *) echo "Unexpected generated mutation: $p" >&2; exit 1 ;;
+            esac
+          done
+          test -f data/generated/hero-soldier-command-base.v1.json
+          test -f data/validation/hero-soldier-command-base-n2.v1.json
+          test -f data/validation/hero-soldier-command-base-n2-f.v1.json
+
+      - name: Commit N2 generated authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-soldier-command-base.v1.json \
+                  data/validation/hero-soldier-command-base-n2.v1.json \
+                  data/validation/hero-soldier-command-base-n2-f.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "N2-F freeze hero-owned soldier command base"
+          git push origin HEAD:n2-hero-soldier-command-base
