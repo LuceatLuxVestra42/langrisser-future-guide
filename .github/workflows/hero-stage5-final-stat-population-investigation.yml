@@ -1,0 +1,41 @@
+name: Hero Stage 5 final-stat population investigation
+
+on:
+  push:
+    branches:
+      - work/hero-stage5-final-stat-population-20260912
+    paths:
+      - '.github/workflows/hero-stage5-final-stat-population-investigation.yml'
+      - 'scripts/investigate_hero_stage5_final_stat_population.cjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  investigate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pinned ConfigData source tag
+        run: git fetch --force origin refs/tags/source-configdata-v1-6475e63e:refs/tags/source-configdata-v1-6475e63e
+
+      - name: Investigate frozen Stage5 final-stat population inputs
+        run: node scripts/investigate_hero_stage5_final_stat_population.cjs
+
+      - name: Persist investigation artifact
+        run: |
+          TARGET='data/validation/hero-stage5-final-stat-population-investigation.v1.json'
+          if [ -z "$(git status --porcelain -- "$TARGET")" ]; then
+            echo 'Investigation artifact already current.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '4189826+github-actions[bot]@users.noreply.github.com'
+            git add "$TARGET"
+            git commit -m 'Record Hero Stage5 final-stat population investigation'
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
