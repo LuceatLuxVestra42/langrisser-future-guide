@@ -7,7 +7,7 @@ const exceptions = JSON.parse(fs.readFileSync('data/generated/hero-fusion-power-
 const factionAssets = JSON.parse(fs.readFileSync('data/generated/hero-fusion-faction-assets.v1.json', 'utf8'));
 const armyIcons = JSON.parse(fs.readFileSync('data/generated/army-icon-manifest.v1.json', 'utf8'));
 const route = fs.readFileSync('src/routes/heroes.tsx', 'utf8');
-const server = fs.readFileSync('src/lib/hero-fusion-power.server.ts', 'utf8');
+const staticConsumer = fs.readFileSync('src/lib/hero-fusion-power.static.ts', 'utf8');
 const functions = fs.readFileSync('src/lib/hero-fusion-power.functions.ts', 'utf8');
 
 check(baseline.status === 'PASS' && baseline.completion === 'COMPLETE', 'baseline fusion presentation must be complete');
@@ -110,11 +110,14 @@ for (const row of exceptions.records) {
 }
 check(exceptionHeroIds.size === expectedExceptions.size, 'not all expanded fusion Heroes are present');
 
-check(functions.includes('readHeroFusionPowerIndex'), 'server function must expose fusion-power index');
-check(server.includes('hero-fusion-power-presentation.v1.json'), 'server must preserve frozen baseline fusion projection');
-check(server.includes('hero-fusion-power-exceptions.v1.json'), 'server must consume frozen fusion exceptions');
-check(server.includes('army-icon-manifest.v1.json'), 'server must consume frozen official class icons');
-check(server.includes('HERO_FUSION_POWER_EXPANDED_FROZEN'), 'server must expose expanded fusion freeze state');
+check(functions.includes('getStaticHeroFusionPowerIndex'), 'fusion-power function must consume the static index');
+check(!functions.includes('createServerFn'), 'fusion-power function must not restore a server-function RPC');
+check(!functions.includes('readHeroFusionPowerIndex'), 'fusion-power function must not depend on the retired server reader');
+check(staticConsumer.includes('hero-fusion-power-presentation.v1.json'), 'static consumer must preserve frozen baseline fusion projection');
+check(staticConsumer.includes('hero-fusion-power-exceptions.v1.json'), 'static consumer must consume frozen fusion exceptions');
+check(staticConsumer.includes('hero-fusion-faction-assets.v1.json'), 'static consumer must consume frozen faction assets');
+check(staticConsumer.includes('army-icon-manifest.v1.json'), 'static consumer must consume frozen official class icons');
+check(staticConsumer.includes('HERO_FUSION_POWER_EXPANDED_FROZEN'), 'static consumer must expose expanded fusion freeze state');
 check(route.includes('getHeroFusionPowerIndex'), 'Hero list loader must consume fusion-power index');
 check(route.includes('fusionPowers.summary.total !== 43'), 'Hero list loader must require 43 expanded fusion Heroes');
 check(route.includes('data-hero-fusion-power-marks="true"'), 'Hero list surface marker missing');
