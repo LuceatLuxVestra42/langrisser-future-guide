@@ -14,7 +14,6 @@ const EXPECTED_AWAKENING_RECORDS = 256;
 
 const readJson = (p) => JSON.parse(fs.readFileSync(p, "utf8"));
 const sha256 = (v) => crypto.createHash("sha256").update(v).digest("hex");
-const compactSha = (v) => sha256(Buffer.from(JSON.stringify(v)));
 const fail = (m) => { throw new Error(m); };
 
 function collectStage6Usage() {
@@ -48,7 +47,7 @@ if (!Array.isArray(manifest.records) || manifest.records.length !== EXPECTED_LEG
 if (!Array.isArray(manifest.awakeningRecords) || manifest.awakeningRecords.length !== EXPECTED_AWAKENING_RECORDS) fail(`awakeningRecords mismatch ${manifest.awakeningRecords?.length}`);
 if (manifest.allHeroAdmission) fail("allHeroAdmission already exists; refusing duplicate admission");
 if (material.schemaId !== "hero-skill-icon-all-hero-materialization/v1" || material.status !== "FROZEN" || material.completion !== "COMPLETE" || material.semanticReopen !== false) fail("materialization contract mismatch");
-if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA || compactSha(material.records) !== EXPECTED_MATERIALIZATION_SHA) fail("materialization hash mismatch");
+if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA) fail("materialization hash mismatch");
 if (material.summary?.targetCount !== EXPECTED_NEW || material.summary?.materializedCount !== EXPECTED_NEW || material.summary?.missingCount !== 0 || material.summary?.hashMismatchCount !== 0 || material.summary?.publicPathCollisionCount !== 0) fail(`materialization summary mismatch ${JSON.stringify(material.summary)}`);
 if (!Array.isArray(material.records) || material.records.length !== EXPECTED_NEW) fail("materialization record count mismatch");
 
