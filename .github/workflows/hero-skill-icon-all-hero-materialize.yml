@@ -1,0 +1,74 @@
+name: Hero Skill Icon All-Hero Materialize
+
+on:
+  push:
+    branches:
+      - work/hero-skill-icon-all-hero-coverage-20260912
+    paths:
+      - scripts/materialize-hero-skill-icon-all-hero-assets.py
+      - .github/workflows/hero-skill-icon-all-hero-materialize.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        run: python -m pip install 'UnityPy==1.25.3'
+      - name: Download frozen all-hero verification artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/direct" "$RUNNER_TEMP/gap"
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -o "$RUNNER_TEMP/direct.zip" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10288027514/zip"
+          unzip -q "$RUNNER_TEMP/direct.zip" -d "$RUNNER_TEMP/direct"
+          curl -L --fail --retry 3 \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -o "$RUNNER_TEMP/gap.zip" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10287724486/zip"
+          unzip -q "$RUNNER_TEMP/gap.zip" -d "$RUNNER_TEMP/gap"
+          sha256sum "$RUNNER_TEMP/direct.zip" "$RUNNER_TEMP/gap.zip"
+      - name: Materialize exact verified PNGs
+        run: >-
+          python scripts/materialize-hero-skill-icon-all-hero-assets.py
+          --verification-report="$RUNNER_TEMP/direct/hero-skill-icon-all-hero-official-verification.v1.json"
+          --gap-report="$RUNNER_TEMP/gap/hero-skill-icon-all-hero-source-snapshot-gap.v1.json"
+          --write
+      - name: Fail closed on unexpected materialization mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad="$(git status --porcelain | awk '{print $2}' | grep -Ev '^(data/generated/hero-skill-icon-all-hero-materialization\.v1\.json|public/images/heroes/skill-icons/[^/]+\.png)$' || true)"
+          if [ -n "$bad" ]; then
+            echo "Unexpected changed paths:"
+            echo "$bad"
+            exit 1
+          fi
+          test "$(git status --porcelain public/images/heroes/skill-icons | wc -l)" -eq 996
+          test "$(git status --porcelain data/generated/hero-skill-icon-all-hero-materialization.v1.json | wc -l)" -eq 1
+      - name: Commit materialized assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/generated/hero-skill-icon-all-hero-materialization.v1.json public/images/heroes/skill-icons
+          git commit -m "Materialize verified all-hero skill icons"
+          git push origin HEAD:${GITHUB_REF_NAME}
