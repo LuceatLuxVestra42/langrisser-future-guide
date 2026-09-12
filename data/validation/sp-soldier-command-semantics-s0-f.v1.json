@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "stage": "S0-F",
+  "status": "FINAL_FROZEN",
+  "completion": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS_COMPLETE",
+  "owner": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS",
+  "predecessor": {
+    "n2Checkpoint": "data/validation/hero-soldier-command-base-n2-f.v1.json",
+    "r5Checkpoint": "data/validation/hero-soldier-bond-command-contribution-r5-f.v1.json",
+    "spPredecessor": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "spPredecessorBlobSha": "c93c37770f5e6678ec397764da289a538518f35f",
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c"
+  },
+  "frozenSemantics": {
+    "spRecordIdentity": "SPHeroInfo.ID == canonical heroId",
+    "spBaseMeaning": "SP-form Hero-owned troop stat modifier base",
+    "selectionRule": "When SP form is selected and SPHeroInfo is RELEASED, use the SPHeroInfo command vector instead of the N2 HeroInfo command vector.",
+    "combinationWithN2": "REPLACEMENT_NOT_ADDITION",
+    "missingCommandField": "ZERO",
+    "normalization": "raw / 100",
+    "hero3Combination": "ADD_FROZEN_R5_CONTRIBUTION_AFTER_SELECTING_EFFECTIVE_BASE",
+    "hero3Recomputed": false
+  },
+  "validation": {
+    "path": "data/validation/sp-soldier-command-semantics-s0.v1.json",
+    "gitBlobSha1": "1fccf246935379daf23b9d9e261b57d2603783cf",
+    "sha256": "3264acd54d00fa161967a6ae606ebcedf67bbe2d2d97d07188b03a95f5fea991",
+    "status": "PASS",
+    "fixtureCount": 2,
+    "hardErrorCount": 0
+  },
+  "evidenceBoundary": {
+    "canonicalAuthority": "Pinned project artifacts and ConfigData projections",
+    "behavioralCrossCheckRole": "CORROBORATION_ONLY_NOT_CANONICAL_AUTHORITY"
+  },
+  "blockers": [],
+  "review": [
+    "Behavioral published values are corroboration only; canonical numeric sources remain pinned project artifacts/ConfigData projections."
+  ],
+  "reopenConditions": [
+    "N2 or R5 frozen predecessor is reopened",
+    "Stage5-4 SP source/projection or pinned ConfigData snapshot changes",
+    "SP command field schema changes",
+    "behavioral fixture contradiction",
+    "independent S0 validator hard failure",
+    "actual canonical/parity damage"
+  ],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextOwner": "SP_SOLDIER_COMMAND_BASE_MATERIALIZATION",
+    "nextStage": "S1",
+    "nextStart": "Materialize one complete four-component SP command base for each of the 25 RELEASED SP heroes using Stage5-4 stats, zero for absent command fields, raw/100 normalization, and no N2 additive stacking. Preserve N2 as the Normal/non-SP base and R5 separately."
+  }
+}

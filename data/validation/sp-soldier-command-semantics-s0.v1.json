@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "stage": "S0",
+  "status": "PASS",
+  "owner": "SP_SOLDIER_COMMAND_OVERRIDE_SEMANTICS",
+  "spReleasedCount": 25,
+  "selectionRule": "When SP form is selected and SPHeroInfo is RELEASED, use the SPHeroInfo command vector instead of the N2 HeroInfo command vector.",
+  "combinationWithN2": "REPLACEMENT_NOT_ADDITION",
+  "missingCommandField": "ZERO",
+  "hero3Combination": "ADD_FROZEN_R5_CONTRIBUTION_AFTER_SELECTING_EFFECTIVE_BASE",
+  "fixtures": [
+    {
+      "heroId": 6,
+      "raw": {
+        "hp": 1500,
+        "at": 1500,
+        "df": 0,
+        "magicDf": 0
+      },
+      "base": {
+        "hp": 15,
+        "at": 15,
+        "df": 0,
+        "magicDf": 0
+      },
+      "n2Base": {
+        "hp": 15,
+        "at": 15,
+        "df": 0,
+        "magicDf": 0
+      },
+      "r5": {
+        "hp": 25,
+        "at": 25,
+        "df": 10,
+        "magicDf": 10
+      },
+      "replacementTotal": {
+        "hp": 40,
+        "at": 40,
+        "df": 10,
+        "magicDf": 10
+      },
+      "additiveTotal": {
+        "hp": 55,
+        "at": 55,
+        "df": 10,
+        "magicDf": 10
+      },
+      "publishedFinal": {
+        "hp": 40,
+        "at": 40,
+        "df": 10,
+        "magicDf": 10
+      },
+      "rawPass": true,
+      "r5Pass": true,
+      "replacementPass": true,
+      "additiveRejected": true
+    },
+    {
+      "heroId": 8,
+      "raw": {
+        "hp": 1000,
+        "at": 1500,
+        "df": 500,
+        "magicDf": 0
+      },
+      "base": {
+        "hp": 10,
+        "at": 15,
+        "df": 5,
+        "magicDf": 0
+      },
+      "n2Base": {
+        "hp": 0,
+        "at": 15,
+        "df": 0,
+        "magicDf": 15
+      },
+      "r5": {
+        "hp": 10,
+        "at": 25,
+        "df": 10,
+        "magicDf": 25
+      },
+      "replacementTotal": {
+        "hp": 20,
+        "at": 40,
+        "df": 15,
+        "magicDf": 25
+      },
+      "additiveTotal": {
+        "hp": 20,
+        "at": 55,
+        "df": 15,
+        "magicDf": 40
+      },
+      "publishedFinal": {
+        "hp": 20,
+        "at": 40,
+        "df": 15,
+        "magicDf": 25
+      },
+      "rawPass": true,
+      "r5Pass": true,
+      "replacementPass": true,
+      "additiveRejected": true
+    }
+  ],
+  "hardErrors": [],
+  "blockers": [],
+  "review": [
+    "Behavioral published values are corroboration only; canonical numeric sources remain pinned project artifacts/ConfigData projections."
+  ]
+}
