@@ -116,22 +116,18 @@ function CategoryCard({ category }: { category: Category }) {
   }
 
   const href = resolveCategoryHref(category.to!);
-  const isHeroCategory = category.title === "영웅" && category.to === "/heroes";
 
   return (
     <a
       href={href}
       onClick={(event) => navigateWithFreshDocument(event, href)}
-      aria-label={isHeroCategory ? "영웅 · 영웅 상세 · 스킬 코스트 페이지로 이동" : `${category.title} 페이지로 이동`}
+      aria-label={`${category.title} 페이지로 이동`}
       className={`${cardLayout} card-nav-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
     >
       <CategoryArtwork category={category} />
       <h3 className="mt-4 text-lg font-bold tracking-tight text-foreground sm:mt-5 sm:text-xl lg:mt-6 lg:text-2xl">
         {category.title}
       </h3>
-      {isHeroCategory ? (
-        <p className="mt-2 text-sm font-semibold text-muted-foreground">영웅 상세 · 스킬 코스트</p>
-      ) : null}
     </a>
   );
 }
@@ -230,9 +226,6 @@ function UpdatesSection() {
           <h2 id="home-updates-title" className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             업데이트
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            신규 영웅, 용병, 장비와 주요 콘텐츠 업데이트를 한 흐름에서 확인할 수 있도록 준비 중입니다.
-          </p>
         </div>
       </div>
     </section>
