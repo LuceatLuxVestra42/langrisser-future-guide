@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "stage": "I0-F",
+  "status": "FINAL_FROZEN",
+  "completion": "HERO_SOLDIER_COMMAND_INTEGRATION_CONTRACT_COMPLETE",
+  "owner": "HERO_SOLDIER_COMMAND_INTEGRATION_CONTRACT",
+  "frozenComposition": {
+    "components": [
+      "hp",
+      "at",
+      "df",
+      "magicDf"
+    ],
+    "normal": {
+      "baseSource": "N2_HEROINFO_HERO_OWNED_BASE",
+      "baseSelection": "Use N2 base for every canonical hero.",
+      "final": "base + R5 Hero3 contribution"
+    },
+    "sp": {
+      "eligibility": "Hero must have a frozen S1 RELEASED SP command-base record.",
+      "baseSource": "S1_SPHEROINFO_REPLACEMENT_BASE",
+      "baseSelection": "Replace, do not add, the N2 base when SP form is selected.",
+      "final": "SP replacement base + R5 Hero3 contribution"
+    },
+    "hero3Occurrence": "EXACTLY_ONCE_AFTER_BASE_SELECTION",
+    "arithmetic": "component-wise numeric addition of already-normalized percentages",
+    "rounding": "NONE"
+  },
+  "authority": {
+    "normalBaseCheckpoint": "data/validation/hero-soldier-command-base-n2-f.v1.json",
+    "normalBaseExpectedStatus": "FINAL_FROZEN",
+    "normalBaseArtifact": "data/generated/hero-soldier-command-base.v1.json",
+    "normalBaseRecordCount": 267,
+    "spBaseCheckpoint": "data/validation/hero-sp-soldier-command-base-s1-f.v1.json",
+    "spBaseExpectedStatus": "FINAL_FROZEN",
+    "spBaseArtifact": "data/generated/hero-sp-soldier-command-base.v1.json",
+    "spBaseRecordCount": 25,
+    "hero3Checkpoint": "data/validation/hero-soldier-bond-command-contribution-r5-f.v1.json",
+    "hero3ExpectedStatus": "PASS",
+    "hero3ExpectedCompletion": "FINAL_FROZEN",
+    "hero3Artifact": "data/generated/hero-soldier-bond-command-contribution.v1.json",
+    "hero3RecordCount": 267
+  },
+  "validation": {
+    "path": "data/validation/hero-soldier-command-integration-i0.v1.json",
+    "gitBlobSha1": "d6ec57f58543540b3c97fc05cc3c002e9cb48d6c",
+    "sha256": "f7910fd1c9a498209b19c9d715a09501fae1161cc747dca331e993e077791009",
+    "status": "PASS",
+    "normalBaseCount": 267,
+    "spBaseCount": 25,
+    "hero3Count": 267,
+    "fixtureResults": {
+      "leon": {
+        "normalPass": true,
+        "spPass": true
+      },
+      "lana": {
+        "normalPass": true,
+        "spPass": true
+      }
+    },
+    "hardErrorCount": 0
+  },
+  "blockers": [],
+  "review": [],
+  "reopenConditions": [
+    "N2/S1/R5 frozen predecessor change",
+    "integration fixture contradiction",
+    "independent I0 validator hard failure",
+    "actual canonical/parity damage"
+  ],
+  "handoff": {
+    "currentOwnerClosed": true,
+    "nextOwner": "HERO_SOLDIER_COMMAND_FINAL_MATERIALIZATION",
+    "nextStage": "I1",
+    "nextStart": "Materialize final normal and optional SP command totals strictly from frozen N2/S1/R5 artifacts under this I0 contract; preserve base, Hero3, final, eligibility, and source provenance."
+  }
+}
