@@ -323,7 +323,7 @@ function HeroCard({
   fusionPower,
 }: {
   hero: HeroEntry;
-  fusionPower?: FusionPowerRecord;
+  fusionPower: FusionPowerRecord | undefined;
 }) {
   return (
     <Link
