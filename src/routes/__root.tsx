@@ -3,12 +3,14 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { SinglePickupLogPage } from "../components/banner-log/single-pickup-log-page";
 import { SiteSectionNav } from "../components/site-section-nav";
 import appCss from "../styles.css?url";
 import { EquipmentDetailModalBridge } from "../lib/equipment-detail-modal-bridge";
@@ -236,15 +238,44 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function BannerSingleLogView() {
+  return (
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <div className="mb-8 flex items-center justify-between gap-3">
+          <Link
+            to="/banners"
+            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-primary/40 bg-card/95 px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/70 hover:bg-muted"
+          >
+            ← 가챠 배너로
+          </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-primary/40 bg-card/95 px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/70 hover:bg-muted"
+          >
+            메인으로
+          </Link>
+        </div>
+        <SinglePickupLogPage />
+      </div>
+    </main>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const normalizedPath = location.pathname.replace(/\/+$/, "") || "/";
+  const showSinglePickupLog =
+    normalizedPath === "/banners" &&
+    new URLSearchParams(location.searchStr).get("view") === "single-log";
 
   return (
     <QueryClientProvider client={queryClient}>
       <SiteVersionGuard />
       <SiteSectionNav />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {showSinglePickupLog ? <BannerSingleLogView /> : <Outlet />}
       <EquipmentDetailModalBridge />
     </QueryClientProvider>
   );
