@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
 import clockIcon from "@/assets/clock_of_forgiveness.png";
@@ -208,9 +208,12 @@ function UpdatesSection() {
       aria-labelledby="home-updates-title"
       className="rounded-2xl border border-border bg-card px-5 py-4 sm:px-6"
     >
-      <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
-        업데이트 정리표
-      </h2>
+      <div className="flex items-center justify-center gap-2 text-center">
+        <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+          업데이트 정리표
+        </h2>
+        <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-muted-foreground sm:h-6 sm:w-6" />
+      </div>
     </section>
   );
 }
