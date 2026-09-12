@@ -129,10 +129,10 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99240, name: "사프린" },
     ],
     spSoldiers: [
-      { name: "영종의 투승", soldierId: 5110 },
-      { name: "용암 샤먼", soldierId: 5601 },
-      { name: "마스터 디노", soldierId: 5618 },
-      { name: "데몬헌터", soldierId: 5415 },
+      { name: "영종의 투승", soldierId: 5815 },
+      { name: "용암 샤먼", soldierId: 5644 },
+      { name: "마스터 디노", soldierId: 5311 },
+      { name: "데몬헌터", soldierId: 5631 },
     ],
     patches: [
       "밀레니엄 DC 스토리 2장 추가",
@@ -172,9 +172,9 @@ const UPDATE_ROWS: UpdateRow[] = [
     ],
     spSoldiers: [
       { name: "근위창병", soldierId: 5115 },
-      { name: "신성 호위술사", soldierId: 5639 },
-      { name: "그레나디어", soldierId: 5226 },
-      { name: "천공사수", soldierId: 5725 },
+      { name: "신성 호위술사", soldierId: 5816 },
+      { name: "그레나디어", soldierId: 5203 },
+      { name: "천공사수", soldierId: 5607 },
     ],
     patches: [
       "시공원정군 재출시 및 업데이트 길드 순위 및 보상 삭제\n그만큼 원정군 상점 보상 조정 연속전투, 자동보급, 재전투 추가\n용병 사용 가능, 진행 관련 편의성, 보급 시기 개선",
