@@ -1,0 +1,96 @@
+name: Hero Skill Icon All-Hero Source Gap
+
+on:
+  push:
+    branches:
+      - work/hero-skill-icon-all-hero-coverage-20260912
+    paths:
+      - scripts/classify-hero-skill-icon-all-hero-source-gap.py
+      - .github/workflows/hero-skill-icon-all-hero-source-gap.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        run: python -m pip install 'UnityPy==1.25.3'
+      - name: Reproduce current locator verification
+        run: python scripts/verify-hero-skill-icon-all-hero-official.py --output="$RUNNER_TEMP/verification.json"
+      - name: Upload prepared verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-skill-icon-gap-prepared-verification
+          path: ${{ runner.temp }}/verification.json
+          if-no-files-found: error
+
+  scan:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        run: python -m pip install 'UnityPy==1.25.3'
+      - name: Download prepared verification
+        uses: actions/download-artifact@v4
+        with:
+          name: hero-skill-icon-gap-prepared-verification
+          path: ${{ runner.temp }}/prepared
+      - name: Exhaustively scan official package shard
+        run: >-
+          python scripts/classify-hero-skill-icon-all-hero-source-gap.py
+          --verification-report="$RUNNER_TEMP/prepared/verification.json"
+          --shard-index=${{ matrix.shard }}
+          --shard-count=8
+          --output="$RUNNER_TEMP/gap-shard-${{ matrix.shard }}.json"
+      - name: Upload shard result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-skill-icon-gap-shard-${{ matrix.shard }}
+          path: ${{ runner.temp }}/gap-shard-${{ matrix.shard }}.json
+          if-no-files-found: error
+
+  merge:
+    needs: scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download prepared verification
+        uses: actions/download-artifact@v4
+        with:
+          name: hero-skill-icon-gap-prepared-verification
+          path: ${{ runner.temp }}/prepared
+      - name: Download all shard results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: hero-skill-icon-gap-shard-*
+          path: ${{ runner.temp }}/shards
+          merge-multiple: true
+      - name: Merge exhaustive classification
+        run: >-
+          python scripts/classify-hero-skill-icon-all-hero-source-gap.py
+          --verification-report="$RUNNER_TEMP/prepared/verification.json"
+          --merge-dir="$RUNNER_TEMP/shards"
+          --output="$RUNNER_TEMP/hero-skill-icon-all-hero-source-snapshot-gap.v1.json"
+      - name: Upload merged classification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-skill-icon-all-hero-source-snapshot-gap
+          path: ${{ runner.temp }}/hero-skill-icon-all-hero-source-snapshot-gap.v1.json
+          if-no-files-found: error
