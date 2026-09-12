@@ -37,15 +37,14 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -o "$RUNNER_TEMP/direct.zip" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10288027514/zip"
-          echo "b8cc01edce5b92f886c70af61737b4e592ae50d03ed09c5b9ea6e4577950a292  $RUNNER_TEMP/direct.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/direct.zip" -d "$RUNNER_TEMP/direct"
           curl -L --fail --retry 3 \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -o "$RUNNER_TEMP/gap.zip" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10287724486/zip"
-          echo "294f7fc75d0b70bfb49de7f14a0fe2d56692028174de4be0f0f38be2796e13c3  $RUNNER_TEMP/gap.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/gap.zip" -d "$RUNNER_TEMP/gap"
+          sha256sum "$RUNNER_TEMP/direct.zip" "$RUNNER_TEMP/gap.zip"
       - name: Materialize exact verified PNGs
         run: >-
           python scripts/materialize-hero-skill-icon-all-hero-assets.py
