@@ -29,14 +29,22 @@ jobs:
           const fs = require('fs');
 
           const ownerPath = 'tools/project-check/contracts/owners.v1.json';
-          let owners = fs.readFileSync(ownerPath, 'utf8');
+          const ownerMap = JSON.parse(fs.readFileSync(ownerPath, 'utf8'));
           const ruleId = 'sp-soldier-command-semantics-s0';
-          if (!owners.includes(`\"id\": \"${ruleId}\"`)) {
-            const anchor = `    {\n      \"id\": \"hero-soldier-relation\",`;
-            if (!owners.includes(anchor)) throw new Error('owner-map insertion anchor missing');
-            const rule = `    {\n      \"id\": \"${ruleId}\",\n      \"patterns\": [\n        \".github/workflows/sp-soldier-command-semantics-s0.yml\",\n        \"data/contracts/sp-soldier-command-semantics.v1.json\",\n        \"data/validation/sp-soldier-command-semantics-s0.v1.json\",\n        \"data/validation/sp-soldier-command-semantics-s0-f.v1.json\"\n      ],\n      \"owners\": [\n        \"soldier-canonical\"\n      ]\n    },\n`;
-            owners = owners.replace(anchor, rule + anchor);
-            fs.writeFileSync(ownerPath, owners);
+          if (!ownerMap.pathRules.some(rule => rule.id === ruleId)) {
+            const index = ownerMap.pathRules.findIndex(rule => rule.id === 'hero-soldier-relation');
+            if (index < 0) throw new Error('pathRules hero-soldier-relation anchor missing');
+            ownerMap.pathRules.splice(index, 0, {
+              id: ruleId,
+              patterns: [
+                '.github/workflows/sp-soldier-command-semantics-s0.yml',
+                'data/contracts/sp-soldier-command-semantics.v1.json',
+                'data/validation/sp-soldier-command-semantics-s0.v1.json',
+                'data/validation/sp-soldier-command-semantics-s0-f.v1.json',
+              ],
+              owners: ['soldier-canonical'],
+            });
+            fs.writeFileSync(ownerPath, JSON.stringify(ownerMap, null, 2) + '\n');
           }
 
           const testPath = 'tools/project-check/test/project-check-self-test.mjs';
