@@ -15,6 +15,7 @@ LEON_SOURCE = 'UI/Icon/Skill_ABS/Skill_Super4.png'
 LEON_PUBLIC = '/images/heroes/skill-icons/Skill_Super4.png'
 EXPECTED_PENDING = 256
 EXPECTED_TOTAL_AWAKENING = 257
+EXPECTED_LEGACY_RECORDS = 13
 
 
 def load(path):
@@ -36,9 +37,21 @@ def build_expected():
 
     if manifest.get('schemaId') != 'hero-skill-icon-assets/v1' or manifest.get('status') != 'FROZEN':
         raise RuntimeError('base manifest contract mismatch')
-    legacy = manifest.get('records')
-    if not isinstance(legacy, list) or len(legacy) != 13:
-        raise RuntimeError('legacy Hero 6 record contract mismatch')
+    records = manifest.get('records')
+    if not isinstance(records, list):
+        raise RuntimeError('manifest records contract mismatch')
+    legacy = [r for r in records if r.get('role') != 'stage6-general']
+    general = [r for r in records if r.get('role') == 'stage6-general']
+    if len(legacy) != EXPECTED_LEGACY_RECORDS:
+        raise RuntimeError(f'legacy Hero 6 record contract mismatch {len(legacy)}/{EXPECTED_LEGACY_RECORDS}')
+    if manifest.get('allHeroAdmission') is not None:
+        admission = manifest.get('allHeroAdmission') or {}
+        if admission.get('status') != 'FROZEN' or admission.get('completion') != 'COMPLETE' or admission.get('semanticReopen') is not False:
+            raise RuntimeError('all-hero extension contract mismatch')
+        if admission.get('admittedNowCount') != len(general):
+            raise RuntimeError('all-hero extension record count mismatch')
+    elif general:
+        raise RuntimeError('stage6-general records present without allHeroAdmission')
     leon = [r for r in legacy if r.get('sourcePath') == LEON_SOURCE]
     if len(leon) != 1 or leon[0].get('publicPath') != LEON_PUBLIC or leon[0].get('role') != 'awakening':
         raise RuntimeError('existing Leon awakening admission mismatch')
@@ -60,13 +73,13 @@ def build_expected():
     if len(mat_rows) != EXPECTED_PENDING or len(prov_by_path) != EXPECTED_PENDING:
         raise RuntimeError('A7-2 input population mismatch')
 
-    legacy_paths = {r.get('sourcePath') for r in legacy}
+    record_paths = {r.get('sourcePath') for r in records}
     new_records = []
-    seen_public = set(r.get('publicPath') for r in legacy)
+    seen_public = {r.get('publicPath') for r in records}
     for row in mat_rows:
         source = row['sourcePath']
-        if source in legacy_paths:
-            raise RuntimeError(f'A7-2 unexpected overlap with legacy record: {source}')
+        if source in record_paths:
+            raise RuntimeError(f'A7-2 unexpected overlap with existing record: {source}')
         prov = prov_by_path.get(source)
         if prov is None:
             raise RuntimeError(f'A7-2 missing provenance row: {source}')
