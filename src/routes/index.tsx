@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { heroImages, getHeroIndexForDate } from "@/lib/hero-images";
 import clockIcon from "@/assets/clock_of_forgiveness.png";
 
-import cardUpdate from "@/assets/card-update.jpg";
 import cardGacha from "@/assets/card-gacha.jpg";
 import cardCharacter from "@/assets/card-character.png";
 import cardEquip from "@/assets/card-equip.jpg";
@@ -144,7 +143,10 @@ function HeroSection() {
     setIndex((i) => (i + delta + heroImages.length) % heroImages.length);
 
   return (
-    <section className="relative isolate overflow-hidden" aria-label="히어로 이미지 미리보기">
+    <section
+      className="relative isolate mx-auto w-[calc(100%-2rem)] max-w-[68rem] overflow-hidden sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]"
+      aria-label="히어로 이미지 미리보기"
+    >
       <div className="absolute inset-0 -z-10">
         <img
           src={hero.url}
@@ -207,26 +209,13 @@ function UpdatesSection() {
   return (
     <section
       aria-labelledby="home-updates-title"
-      className="rounded-2xl border border-border bg-card p-5 sm:p-6"
+      className="rounded-2xl border border-border bg-card px-5 py-4 sm:px-6"
     >
-      <div className="flex items-center gap-4 sm:gap-5">
-        <div className="hidden h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-illustration-bg sm:flex">
-          <img
-            src={cardUpdate}
-            alt=""
-            width={512}
-            height={512}
-            loading="lazy"
-            decoding="async"
-            className="h-20 w-20 object-contain"
-          />
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground sm:text-sm">최근 정보</p>
-          <h2 id="home-updates-title" className="mt-1 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-            업데이트
-          </h2>
-        </div>
+      <div className="flex items-center justify-center gap-2 text-center">
+        <h2 id="home-updates-title" className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+          업데이트 정리표
+        </h2>
+        <ChevronDown size={20} aria-hidden="true" className="shrink-0 text-muted-foreground sm:h-6 sm:w-6" />
       </div>
     </section>
   );
