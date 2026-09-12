@@ -1,7 +1,5 @@
-import { createServerFn } from "@tanstack/react-start";
+import { getStaticHeroFusionPowerIndex } from "./hero-fusion-power.static";
 
-import { readHeroFusionPowerIndex } from "./hero-fusion-power.server";
-
-export const getHeroFusionPowerIndex = createServerFn({ method: "GET" }).handler(
-  async () => readHeroFusionPowerIndex(),
-);
+export async function getHeroFusionPowerIndex() {
+  return getStaticHeroFusionPowerIndex();
+}
