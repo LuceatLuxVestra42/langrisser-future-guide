@@ -1,0 +1,37 @@
+name: Hero Skill Icon All-Hero Official Verification
+
+on:
+  push:
+    branches:
+      - work/hero-skill-icon-all-hero-coverage-20260912
+    paths:
+      - scripts/verify-hero-skill-icon-all-hero-official.py
+      - .github/workflows/hero-skill-icon-all-hero-official-verification.yml
+      - data/generated/hero-detail/by-id/**
+      - data/generated/hero-skill-icon-assets.v1.json
+      - data/generated/hero-awakening-icon-official-bundle-locator.v1.json
+      - scripts/verify-hero-awakening-icon-official.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Unity parser
+        run: python -m pip install 'UnityPy==1.25.3'
+      - name: Verify unmatched icons against official installer bundles
+        run: python scripts/verify-hero-skill-icon-all-hero-official.py --output="$RUNNER_TEMP/hero-skill-icon-all-hero-official-verification.v1.json"
+      - name: Upload verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-skill-icon-all-hero-official-verification
+          path: ${{ runner.temp }}/hero-skill-icon-all-hero-official-verification.v1.json
+          if-no-files-found: error
