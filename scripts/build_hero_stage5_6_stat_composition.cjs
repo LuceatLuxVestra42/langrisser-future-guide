@@ -186,7 +186,7 @@ function spStatInputs(spRecord, connectionById, jobLevelById, label) {
     if (!Array.isArray(stars) || stars.length !== 6) throw new Error(`${label}: ${SP_STAR_FIELD[stat]} expected 6 values`);
     out[stat] = {
       ini: finite(level[iniField], `${label}.${iniField}`),
-      up: finite(level[upField], `${label}.${upField}`),
+      up: Object.prototype.hasOwnProperty.call(level, upField) ? finite(level[upField], `${label}.${upField}`) : 0,
       starCorrection: finite(stars[5], `${label}.${SP_STAR_FIELD[stat]}[5]`),
       heroLevel: 70,
     };
