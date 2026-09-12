@@ -1,0 +1,1 @@
+import{t as e}from"./army-icon-manifest.v1-B1Yi4_TC.js";var t=e,n=new Map(t.records.map(e=>[e.armyType,e]));function r(e){if(!t.assetsReady)return null;let r=n.get(e);return r?`/langrisser-future-guide/${t.publicRoot}/${r.fileName}`:null}export{r as t};
