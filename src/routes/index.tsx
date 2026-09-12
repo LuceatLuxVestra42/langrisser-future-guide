@@ -143,7 +143,10 @@ function HeroSection() {
     setIndex((i) => (i + delta + heroImages.length) % heroImages.length);
 
   return (
-    <section className="relative isolate overflow-hidden" aria-label="히어로 이미지 미리보기">
+    <section
+      className="relative isolate mx-auto w-[calc(100%-2rem)] max-w-[68rem] overflow-hidden sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]"
+      aria-label="히어로 이미지 미리보기"
+    >
       <div className="absolute inset-0 -z-10">
         <img
           src={hero.url}
