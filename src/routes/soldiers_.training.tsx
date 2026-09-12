@@ -22,6 +22,10 @@ export const Route = createFileRoute("/soldiers_/training")({
         content: "검증된 용병 훈련장 자료와 훈련 항목별 레벨 상승 효과를 확인합니다.",
       },
     ],
+    links: [
+      { rel: "preconnect", href: "https://drive.google.com" },
+      { rel: "preconnect", href: "https://lh3.googleusercontent.com" },
+    ],
   }),
   component: SoldierTrainingPage,
 });
@@ -176,6 +180,16 @@ function SoldierTrainingPage() {
     [filteredTechs, trainingGroupByTechId],
   );
 
+  const activeGroupPassiveTechs = useMemo(
+    () =>
+      data.techs.filter(
+        (tech) =>
+          getPresentationKind(tech) === "COMMON_PASSIVE" &&
+          trainingGroupByTechId.get(tech.techId)?.id === trainingGroupFilter,
+      ),
+    [data.techs, trainingGroupByTechId, trainingGroupFilter],
+  );
+
   const selectedTech =
     data.techs.find((tech) => tech.techId === selectedTechId) ?? filteredTechs[0] ?? data.techs[0];
   const safeTargetLevel = selectedTech ? clampLevel(targetLevel, 1, selectedTech.maxLevel) : 1;
@@ -191,6 +205,13 @@ function SoldierTrainingPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      <div className="hidden" aria-hidden="true">
+        {activeGroupPassiveTechs.map((tech) => {
+          const iconUrl = getPassiveTrainingIconUrl(tech.techId);
+          return iconUrl ? <img key={tech.techId} src={iconUrl} alt="" decoding="async" /> : null;
+        })}
+      </div>
+
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <header>
           <Link
