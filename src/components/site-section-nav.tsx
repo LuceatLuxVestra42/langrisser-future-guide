@@ -115,6 +115,9 @@ export function SiteSectionNav() {
             const groupActive = group.matchPrefixes.some((prefix) =>
               location.pathname.startsWith(prefix),
             );
+            const hasUnavailableItems = group.items.some(
+              (item) => !item.to && !item.bannerView,
+            );
 
             return (
               <DropdownMenu key={group.label}>
@@ -133,11 +136,20 @@ export function SiteSectionNav() {
                   </button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="min-w-44">
+                <DropdownMenuContent
+                  align="end"
+                  className={cn(
+                    hasUnavailableItems ? "min-w-44" : "w-max min-w-0",
+                  )}
+                >
                   {group.items.map((item) => {
                     if (item.bannerView === "single-log") {
                       return (
-                        <DropdownMenuItem key={item.label} asChild>
+                        <DropdownMenuItem
+                          key={item.label}
+                          asChild
+                          className="px-4 py-3 text-sm"
+                        >
                           <a href={singlePickupHref}>{item.label}</a>
                         </DropdownMenuItem>
                       );
@@ -145,7 +157,11 @@ export function SiteSectionNav() {
 
                     if (!item.to) {
                       return (
-                        <DropdownMenuItem key={item.label} disabled>
+                        <DropdownMenuItem
+                          key={item.label}
+                          disabled
+                          className="px-4 py-3 text-sm"
+                        >
                           <span>{item.label}</span>
                           <span className="ml-auto text-[11px] text-muted-foreground">
                             {item.unavailableLabel ?? "준비 중"}
@@ -157,7 +173,11 @@ export function SiteSectionNav() {
                     const itemActive = isPathActive(location.pathname, item.to);
 
                     return (
-                      <DropdownMenuItem key={item.label} asChild>
+                      <DropdownMenuItem
+                        key={item.label}
+                        asChild
+                        className="px-4 py-3 text-sm"
+                      >
                         <Link
                           to={item.to}
                           className={cn(itemActive && "bg-accent font-semibold text-accent-foreground")}
