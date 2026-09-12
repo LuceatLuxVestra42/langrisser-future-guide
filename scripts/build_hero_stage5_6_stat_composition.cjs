@@ -62,6 +62,10 @@ function collectGotSkillIds(value, out = new Set()) {
   }
   for (const [key, child] of Object.entries(value)) {
     if (key === 'gotSkillId' && Number.isInteger(Number(child)) && Number(child) > 0) out.add(Number(child));
+    if (key === 'gotSkillIds' && Array.isArray(child)) {
+      for (const id of child) if (Number.isInteger(Number(id)) && Number(id) > 0) out.add(Number(id));
+      continue;
+    }
     collectGotSkillIds(child, out);
   }
   return out;
