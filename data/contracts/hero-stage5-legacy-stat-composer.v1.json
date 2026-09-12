@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "stage": "hero-stage5-legacy-stat-composer",
+  "status": "PROPOSED",
+  "purpose": "Own only the pure numeric composition from already-validated selected-form stat inputs to pre-central legacyValues.",
+  "currentAuthority": {
+    "mainShaAtCreation": "bc9070043c23b1f083ff45e69759220baa7eb63a",
+    "stage4FormulaContract": "data/hero-basic-combat-stage4-5.v1.json",
+    "stage4FrozenInput": "data/generated/hero-basic-combat.v1.json",
+    "stage5SpFrozenInput": "data/generated/hero-page-stage5-4-sp.v1.json",
+    "configDataSourceTag": "source-configdata-v1-6475e63e",
+    "configDataSourceCommit": "6475e63ee23d18adf733756c26a14fa9e3ed662c"
+  },
+  "authorityBoundary": {
+    "rawConfigDataRead": false,
+    "sourceSelection": false,
+    "relationRecomputation": false,
+    "normalFetterSemanticDiscovery": false,
+    "spSemanticDiscovery": false,
+    "centralBondApplication": false,
+    "stage4Mutation": false,
+    "stage6Mutation": false,
+    "generatedMutation": false,
+    "frontendMutation": false
+  },
+  "inputContract": {
+    "statInputs": "Caller-supplied verified {ini,up,starCorrection} per hp/at/magic/df/magicDf/dex from an already-selected form.",
+    "masteryFlats": "Caller-supplied frozen Stage4 global mastery totals.",
+    "normalBondRate": "Caller-supplied verified normal-Fetter rate; this composer does not infer Fetter semantics.",
+    "spBonusRates": "Caller-supplied verified per-stat SP bonus rates; omitted stats are zero. Property-ID or description parsing is outside this owner."
+  },
+  "formula": {
+    "heroLevel": 70,
+    "starAdjustedRaw": "(INI + UP * 69 / 10) * (1 + starCorrection / 10000)",
+    "percentAdjusted": "round(starAdjustedRaw * (1 + normalBondRate + spBonusRate))",
+    "legacyValue": "percentAdjusted + masteryFlat",
+    "roundingBoundary": "Normal Fetter and same-stage SP stat bonus are combined before the integer round. Central-bond +5% remains a later separately rounded delta."
+  },
+  "leonEvidence": {
+    "heroId": 6,
+    "spStatus": "RELEASED",
+    "jobConnectionId": 66,
+    "jobId": 377,
+    "jobNameCn": "湮黯青龙",
+    "jobLevelId": 661,
+    "normalBondRate": 0.25,
+    "spBonusRates": { "hp": 0.05, "df": 0.05 },
+    "masteryFlats": { "hp": 452, "at": 73, "magic": 0, "df": 10, "magicDf": 10, "dex": 5 },
+    "expectedLegacyValues": { "hp": 4041, "at": 602, "magic": 224, "df": 260, "magicDf": 231, "dex": 125 },
+    "roundingDiscriminator": "DEF is 260 when normal +25% and SP +5% are combined before rounding; splitting the SP delta would produce 261."
+  },
+  "forbidden": [
+    "name JOIN",
+    "ID arithmetic",
+    "filename similarity mapping",
+    "raw ConfigData reads inside the composer",
+    "SP relation discovery inside the composer",
+    "normal Fetter semantic discovery inside the composer",
+    "central-bond application inside the composer",
+    "Stage6 regeneration",
+    "silent fallback for missing stat inputs or mastery flats"
+  ],
+  "validator": "node scripts/validate_hero_stage5_legacy_stat_composer.cjs",
+  "completion": "Leon pre-central parity is exact at tolerance 0, the combined normal-Fetter/SP rounding boundary is discriminated, invalid rates fail closed, and no generated/frontend/Stage4/Stage6 files are mutated."
+}
