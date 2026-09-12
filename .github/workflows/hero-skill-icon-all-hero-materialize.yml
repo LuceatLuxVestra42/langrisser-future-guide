@@ -5,72 +5,39 @@ on:
     branches:
       - work/hero-skill-icon-all-hero-coverage-current-20260912
     paths:
-      - scripts/materialize-hero-skill-icon-all-hero-assets.py
+      - scripts/admit-hero-skill-icon-all-hero-manifest.mjs
       - .github/workflows/hero-skill-icon-all-hero-materialize.yml
+      - data/generated/hero-skill-icon-all-hero-materialization.v1.json
   workflow_dispatch:
 
 permissions:
-  actions: read
   contents: write
 
-env:
-  PYTHONDONTWRITEBYTECODE: '1'
-
 jobs:
-  materialize:
+  admit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install pinned Unity parser
-        run: python -m pip install 'UnityPy==1.25.3'
-      - name: Download frozen all-hero verification artifacts
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Admit exact verified all-hero skill icons
+        run: node scripts/admit-hero-skill-icon-all-hero-manifest.mjs
+      - name: Fail closed on unexpected admission mutation
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/direct" "$RUNNER_TEMP/gap"
-          curl -L --fail --retry 3 \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -o "$RUNNER_TEMP/direct.zip" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10288027514/zip"
-          unzip -q "$RUNNER_TEMP/direct.zip" -d "$RUNNER_TEMP/direct"
-          curl -L --fail --retry 3 \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -o "$RUNNER_TEMP/gap.zip" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/10287724486/zip"
-          unzip -q "$RUNNER_TEMP/gap.zip" -d "$RUNNER_TEMP/gap"
-      - name: Materialize exact verified PNGs
-        run: >-
-          python scripts/materialize-hero-skill-icon-all-hero-assets.py
-          --verification-report="$RUNNER_TEMP/direct/hero-skill-icon-all-hero-official-verification.v1.json"
-          --gap-report="$RUNNER_TEMP/gap/hero-skill-icon-all-hero-source-snapshot-gap.v1.json"
-          --write
-      - name: Fail closed on unexpected materialization mutation
-        shell: bash
-        run: |
-          set -euo pipefail
-          bad="$(git status --porcelain | awk '{print $2}' | grep -Ev '^(data/generated/hero-skill-icon-all-hero-materialization\.v1\.json|public/images/heroes/skill-icons/[^/]+\.[Pp][Nn][Gg])$' || true)"
-          if [ -n "$bad" ]; then
+          changed="$(git status --porcelain | awk '{print $2}')"
+          if [ "$changed" != "data/generated/hero-skill-icon-assets.v1.json" ]; then
             echo "Unexpected changed paths:"
-            echo "$bad"
+            echo "$changed"
             exit 1
           fi
-          test "$(git status --porcelain public/images/heroes/skill-icons | wc -l)" -eq 996
-          test "$(git status --porcelain data/generated/hero-skill-icon-all-hero-materialization.v1.json | wc -l)" -eq 1
-      - name: Commit materialized assets
+      - name: Commit manifest admission
         shell: bash
         run: |
           set -euo pipefail
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add data/generated/hero-skill-icon-all-hero-materialization.v1.json public/images/heroes/skill-icons
-          git commit -m "Materialize verified all-hero skill icons"
+          git add data/generated/hero-skill-icon-assets.v1.json
+          git commit -m "Admit verified all-hero skill icons"
           git push origin HEAD:${GITHUB_REF_NAME}
