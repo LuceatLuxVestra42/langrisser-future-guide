@@ -250,7 +250,7 @@ function Index() {
 
       <HeroSection />
 
-      <main className="mx-auto -mt-8 w-full max-w-6xl flex-1 px-4 pb-10 sm:-mt-10 sm:px-6 sm:pb-12 lg:-mt-12 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 lg:px-8">
         <UpdatesSection />
 
         <nav
