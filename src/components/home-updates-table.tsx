@@ -17,6 +17,7 @@ type SingleEntry = {
 };
 
 type LawEntry = { id: number; name: string };
+type SpSoldierEntry = { name: string; soldierId?: number };
 
 type UpdateRow = {
   date: string;
@@ -27,7 +28,7 @@ type UpdateRow = {
   singles?: SingleEntry[];
   law?: LawEntry[];
   newSoldiers?: string[];
-  spSoldiers?: string[];
+  spSoldiers?: SpSoldierEntry[];
   patches: string[];
 };
 
@@ -77,7 +78,12 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99215, name: "안드리올" },
       { id: 99234, name: "티아나" },
     ],
-    spSoldiers: ["헬하운드", "파도의 정령", "팔랑크스", "가고일"],
+    spSoldiers: [
+      { name: "헬하운드", soldierId: 5314 },
+      { name: "파도의 정령", soldierId: 5511 },
+      { name: "팔랑크스", soldierId: 5130 },
+      { name: "가고일", soldierId: 5413 },
+    ],
     patches: [
       "명예던전 맵 3개 추가",
       "만상의 길 신규 각인 2종 추가",
@@ -122,7 +128,12 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99216, name: "에쉬앤" },
       { id: 99240, name: "사프린" },
     ],
-    spSoldiers: ["영종의 투승", "용암 샤먼", "마스터 디노", "데몬헌터"],
+    spSoldiers: [
+      { name: "영종의 투승", soldierId: 5110 },
+      { name: "용암 샤먼", soldierId: 5601 },
+      { name: "마스터 디노", soldierId: 5618 },
+      { name: "데몬헌터", soldierId: 5415 },
+    ],
     patches: [
       "밀레니엄 DC 스토리 2장 추가",
       "환령-만상 비슷한 용암의 여정 컨텐츠 신규 출시",
@@ -159,7 +170,12 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99249, name: "마카엘라" },
       { id: 99231, name: "비리아" },
     ],
-    spSoldiers: ["근위창병", "신성 호위술사", "그레나디어", "천공사수"],
+    spSoldiers: [
+      { name: "근위창병", soldierId: 5115 },
+      { name: "신성 호위술사", soldierId: 5639 },
+      { name: "그레나디어", soldierId: 5226 },
+      { name: "천공사수", soldierId: 5725 },
+    ],
     patches: [
       "시공원정군 재출시 및 업데이트 길드 순위 및 보상 삭제\n그만큼 원정군 상점 보상 조정 연속전투, 자동보급, 재전투 추가\n용병 사용 가능, 진행 관련 편의성, 보급 시기 개선",
       "토이바르 산과 숲의 장 4장 추가",
@@ -200,7 +216,12 @@ const UPDATE_ROWS: UpdateRow[] = [
       { id: 99221, name: "군" },
     ],
     newSoldiers: ["창병", "마족"],
-    spSoldiers: ["거대 랍스터", "수정 마도사", "사무라이", "중장기병"],
+    spSoldiers: [
+      { name: "거대 랍스터", soldierId: 5504 },
+      { name: "수정 마도사", soldierId: 5636 },
+      { name: "사무라이" },
+      { name: "중장기병" },
+    ],
     patches: [
       "2950일 로그인 보상 추가",
       "일일퀘스트 완료 조건 중 시공의 균열 3회 클리어 삭제",
@@ -297,11 +318,39 @@ function LawCell({ entries }: { entries: LawEntry[] }) {
   );
 }
 
-function SoldierCell({ title, entries, kind }: { title: string; entries: string[]; kind: "new" | "sp" }) {
+function SoldierCell({
+  title,
+  entries,
+  kind,
+}: {
+  title: string;
+  entries: string[] | SpSoldierEntry[];
+  kind: "new" | "sp";
+}) {
   return (
     <section className={`hut-cell hut-soldier ${kind === "new" ? "hut-new-soldier" : ""}`}>
       <div className="hut-head">{title}</div>
-      <div className="hut-soldier-list">{entries.map((entry) => <span key={entry}>{entry}</span>)}</div>
+      <div className="hut-soldier-list">
+        {entries.map((entry) => {
+          const name = typeof entry === "string" ? entry : entry.name;
+          const soldierId = typeof entry === "string" ? undefined : entry.soldierId;
+          if (kind === "sp" && soldierId) {
+            return (
+              <Link
+                key={name}
+                reloadDocument
+                to="/soldiers/$soldierId"
+                params={{ soldierId: String(soldierId) }}
+                aria-label={`${name} SP용병 상세 보기`}
+                className="hut-soldier-link"
+              >
+                {name}
+              </Link>
+            );
+          }
+          return <span key={name}>{name}</span>;
+        })}
+      </div>
     </section>
   );
 }
@@ -367,7 +416,10 @@ const TABLE_CSS = `
 .home-update-table .hut-law .hut-mini-card{gap:1px;font-size:9px}.home-update-table .hut-law .hut-mini-card img{width:40px;height:40px}
 .home-update-table .hut-soldier{display:flex;flex-direction:column;background:#e6effc;text-align:center}.home-update-table .hut-new-soldier{background:#eaf3fa}
 .home-update-table .hut-soldier-list{display:grid;grid-template-columns:1fr;flex:1;align-content:center;gap:3px}
-.home-update-table .hut-soldier-list span{display:block;border:1px solid #cfd9d4;border-radius:6px;background:#fff;padding:4px 1px;text-align:center;font-size:9px;font-weight:850;white-space:nowrap}
+.home-update-table .hut-soldier-list span,.home-update-table .hut-soldier-list .hut-soldier-link{display:block;border:1px solid #cfd9d4;border-radius:6px;background:#fff;padding:4px 1px;text-align:center;font-size:9px;font-weight:850;white-space:nowrap;color:inherit;text-decoration:none}
+.home-update-table .hut-soldier-list .hut-soldier-link{cursor:pointer;outline:none;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
+.home-update-table .hut-soldier-list .hut-soldier-link:hover{border-color:#aeb8c6;background:#f8fafc;box-shadow:0 1px 4px rgba(23,32,51,.12)}
+.home-update-table .hut-soldier-list .hut-soldier-link:focus-visible{box-shadow:0 0 0 2px rgba(23,32,51,.24)}
 .home-update-table .hut-patch{display:flex;min-width:0;flex-direction:column;background:#f5e8ee;padding-right:18px}
 .home-update-table .hut-patch ul{min-width:0;flex:1;align-content:center;margin:0;padding-left:18px;list-style-type:disc;list-style-position:outside;font-size:10.5px;line-height:1.52;word-break:keep-all;overflow-wrap:break-word;line-break:strict;text-wrap:pretty}
 .home-update-table .hut-patch li{max-width:100%}.home-update-table .hut-patch li::marker{color:#697386}.home-update-table .hut-patch li+li{margin-top:2px}
