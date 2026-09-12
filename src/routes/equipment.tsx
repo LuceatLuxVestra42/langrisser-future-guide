@@ -30,6 +30,20 @@ type EquipmentListUiState = {
 
 const EQUIPMENT_LIST_STORAGE_KEY = "equipment-general-list-ui.v2";
 
+const EQUIPMENT_PASS_PRESENTATION_IDS = new Set([
+  553, 554, 555, 556,
+  563, 564, 565, 566,
+  574, 575, 576, 577,
+  583, 584, 585, 586,
+  591, 592, 593, 594,
+  599, 600, 601, 602,
+  607, 608, 609, 610,
+  615, 616, 617, 618,
+  623, 624, 625, 626,
+  630, 631, 632, 633,
+  639, 640, 641, 642,
+]);
+
 const DEFAULT_UI_STATE: EquipmentListUiState = {
   group: null,
   subtype: null,
@@ -49,6 +63,7 @@ function isEquipmentSortMode(value: unknown): value is EquipmentSortMode {
 function EquipmentGeneralListPage() {
   const data = Route.useLoaderData();
   const [uiState, setUiState] = useState<EquipmentListUiState>(DEFAULT_UI_STATE);
+  const [passOnly, setPassOnly] = useState(false);
   const [persistenceReady, setPersistenceReady] = useState(false);
 
   useEffect(() => {
@@ -97,6 +112,7 @@ function EquipmentGeneralListPage() {
   const filteredRecords = useMemo(() => {
     const normalizedQuery = uiState.query.trim().toLocaleLowerCase();
     const records = data.records.filter((record) => {
+      if (passOnly && !EQUIPMENT_PASS_PRESENTATION_IDS.has(record.equipmentId)) return false;
       if (uiState.group && record.group !== uiState.group) return false;
       if (uiState.subtype && record.subtype !== uiState.subtype) return false;
 
@@ -128,7 +144,7 @@ function EquipmentGeneralListPage() {
     }
 
     return records.sort((left, right) => right.equipmentId - left.equipmentId);
-  }, [data.records, uiState]);
+  }, [data.records, passOnly, uiState]);
 
   const selectGroup = (group: string) => {
     setUiState((current) =>
@@ -150,6 +166,7 @@ function EquipmentGeneralListPage() {
   };
 
   const resetDiscovery = () => {
+    setPassOnly(false);
     setUiState((current) => ({
       ...current,
       group: null,
@@ -238,6 +255,21 @@ function EquipmentGeneralListPage() {
                   className="pointer-events-none absolute right-3 rotate-90 text-muted-foreground"
                 />
               </label>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
+              <button
+                type="button"
+                aria-pressed={passOnly}
+                onClick={() => setPassOnly((current) => !current)}
+                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                  passOnly
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-accent"
+                }`}
+              >
+                장비패스
+              </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
