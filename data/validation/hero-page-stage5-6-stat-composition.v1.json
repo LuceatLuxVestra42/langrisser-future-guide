@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "stage": "hero-page-5-6-stat-composition",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "owner": "hero-canonical",
+  "checks": {
+    "canonicalHeroCount": {
+      "expected": 267,
+      "actual": 267,
+      "pass": true
+    },
+    "normalBondFrozenParity": {
+      "expected": 267,
+      "actual": 267,
+      "bondProfile": "MAX",
+      "bondSelfMul": 2500,
+      "rate": 0.25,
+      "pass": true
+    },
+    "spReleasedCount": {
+      "expected": 25,
+      "actual": 25,
+      "pass": true
+    },
+    "leonSpJob377ExactFinal": {
+      "expected": {
+        "hp": 4929,
+        "at": 623,
+        "magic": 233,
+        "df": 300,
+        "magicDf": 280,
+        "dex": 130
+      },
+      "actual": {
+        "hp": 4929,
+        "at": 623,
+        "magic": 233,
+        "df": 300,
+        "magicDf": 280,
+        "dex": 130
+      },
+      "pass": true
+    },
+    "predecessorParity": {
+      "stage4": "PASS",
+      "stage54": "COMPLETE",
+      "pass": true
+    },
+    "boundary": {
+      "stage4Recomputed": false,
+      "relationReDerivedByName": false,
+      "idArithmeticUsed": false,
+      "rawRuntimeDependencyIntroduced": false,
+      "pass": true
+    }
+  },
+  "errors": [],
+  "decision": "Stage 5-6 stat composition is complete and may be promoted as the Hero production stat-composition predecessor for Stage 6 materialization."
+}
