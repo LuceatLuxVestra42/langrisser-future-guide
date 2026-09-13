@@ -18,6 +18,8 @@ const STAGE4_PATH = path.join(GENERATED, 'hero-basic-combat.v1.json');
 const STAGE51_PATH = path.join(GENERATED, 'hero-page-stage5-1-bonds-final.v1.json');
 const STAGE54_PATH = path.join(GENERATED, 'hero-page-stage5-4-sp.v1.json');
 
+const NORMAL_BOND_SELF_MUL = 2500;
+const NORMAL_BOND_RATE = NORMAL_BOND_SELF_MUL / 10000;
 const HERO_PROPERTY_TO_STAT = Object.freeze({
   99: 'hp',
   100: 'at',
@@ -63,43 +65,14 @@ function collectNormalBondSkillIds(stage51Record, label) {
     const skillIds = Array.isArray(bond.gotSkillIds) ? bond.gotSkillIds : [];
     for (const value of skillIds) {
       const skillId = Number(value);
-      if (!Number.isInteger(skillId) || skillId <= 0) {
-        throw new Error(`${label}: invalid Stage5-1 bond skill ID ${value}`);
-      }
+      if (!Number.isInteger(skillId) || skillId <= 0) throw new Error(`${label}: invalid Stage5-1 bond skill ID ${value}`);
       out.add(skillId);
     }
   }
   return out;
 }
 function zeroRates() { return Object.fromEntries(STAT_KEYS.map((stat) => [stat, 0])); }
-function resolveHeroPropertyRates(skillIds, skillById, buffById, label) {
-  const rawByStat = zeroRates();
-  const evidence = [];
-  for (const skillId of [...skillIds].sort((a, b) => a - b)) {
-    const skill = skillById.get(skillId);
-    if (!skill) throw new Error(`${label}: missing SkillInfo ${skillId}`);
-    const buffIds = Array.isArray(skill.PassiveBuffs_ID) ? skill.PassiveBuffs_ID.map(Number).filter(Number.isInteger) : [];
-    for (const buffId of buffIds) {
-      const buff = buffById.get(buffId);
-      if (!buff) throw new Error(`${label}: Skill ${skillId} missing BuffInfo ${buffId}`);
-      const effects = [];
-      for (let i = 1; i <= 4; i += 1) {
-        const propertyId = Number(buff[`Property${i}_ID`]);
-        const rawValue = Number(buff[`Property${i}_Value`]);
-        const stat = HERO_PROPERTY_TO_STAT[propertyId];
-        if (!stat || !Number.isFinite(rawValue) || rawValue === 0) continue;
-        rawByStat[stat] += rawValue;
-        effects.push({ propertyId, stat, rawValue });
-      }
-      if (effects.length) evidence.push({ skillId, buffId, effects });
-    }
-  }
-  const rates = Object.fromEntries(STAT_KEYS.map((stat) => [stat, rawByStat[stat] / 10000]));
-  for (const [stat, rate] of Object.entries(rates)) {
-    if (rate < 0 || rate > 1) throw new Error(`${label}: ${stat} rate out of range ${rate}`);
-  }
-  return { rates, rawByStat, evidence };
-}
+function normalBondRates() { return Object.fromEntries(STAT_KEYS.map((stat) => [stat, NORMAL_BOND_RATE])); }
 function resolveSpBonusRates(spRecord, label) {
   const rawByStat = zeroRates();
   const properties = spRecord?.sp?.secondStageRewards?.buff?.properties || [];
@@ -142,14 +115,14 @@ function masteryFlatsFromStage4(stage4Record, label) {
   }
   return out;
 }
-function composeWithRates({ statInputs, masteryFlats, normalBondRates, spBonusRates = zeroRates(), central }) {
+function composeWithRates({ statInputs, masteryFlats, normalRates, spBonusRates = zeroRates(), central }) {
   const legacyValues = {};
   const legacyComponents = {};
   for (const stat of STAT_KEYS) {
     const result = composeLegacyStat({
       input: statInputs[stat],
       masteryFlat: masteryFlats[stat],
-      normalBondRate: normalBondRates[stat] || 0,
+      normalBondRate: normalRates[stat],
       spBonusRate: spBonusRates[stat] || 0,
     });
     legacyValues[stat] = result.value;
@@ -253,7 +226,6 @@ function main() {
   const informationById = indexBy(loadArray('ConfigDataHeroInformationInfo'), 'ID', 'HeroInformationInfo');
   const heartById = indexBy(loadArray('ConfigDataHeroHeartFetterInfo'), 'ID', 'HeroHeartFetterInfo');
   const skillById = indexBy(loadArray('ConfigDataSkillInfo'), 'ID', 'SkillInfo');
-  const buffById = indexBy(loadArray('ConfigDataBuffInfo'), 'ID', 'BuffInfo');
   const connectionById = indexBy(loadArray('ConfigDataJobConnectionInfo'), 'ID', 'JobConnectionInfo');
   const jobLevelById = indexBy(loadArray('ConfigDataJobLevelInfo'), 'ID', 'JobLevelInfo');
 
@@ -261,6 +233,7 @@ function main() {
     throw new Error(`input population mismatch: stage4=${stage4Records.length}, stage51=${stage51Records.length}, stage54=${stage54Records.length}`);
   }
 
+  const fixedNormalRates = normalBondRates();
   const records = [];
   for (const stage4Record of stage4Records) {
     const heroId = Number(stage4Record.heroId);
@@ -270,13 +243,12 @@ function main() {
     if (!bondRecord || !spRecord) throw new Error(`${label}: missing Stage5 input`);
 
     const gotSkillIds = collectNormalBondSkillIds(bondRecord, label);
-    const normalBond = resolveHeroPropertyRates(gotSkillIds, skillById, buffById, `${label} normal bond`);
     const central = resolveCentral(heroId, heroById, informationById, heartById, skillById);
     const masteryFlats = masteryFlatsFromStage4(stage4Record, label);
 
     const normalJobs = (stage4Record.jobTree?.connections || []).map((connection) => {
       const statInputs = statInputsFromStage4(connection.finalDisplayStats, `${label} JobConnection ${connection.jobConnectionId}`);
-      const composed = composeWithRates({ statInputs, masteryFlats, normalBondRates: normalBond.rates, central });
+      const composed = composeWithRates({ statInputs, masteryFlats, normalRates: fixedNormalRates, central });
       return {
         jobConnectionId: Number(connection.jobConnectionId),
         jobId: Number(connection.jobId),
@@ -293,7 +265,7 @@ function main() {
       const composed = composeWithRates({
         statInputs,
         masteryFlats,
-        normalBondRates: normalBond.rates,
+        normalRates: fixedNormalRates,
         spBonusRates: spBonus.rates,
         central,
       });
@@ -312,10 +284,11 @@ function main() {
       heroId,
       nameKr: stage4Record.nameKr ?? null,
       normalBond: {
-        gotSkillIds: [...gotSkillIds].sort((a, b) => a - b),
-        rates: normalBond.rates,
-        rawByStat: normalBond.rawByStat,
-        evidence: normalBond.evidence,
+        bondProfile: 'MAX',
+        bondSelfMul: NORMAL_BOND_SELF_MUL,
+        rates: { ...fixedNormalRates },
+        stage51GotSkillIds: [...gotSkillIds].sort((a, b) => a - b),
+        provenanceRole: 'Stage5-1 relation/provenance only; GotSkills are not re-aggregated into Hero stat rates.',
       },
       centralBond: central,
       normalJobs,
@@ -335,9 +308,11 @@ function main() {
       relationReDerivedByName: false,
       idArithmeticUsed: false,
       rawRuntimeDependencyIntroduced: false,
+      normalBondRuleReused: 'B1_FROZEN_BOND_SELF_MUL_2500',
     },
     formula: {
       preCentral: 'round(starAdjustedRaw * (1 + normalBondRate + spBonusRate)) + globalJobMasteryFlat',
+      normalBond: 'MAX normal Hero bond uses frozen B1 bondSelfMul=2500 (+25%) for all six Hero stats.',
       centralPercent: 'round(starAdjustedRaw * 0.05), added separately per stat',
       centralFlat: 'HeartFetter Lv10 explicit HP/DEF/MDEF flat skill, added after percent terms',
     },
@@ -345,8 +320,9 @@ function main() {
       'data/generated/hero-basic-combat.v1.json',
       'data/generated/hero-page-stage5-1-bonds-final.v1.json',
       'data/generated/hero-page-stage5-4-sp.v1.json',
+      'historical FROZEN B1 normal bonded consumer rule: bondSelfMul=2500',
       'ConfigDataHeroInfo', 'ConfigDataHeroInformationInfo', 'ConfigDataHeroHeartFetterInfo',
-      'ConfigDataSkillInfo', 'ConfigDataBuffInfo', 'ConfigDataJobConnectionInfo', 'ConfigDataJobLevelInfo',
+      'ConfigDataSkillInfo', 'ConfigDataJobConnectionInfo', 'ConfigDataJobLevelInfo',
     ],
     summary: { canonicalHeroCount: records.length, spReleasedCount: released },
     records,
