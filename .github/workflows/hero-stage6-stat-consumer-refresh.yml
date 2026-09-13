@@ -1,0 +1,60 @@
+name: Hero Stage 6 Stat Consumer Refresh
+
+on:
+  push:
+    branches:
+      - 'work/**'
+    paths:
+      - 'scripts/refresh_hero_stage6_stat_consumer.cjs'
+      - 'data/contracts/hero-stage6-5-stat-consumer-refresh.v1.json'
+      - 'data/generated/hero-page-stage5-6-stat-composition.v1.json'
+      - 'data/validation/hero-page-stage5-6-stat-composition.v1.json'
+      - '.github/workflows/hero-stage6-stat-consumer-refresh.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-stage6-stat-consumer-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh-validate-writeback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh Stage 6 production stat consumer
+        run: node scripts/refresh_hero_stage6_stat_consumer.cjs
+
+      - name: Verify mutation scope
+        run: |
+          set -euo pipefail
+          changed="$(git status --porcelain | awk '{print $2}')"
+          test -n "$changed"
+          while IFS= read -r path; do
+            case "$path" in
+              data/generated/hero-detail.v1.json|data/generated/hero-detail/by-id/*.json|data/validation/hero-stage6-5-stat-consumer-refresh.v1.json|data/checkpoints/hero-stage6-5-stat-consumer-refresh.md) ;;
+              *) echo "unexpected Stage6 stat-consumer mutation: $path" >&2; exit 1 ;;
+            esac
+          done <<< "$changed"
+
+      - name: Commit refreshed production shards and validation
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-detail.v1.json data/generated/hero-detail/by-id data/validation/hero-stage6-5-stat-consumer-refresh.v1.json data/checkpoints/hero-stage6-5-stat-consumer-refresh.md
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(hero): refresh Stage6 final stat consumer"
+          git push origin HEAD:${{ github.ref_name }}
