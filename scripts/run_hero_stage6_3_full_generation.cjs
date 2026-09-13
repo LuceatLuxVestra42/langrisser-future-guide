@@ -47,3 +47,5 @@ const runner = new Module(target, module);
 runner.filename = target;
 runner.paths = Module._nodeModulePaths(path.dirname(target));
 runner._compile(source, target);
+
+// producer-trigger: PR-901 stage6-3 freshness refresh; remove after downstream writeback.
