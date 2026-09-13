@@ -1,0 +1,40 @@
+name: tmp-sp-reward-metadata-inspect
+
+on:
+  push:
+    branches:
+      - feat/sp-reward-skill-metadata-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Hydrate ConfigData source pack
+        run: npm run hydrate:configdata-source-pack
+      - name: Inspect reward skill rows
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'data/configdata/ConfigDataSkillInfo.json';
+          const d = JSON.parse(fs.readFileSync(p, 'utf8'));
+          const rows = Array.isArray(d) ? d : (d?.records || d?.rows || d?.data || []);
+          console.log('ROOT_KEYS', Object.keys(d || {}));
+          console.log('ROW_COUNT', rows.length);
+          for (const id of [12478, 12479]) {
+            const q = rows.find(x => Number(x?.ID) === id);
+            console.log('SKILL_ID', id);
+            console.log('ROW_KEYS', q ? Object.keys(q) : null);
+            console.log('ROW_JSON', q ? JSON.stringify(q) : null);
+          }
+          NODE
