@@ -58,7 +58,7 @@
       "Stage 4-3 hero-job-trees output is absent or has a status other than PASS/REVIEW."
     ],
     "SOURCE_BLOCKED": [
-      "HeroInfo, JobConnectionInfo, or SkillInfo TextAsset is missing, structurally invalid, or has no usable m_bytes payload."
+      "HeroInfo, JobConnectionInfo, or SkillInfo source is missing or structurally invalid for the current UnityDataTool direct-array format or the preserved legacy TextAsset format."
     ],
     "FAIL": [
       "A Stage 4-3 hero is missing from usable HeroInfo.",
@@ -80,9 +80,9 @@
   },
   "currentSourceState": {
     "stage4-3": "PASS: 267/267 job-tree records generated",
-    "ConfigDataHeroInfo.json": "usable: restored/current payload present, m_size=3462088",
-    "ConfigDataJobConnectionInfo.json": "usable: restored payload present, m_size=3519252",
-    "ConfigDataSkillInfo.json": "usable: restored payload present, m_size=10667280"
+    "ConfigDataHeroInfo.json": "current hash-pinned source-pack payload; UnityDataTool direct JSON array",
+    "ConfigDataJobConnectionInfo.json": "current hash-pinned source-pack payload; UnityDataTool direct JSON array",
+    "ConfigDataSkillInfo.json": "current hash-pinned source-pack payload; UnityDataTool direct JSON array"
   },
   "latestValidation": {
     "status": "REVIEW",
@@ -91,5 +91,27 @@
     "reviewReason": "Auxiliary HeroInfo/JobConnection skill references exist without a JobLevel.GotSkill_ID acquisition point for multiple heroes; preserved as auxiliaryOnlySkillIds instead of inventing acquisition positions."
   },
   "completionRule": "Run npm run inspect:hero-skills after Stage 4-3. REVIEW is allowed when every explicit reference resolves but auxiliary skill references lack a verified JobLevel acquisition point; those references remain separate for later semantic classification.",
-  "nextStage": "4-5 complete the basic combat dataset: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes."
+  "nextStage": "4-5 complete the basic combat dataset: awakening classification, job stats, soldier modifiers, talent and star-rank talent changes.",
+  "directSourceContract": {
+    "heroInfo": {
+      "id": "ID",
+      "useable": "Useable",
+      "skillIds": "Skill_IDs",
+      "hiddenSkillIds": "HiddenSkill_IDs"
+    },
+    "jobConnectionInfo": {
+      "id": "ID",
+      "talentSkillIds": "TalentSkill_IDs"
+    },
+    "skillInfo": {
+      "id": "ID",
+      "name": "Name",
+      "desc": "Desc",
+      "iconPath": "Icon",
+      "displayType": "TypeText",
+      "cooldown": "CDText",
+      "range": "DistanceText",
+      "areaOrTarget": "RangeText"
+    }
+  }
 }

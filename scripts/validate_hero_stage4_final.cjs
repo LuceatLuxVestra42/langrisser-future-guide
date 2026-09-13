@@ -33,6 +33,26 @@ const boundary = read(BOUNDARY);
 const upstream = read(UPSTREAM);
 const errors = [];
 
+const stage44SkillInfoRows = Array.isArray(skills.skillInfoPresentationCatalog)
+  ? skills.skillInfoPresentationCatalog
+  : [];
+const stage44SkillInfoById = new Map();
+for (const skill of stage44SkillInfoRows) {
+  const skillId = skill?.skillId;
+  if (!Number.isInteger(skillId) || skillId <= 0) {
+    errors.push(`Stage 4-4 skillInfoPresentationCatalog invalid skillId=${String(skillId)}`);
+    continue;
+  }
+  if (stage44SkillInfoById.has(skillId)) errors.push(`Stage 4-4 skillInfoPresentationCatalog duplicate skillId=${skillId}`);
+  else stage44SkillInfoById.set(skillId, skill);
+  for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
+    if (!Object.prototype.hasOwnProperty.call(skill, field)) errors.push(`Stage 4-4 skillInfoPresentationCatalog ${skillId} missing ${field}`);
+  }
+}
+if (skills.skillInfoPresentationCount !== stage44SkillInfoRows.length) {
+  errors.push(`Stage 4-4 skillInfoPresentationCount=${String(skills.skillInfoPresentationCount)} rows=${stage44SkillInfoRows.length}`);
+}
+
 const skillRows = loadArray('ConfigDataSkillInfo');
 const skillCostById = new Map();
 for (const row of skillRows) {
@@ -83,6 +103,7 @@ const awakeningAudit = {
   level2SkillNotDefined: 0,
   falseNone: 0,
   missingSkillReference: 0,
+  presentationMetadataMatched: 0,
 };
 for (const heroId of canonical) {
   const sourceAwaken = awakenById.get(heroId);
@@ -103,6 +124,22 @@ for (const heroId of canonical) {
     if (generated.level2Status !== 'DEFINED') errors.push(`heroId ${heroId}: generated level2Status=${generated.level2Status}, expected DEFINED`);
     if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
     if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
+    const stage44Skill = stage44SkillInfoById.get(level2SkillId);
+    if (!stage44Skill) {
+      errors.push(`heroId ${heroId}: Stage 4-4 presentation metadata missing awakening skill ${level2SkillId}`);
+    } else {
+      let presentationMatch = true;
+      for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
+        if (!Object.prototype.hasOwnProperty.call(generated.skill || {}, field)) {
+          errors.push(`heroId ${heroId}: generated awakening skill ${level2SkillId} missing ${field}`);
+          presentationMatch = false;
+        } else if (generated.skill[field] !== stage44Skill[field]) {
+          errors.push(`heroId ${heroId}: generated awakening skill ${level2SkillId} ${field}=${String(generated.skill[field])} Stage 4-4=${String(stage44Skill[field])}`);
+          presentationMatch = false;
+        }
+      }
+      if (presentationMatch) awakeningAudit.presentationMetadataMatched += 1;
+    }
     awakeningAudit.verifiedLevel2Skill += 1;
   } else {
     if (generated.status !== 'VERIFIED') errors.push(`heroId ${heroId}: generated source-row status=${generated.status}, expected VERIFIED`);
@@ -116,6 +153,7 @@ if (awakeningAudit.verifiedLevel2Skill !== 257) errors.push(`awakening defined L
 if (awakeningAudit.level2SkillNotDefined !== 10) errors.push(`awakening Level2-not-defined count=${awakeningAudit.level2SkillNotDefined}, expected 10`);
 if (awakeningAudit.falseNone !== 0) errors.push(`awakening false NONE=${awakeningAudit.falseNone}`);
 if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
+if (awakeningAudit.presentationMetadataMatched !== 257) errors.push(`awakening Stage 4-4 presentation metadata parity=${awakeningAudit.presentationMetadataMatched}, expected 257`);
 const summaryAwakening = summary.awakeningSummary || {};
 for (const [key, expected] of Object.entries({ canonicalAwakenInfoRows: 267, verifiedLevel2Skill: 257, level2SkillNotDefined: 10, falseNone: 0 })) {
   if (summaryAwakening[key] !== expected) errors.push(`summary awakeningSummary.${key}=${summaryAwakening[key]}, expected ${expected}`);
