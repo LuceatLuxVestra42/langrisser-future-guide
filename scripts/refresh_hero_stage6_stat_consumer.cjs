@@ -187,9 +187,9 @@ for (const heroId of heroIds) {
         };
         spMaterializedCount += 1;
         if (!same(shard.sp.finalDisplayStats.values, spComposed.values) || !same(shard.sp.finalDisplayStats.components, spComposed.components)) spParityMismatchCount += 1;
-        if (Number(spComposed.jobConnectionId) === 377) {
+        if (heroId === 6 && Number(spComposed.jobId) === 377) {
           leonSpJob377MatchCount += 1;
-          if (!same(spComposed.values, EXPECTED_LEON_SP)) heroErrors.push(`SP JobConnection 377 exact regression mismatch: ${JSON.stringify(spComposed.values)}`);
+          if (!same(spComposed.values, EXPECTED_LEON_SP)) heroErrors.push(`Leon SP Job 377 exact regression mismatch: ${JSON.stringify(spComposed.values)}`);
         }
       }
     }
@@ -290,7 +290,7 @@ const validation = {
 };
 writeJson(P.validation, validation, true);
 
-const checkpoint = `# Hero Stage 6-5 Stat Consumer Refresh\n\n- Status: **${status} / ${completion}**\n- Stage 5-6 predecessor: **${stage56Validation?.status} / ${stage56Validation?.completion}**\n- Production Hero shards: **${heroIds.length}/267**\n- Normal jobs refreshed: **${normalJobCount}**\n- Normal parity mismatches: **${normalParityMismatchCount}**\n- SP jobs refreshed: **${spMaterializedCount}/25**\n- SP parity mismatches: **${spParityMismatchCount}**\n- Leon SP JobConnection 377 exact regression matches: **${leonSpJob377MatchCount}**\n- Frontend production shard consumer: **${frontendShardReadPass ? 'PASS' : 'FAIL'}**\n- Frontend normal final-job stat render: **${frontendRenderPass ? 'PASS' : 'FAIL'}**\n- Hard errors: **${errors.length}**\n\n## Authority\n\nStage 5-6 remains the stat-composition semantic predecessor. This Stage 6 layer only materializes its frozen values/components into the existing production Hero shards and refreshes shard integrity metadata. No Stage 4/5 semantic or relation is recomputed.\n\n## Reopen conditions\n\nReopen only if the Stage 5-6 artifact/validation changes, production shard schema changes, exact parity fails, or the frontend stops consuming the Stage 6 per-Hero shard finalDisplayStats path.\n`;
+const checkpoint = `# Hero Stage 6-5 Stat Consumer Refresh\n\n- Status: **${status} / ${completion}**\n- Stage 5-6 predecessor: **${stage56Validation?.status} / ${stage56Validation?.completion}**\n- Production Hero shards: **${heroIds.length}/267**\n- Normal jobs refreshed: **${normalJobCount}**\n- Normal parity mismatches: **${normalParityMismatchCount}**\n- SP jobs refreshed: **${spMaterializedCount}/25**\n- SP parity mismatches: **${spParityMismatchCount}**\n- Leon SP Job 377 exact regression matches: **${leonSpJob377MatchCount}**\n- Frontend production shard consumer: **${frontendShardReadPass ? 'PASS' : 'FAIL'}**\n- Frontend normal final-job stat render: **${frontendRenderPass ? 'PASS' : 'FAIL'}**\n- Hard errors: **${errors.length}**\n\n## Authority\n\nStage 5-6 remains the stat-composition semantic predecessor. This Stage 6 layer only materializes its frozen values/components into the existing production Hero shards and refreshes shard integrity metadata. No Stage 4/5 semantic or relation is recomputed.\n\n## Reopen conditions\n\nReopen only if the Stage 5-6 artifact/validation changes, production shard schema changes, exact parity fails, or the frontend stops consuming the Stage 6 per-Hero shard finalDisplayStats path.\n`;
 writeText(P.checkpoint, checkpoint);
 
 console.log(JSON.stringify({ status, completion, summary: validation.summary, checks, errors: errors.slice(0, 20) }, null, 2));
