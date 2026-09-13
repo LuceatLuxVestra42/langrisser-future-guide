@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-5-stat-consumer-refresh",
+  "status": "FROZEN",
+  "owner": "hero-production-materialization",
+  "purpose": "Refresh the existing Stage 6 production Hero shards so final job stats consume the validated Stage 5-6 stat-composition artifact without reopening or recomputing Stage 4/5 semantics.",
+  "predecessors": {
+    "stage56Generated": "data/generated/hero-page-stage5-6-stat-composition.v1.json",
+    "stage56Validation": "data/validation/hero-page-stage5-6-stat-composition.v1.json",
+    "stage63Manifest": "data/generated/hero-detail.v1.json",
+    "stage64Validation": "data/validation/hero-stage6-4-final.v1.json"
+  },
+  "productionTargets": {
+    "manifest": "data/generated/hero-detail.v1.json",
+    "shards": "data/generated/hero-detail/by-id/<heroId>.json",
+    "normalStatTarget": "normal.jobTree.connections[*].finalDisplayStats",
+    "spStatTarget": "sp.finalDisplayStats"
+  },
+  "materializationRules": {
+    "normalJoin": "heroId + explicit jobConnectionId; require exact jobId/jobLevelId parity",
+    "spJoin": "heroId + explicit Stage 5-4/Stage 5-6 SP jobConnectionId; require exact jobId parity",
+    "normalPayload": "Replace only finalDisplayStats values/components/formula provenance while preserving Stage 4 job identity, tree, level, skill, and relation fields.",
+    "spPayload": "Attach the already-composed Stage 5-6 SP finalDisplayStats under the existing released SP block; do not synthesize job-tree relations.",
+    "manifest": "Recompute per-shard SHA256/byteLength and totalShardBytes, then record Stage 5-6 predecessor provenance.",
+    "frontend": "Existing production frontend continues to read data/generated/hero-detail/by-id/*.json; normal final-job UI therefore consumes the refreshed values without raw-source access or semantic recomputation."
+  },
+  "boundaries": {
+    "nameJoin": false,
+    "idArithmetic": false,
+    "rawConfigDataRead": false,
+    "stage4Recomputation": false,
+    "stage5Recomputation": false,
+    "relationRecomputation": false,
+    "historicalFallback": false
+  },
+  "producer": "scripts/refresh_hero_stage6_stat_consumer.cjs",
+  "validator": "scripts/validate_hero_stage6_stat_consumer.cjs",
+  "validationOutput": "data/validation/hero-stage6-5-stat-consumer-refresh.v1.json",
+  "checkpoint": "data/checkpoints/hero-stage6-5-stat-consumer-refresh.md",
+  "completionCriteria": [
+    "Stage 5-6 validation remains PASS/COMPLETE with 267 canonical Heroes and 25 released SP Heroes.",
+    "All Stage 6 production Hero shards remain present, structurally site-usable, and integrity-indexed by the existing manifest.",
+    "Every normal Stage 6 job connection has exact values/components parity with the corresponding Stage 5-6 normalJobs entry.",
+    "All 25 released SP records materialize exact Stage 5-6 SP finalDisplayStats without inventing job-tree relations.",
+    "Leon HeroID 6 SP JobID 377 remains exactly hp=4929, at=623, magic=233, df=300, magicDf=280, dex=130.",
+    "The independent read-only validator passes 267 Hero shards, 1,388 normal jobs, 25 SP jobs, shard integrity, provenance, and frontend consumer boundaries.",
+    "The production frontend build passes after the refreshed generated consumer is present.",
+    "No name JOIN, ID arithmetic, raw ConfigData read, Stage 4/5 semantic recomputation, or unrelated repository mutation is introduced."
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "stage": "hero-page-6-5-stat-consumer-refresh",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "owner": "hero-production-materialization",
+  "contract": "data/contracts/hero-stage6-5-stat-consumer-refresh.v1.json",
+  "predecessors": {
+    "stage56Generated": {
+      "path": "data/generated/hero-page-stage5-6-stat-composition.v1.json",
+      "gitBlobSha": "d640927c5d68e575873cc5a81311acc927722459"
+    },
+    "stage56Validation": {
+      "path": "data/validation/hero-page-stage5-6-stat-composition.v1.json",
+      "gitBlobSha": "9a26c40d67c6d54dc2d43a17a57dde4e003a1767"
+    },
+    "stage64Validation": {
+      "path": "data/validation/hero-stage6-4-final.v1.json",
+      "gitBlobSha": "865b19d87c1e492226c66ca048b7553d1f33a8f0"
+    }
+  },
+  "checks": [
+    {
+      "name": "contract-frozen",
+      "pass": true,
+      "detail": "1/hero-page-6-5-stat-consumer-refresh/FROZEN"
+    },
+    {
+      "name": "stage5-6-pass",
+      "pass": true,
+      "detail": "PASS/COMPLETE/errors=0"
+    },
+    {
+      "name": "stage5-6-population",
+      "pass": true,
+      "detail": "heroes=267, sp=25"
+    },
+    {
+      "name": "stage6-4-predecessor-closed",
+      "pass": true,
+      "detail": "PASS_WITH_REVIEW/COMPLETE/hard=0"
+    },
+    {
+      "name": "manifest-production-shards",
+      "pass": true,
+      "detail": "hero-page-6-3/COMPLETE/SHARDED_BY_HERO/records=267"
+    },
+    {
+      "name": "stage5-6-unique-267",
+      "pass": true,
+      "detail": "unique=267"
+    },
+    {
+      "name": "manifest-unique-267",
+      "pass": true,
+      "detail": "keys=267"
+    },
+    {
+      "name": "all-shards-remain-structural",
+      "pass": true,
+      "detail": "fail=0"
+    },
+    {
+      "name": "normal-stat-full-parity",
+      "pass": true,
+      "detail": "jobs=1388, mismatch=0"
+    },
+    {
+      "name": "sp-stat-full-parity",
+      "pass": true,
+      "detail": "materialized=25, mismatch=0"
+    },
+    {
+      "name": "leon-sp-job377-exact",
+      "pass": true,
+      "detail": "matches=1"
+    },
+    {
+      "name": "frontend-production-shard-consumer",
+      "pass": true,
+      "detail": "server must load per-Hero Stage6 shards and project finalDisplayStats without raw ConfigData"
+    },
+    {
+      "name": "frontend-final-job-stat-render",
+      "pass": true,
+      "detail": "Hero route must render the final job stat section from projected Stage6 data"
+    }
+  ],
+  "summary": {
+    "canonicalHeroCount": 267,
+    "normalJobCount": 1388,
+    "normalParityMismatchCount": 0,
+    "spMaterializedCount": 25,
+    "spParityMismatchCount": 0,
+    "leonSpJob377MatchCount": 1,
+    "structuralFailureCount": 0,
+    "failedHeroCount": 0,
+    "hardErrorCount": 0,
+    "frontendProductionShardConsumer": true,
+    "frontendFinalJobStatRender": true
+  },
+  "boundaries": {
+    "nameJoin": false,
+    "idArithmetic": false,
+    "rawConfigDataRead": false,
+    "stage4Recomputed": false,
+    "stage5Recomputed": false,
+    "relationRecomputed": false
+  },
+  "errors": [],
+  "decision": "Hero Stage 6 stat-consumer refresh is COMPLETE. The existing production Hero shards now consume Stage 5-6 final stat composition for every normal job and all 25 released SP jobs; the current frontend reads those shards and renders normal final job stats without semantic recomputation."
+}

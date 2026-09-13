@@ -2,6 +2,11 @@ name: Hero List Stage 1 Lightweight Consumer
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Hero Stage 6 Stat Consumer Refresh
+    types:
+      - completed
   push:
     branches:
       - main
@@ -29,12 +34,13 @@ permissions:
 
 jobs:
   hero-list-stage1:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node
@@ -73,8 +79,10 @@ jobs:
             data/checkpoints/hero-list-stage1.json
             data/checkpoints/hero-list-stage1.md
 
-      - name: Commit frozen Stage 1 outputs on work branch
-        if: steps.finalize.outcome == 'success' && github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
+      - name: Commit frozen Stage 1 outputs on writable work branch
+        if: steps.finalize.outcome == 'success' && ((github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')) || (github.event_name == 'workflow_run' && startsWith(github.event.workflow_run.head_branch, 'work/')))
+        env:
+          TARGET_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
         run: |
           TARGETS='data/generated/hero-list-stage1.v1.json data/validation/hero-list-stage1-final.v1.json data/checkpoints/hero-list-stage1.json data/checkpoints/hero-list-stage1.md'
           if [ -z "$(git status --porcelain -- $TARGETS)" ]; then
@@ -85,8 +93,8 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add $TARGETS
           git commit -m 'Freeze Hero list Stage 1 consumer'
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git pull --rebase origin "$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
 
       - name: Verify frozen outputs on PR or main
         if: steps.finalize.outcome == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
