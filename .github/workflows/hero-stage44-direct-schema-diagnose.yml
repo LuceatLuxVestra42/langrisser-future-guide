@@ -1,0 +1,43 @@
+name: hero-stage44-direct-schema-diagnose
+on:
+  push:
+    branches: [hero-awakening-display-metadata]
+    paths: [.github/workflows/hero-stage44-direct-schema-diagnose.yml]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hydrate pinned ConfigData authority
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+      - name: Capture direct schema samples
+        run: |
+          node - <<'NODE' > /tmp/direct-schema.json
+          const fs=require('fs');
+          const root=process.env.RUNNER_TEMP+'/configdata-hydrated/data/configdata/';
+          const hero=JSON.parse(fs.readFileSync(root+'ConfigDataHeroInfo.json','utf8'));
+          const conn=JSON.parse(fs.readFileSync(root+'ConfigDataJobConnectionInfo.json','utf8'));
+          const hero6=hero.find(r=>r.ID===6);
+          const hero1=hero.find(r=>r.ID===1);
+          const playable=hero.filter(r=>r&&Object.prototype.hasOwnProperty.call(r,'Useable'));
+          const out={
+            heroRootArray:Array.isArray(hero),
+            heroCount:hero.length,
+            playableCount:playable.length,
+            heroKeyUnion:[...new Set([...(hero6?Object.keys(hero6):[]),...(hero1?Object.keys(hero1):[])])].sort(),
+            hero1,
+            hero6,
+            connectionRootArray:Array.isArray(conn),
+            connectionCount:conn.length,
+            connectionSample:conn.find(r=>Array.isArray(r?.TalentSkill_IDs)&&r.TalentSkill_IDs.length===6) || conn[0],
+          };
+          console.log(JSON.stringify(out,null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hero-stage44-direct-schema
+          path: /tmp/direct-schema.json
