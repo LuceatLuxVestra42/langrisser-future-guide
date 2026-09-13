@@ -58,6 +58,10 @@ function skillSnapshot(row) {
     nameCn: row.Name ?? null,
     desc: row.Desc ?? null,
     iconPath: row.IconPath ?? row.Icon ?? null,
+    displayType: row.TypeText ?? null,
+    cooldown: row.CDText ?? null,
+    range: row.DistanceText ?? null,
+    areaOrTarget: row.RangeText ?? null,
   };
 }
 
