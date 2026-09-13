@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Correct authoritative direct source keys
         run: |
           node - <<'NODE'
@@ -45,8 +45,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          node scripts/validate-configdata-source-pack-v1.mjs
-          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs \
+            --target-dir "$RUNNER_TEMP/configdata-hydrated" \
+            --compare-repo-source
+          count="$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
           test ! -e data/configdata
           ln -s "$RUNNER_TEMP/configdata-hydrated/data/configdata" data/configdata
       - name: Regenerate owning artifacts
