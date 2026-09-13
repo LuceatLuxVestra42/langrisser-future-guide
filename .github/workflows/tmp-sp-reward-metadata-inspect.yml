@@ -1,4 +1,4 @@
-name: tmp-sp-reward-metadata-inspect
+name: tmp-sp-reward-metadata-writer
 
 on:
   push:
@@ -10,33 +10,196 @@ permissions:
   contents: write
 
 jobs:
-  inspect:
+  write-validate-freeze:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect pipeline entrypoints
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Patch Stage 5-4 producer and frontend passthrough
         shell: bash
         run: |
-          if [ -f .tmp-sp-pipeline-inspect.txt ]; then
-            echo 'pipeline inspection report already present; no-op'
-            exit 0
+          python3 <<'PY'
+          from pathlib import Path
+
+          producer = Path('scripts/build_hero_stage5_4_sp_v2.cjs')
+          text = producer.read_text()
+          old = "return{skillId:x,nameCn:q?.Name??null,descCn:q?.Desc??null,icon:q?.Icon??q?.IconName??null,cost:q?.Cost??null};"
+          new = "return{skillId:x,nameCn:q?.Name??null,descCn:q?.Desc??null,icon:q?.Icon??q?.IconName??null,displayType:q?.TypeText??null,cooldown:q?.CDText??null,range:q?.DistanceText??null,areaOrTarget:q?.RangeText??null,cost:q?.Cost??null};"
+          if old not in text:
+              raise SystemExit('Stage5-4 reward skill projection authority drift')
+          producer.write_text(text.replace(old, new, 1))
+
+          frontend = Path('src/lib/hero-detail-stage5.server.ts')
+          text = frontend.read_text()
+          old_type = '''type Stage6SpRewardSkill = {\n  skillId?: number;\n  nameCn?: string | null;\n  descCn?: string | null;\n  icon?: string | null;\n  cost?: number | null;\n};'''
+          new_type = '''type Stage6SpRewardSkill = {\n  skillId?: number;\n  nameCn?: string | null;\n  descCn?: string | null;\n  icon?: string | null;\n  displayType?: string | null;\n  cooldown?: string | null;\n  range?: string | null;\n  areaOrTarget?: string | null;\n  cost?: number | null;\n};'''
+          if old_type not in text:
+              raise SystemExit('SP reward skill frontend type authority drift')
+          text = text.replace(old_type, new_type, 1)
+          old_projection = '''    displayType: null,\n    cooldown: null,\n    range: null,\n    areaOrTarget: null,'''
+          new_projection = '''    displayType: skill.displayType ?? null,\n    cooldown: skill.cooldown ?? null,\n    range: skill.range ?? null,\n    areaOrTarget: skill.areaOrTarget ?? null,'''
+          if old_projection not in text:
+              raise SystemExit('SP reward skill forced-null projection authority drift')
+          frontend.write_text(text.replace(old_projection, new_projection, 1))
+          PY
+
+      - name: Materialize pinned ConfigData maintenance root
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -e data/configdata ]; then
+            echo 'data/configdata unexpectedly exists in tracked checkout' >&2
+            exit 1
           fi
-          {
-            echo '=== stage5-4 references ==='
-            grep -RIl --exclude-dir=node_modules 'hero-page-stage5-4-sp.v1.json' scripts src .github 2>/dev/null || true
-            echo '=== stage6-1 output references ==='
-            grep -RIl --exclude-dir=node_modules 'hero-detail-stage6-1.v1.json' scripts src .github 2>/dev/null || true
-            echo '=== full hero detail output references ==='
-            grep -RIl --exclude-dir=node_modules 'hero-detail.v1.json' scripts src .github 2>/dev/null || true
-            echo '=== shard/by-id references ==='
-            grep -RIl --exclude-dir=node_modules 'hero-detail/by-id' scripts src .github 2>/dev/null || true
-            echo '=== preflight references ==='
-            grep -RIl --exclude-dir=node_modules -E 'preflight|Preflight' scripts package.json .github 2>/dev/null || true
-            echo '=== candidate hero generation scripts ==='
-            find scripts -maxdepth 1 -type f \( -name '*hero*stage6*' -o -name '*hero*detail*' -o -name '*hero*page*stage5*' \) -printf '%f\n' | sort
-          } > .tmp-sp-pipeline-inspect.txt
+          CONFIG_ROOT="$(node -e "const m=require('./scripts/configdata-source-pack-maintenance-root.cjs');process.stdout.write(m.resolveConfigDataSourceRoot())")"
+          test -f "$CONFIG_ROOT/data/configdata/ConfigDataSkillInfo.json"
+          ln -s "$CONFIG_ROOT/data/configdata" data/configdata
+          echo "CONFIG_ROOT=$CONFIG_ROOT" >> "$GITHUB_ENV"
+
+      - name: Regenerate and validate Stage 5-4
+        run: node scripts/build_hero_stage5_4_sp_v2.cjs
+
+      - name: Verify representative SP reward skills
+        shell: bash
+        run: |
+          node <<'NODE'
+          const artifact = require('./data/generated/hero-page-stage5-4-sp.v1.json');
+          const validation = require('./data/validation/hero-page-stage5-4-final.v1.json');
+          if (validation.status !== 'PASS' || validation.completion !== 'COMPLETE') throw new Error(`Stage5-4 validation ${validation.status}/${validation.completion}`);
+          const found = new Map();
+          for (const hero of artifact.records || []) {
+            for (const skill of hero?.sp?.secondStageRewards?.skills || []) found.set(Number(skill.skillId), skill);
+          }
+          const expected = {
+            12478: {displayType:'被动', cooldown:'-', range:'-', areaOrTarget:'-'},
+            12479: {displayType:'物理伤害', cooldown:'5回合', range:'2格', areaOrTarget:'2格'},
+          };
+          for (const [id, want] of Object.entries(expected)) {
+            const got = found.get(Number(id));
+            if (!got) throw new Error(`missing representative SP reward skill ${id}`);
+            for (const [k, v] of Object.entries(want)) if (got[k] !== v) throw new Error(`${id}.${k}: ${JSON.stringify(got[k])} != ${JSON.stringify(v)}`);
+            console.log(id, JSON.stringify({displayType:got.displayType,cooldown:got.cooldown,range:got.range,areaOrTarget:got.areaOrTarget,cost:got.cost}));
+          }
+          NODE
+
+      - name: Regenerate and validate Stage 6-1
+        run: node scripts/build_hero_stage6_1_detail.cjs
+
+      - name: Verify Stage 6-1 passthrough
+        shell: bash
+        run: |
+          node <<'NODE'
+          const artifact = require('./data/generated/hero-detail-stage6-1.v1.json');
+          const validation = require('./data/validation/hero-stage6-1-final.v1.json');
+          if (validation.status !== 'PASS') throw new Error(`Stage6-1 validation ${validation.status}`);
+          const rows = Array.isArray(artifact.records) ? artifact.records : [];
+          const found = new Map();
+          for (const hero of rows) for (const skill of hero?.sp?.secondStageRewards?.skills || []) found.set(Number(skill.skillId), skill);
+          const s = found.get(12479);
+          if (!s || s.displayType !== '物理伤害' || s.cooldown !== '5回合' || s.range !== '2格' || s.areaOrTarget !== '2格') throw new Error(`Stage6-1 did not preserve SP reward metadata: ${JSON.stringify(s)}`);
+          NODE
+
+      - name: Regenerate full Hero detail and shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+          node - <<'NODE'
+          const v = require('./data/validation/hero-stage6-3-final.v1.json');
+          if (v.status !== 'PASS' || v.completion !== 'COMPLETE') throw new Error(`Stage6-3 validation ${v.status}/${v.completion}`);
+          const shards = require('fs').readdirSync('./data/generated/hero-detail/by-id').filter(x => x.endsWith('.json'));
+          if (shards.length !== 267) throw new Error(`expected 267 Hero shards, got ${shards.length}`);
+          let found = null;
+          for (const file of shards) {
+            const hero = require(`./data/generated/hero-detail/by-id/${file}`);
+            for (const skill of hero?.sp?.secondStageRewards?.skills || []) if (Number(skill.skillId) === 12479) found = skill;
+          }
+          if (!found || found.displayType !== '物理伤害' || found.cooldown !== '5回合' || found.range !== '2格' || found.areaOrTarget !== '2格') throw new Error(`sharded Hero detail did not preserve SP reward metadata: ${JSON.stringify(found)}`);
+          NODE
+
+      - name: Remove temporary ConfigData link
+        if: always()
+        run: |
+          if [ -L data/configdata ]; then rm data/configdata; fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Frontend preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-skin-stage3-5-static-assets-readonly.mjs
+          node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          node scripts/validate-hero-card-icon-frontend.mjs
+          node scripts/validate-hero-fusion-power-frontend.mjs
+          npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Audit and freeze final change set
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -L data/configdata ]; then rm data/configdata; fi
+          git rm -f .github/workflows/tmp-sp-reward-metadata-inspect.yml
+          git rm -f .tmp-sp-reward-metadata-inspect.json .tmp-sp-pipeline-inspect.txt
+
+          EXPECTED='scripts/build_hero_stage5_4_sp_v2.cjs
+          src/lib/hero-detail-stage5.server.ts
+          data/generated/hero-page-stage5-4-sp.v1.json
+          data/validation/hero-page-stage5-4-final.v1.json
+          data/generated/hero-detail-stage6-1.v1.json
+          data/validation/hero-stage6-1-final.v1.json
+          data/generated/hero-detail.v1.json
+          data/generated/hero-detail-shared.v1.json
+          data/generated/hero-detail/by-id
+          data/validation/hero-stage6-3-final.v1.json
+          data/checkpoints/hero-stage6-3-full-generation.json
+          data/checkpoints/hero-stage6-3-full-generation.md
+          .github/workflows/tmp-sp-reward-metadata-inspect.yml
+          .tmp-sp-reward-metadata-inspect.json
+          .tmp-sp-pipeline-inspect.txt'
+
+          echo '=== working tree before freeze ==='
+          git status --short
+
+          git add scripts/build_hero_stage5_4_sp_v2.cjs \
+            src/lib/hero-detail-stage5.server.ts \
+            data/generated/hero-page-stage5-4-sp.v1.json \
+            data/validation/hero-page-stage5-4-final.v1.json \
+            data/generated/hero-detail-stage6-1.v1.json \
+            data/validation/hero-stage6-1-final.v1.json \
+            data/generated/hero-detail.v1.json \
+            data/generated/hero-detail-shared.v1.json \
+            data/generated/hero-detail/by-id \
+            data/validation/hero-stage6-3-final.v1.json \
+            data/checkpoints/hero-stage6-3-full-generation.json \
+            data/checkpoints/hero-stage6-3-full-generation.md
+
+          if [ -n "$(git status --porcelain | grep '^??' || true)" ]; then
+            echo 'unexpected untracked paths:' >&2
+            git status --short >&2
+            exit 1
+          fi
+
+          git diff --cached --check
+          echo '=== staged paths ==='
+          git diff --cached --name-status
+
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .tmp-sp-pipeline-inspect.txt
-          git commit -m 'chore: capture SP pipeline entrypoints'
-          git push
+          git commit -m 'Preserve SP reward skill display metadata'
+          git pull --rebase origin feat/sp-reward-skill-metadata-v2
+          git push origin HEAD:feat/sp-reward-skill-metadata-v2
