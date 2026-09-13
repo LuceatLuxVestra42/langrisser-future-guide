@@ -83,18 +83,17 @@ jobs:
       - name: Regenerate and validate Stage 6-1
         run: node scripts/build_hero_stage6_1_detail.cjs
 
-      - name: Verify Stage 6-1 passthrough
+      - name: Verify Stage 6-1 composition index
         shell: bash
         run: |
           node <<'NODE'
           const artifact = require('./data/generated/hero-detail-stage6-1.v1.json');
           const validation = require('./data/validation/hero-stage6-1-final.v1.json');
-          if (validation.status !== 'PASS') throw new Error(`Stage6-1 validation ${validation.status}`);
-          const rows = Array.isArray(artifact.records) ? artifact.records : [];
-          const found = new Map();
-          for (const hero of rows) for (const skill of hero?.sp?.secondStageRewards?.skills || []) found.set(Number(skill.skillId), skill);
-          const s = found.get(12479);
-          if (!s || s.displayType !== '物理伤害' || s.cooldown !== '5回合' || s.range !== '2格' || s.areaOrTarget !== '2格') throw new Error(`Stage6-1 did not preserve SP reward metadata: ${JSON.stringify(s)}`);
+          if (artifact.status !== 'PASS' || artifact.completion !== 'COMPLETE') throw new Error(`Stage6-1 artifact ${artifact.status}/${artifact.completion}`);
+          if (validation.status !== 'PASS' || validation.completion !== 'COMPLETE') throw new Error(`Stage6-1 validation ${validation.status}/${validation.completion}`);
+          if (artifact.representation !== 'normalized-composition-index') throw new Error(`unexpected Stage6-1 representation ${artifact.representation}`);
+          if (artifact.sourceMap?.sp?.path !== 'data/generated/hero-page-stage5-4-sp.v1.json') throw new Error(`Stage6-1 SP sourceMap drift: ${JSON.stringify(artifact.sourceMap?.sp)}`);
+          if (!Array.isArray(artifact.records) || artifact.records.length !== 267) throw new Error(`Stage6-1 Hero index count ${artifact.records?.length}`);
           NODE
 
       - name: Regenerate full Hero detail and shards
