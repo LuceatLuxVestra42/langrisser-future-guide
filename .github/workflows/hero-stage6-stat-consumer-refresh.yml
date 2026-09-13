@@ -35,9 +35,34 @@ jobs:
           node-version: 22
 
       - name: Refresh Stage 6 production stat consumer
-        run: node scripts/refresh_hero_stage6_stat_consumer.cjs
+        id: refresh
+        shell: bash
+        run: |
+          set +e
+          node scripts/refresh_hero_stage6_stat_consumer.cjs
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Persist fail-closed diagnostics
+        if: steps.refresh.outputs.exit_code != '0'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git restore --worktree -- data/generated/hero-detail.v1.json data/generated/hero-detail/by-id || true
+          test -f data/validation/hero-stage6-5-stat-consumer-refresh.v1.json || { echo "refresh failed before validation output" >&2; exit 1; }
+          git add data/validation/hero-stage6-5-stat-consumer-refresh.v1.json
+          test -f data/checkpoints/hero-stage6-5-stat-consumer-refresh.md && git add data/checkpoints/hero-stage6-5-stat-consumer-refresh.md || true
+          git diff --cached --quiet || {
+            git commit -m "chore(hero): record Stage6 stat refresh blocker"
+            git push origin HEAD:${{ github.ref_name }}
+          }
+          echo "Stage6 stat-consumer refresh reported a blocker; production shards were restored and not committed." >&2
+          exit 1
 
       - name: Verify mutation scope
+        if: steps.refresh.outputs.exit_code == '0'
         run: |
           set -euo pipefail
           changed="$(git status --porcelain | awk '{print $2}')"
@@ -50,6 +75,7 @@ jobs:
           done <<< "$changed"
 
       - name: Commit refreshed production shards and validation
+        if: steps.refresh.outputs.exit_code == '0'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
