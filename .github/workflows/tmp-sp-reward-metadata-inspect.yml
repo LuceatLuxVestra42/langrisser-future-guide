@@ -22,6 +22,10 @@ jobs:
         with:
           node-version: 22
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+
       - name: Patch Stage 5-4 producer and frontend passthrough
         shell: bash
         run: |
@@ -115,8 +119,8 @@ jobs:
           if (!found || found.displayType !== '物理伤害' || found.cooldown !== '5回合' || found.range !== '2格' || found.areaOrTarget !== '2格') throw new Error(`sharded Hero detail did not preserve SP reward metadata: ${JSON.stringify(found)}`);
           NODE
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
 
       - name: Frontend preflight
         shell: bash
@@ -126,10 +130,10 @@ jobs:
           node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
           node scripts/validate-hero-card-icon-frontend.mjs
           node scripts/validate-hero-fusion-power-frontend.mjs
-          npx tsc --noEmit
+          bunx tsc --noEmit
 
       - name: Build
-        run: npm run build
+        run: bunx vite build --config vite.config.pages.ts
 
       - name: Audit and freeze final change set
         shell: bash
