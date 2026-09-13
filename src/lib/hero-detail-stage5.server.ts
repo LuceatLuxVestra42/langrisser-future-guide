@@ -126,10 +126,18 @@ type FeatureBlock = {
   status?: string | null;
 } | null | undefined;
 
+type Stage6SpRewardSkill = {
+  skillId?: number;
+  nameCn?: string | null;
+  descCn?: string | null;
+  icon?: string | null;
+  cost?: number | null;
+};
+
 type Stage6Sp = {
   status?: string | null;
   secondStageRewards?: {
-    skills?: Stage6Skill[] | null;
+    skills?: Stage6SpRewardSkill[] | null;
   } | null;
 } | null | undefined;
 
@@ -224,6 +232,21 @@ function projectEquipableSkill(skill: Stage6Skill | null | undefined) {
   return {
     ...projected,
     cost,
+  };
+}
+
+function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
+  if (!skill || !Number.isInteger(skill.skillId)) return null;
+  return {
+    skillId: Number(skill.skillId),
+    nameCn: skill.nameCn ?? null,
+    desc: skill.descCn ?? null,
+    iconPath: skill.icon ?? null,
+    displayType: null,
+    cooldown: null,
+    range: null,
+    areaOrTarget: null,
+    cost: Number.isInteger(skill.cost) ? Number(skill.cost) : null,
   };
 }
 
@@ -399,7 +422,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     : [];
   const spRewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)
     ? shard.sp.secondStageRewards.skills
-        .map(projectSkill)
+        .map(projectSpRewardSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
   const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);
