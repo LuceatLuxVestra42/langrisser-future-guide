@@ -9,6 +9,8 @@ const STAGE4 = path.join(ROOT, 'data', 'generated', 'hero-basic-combat.v1.json')
 const STAGE54 = path.join(ROOT, 'data', 'generated', 'hero-page-stage5-4-sp.v1.json');
 const OUTPUT = path.join(ROOT, 'data', 'validation', 'hero-page-stage5-6-stat-composition.v1.json');
 const STAT_KEYS = ['hp', 'at', 'magic', 'df', 'magicDf', 'dex'];
+const NORMAL_BOND_RATE = 0.25;
+const NORMAL_BOND_SELF_MUL = 2500;
 
 function read(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function write(file, value) {
@@ -20,6 +22,11 @@ function sameValues(actual, expected) {
 }
 function statValuesValid(values) {
   return STAT_KEYS.every((key) => Number.isInteger(values?.[key]) && values[key] >= 0);
+}
+function normalBondFrozenParity(block) {
+  return block?.bondProfile === 'MAX'
+    && block?.bondSelfMul === NORMAL_BOND_SELF_MUL
+    && STAT_KEYS.every((key) => block?.rates?.[key] === NORMAL_BOND_RATE);
 }
 
 const artifact = read(GENERATED);
@@ -34,6 +41,7 @@ if (artifact.authority?.stage4Recomputed !== false) errors.push('Stage4 recomput
 if (artifact.authority?.relationReDerivedByName !== false) errors.push('name JOIN boundary violated');
 if (artifact.authority?.idArithmeticUsed !== false) errors.push('ID arithmetic boundary violated');
 if (artifact.authority?.rawRuntimeDependencyIntroduced !== false) errors.push('raw runtime dependency boundary violated');
+if (artifact.authority?.normalBondRuleReused !== 'B1_FROZEN_BOND_SELF_MUL_2500') errors.push(`normalBondRuleReused=${artifact.authority?.normalBondRuleReused}`);
 
 const records = artifact.records || [];
 const stage4Records = stage4.records || [];
@@ -45,6 +53,7 @@ if (artifact.summary?.canonicalHeroCount !== 267) errors.push(`summary canonical
 const stage4By = new Map(stage4Records.map((r) => [Number(r.heroId), r]));
 const stage54By = new Map(stage54Records.map((r) => [Number(r.heroId), r]));
 let released = 0;
+let normalBondParityCount = 0;
 for (const record of records) {
   const heroId = Number(record.heroId);
   const source4 = stage4By.get(heroId);
@@ -54,7 +63,8 @@ for (const record of records) {
   if ((record.normalJobs || []).length !== expectedNormal) errors.push(`Hero ${heroId}: normal job count ${(record.normalJobs || []).length}/${expectedNormal}`);
   for (const job of record.normalJobs || []) if (!statValuesValid(job.values)) errors.push(`Hero ${heroId}: invalid normal job ${job.jobId} values`);
   if (record.centralBond?.rate !== 0.05) errors.push(`Hero ${heroId}: central rate=${record.centralBond?.rate}`);
-  if (!STAT_KEYS.every((key) => Number.isFinite(record.normalBond?.rates?.[key]))) errors.push(`Hero ${heroId}: incomplete normal bond rates`);
+  if (normalBondFrozenParity(record.normalBond)) normalBondParityCount += 1;
+  else errors.push(`Hero ${heroId}: normal bond does not match frozen B1 MAX/2500 rule`);
   const sourceReleased = source54.sp?.status === 'RELEASED';
   if (sourceReleased) released += 1;
   if ((record.sp?.status === 'RELEASED') !== sourceReleased) errors.push(`Hero ${heroId}: SP release parity mismatch`);
@@ -62,6 +72,7 @@ for (const record of records) {
 }
 if (released !== 25) errors.push(`SP released=${released}`);
 if (artifact.summary?.spReleasedCount !== 25) errors.push(`summary spReleasedCount=${artifact.summary?.spReleasedCount}`);
+if (normalBondParityCount !== 267) errors.push(`normal bond frozen parity=${normalBondParityCount}/267`);
 
 const leon = records.find((r) => Number(r.heroId) === 6);
 const expectedLeon = { hp: 4929, at: 623, magic: 233, df: 300, magicDf: 280, dex: 130 };
@@ -70,7 +81,7 @@ else {
   if (leon.sp?.status !== 'RELEASED') errors.push(`Leon SP status=${leon.sp?.status}`);
   if (leon.sp?.jobId !== 377) errors.push(`Leon SP jobId=${leon.sp?.jobId}`);
   if (!sameValues(leon.sp?.values, expectedLeon)) errors.push(`Leon SP values=${JSON.stringify(leon.sp?.values)} expected=${JSON.stringify(expectedLeon)}`);
-  for (const key of STAT_KEYS) if (leon.normalBond?.rates?.[key] !== 0.25) errors.push(`Leon normalBond ${key}=${leon.normalBond?.rates?.[key]}`);
+  if (!normalBondFrozenParity(leon.normalBond)) errors.push(`Leon normalBond=${JSON.stringify(leon.normalBond)}`);
   if (leon.centralBond?.flat?.hp !== 750 || leon.centralBond?.flat?.df !== 30 || leon.centralBond?.flat?.magicDf !== 40) {
     errors.push(`Leon central flat=${JSON.stringify(leon.centralBond?.flat)}`);
   }
@@ -85,6 +96,7 @@ const validation = {
   owner: 'hero-canonical',
   checks: {
     canonicalHeroCount: { expected: 267, actual: records.length, pass: records.length === 267 },
+    normalBondFrozenParity: { expected: 267, actual: normalBondParityCount, bondProfile: 'MAX', bondSelfMul: NORMAL_BOND_SELF_MUL, rate: NORMAL_BOND_RATE, pass: normalBondParityCount === 267 },
     spReleasedCount: { expected: 25, actual: released, pass: released === 25 },
     leonSpJob377ExactFinal: { expected: expectedLeon, actual: leon?.sp?.values ?? null, pass: Boolean(leon && leon.sp?.jobId === 377 && sameValues(leon.sp?.values, expectedLeon)) },
     predecessorParity: { stage4: stage4.status, stage54: stage54.status, pass: stage4Records.length === 267 && stage54Records.length === 267 },
