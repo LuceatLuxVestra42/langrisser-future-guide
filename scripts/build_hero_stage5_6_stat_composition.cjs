@@ -54,19 +54,20 @@ function finite(value, label) {
   if (!Number.isFinite(n)) throw new Error(`${label} must be finite`);
   return n;
 }
-function collectGotSkillIds(value, out = new Set()) {
-  if (!value || typeof value !== 'object') return out;
-  if (Array.isArray(value)) {
-    for (const item of value) collectGotSkillIds(item, out);
-    return out;
-  }
-  for (const [key, child] of Object.entries(value)) {
-    if (key === 'gotSkillId' && Number.isInteger(Number(child)) && Number(child) > 0) out.add(Number(child));
-    if (key === 'gotSkillIds' && Array.isArray(child)) {
-      for (const id of child) if (Number.isInteger(Number(id)) && Number(id) > 0) out.add(Number(id));
-      continue;
+function collectNormalBondSkillIds(stage51Record, label) {
+  const bonds = Array.isArray(stage51Record?.bonds) ? stage51Record.bonds : [];
+  if (bonds.length !== 5) throw new Error(`${label}: expected 5 Stage5-1 bonds, got ${bonds.length}`);
+  const out = new Set();
+  for (const bond of bonds) {
+    if (bond?.sourceResolved !== true) throw new Error(`${label}: unresolved Stage5-1 bond ${bond?.fetterId ?? 'unknown'}`);
+    const skillIds = Array.isArray(bond.gotSkillIds) ? bond.gotSkillIds : [];
+    for (const value of skillIds) {
+      const skillId = Number(value);
+      if (!Number.isInteger(skillId) || skillId <= 0) {
+        throw new Error(`${label}: invalid Stage5-1 bond skill ID ${value}`);
+      }
+      out.add(skillId);
     }
-    collectGotSkillIds(child, out);
   }
   return out;
 }
@@ -268,7 +269,7 @@ function main() {
     const spRecord = stage54ById.get(heroId);
     if (!bondRecord || !spRecord) throw new Error(`${label}: missing Stage5 input`);
 
-    const gotSkillIds = collectGotSkillIds(bondRecord);
+    const gotSkillIds = collectNormalBondSkillIds(bondRecord, label);
     const normalBond = resolveHeroPropertyRates(gotSkillIds, skillById, buffById, `${label} normal bond`);
     const central = resolveCentral(heroId, heroById, informationById, heartById, skillById);
     const masteryFlats = masteryFlatsFromStage4(stage4Record, label);
