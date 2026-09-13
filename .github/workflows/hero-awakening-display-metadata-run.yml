@@ -1,0 +1,235 @@
+name: hero-awakening-display-metadata-run
+
+on:
+  push:
+    branches:
+      - hero-awakening-display-metadata
+    paths:
+      - .github/workflows/hero-awakening-display-metadata-run.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch producer and validator
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          producer = Path('scripts/prepare_hero_basic_combat_stage45.cjs')
+          text = producer.read_text()
+          old = """function skillSnapshot(row) {
+            if (!row) return null;
+            return {
+              skillId: row.ID,
+              nameCn: row.Name ?? null,
+              desc: row.Desc ?? null,
+              iconPath: row.IconPath ?? row.Icon ?? null,
+            };
+          }
+          """
+          new = """function skillSnapshot(row, presentation = null) {
+            if (!row) return null;
+            const snapshot = {
+              skillId: row.ID,
+              nameCn: row.Name ?? null,
+              desc: row.Desc ?? null,
+              iconPath: row.IconPath ?? row.Icon ?? null,
+            };
+            if (!presentation) return snapshot;
+            return {
+              ...snapshot,
+              displayType: presentation.displayType,
+              cooldown: presentation.cooldown,
+              range: presentation.range,
+              areaOrTarget: presentation.areaOrTarget,
+            };
+          }
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'producer skillSnapshot anchor count={text.count(old)}')
+          text = text.replace(old, new)
+
+          old = """    if (!hero) { errors.push(`heroId ${treeHero.heroId}: missing playable HeroInfo`); continue; }
+              if (!skillHero) { errors.push(`heroId ${treeHero.heroId}: missing Stage 4-4 skill record`); continue; }
+
+              const mastery = masteryTotals(treeHero, jobIndex, errors);
+          """
+          new = """    if (!hero) { errors.push(`heroId ${treeHero.heroId}: missing playable HeroInfo`); continue; }
+              if (!skillHero) { errors.push(`heroId ${treeHero.heroId}: missing Stage 4-4 skill record`); continue; }
+
+              const stage44SkillById = new Map();
+              for (const catalogSkill of skillHero.skillCatalog || []) {
+                const catalogSkillId = catalogSkill?.skillId;
+                if (!Number.isInteger(catalogSkillId) || catalogSkillId <= 0) {
+                  errors.push(`heroId ${treeHero.heroId}: Stage 4-4 skillCatalog has invalid skillId=${String(catalogSkillId)}`);
+                  continue;
+                }
+                if (stage44SkillById.has(catalogSkillId)) {
+                  errors.push(`heroId ${treeHero.heroId}: Stage 4-4 skillCatalog duplicate skillId=${catalogSkillId}`);
+                  continue;
+                }
+                stage44SkillById.set(catalogSkillId, catalogSkill);
+              }
+
+              const mastery = masteryTotals(treeHero, jobIndex, errors);
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'producer stage44 catalog anchor count={text.count(old)}')
+          text = text.replace(old, new)
+
+          old = """        const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
+                  if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
+                  awakening = {
+                    status: awakenSkill ? 'VERIFIED' : 'FAIL',
+                    awakenId: awaken.ID,
+                    nameCn: awaken.Name ?? null,
+                    level2Status: awakenSkill ? 'DEFINED' : 'UNRESOLVED',
+                    level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
+                    skill: skillSnapshot(awakenSkill),
+                  };
+                  if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
+          """
+          new = """        const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
+                  if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
+                  const stage44AwakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? stage44SkillById.get(level2SkillId) : null;
+                  if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !stage44AwakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from Stage 4-4 skillCatalog`);
+
+                  let resolvedAwakenSkill = null;
+                  if (awakenSkill && stage44AwakenSkill) {
+                    const sourceSnapshot = skillSnapshot(awakenSkill);
+                    let metadataValid = true;
+                    for (const field of ['skillId', 'nameCn', 'desc', 'iconPath']) {
+                      if (stage44AwakenSkill[field] !== sourceSnapshot[field]) {
+                        errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} Stage 4-4 ${field} contradicts SkillInfo`);
+                        metadataValid = false;
+                      }
+                    }
+                    for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
+                      if (!hasOwn(stage44AwakenSkill, field)) {
+                        errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} Stage 4-4 missing ${field}`);
+                        metadataValid = false;
+                      }
+                    }
+                    if (metadataValid) resolvedAwakenSkill = skillSnapshot(awakenSkill, stage44AwakenSkill);
+                  }
+                  awakening = {
+                    status: resolvedAwakenSkill ? 'VERIFIED' : 'FAIL',
+                    awakenId: awaken.ID,
+                    nameCn: awaken.Name ?? null,
+                    level2Status: resolvedAwakenSkill ? 'DEFINED' : 'UNRESOLVED',
+                    level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
+                    skill: resolvedAwakenSkill,
+                  };
+                  if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'producer awakening anchor count={text.count(old)}')
+          producer.write_text(text.replace(old, new))
+
+          validator = Path('scripts/validate_hero_stage4_final.cjs')
+          text = validator.read_text()
+          old = """const skillIds = set((skills.records || []).map((x) => x.heroId));
+          const equipableSkillIds = new Set();
+          """
+          new = """const skillIds = set((skills.records || []).map((x) => x.heroId));
+          const skillsByHero = new Map();
+          for (const skillHero of skills.records || []) {
+            if (!Number.isInteger(skillHero?.heroId)) continue;
+            if (skillsByHero.has(skillHero.heroId)) errors.push(`Stage 4-4 duplicate heroId=${skillHero.heroId}`);
+            else skillsByHero.set(skillHero.heroId, skillHero);
+          }
+          const equipableSkillIds = new Set();
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'validator skillsByHero anchor count={text.count(old)}')
+          text = text.replace(old, new)
+
+          old = """  missingSkillReference: 0,
+          };
+          """
+          new = """  missingSkillReference: 0,
+            presentationMetadataMatched: 0,
+          };
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'validator audit anchor count={text.count(old)}')
+          text = text.replace(old, new)
+
+          old = """    if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
+              if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
+              awakeningAudit.verifiedLevel2Skill += 1;
+          """
+          new = """    if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
+              if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
+
+              const stage44SkillMatches = (skillsByHero.get(heroId)?.skillCatalog || []).filter((skill) => skill?.skillId === level2SkillId);
+              if (stage44SkillMatches.length !== 1) {
+                errors.push(`heroId ${heroId}: Stage 4-4 awakening skill ${level2SkillId} exact-ID matches=${stage44SkillMatches.length}, expected 1`);
+              } else {
+                const stage44Skill = stage44SkillMatches[0];
+                let presentationMatch = true;
+                for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
+                  if (!Object.prototype.hasOwnProperty.call(stage44Skill, field)) {
+                    errors.push(`heroId ${heroId}: Stage 4-4 awakening skill ${level2SkillId} missing ${field}`);
+                    presentationMatch = false;
+                  }
+                  if (!Object.prototype.hasOwnProperty.call(generated.skill || {}, field)) {
+                    errors.push(`heroId ${heroId}: generated awakening skill ${level2SkillId} missing ${field}`);
+                    presentationMatch = false;
+                  } else if (generated.skill[field] !== stage44Skill[field]) {
+                    errors.push(`heroId ${heroId}: generated awakening skill ${level2SkillId} ${field}=${String(generated.skill[field])} Stage 4-4=${String(stage44Skill[field])}`);
+                    presentationMatch = false;
+                  }
+                }
+                if (presentationMatch) awakeningAudit.presentationMetadataMatched += 1;
+              }
+              awakeningAudit.verifiedLevel2Skill += 1;
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'validator awakening parity anchor count={text.count(old)}')
+          text = text.replace(old, new)
+
+          old = """if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
+          const summaryAwakening = summary.awakeningSummary || {};
+          """
+          new = """if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
+          if (awakeningAudit.presentationMetadataMatched !== 257) errors.push(`awakening Stage 4-4 presentation metadata parity=${awakeningAudit.presentationMetadataMatched}, expected 257`);
+          const summaryAwakening = summary.awakeningSummary || {};
+          """
+          if text.count(old) != 1:
+              raise SystemExit(f'validator parity invariant anchor count={text.count(old)}')
+          validator.write_text(text.replace(old, new))
+          PY
+      - name: Regenerate Stage 4-5
+        run: npm run inspect:hero-combat
+      - name: Validate hero-canonical
+        run: npm run validate:coverage:hero-canonical
+      - name: Check intended diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only -- scripts/prepare_hero_basic_combat_stage45.cjs scripts/validate_hero_stage4_final.cjs data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json
+          unexpected="$(git diff --name-only | grep -Ev '^(scripts/prepare_hero_basic_combat_stage45\.cjs|scripts/validate_hero_stage4_final\.cjs|data/generated/hero-basic-combat\.v1\.json|data/validation/hero-basic-combat-stage4-5-summary\.v1\.json)$' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected tracked mutation:"
+            echo "$unexpected"
+            exit 1
+          fi
+      - name: Commit completion unit and remove runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/prepare_hero_basic_combat_stage45.cjs scripts/validate_hero_stage4_final.cjs data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json
+          git rm .github/workflows/hero-awakening-display-metadata-run.yml
+          git commit -m "feat(hero): preserve awakening skill display metadata"
+          git push origin HEAD:hero-awakening-display-metadata
