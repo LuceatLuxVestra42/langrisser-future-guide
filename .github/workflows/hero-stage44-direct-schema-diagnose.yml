@@ -20,16 +20,24 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const edits = [
-            ['scripts/prepare_hero_skill_acquisition_stage44.cjs', 'Skill_IDs', 'Skills_ID', 2],
-            ['scripts/prepare_hero_skill_acquisition_stage44.cjs', 'HiddenSkill_IDs', 'HiddenSkills_ID', 2],
-            ['data/hero-skill-acquisition-stage4-4.v1.json', 'Skill_IDs', 'Skills_ID', 1],
-            ['data/hero-skill-acquisition-stage4-4.v1.json', 'HiddenSkill_IDs', 'HiddenSkills_ID', 1],
+            ['scripts/prepare_hero_skill_acquisition_stage44.cjs',
+             'skillIds: uniqueIntegers(Array.isArray(row?.Skill_IDs) ? row.Skill_IDs : []),',
+             'skillIds: uniqueIntegers(Array.isArray(row?.Skills_ID) ? row.Skills_ID : []),'],
+            ['scripts/prepare_hero_skill_acquisition_stage44.cjs',
+             'hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkill_IDs) ? row.HiddenSkill_IDs : []),',
+             'hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkills_ID) ? row.HiddenSkills_ID : []),'],
+            ['data/hero-skill-acquisition-stage4-4.v1.json',
+             '"skillIds": "Skill_IDs"',
+             '"skillIds": "Skills_ID"'],
+            ['data/hero-skill-acquisition-stage4-4.v1.json',
+             '"hiddenSkillIds": "HiddenSkill_IDs"',
+             '"hiddenSkillIds": "HiddenSkills_ID"'],
           ];
-          for (const [file, from, to, expected] of edits) {
+          for (const [file, from, to] of edits) {
             let text = fs.readFileSync(file, 'utf8');
             const count = text.split(from).length - 1;
-            if (count !== expected) throw new Error(`${file}: ${from} count=${count}, expected=${expected}`);
-            text = text.split(from).join(to);
+            if (count !== 1) throw new Error(`${file}: exact patch anchor count=${count} for ${from}`);
+            text = text.replace(from, to);
             fs.writeFileSync(file, text);
           }
           NODE
@@ -78,11 +86,8 @@ jobs:
           };
           const base45 = JSON.parse(fs.readFileSync('/tmp/base45.json', 'utf8'));
           const next45 = JSON.parse(fs.readFileSync('data/generated/hero-basic-combat.v1.json', 'utf8'));
-          if (JSON.stringify(base45.records) !== JSON.stringify(strip({records: next45.records}))) {
-            const baseStripped = strip(base45);
-            if (JSON.stringify(baseStripped) !== JSON.stringify(strip(next45))) {
-              throw new Error('Stage 4-5 drift exceeds awakening presentation fields');
-            }
+          if (JSON.stringify(strip(base45)) !== JSON.stringify(strip(next45))) {
+            throw new Error('Stage 4-5 drift exceeds awakening presentation fields');
           }
           let defined = 0;
           for (const hero of next45.records || []) {
@@ -106,10 +111,12 @@ jobs:
             data/generated/hero-skill-acquisition.v1.json \
             data/generated/hero-basic-combat.v1.json \
             data/validation/hero-skill-stage4-4-summary.v1.json \
-            data/validation/hero-basic-combat-stage4-5-summary.v1.json \
             scripts/prepare_hero_skill_acquisition_stage44.cjs \
             scripts/prepare_hero_basic_combat_stage45.cjs \
             scripts/validate_hero_stage4_final.cjs
+          if test -f data/validation/hero-basic-combat-stage4-5-summary.v1.json; then
+            git add data/validation/hero-basic-combat-stage4-5-summary.v1.json
+          fi
           node - <<'NODE'
           const {execFileSync} = require('child_process');
           const allowed = new Set([
