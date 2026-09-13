@@ -14,18 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Runtime
-        run: node --version
-      - name: Hydrate ConfigData source pack
-        run: node scripts/hydrate-configdata-source-pack-v1.mjs
-      - name: Inspect reward skill rows
+      - name: Inspect reward skill rows from pinned ConfigData source pack
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           node <<'NODE'
           const fs = require('fs');
-          const p = 'data/configdata/ConfigDataSkillInfo.json';
+          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
+          const p = resolveConfigDataFile('ConfigDataSkillInfo.json');
           const d = JSON.parse(fs.readFileSync(p, 'utf8'));
           const rows = Array.isArray(d) ? d : (d?.records || d?.rows || d?.data || []);
+          console.log('RESOLVED_PATH', p);
           console.log('ROOT_KEYS', Object.keys(d || {}));
           console.log('ROW_COUNT', rows.length);
           for (const id of [12478, 12479]) {
