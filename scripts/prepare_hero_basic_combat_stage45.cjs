@@ -61,6 +61,18 @@ function skillSnapshot(row) {
   };
 }
 
+function awakeningSkillSnapshot(row) {
+  const skill = skillSnapshot(row);
+  if (!skill) return null;
+  return {
+    ...skill,
+    displayType: row.TypeText ?? null,
+    cooldown: row.CDText ?? null,
+    range: row.DistanceText ?? null,
+    areaOrTarget: row.RangeText ?? null,
+  };
+}
+
 function requireSkillCost(sourceSkill, skillId, heroId, pathLabel, errors) {
   if (!sourceSkill) {
     errors.push(`heroId ${heroId}: ${pathLabel} skill ${skillId} missing from SkillInfo`);
@@ -363,7 +375,7 @@ function main() {
           nameCn: awaken.Name ?? null,
           level2Status: awakenSkill ? 'DEFINED' : 'UNRESOLVED',
           level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
-          skill: skillSnapshot(awakenSkill),
+          skill: awakeningSkillSnapshot(awakenSkill),
         };
         if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
       } else {
