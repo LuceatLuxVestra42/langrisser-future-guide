@@ -47,8 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/hydrate-configdata-source-pack-v1.mjs \
-            --target-dir "$RUNNER_TEMP/configdata-hydrated" \
-            --compare-repo-source
+            --target-dir "$RUNNER_TEMP/configdata-hydrated"
           count="$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
           test "$count" = "753"
           test ! -e data/configdata
