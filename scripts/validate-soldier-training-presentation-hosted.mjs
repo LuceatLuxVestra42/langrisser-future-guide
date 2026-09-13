@@ -46,15 +46,48 @@ async function assertNoHorizontalOverflow(page, label) {
   );
 }
 
-async function getTrainingSearch(page) {
-  const search = page.getByRole("textbox", { name: "훈련 항목 검색", exact: true });
-  await search.waitFor({ timeout: 20000 });
-  assert.equal(await search.getAttribute("placeholder"), "검색", "Training search placeholder drifted.");
-  return search;
+async function assertPressed(button, expected, label) {
+  await button.waitFor({ state: "visible", timeout: 20000 });
+  assert.equal(await button.getAttribute("aria-pressed"), String(expected), `${label} pressed state drifted.`);
 }
 
-function getTechButtons(page) {
-  return page.locator("section section button");
+async function assertCurrentPresentation(page) {
+  await page.getByText("훈련 계열", { exact: true }).waitFor({ state: "visible", timeout: 20000 });
+  await page.getByText("유형", { exact: true }).waitFor({ state: "visible", timeout: 20000 });
+
+  const groupLabels = [
+    "보병",
+    "창병",
+    "기병",
+    "비병 + 수병",
+    "궁병 + 암살자",
+    "마법사 + 승려 + 마물",
+  ];
+  for (const label of groupLabels) {
+    await page.getByRole("button", { name: label, exact: true }).waitFor({ state: "visible", timeout: 20000 });
+  }
+
+  for (const label of ["스탯", "패시브"]) {
+    await page.getByRole("button", { name: label, exact: true }).waitFor({ state: "visible", timeout: 20000 });
+  }
+
+  const defaultGroup = page.getByRole("button", { name: "보병", exact: true });
+  const defaultKind = page.getByRole("button", { name: "스탯", exact: true });
+  await assertPressed(defaultGroup, true, "Default training group");
+  await assertPressed(defaultKind, true, "Default training kind");
+
+  const targetSlider = page.getByRole("slider", { name: "목표 레벨 조절", exact: true });
+  await targetSlider.waitFor({ state: "visible", timeout: 20000 });
+  assert.equal(await targetSlider.count(), 1, "Expected one target-level slider for the selected training tech.");
+
+  const currentLevel = page.getByRole("spinbutton").first();
+  const targetLevel = page.getByRole("spinbutton").nth(1);
+  await currentLevel.waitFor({ state: "visible", timeout: 20000 });
+  await targetLevel.waitFor({ state: "visible", timeout: 20000 });
+  assert.equal(await page.getByRole("spinbutton").count(), 2, "Expected current and target level controls.");
+
+  await page.getByText("현재 효과", { exact: true }).waitFor({ state: "visible", timeout: 20000 });
+  await page.getByText("목표 효과", { exact: true }).waitFor({ state: "visible", timeout: 20000 });
 }
 
 async function runDesktop(browser) {
@@ -66,7 +99,7 @@ async function runDesktop(browser) {
   });
   const directStatus = response?.status() ?? null;
 
-  const search = await getTrainingSearch(page);
+  await assertCurrentPresentation(page);
 
   const bodyText = await page.locator("body").innerText();
   for (const forbidden of [
@@ -80,48 +113,24 @@ async function runDesktop(browser) {
     assert.ok(!bodyText.includes(forbidden), `Internal implementation wording leaked: ${forbidden}`);
   }
 
-  const techButtons = getTechButtons(page);
-  assert.equal(await techButtons.count(), 130, "ALL filter must render exactly 130 TrainingTech rows.");
+  const lancer = page.getByRole("button", { name: "창병", exact: true });
+  await lancer.click();
+  await assertPressed(lancer, true, "Lancer training group");
+  await assertPressed(page.getByRole("button", { name: "보병", exact: true }), false, "Infantry training group");
 
-  await page.getByRole("button", { name: "스탯", exact: true }).click();
-  assert.equal(await techButtons.count(), 84, "COMMON_STAT filter must render exactly 84 rows.");
+  const passive = page.getByRole("button", { name: "패시브", exact: true });
+  await passive.click();
+  await assertPressed(passive, true, "Passive training kind");
+  await assertPressed(page.getByRole("button", { name: "스탯", exact: true }), false, "Stat training kind");
 
-  await page.getByRole("button", { name: "패시브", exact: true }).click();
-  assert.equal(await techButtons.count(), 46, "COMMON_PASSIVE filter must render exactly 46 rows.");
-
-  await page.getByRole("button", { name: "전체", exact: true }).click();
-  assert.equal(await techButtons.count(), 130, "ALL filter must restore exactly 130 rows.");
-
-  await search.fill("창병 대항 특훈");
-  assert.equal(await techButtons.count(), 1, "Korean TrainingTech search should resolve one exact row.");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Korean search result missing.");
-
-  await search.fill("对枪特训");
-  assert.equal(await techButtons.count(), 1, "Chinese source-name search should resolve one exact row.");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Chinese search did not resolve Korean row.");
-
-  await search.fill("127");
-  assert.equal(await techButtons.count(), 1, "Training ID search should resolve Tech 127 exactly.");
-  assert.ok(await page.getByText("연계 공격 훈련", { exact: true }).count(), "Tech 127 Korean display name missing.");
-
-  await search.fill("창병 대항 특훈");
-  await techButtons.first().click();
-  await search.fill("");
-
-  const slider = page.locator('input[type="range"]');
-  assert.equal(await slider.count(), 1, "Expected one Training level slider.");
-  const sliderMax = Number(await slider.getAttribute("max"));
-  assert.ok(sliderMax >= 2, `Unexpected slider max: ${sliderMax}`);
-  await slider.fill("2");
-  await page.waitForFunction(
-    ({ expectedText }) => document.body.innerText.includes(expectedText),
-    { expectedText: `Lv.2 / ${sliderMax}` },
-  );
-  assert.ok(await page.getByText("Lv.2 효과", { exact: true }).count(), "Selected-level effect panel did not update to Lv.2.");
-
-  const levelOneRow = page.locator("button").filter({ hasText: /^Lv\.1(?:\D|$)/ }).first();
-  await levelOneRow.click();
-  assert.ok(await page.getByText("Lv.1 효과", { exact: true }).count(), "Full level table click did not return to Lv.1.");
+  const targetSlider = page.getByRole("slider", { name: "목표 레벨 조절", exact: true });
+  const sliderMin = Number(await targetSlider.getAttribute("min"));
+  const sliderMax = Number(await targetSlider.getAttribute("max"));
+  assert.ok(Number.isFinite(sliderMin) && Number.isFinite(sliderMax) && sliderMax >= sliderMin, `Unexpected target slider bounds: ${sliderMin}-${sliderMax}`);
+  if (sliderMax > sliderMin) {
+    await targetSlider.fill(String(sliderMin));
+    assert.equal(Number(await targetSlider.inputValue()), sliderMin, "Target-level slider did not accept a valid value.");
+  }
 
   await assertNoHorizontalOverflow(page, "desktop");
   await context.close();
@@ -136,12 +145,17 @@ async function runMobile(browser) {
     timeout: 30000,
   });
 
-  const search = await getTrainingSearch(page);
-  await page.getByRole("button", { name: "패시브", exact: true }).click();
-  await search.fill("对枪特训");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Mobile Chinese-name search failed.");
-  await assertNoHorizontalOverflow(page, "mobile");
+  await assertCurrentPresentation(page);
 
+  const flyingWater = page.getByRole("button", { name: "비병 + 수병", exact: true });
+  await flyingWater.click();
+  await assertPressed(flyingWater, true, "Mobile flying/water training group");
+
+  const passive = page.getByRole("button", { name: "패시브", exact: true });
+  await passive.click();
+  await assertPressed(passive, true, "Mobile passive training kind");
+
+  await assertNoHorizontalOverflow(page, "mobile");
   await context.close();
 }
 
@@ -155,7 +169,7 @@ try {
     `Unexpected direct-route HTTP status: ${directStatus}`,
   );
   console.log(
-    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training techs=130 filters=84/46 searches=kr/cn/id slider=true levelTable=true mobile=true`,
+    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training groups=6 kinds=2 levelControls=true mobile=true`,
   );
 } finally {
   await browser.close();
