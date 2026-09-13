@@ -2,10 +2,8 @@ name: hero-awakening-display-metadata-run
 
 on:
   push:
-    branches:
-      - hero-awakening-display-metadata
-    paths:
-      - .github/workflows/hero-awakening-display-metadata-run.yml
+    branches: [hero-awakening-display-metadata]
+    paths: [.github/workflows/hero-awakening-display-metadata-run.yml]
 
 permissions:
   contents: write
@@ -17,53 +15,45 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Patch Stage 4-4 producer, Stage 4-5 producer, and validator
+      - name: Patch owning producers and validator
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          stage44 = Path('scripts/prepare_hero_skill_acquisition_stage44.cjs')
-          text = stage44.read_text()
-          old = """  const status = hardErrors.length ? 'FAIL' : review.length ? 'REVIEW' : 'PASS';
-          writeJson(outputPath, {
-            version: 1,
-            stage: '4-4',
-            status,
-            recordCount: hardErrors.length ? 0 : records.length,
-            records: hardErrors.length ? [] : records,
-          });
-          """
-          new = """  const status = hardErrors.length ? 'FAIL' : review.length ? 'REVIEW' : 'PASS';
-          const skillInfoPresentationCatalog = hardErrors.length
-            ? []
-            : skillSource.map((skill) => skillSnapshot(skill)).sort((a, b) => a.skillId - b.skillId);
-          writeJson(outputPath, {
-            version: 1,
-            stage: '4-4',
-            status,
-            recordCount: hardErrors.length ? 0 : records.length,
-            records: hardErrors.length ? [] : records,
-            skillInfoPresentationCount: skillInfoPresentationCatalog.length,
-            skillInfoPresentationCatalog,
-          });
-          """
-          if text.count(old) != 1:
-              raise SystemExit(f'Stage 4-4 output anchor count={text.count(old)}')
-          text = text.replace(old, new)
-          old = """    generatedHeroCount: hardErrors.length ? 0 : records.length,
-              sourceRecordCounts: {
-          """
-          new = """    generatedHeroCount: hardErrors.length ? 0 : records.length,
-              skillInfoPresentationCount: hardErrors.length ? 0 : skillSource.length,
-              sourceRecordCounts: {
-          """
-          if text.count(old) != 1:
-              raise SystemExit(f'Stage 4-4 summary anchor count={text.count(old)}')
-          stage44.write_text(text.replace(old, new))
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label} anchor count={count}')
+              return text.replace(old, new, 1)
 
-          stage45 = Path('scripts/prepare_hero_basic_combat_stage45.cjs')
-          text = stage45.read_text()
+          # Stage 4-4 remains the owner of SkillInfo presentation-field decoding.
+          p = Path('scripts/prepare_hero_skill_acquisition_stage44.cjs')
+          text = p.read_text()
+          status = "  const status = hardErrors.length ? 'FAIL' : review.length ? 'REVIEW' : 'PASS';\n"
+          text = replace_once(text, status, status + """  const skillInfoPresentationCatalog = hardErrors.length
+            ? []
+            : skillSource.map((skill) => ({
+                skillId: skill.id,
+                displayType: skill.displayType,
+                cooldown: skill.cooldown,
+                range: skill.range,
+                areaOrTarget: skill.areaOrTarget,
+              })).sort((a, b) => a.skillId - b.skillId);
+          """, 'Stage 4-4 status')
+          tail = "    records: hardErrors.length ? [] : records,\n  });\n  writeJson(summaryPath, {"
+          text = replace_once(text, tail, """    records: hardErrors.length ? [] : records,
+              skillInfoPresentationCount: skillInfoPresentationCatalog.length,
+              skillInfoPresentationCatalog,
+            });
+            writeJson(summaryPath, {""", 'Stage 4-4 output')
+          line = "    generatedHeroCount: hardErrors.length ? 0 : records.length,\n"
+          text = replace_once(text, line, line + "    skillInfoPresentationCount: hardErrors.length ? 0 : skillSource.length,\n", 'Stage 4-4 summary')
+          p.write_text(text)
+
+          # Stage 4-5 keeps AwakenInfo.Level2SkillID as the relation and only consumes Stage 4-4 metadata by exact skillId.
+          p = Path('scripts/prepare_hero_basic_combat_stage45.cjs')
+          text = p.read_text()
           old = """function skillSnapshot(row) {
             if (!row) return null;
             return {
@@ -92,37 +82,23 @@ jobs:
             };
           }
           """
-          if text.count(old) != 1:
-              raise SystemExit(f'Stage 4-5 skillSnapshot anchor count={text.count(old)}')
-          text = text.replace(old, new)
+          text = replace_once(text, old, new, 'Stage 4-5 skillSnapshot')
+          anchor = "  if (!['PASS', 'REVIEW'].includes(skillAcquisition.status)) errors.push(`Stage 4-4 status=${skillAcquisition.status}`);\n\n"
+          insertion = anchor + """  const stage44SkillInfoRows = Array.isArray(skillAcquisition.skillInfoPresentationCatalog)
+            ? skillAcquisition.skillInfoPresentationCatalog
+            : [];
+          const stage44SkillInfoById = indexUnique(
+            stage44SkillInfoRows,
+            'skillId',
+            'Stage 4-4 skillInfoPresentationCatalog',
+            errors,
+          );
+          if (skillAcquisition.skillInfoPresentationCount !== stage44SkillInfoRows.length) {
+            errors.push(`Stage 4-4 skillInfoPresentationCount=${String(skillAcquisition.skillInfoPresentationCount)} rows=${stage44SkillInfoRows.length}`);
+          }
 
-          old = """  if (!['PASS', 'REVIEW'].includes(jobTree.status)) errors.push(`Stage 4-3 status=${jobTree.status}`);
-            if (!['PASS', 'REVIEW'].includes(skillAcquisition.status)) errors.push(`Stage 4-4 status=${skillAcquisition.status}`);
-
-            const canonicalIds = new Set((heroMaster.records || []).map((r) => r.heroId).filter(Number.isInteger));
           """
-          new = """  if (!['PASS', 'REVIEW'].includes(jobTree.status)) errors.push(`Stage 4-3 status=${jobTree.status}`);
-            if (!['PASS', 'REVIEW'].includes(skillAcquisition.status)) errors.push(`Stage 4-4 status=${skillAcquisition.status}`);
-
-            const stage44SkillInfoRows = Array.isArray(skillAcquisition.skillInfoPresentationCatalog)
-              ? skillAcquisition.skillInfoPresentationCatalog
-              : [];
-            const stage44SkillInfoById = indexUnique(
-              stage44SkillInfoRows,
-              'skillId',
-              'Stage 4-4 skillInfoPresentationCatalog',
-              errors,
-            );
-            if (skillAcquisition.skillInfoPresentationCount !== stage44SkillInfoRows.length) {
-              errors.push(`Stage 4-4 skillInfoPresentationCount=${String(skillAcquisition.skillInfoPresentationCount)} rows=${stage44SkillInfoRows.length}`);
-            }
-
-            const canonicalIds = new Set((heroMaster.records || []).map((r) => r.heroId).filter(Number.isInteger));
-          """
-          if text.count(old) != 1:
-              raise SystemExit(f'Stage 4-5 Stage 4-4 index anchor count={text.count(old)}')
-          text = text.replace(old, new)
-
+          text = replace_once(text, anchor, insertion, 'Stage 4-5 Stage 4-4 index')
           old = """        const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
                   if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
                   awakening = {
@@ -139,25 +115,16 @@ jobs:
                   if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
                   const stage44AwakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? stage44SkillInfoById.get(level2SkillId) : null;
                   if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !stage44AwakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from Stage 4-4 skillInfoPresentationCatalog`);
-
-                  let resolvedAwakenSkill = null;
-                  if (awakenSkill && stage44AwakenSkill) {
-                    const sourceSnapshot = skillSnapshot(awakenSkill);
-                    let metadataValid = true;
-                    for (const field of ['skillId', 'nameCn', 'desc', 'iconPath']) {
-                      if (stage44AwakenSkill[field] !== sourceSnapshot[field]) {
-                        errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} Stage 4-4 ${field} contradicts SkillInfo`);
-                        metadataValid = false;
-                      }
-                    }
+                  let metadataValid = Boolean(awakenSkill && stage44AwakenSkill);
+                  if (stage44AwakenSkill) {
                     for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
                       if (!hasOwn(stage44AwakenSkill, field)) {
                         errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} Stage 4-4 missing ${field}`);
                         metadataValid = false;
                       }
                     }
-                    if (metadataValid) resolvedAwakenSkill = skillSnapshot(awakenSkill, stage44AwakenSkill);
                   }
+                  const resolvedAwakenSkill = metadataValid ? skillSnapshot(awakenSkill, stage44AwakenSkill) : null;
                   awakening = {
                     status: resolvedAwakenSkill ? 'VERIFIED' : 'FAIL',
                     awakenId: awaken.ID,
@@ -168,17 +135,14 @@ jobs:
                   };
                   if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
           """
-          if text.count(old) != 1:
-              raise SystemExit(f'Stage 4-5 awakening anchor count={text.count(old)}')
-          stage45.write_text(text.replace(old, new))
+          text = replace_once(text, old, new, 'Stage 4-5 awakening')
+          p.write_text(text)
 
-          validator = Path('scripts/validate_hero_stage4_final.cjs')
-          text = validator.read_text()
-          old = """const errors = [];
-
-          const skillRows = loadArray('ConfigDataSkillInfo');
-          """
-          new = """const errors = [];
+          # Independent validator checks every defined awakening against the Stage 4-4 exact-ID metadata catalog.
+          p = Path('scripts/validate_hero_stage4_final.cjs')
+          text = p.read_text()
+          anchor = "const errors = [];\n\nconst skillRows = loadArray('ConfigDataSkillInfo');\n"
+          insertion = """const errors = [];
 
           const stage44SkillInfoRows = Array.isArray(skills.skillInfoPresentationCatalog)
             ? skills.skillInfoPresentationCatalog
@@ -202,28 +166,14 @@ jobs:
 
           const skillRows = loadArray('ConfigDataSkillInfo');
           """
-          if text.count(old) != 1:
-              raise SystemExit(f'validator Stage 4-4 index anchor count={text.count(old)}')
-          text = text.replace(old, new)
-
-          old = """  missingSkillReference: 0,
-          };
-          """
-          new = """  missingSkillReference: 0,
-            presentationMetadataMatched: 0,
-          };
-          """
-          if text.count(old) != 1:
-              raise SystemExit(f'validator audit anchor count={text.count(old)}')
-          text = text.replace(old, new)
-
+          text = replace_once(text, anchor, insertion, 'validator Stage 4-4 index')
+          text = replace_once(text, "  missingSkillReference: 0,\n};", "  missingSkillReference: 0,\n  presentationMetadataMatched: 0,\n};", 'validator awakening audit')
           old = """    if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
               if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
               awakeningAudit.verifiedLevel2Skill += 1;
           """
           new = """    if (generated.level2SkillId !== level2SkillId) errors.push(`heroId ${heroId}: generated Level2SkillID=${generated.level2SkillId}, expected ${level2SkillId}`);
               if (generated.skill?.skillId !== level2SkillId) errors.push(`heroId ${heroId}: generated awakening Skill snapshot mismatch`);
-
               const stage44Skill = stage44SkillInfoById.get(level2SkillId);
               if (!stage44Skill) {
                 errors.push(`heroId ${heroId}: Stage 4-4 presentation metadata missing awakening skill ${level2SkillId}`);
@@ -242,20 +192,10 @@ jobs:
               }
               awakeningAudit.verifiedLevel2Skill += 1;
           """
-          if text.count(old) != 1:
-              raise SystemExit(f'validator awakening parity anchor count={text.count(old)}')
-          text = text.replace(old, new)
-
-          old = """if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
-          const summaryAwakening = summary.awakeningSummary || {};
-          """
-          new = """if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);
-          if (awakeningAudit.presentationMetadataMatched !== 257) errors.push(`awakening Stage 4-4 presentation metadata parity=${awakeningAudit.presentationMetadataMatched}, expected 257`);
-          const summaryAwakening = summary.awakeningSummary || {};
-          """
-          if text.count(old) != 1:
-              raise SystemExit(f'validator parity invariant anchor count={text.count(old)}')
-          validator.write_text(text.replace(old, new))
+          text = replace_once(text, old, new, 'validator awakening parity')
+          line = "if (awakeningAudit.missingSkillReference !== 0) errors.push(`awakening missing SkillInfo references=${awakeningAudit.missingSkillReference}`);\n"
+          text = replace_once(text, line, line + "if (awakeningAudit.presentationMetadataMatched !== 257) errors.push(`awakening Stage 4-4 presentation metadata parity=${awakeningAudit.presentationMetadataMatched}, expected 257`);\n", 'validator presentation invariant')
+          p.write_text(text)
           PY
       - name: Regenerate Stage 4-4
         run: npm run inspect:hero-skills
@@ -268,13 +208,9 @@ jobs:
         run: |
           set -euo pipefail
           allowed='^(scripts/prepare_hero_skill_acquisition_stage44\.cjs|scripts/prepare_hero_basic_combat_stage45\.cjs|scripts/validate_hero_stage4_final\.cjs|data/generated/hero-skill-acquisition\.v1\.json|data/validation/hero-skill-stage4-4-summary\.v1\.json|data/generated/hero-basic-combat\.v1\.json|data/validation/hero-basic-combat-stage4-5-summary\.v1\.json|\.github/workflows/hero-awakening-display-metadata-run\.yml)$'
-          git diff --name-only
           unexpected="$(git diff --name-only | grep -Ev "$allowed" || true)"
-          if [ -n "$unexpected" ]; then
-            echo "Unexpected tracked mutation:"
-            echo "$unexpected"
-            exit 1
-          fi
+          [ -z "$unexpected" ] || { echo "Unexpected tracked mutation:"; echo "$unexpected"; exit 1; }
+          git diff --name-only
       - name: Commit completion unit and remove runner
         shell: bash
         run: |
