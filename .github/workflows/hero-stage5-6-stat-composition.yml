@@ -49,13 +49,14 @@ jobs:
         run: |
           set -euo pipefail
           changed="$(git status --porcelain | awk '{print $2}')"
-          test -n "$changed"
-          while IFS= read -r path; do
-            case "$path" in
-              data/generated/hero-page-stage5-6-stat-composition.v1.json|data/validation/hero-page-stage5-6-stat-composition.v1.json) ;;
-              *) echo "unexpected generated mutation: $path" >&2; exit 1 ;;
-            esac
-          done <<< "$changed"
+          if [ -n "$changed" ]; then
+            while IFS= read -r path; do
+              case "$path" in
+                data/generated/hero-page-stage5-6-stat-composition.v1.json|data/validation/hero-page-stage5-6-stat-composition.v1.json) ;;
+                *) echo "unexpected generated mutation: $path" >&2; exit 1 ;;
+              esac
+            done <<< "$changed"
+          fi
 
       - name: Commit generated candidate and validation
         run: |
