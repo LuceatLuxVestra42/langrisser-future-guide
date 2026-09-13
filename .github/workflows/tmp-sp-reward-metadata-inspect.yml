@@ -7,31 +7,37 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect reward skill rows from pinned ConfigData source pack
+      - name: Inspect and persist reward skill rows
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          if [ -f .tmp-sp-reward-metadata-inspect.json ]; then
+            echo 'inspection report already present; no-op'
+            exit 0
+          fi
           node <<'NODE'
           const fs = require('fs');
           const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
           const p = resolveConfigDataFile('ConfigDataSkillInfo.json');
           const d = JSON.parse(fs.readFileSync(p, 'utf8'));
           const rows = Array.isArray(d) ? d : (d?.records || d?.rows || d?.data || []);
-          console.log('RESOLVED_PATH', p);
-          console.log('ROOT_KEYS', Object.keys(d || {}));
-          console.log('ROW_COUNT', rows.length);
+          const skills = {};
           for (const id of [12478, 12479]) {
-            const q = rows.find(x => Number(x?.ID) === id);
-            console.log('SKILL_ID', id);
-            console.log('ROW_KEYS', q ? Object.keys(q) : null);
-            console.log('ROW_JSON', q ? JSON.stringify(q) : null);
+            const q = rows.find(x => Number(x?.ID) === id) || null;
+            skills[id] = q;
           }
+          fs.writeFileSync('.tmp-sp-reward-metadata-inspect.json', JSON.stringify({rowCount: rows.length, skills}, null, 2) + '\n');
           NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .tmp-sp-reward-metadata-inspect.json
+          git commit -m 'chore: capture SP reward skill metadata inspection'
+          git push
