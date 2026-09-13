@@ -46,15 +46,31 @@ async function assertNoHorizontalOverflow(page, label) {
   );
 }
 
-async function getTrainingSearch(page) {
-  const search = page.getByRole("textbox", { name: "훈련 항목 검색", exact: true });
-  await search.waitFor({ timeout: 20000 });
-  assert.equal(await search.getAttribute("placeholder"), "검색", "Training search placeholder drifted.");
-  return search;
+async function assertCurrentTrainingControls(page) {
+  const infantry = page.getByRole("button", { name: "보병", exact: true });
+  const lancer = page.getByRole("button", { name: "창병", exact: true });
+  const stat = page.getByRole("button", { name: "스탯", exact: true });
+  const passive = page.getByRole("button", { name: "패시브", exact: true });
+
+  await infantry.waitFor({ timeout: 20000 });
+  await stat.waitFor({ timeout: 20000 });
+  assert.equal(await infantry.getAttribute("aria-pressed"), "true", "Infantry must be the default training group.");
+  assert.equal(await stat.getAttribute("aria-pressed"), "true", "Stat must be the default training type.");
+
+  return { infantry, lancer, stat, passive };
 }
 
-function getTechButtons(page) {
-  return page.locator("section section button");
+async function selectLancerPassive(page) {
+  const controls = await assertCurrentTrainingControls(page);
+  await controls.lancer.click();
+  await controls.passive.click();
+  assert.equal(await controls.lancer.getAttribute("aria-pressed"), "true", "Lancer training group did not activate.");
+  assert.equal(await controls.passive.getAttribute("aria-pressed"), "true", "Passive training type did not activate.");
+
+  const tech = page.getByRole("button", { name: "창병 대항 특훈", exact: true });
+  await tech.waitFor({ timeout: 20000 });
+  await tech.click();
+  await page.getByRole("heading", { name: "창병 대항 특훈", exact: true }).waitFor({ timeout: 20000 });
 }
 
 async function runDesktop(browser) {
@@ -66,7 +82,7 @@ async function runDesktop(browser) {
   });
   const directStatus = response?.status() ?? null;
 
-  const search = await getTrainingSearch(page);
+  await assertCurrentTrainingControls(page);
 
   const bodyText = await page.locator("body").innerText();
   for (const forbidden of [
@@ -80,48 +96,28 @@ async function runDesktop(browser) {
     assert.ok(!bodyText.includes(forbidden), `Internal implementation wording leaked: ${forbidden}`);
   }
 
-  const techButtons = getTechButtons(page);
-  assert.equal(await techButtons.count(), 130, "ALL filter must render exactly 130 TrainingTech rows.");
+  for (const groupName of ["보병", "창병", "기병", "비병 + 수병", "궁병 + 암살자", "마법사 + 승려 + 마물"]) {
+    await page.getByRole("button", { name: groupName, exact: true }).waitFor({ timeout: 10000 });
+  }
 
-  await page.getByRole("button", { name: "스탯", exact: true }).click();
-  assert.equal(await techButtons.count(), 84, "COMMON_STAT filter must render exactly 84 rows.");
+  await selectLancerPassive(page);
 
-  await page.getByRole("button", { name: "패시브", exact: true }).click();
-  assert.equal(await techButtons.count(), 46, "COMMON_PASSIVE filter must render exactly 46 rows.");
-
-  await page.getByRole("button", { name: "전체", exact: true }).click();
-  assert.equal(await techButtons.count(), 130, "ALL filter must restore exactly 130 rows.");
-
-  await search.fill("창병 대항 특훈");
-  assert.equal(await techButtons.count(), 1, "Korean TrainingTech search should resolve one exact row.");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Korean search result missing.");
-
-  await search.fill("对枪特训");
-  assert.equal(await techButtons.count(), 1, "Chinese source-name search should resolve one exact row.");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Chinese search did not resolve Korean row.");
-
-  await search.fill("127");
-  assert.equal(await techButtons.count(), 1, "Training ID search should resolve Tech 127 exactly.");
-  assert.ok(await page.getByText("연계 공격 훈련", { exact: true }).count(), "Tech 127 Korean display name missing.");
-
-  await search.fill("창병 대항 특훈");
-  await techButtons.first().click();
-  await search.fill("");
-
-  const slider = page.locator('input[type="range"]');
-  assert.equal(await slider.count(), 1, "Expected one Training level slider.");
+  const slider = page.getByRole("slider", { name: "목표 레벨 조절", exact: true });
+  assert.equal(await slider.count(), 1, "Expected one target-level slider.");
   const sliderMax = Number(await slider.getAttribute("max"));
   assert.ok(sliderMax >= 2, `Unexpected slider max: ${sliderMax}`);
   await slider.fill("2");
-  await page.waitForFunction(
-    ({ expectedText }) => document.body.innerText.includes(expectedText),
-    { expectedText: `Lv.2 / ${sliderMax}` },
-  );
-  assert.ok(await page.getByText("Lv.2 효과", { exact: true }).count(), "Selected-level effect panel did not update to Lv.2.");
 
-  const levelOneRow = page.locator("button").filter({ hasText: /^Lv\.1(?:\D|$)/ }).first();
-  await levelOneRow.click();
-  assert.ok(await page.getByText("Lv.1 효과", { exact: true }).count(), "Full level table click did not return to Lv.1.");
+  const currentLevel = page.getByRole("spinbutton", { name: "현재 Lv", exact: true });
+  const targetLevel = page.getByRole("spinbutton", { name: "목표 Lv", exact: true });
+  await currentLevel.fill("1");
+  await targetLevel.fill("2");
+  assert.equal(await currentLevel.inputValue(), "1", "Current level input did not update to Lv.1.");
+  assert.equal(await targetLevel.inputValue(), "2", "Target level input did not update to Lv.2.");
+
+  await page.getByText("현재 효과", { exact: true }).waitFor({ timeout: 10000 });
+  await page.getByText("목표 효과", { exact: true }).waitFor({ timeout: 10000 });
+  await page.getByLabel("Lv.1에서 Lv.2로 강화", { exact: true }).waitFor({ timeout: 10000 });
 
   await assertNoHorizontalOverflow(page, "desktop");
   await context.close();
@@ -136,10 +132,8 @@ async function runMobile(browser) {
     timeout: 30000,
   });
 
-  const search = await getTrainingSearch(page);
-  await page.getByRole("button", { name: "패시브", exact: true }).click();
-  await search.fill("对枪特训");
-  assert.ok(await page.getByText("창병 대항 특훈", { exact: true }).count(), "Mobile Chinese-name search failed.");
+  await selectLancerPassive(page);
+  await page.getByRole("slider", { name: "목표 레벨 조절", exact: true }).waitFor({ timeout: 10000 });
   await assertNoHorizontalOverflow(page, "mobile");
 
   await context.close();
@@ -155,7 +149,7 @@ try {
     `Unexpected direct-route HTTP status: ${directStatus}`,
   );
   console.log(
-    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training techs=130 filters=84/46 searches=kr/cn/id slider=true levelTable=true mobile=true`,
+    `[soldier-training-hosted] PASS sourceSha=${manifest.sourceSha} directStatus=${directStatus} route=/soldiers/training groups=6 types=stat/passive lancerPassive=true levelComparison=true mobile=true`,
   );
 } finally {
   await browser.close();
