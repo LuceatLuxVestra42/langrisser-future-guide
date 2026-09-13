@@ -27,6 +27,21 @@ jobs:
           test ! -e data/configdata
           ln -s "$RUNNER_TEMP/configdata-hydrated/data/configdata" data/configdata
 
+      - name: Capture direct source schema evidence
+        run: |
+          node - <<'NODE' > /tmp/source-schema.json
+          const fs = require('fs');
+          const rows = JSON.parse(fs.readFileSync('data/configdata/ConfigDataSkillInfo.json', 'utf8'));
+          const wanted = new Set([10301, 10328, 90085]);
+          const matches = rows.filter((row) => wanted.has(Number(row.ID)));
+          console.log(JSON.stringify({
+            rootIsArray: Array.isArray(rows),
+            rowCount: rows.length,
+            firstRowKeys: Object.keys(rows[0] || {}).sort(),
+            samples: matches,
+          }, null, 2));
+          NODE
+
       - name: Apply owning-layer patch from reviewed runner
         shell: bash
         run: |
@@ -67,6 +82,7 @@ jobs:
         with:
           name: awakening-regeneration-evidence
           path: |
+            /tmp/source-schema.json
             /tmp/stage44.log
             /tmp/stage45.log
           if-no-files-found: ignore
