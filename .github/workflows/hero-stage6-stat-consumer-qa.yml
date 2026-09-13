@@ -1,0 +1,50 @@
+name: Hero Stage 6 Stat Consumer QA
+
+on:
+  push:
+    branches:
+      - 'work/**'
+    paths:
+      - '.github/workflows/hero-stage6-stat-consumer-qa.yml'
+      - 'data/contracts/hero-stage6-5-stat-consumer-refresh.v1.json'
+      - 'data/generated/hero-detail.v1.json'
+      - 'data/generated/hero-detail/by-id/**'
+      - 'data/generated/hero-page-stage5-6-stat-composition.v1.json'
+      - 'data/validation/hero-page-stage5-6-stat-composition.v1.json'
+      - 'data/validation/hero-stage6-5-stat-consumer-refresh.v1.json'
+      - 'scripts/validate_hero_stage6_stat_consumer.cjs'
+      - 'src/lib/hero-detail-stage5.server.ts'
+      - 'src/routes/heroes_.$heroId.tsx'
+      - 'package.json'
+      - 'bun.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Independent Stage 6 stat-consumer validation
+        run: node scripts/validate_hero_stage6_stat_consumer.cjs
+
+      - name: Production frontend build
+        run: bun run build
+
+      - name: Verify tracked mutation remains clean
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"

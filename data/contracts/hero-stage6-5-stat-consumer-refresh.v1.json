@@ -33,7 +33,8 @@
     "relationRecomputation": false,
     "historicalFallback": false
   },
-  "validator": "scripts/refresh_hero_stage6_stat_consumer.cjs",
+  "producer": "scripts/refresh_hero_stage6_stat_consumer.cjs",
+  "validator": "scripts/validate_hero_stage6_stat_consumer.cjs",
   "validationOutput": "data/validation/hero-stage6-5-stat-consumer-refresh.v1.json",
   "checkpoint": "data/checkpoints/hero-stage6-5-stat-consumer-refresh.md",
   "completionCriteria": [
@@ -41,8 +42,9 @@
     "All Stage 6 production Hero shards remain present, structurally site-usable, and integrity-indexed by the existing manifest.",
     "Every normal Stage 6 job connection has exact values/components parity with the corresponding Stage 5-6 normalJobs entry.",
     "All 25 released SP records materialize exact Stage 5-6 SP finalDisplayStats without inventing job-tree relations.",
-    "Leon SP JobConnection 377 remains exactly hp=4929, at=623, magic=233, df=300, magicDf=280, dex=130.",
-    "The current frontend consumer still loads the Stage 6 per-Hero shards and renders normal finalDisplayStats as final job stats.",
+    "Leon HeroID 6 SP JobID 377 remains exactly hp=4929, at=623, magic=233, df=300, magicDf=280, dex=130.",
+    "The independent read-only validator passes 267 Hero shards, 1,388 normal jobs, 25 SP jobs, shard integrity, provenance, and frontend consumer boundaries.",
+    "The production frontend build passes after the refreshed generated consumer is present.",
     "No name JOIN, ID arithmetic, raw ConfigData read, Stage 4/5 semantic recomputation, or unrelated repository mutation is introduced."
   ]
 }
