@@ -612,19 +612,28 @@ function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) 
 }
 
 function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
+  const hasMetadata = Boolean(
+    skill.displayType ||
+    skill.cooldown ||
+    skill.range ||
+    skill.areaOrTarget ||
+    Number.isInteger(skill.cost),
+  );
   return (
     <article className="rounded-xl border border-border bg-muted/20 p-4">
       <div className="flex items-start gap-3">
         <HeroSkillIcon heroId={heroId} skill={skill} />
         <div className="min-w-0 flex-1">
           <h4 className="font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4>
-          <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
-            <span className="rounded bg-zinc-800 px-2 py-1">유형 {skill.displayType}</span>
-            <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span>
-            <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span>
-            <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span>
-            {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
-          </div>
+          {hasMetadata ? (
+            <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
+              {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">유형 {skill.displayType}</span> : null}
+              {skill.cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span> : null}
+              {skill.range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span> : null}
+              {skill.areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span> : null}
+              {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
+            </div>
+          ) : null}
           <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(skill.desc)}</p>
         </div>
       </div>
