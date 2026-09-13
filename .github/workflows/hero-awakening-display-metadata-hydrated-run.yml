@@ -1,0 +1,79 @@
+name: hero-awakening-display-metadata-hydrated-run
+
+on:
+  push:
+    branches: [hero-awakening-display-metadata]
+    paths: [.github/workflows/hero-awakening-display-metadata-hydrated-run.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-validate-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Hydrate current pinned ConfigData authority
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+          count="$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+          test "$count" = "753"
+          test ! -e data/configdata
+          ln -s "$RUNNER_TEMP/configdata-hydrated/data/configdata" data/configdata
+
+      - name: Apply owning-layer patch from reviewed runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('.github/workflows/hero-awakening-display-metadata-run.yml').read_text().splitlines()
+          start = source.index('      - name: Patch owning producers and validator')
+          run_index = next(i for i in range(start + 1, len(source)) if source[i] == '        run: |')
+          body = []
+          for line in source[run_index + 1:]:
+              if line.startswith('      - name: '):
+                  break
+              body.append(line[10:] if line.startswith('          ') else line)
+          if not body or not any('prepare_hero_skill_acquisition_stage44.cjs' in line for line in body):
+              raise SystemExit('reviewed patch block extraction failed')
+          Path('/tmp/apply-awakening-metadata-patch.sh').write_text('\n'.join(body) + '\n')
+          PY
+          bash /tmp/apply-awakening-metadata-patch.sh
+
+      - name: Regenerate Stage 4-4 and Stage 4-5
+        run: |
+          set -euo pipefail
+          npm run inspect:hero-skills
+          npm run inspect:hero-combat
+
+      - name: Validate hero-canonical
+        run: npm run validate:coverage:hero-canonical
+
+      - name: Remove ephemeral raw-source bridge and check intended diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm data/configdata
+          test ! -e data/configdata
+          allowed='^(scripts/prepare_hero_skill_acquisition_stage44\.cjs|scripts/prepare_hero_basic_combat_stage45\.cjs|scripts/validate_hero_stage4_final\.cjs|data/generated/hero-skill-acquisition\.v1\.json|data/validation/hero-skill-stage4-4-summary\.v1\.json|data/generated/hero-basic-combat\.v1\.json|data/validation/hero-basic-combat-stage4-5-summary\.v1\.json|\.github/workflows/hero-awakening-display-metadata-run\.yml|\.github/workflows/hero-awakening-display-metadata-hydrated-run\.yml)$'
+          unexpected="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          [ -z "$unexpected" ] || { echo 'Unexpected repository mutation:'; echo "$unexpected"; exit 1; }
+          git status --short
+
+      - name: Commit completion unit and remove temporary runners
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/prepare_hero_skill_acquisition_stage44.cjs scripts/prepare_hero_basic_combat_stage45.cjs scripts/validate_hero_stage4_final.cjs data/generated/hero-skill-acquisition.v1.json data/validation/hero-skill-stage4-4-summary.v1.json data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json
+          git rm .github/workflows/hero-awakening-display-metadata-run.yml .github/workflows/hero-awakening-display-metadata-hydrated-run.yml
+          git commit -m "feat(hero): preserve awakening skill display metadata"
+          git push origin HEAD:hero-awakening-display-metadata
