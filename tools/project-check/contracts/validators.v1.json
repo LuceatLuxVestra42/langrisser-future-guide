@@ -139,6 +139,14 @@
       "coverage": "Existing Hero canonical validator."
     },
     {
+      "id": "hero-production-materialization",
+      "phase": 20,
+      "executable": "node",
+      "args": ["scripts/validate_hero_stage6_stat_consumer.cjs"],
+      "owner": "hero-production-materialization",
+      "coverage": "Read-only Stage 6-5 production finalDisplayStats materialization parity against the frozen Stage 5-6 composition, Stage 6-3 manifest and Stage 6-4 predecessor validation."
+    },
+    {
       "id": "soldier-canonical",
       "phase": 20,
       "executable": "npm",
