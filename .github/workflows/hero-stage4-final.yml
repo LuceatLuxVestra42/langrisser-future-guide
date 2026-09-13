@@ -34,6 +34,25 @@ jobs:
           node-version: 22
       - name: Regress frozen 4-3 and 4-4 against current direct JSON
         run: node scripts/validate_hero_stage4_upstream_direct.cjs
+      - name: Narrow display metadata projection to awakening snapshots
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'scripts/prepare_hero_basic_combat_stage45.cjs';
+          let s = fs.readFileSync(p, 'utf8');
+          if (!s.includes('function awakeningSkillSnapshot(row)')) {
+            s = s.replace(
+              "    iconPath: row.IconPath ?? row.Icon ?? null,\n    displayType: row.TypeText ?? null,\n    cooldown: row.CDText ?? null,\n    range: row.DistanceText ?? null,\n    areaOrTarget: row.RangeText ?? null,\n",
+              "    iconPath: row.IconPath ?? row.Icon ?? null,\n",
+            );
+            s = s.replace(
+              "\nfunction requireSkillCost",
+              "\nfunction awakeningSkillSnapshot(row) {\n  const skill = skillSnapshot(row);\n  if (!skill) return null;\n  return {\n    ...skill,\n    displayType: row.TypeText ?? null,\n    cooldown: row.CDText ?? null,\n    range: row.DistanceText ?? null,\n    areaOrTarget: row.RangeText ?? null,\n  };\n}\n\nfunction requireSkillCost",
+            );
+            s = s.replace('skill: skillSnapshot(awakenSkill),', 'skill: awakeningSkillSnapshot(awakenSkill),');
+            fs.writeFileSync(p, s.endsWith('\n') ? s : `${s}\n`);
+          }
+          NODE
       - name: Generate final Hero Stage 4-5 data
         run: node scripts/prepare_hero_basic_combat_stage45.cjs
       - name: Validate final Hero Stage 4
@@ -45,8 +64,8 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/generated/hero-basic-combat.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
+          git add scripts/prepare_hero_basic_combat_stage45.cjs data/generated/hero-basic-combat.v1.json data/validation/hero-stage4-upstream-direct.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json data/validation/hero-stage4-a-boundary.v1.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Record Hero Stage 4 final PASS outputs'
+            git commit -m 'Record scoped awakening metadata PASS outputs'
             git push origin HEAD:tmp/awakening-stage4-materialize
           fi
