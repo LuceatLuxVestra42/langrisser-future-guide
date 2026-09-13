@@ -275,8 +275,8 @@ const heroSource = (Array.isArray(heroAsset)
   ? heroAsset.map((row) => ({
       id: row?.ID,
       useable: row?.Useable === true,
-      skillIds: uniqueIntegers(Array.isArray(row?.Skill_IDs) ? row.Skill_IDs : []),
-      hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkill_IDs) ? row.HiddenSkill_IDs : []),
+      skillIds: uniqueIntegers(Array.isArray(row?.Skills_ID) ? row.Skills_ID : []),
+      hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkills_ID) ? row.HiddenSkills_ID : []),
     }))
   : parseSourceRecords(heroAsset).map((fields) => ({
       id: firstVarint(fields, heroFields.id),
