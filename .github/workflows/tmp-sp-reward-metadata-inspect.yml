@@ -30,6 +30,11 @@ jobs:
 
           producer = Path('scripts/build_hero_stage5_4_sp_v2.cjs')
           text = producer.read_text()
+          old_header = "const fs=require('fs'),path=require('path'),R=path.resolve(__dirname,'..');\nconst read=p=>JSON.parse(fs.readFileSync(path.join(R,p),'utf8')), rows=d=>Array.isArray(d)?d:(d?.records||d?.rows||d?.data||[]), mapId=a=>new Map(a.map(x=>[Number(x.ID),x]));"
+          new_header = "const fs=require('fs'),path=require('path'),R=path.resolve(__dirname,'..');\nconst {resolveConfigDataFile}=require('./configdata-source-pack-maintenance-root.cjs');\nconst read=p=>JSON.parse(fs.readFileSync(p.startsWith('data/configdata/')?resolveConfigDataFile(path.basename(p)):path.join(R,p),'utf8')), rows=d=>Array.isArray(d)?d:(d?.records||d?.rows||d?.data||[]), mapId=a=>new Map(a.map(x=>[Number(x.ID),x]));"
+          if old_header not in text:
+              raise SystemExit('Stage5-4 ConfigData read authority drift')
+          text = text.replace(old_header, new_header, 1)
           old = "return{skillId:x,nameCn:q?.Name??null,descCn:q?.Desc??null,icon:q?.Icon??q?.IconName??null,cost:q?.Cost??null};"
           new = "return{skillId:x,nameCn:q?.Name??null,descCn:q?.Desc??null,icon:q?.Icon??q?.IconName??null,displayType:q?.TypeText??null,cooldown:q?.CDText??null,range:q?.DistanceText??null,areaOrTarget:q?.RangeText??null,cost:q?.Cost??null};"
           if old not in text:
@@ -50,22 +55,9 @@ jobs:
           frontend.write_text(text.replace(old_projection, new_projection, 1))
           PY
 
-      - name: Materialize pinned ConfigData maintenance root
-        shell: bash
+      - name: Regenerate and validate Stage 5-4
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          if [ -e data/configdata ]; then
-            echo 'data/configdata unexpectedly exists in tracked checkout' >&2
-            exit 1
-          fi
-          CONFIG_ROOT="$(node -e "const m=require('./scripts/configdata-source-pack-maintenance-root.cjs');process.stdout.write(m.resolveConfigDataSourceRoot())")"
-          test -f "$CONFIG_ROOT/data/configdata/ConfigDataSkillInfo.json"
-          ln -s "$CONFIG_ROOT/data/configdata" data/configdata
-          echo "CONFIG_ROOT=$CONFIG_ROOT" >> "$GITHUB_ENV"
-
-      - name: Regenerate and validate Stage 5-4
         run: node scripts/build_hero_stage5_4_sp_v2.cjs
 
       - name: Verify representative SP reward skills
@@ -76,9 +68,7 @@ jobs:
           const validation = require('./data/validation/hero-page-stage5-4-final.v1.json');
           if (validation.status !== 'PASS' || validation.completion !== 'COMPLETE') throw new Error(`Stage5-4 validation ${validation.status}/${validation.completion}`);
           const found = new Map();
-          for (const hero of artifact.records || []) {
-            for (const skill of hero?.sp?.secondStageRewards?.skills || []) found.set(Number(skill.skillId), skill);
-          }
+          for (const hero of artifact.records || []) for (const skill of hero?.sp?.secondStageRewards?.skills || []) found.set(Number(skill.skillId), skill);
           const expected = {
             12478: {displayType:'被动', cooldown:'-', range:'-', areaOrTarget:'-'},
             12479: {displayType:'物理伤害', cooldown:'5回合', range:'2格', areaOrTarget:'2格'},
@@ -87,7 +77,6 @@ jobs:
             const got = found.get(Number(id));
             if (!got) throw new Error(`missing representative SP reward skill ${id}`);
             for (const [k, v] of Object.entries(want)) if (got[k] !== v) throw new Error(`${id}.${k}: ${JSON.stringify(got[k])} != ${JSON.stringify(v)}`);
-            console.log(id, JSON.stringify({displayType:got.displayType,cooldown:got.cooldown,range:got.range,areaOrTarget:got.areaOrTarget,cost:got.cost}));
           }
           NODE
 
@@ -127,11 +116,6 @@ jobs:
           if (!found || found.displayType !== '物理伤害' || found.cooldown !== '5回合' || found.range !== '2格' || found.areaOrTarget !== '2格') throw new Error(`sharded Hero detail did not preserve SP reward metadata: ${JSON.stringify(found)}`);
           NODE
 
-      - name: Remove temporary ConfigData link
-        if: always()
-        run: |
-          if [ -L data/configdata ]; then rm data/configdata; fi
-
       - name: Install dependencies
         run: npm ci
 
@@ -152,25 +136,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ -L data/configdata ]; then rm data/configdata; fi
           git rm -f .github/workflows/tmp-sp-reward-metadata-inspect.yml
           git rm -f .tmp-sp-reward-metadata-inspect.json .tmp-sp-pipeline-inspect.txt
-
-          EXPECTED='scripts/build_hero_stage5_4_sp_v2.cjs
-          src/lib/hero-detail-stage5.server.ts
-          data/generated/hero-page-stage5-4-sp.v1.json
-          data/validation/hero-page-stage5-4-final.v1.json
-          data/generated/hero-detail-stage6-1.v1.json
-          data/validation/hero-stage6-1-final.v1.json
-          data/generated/hero-detail.v1.json
-          data/generated/hero-detail-shared.v1.json
-          data/generated/hero-detail/by-id
-          data/validation/hero-stage6-3-final.v1.json
-          data/checkpoints/hero-stage6-3-full-generation.json
-          data/checkpoints/hero-stage6-3-full-generation.md
-          .github/workflows/tmp-sp-reward-metadata-inspect.yml
-          .tmp-sp-reward-metadata-inspect.json
-          .tmp-sp-pipeline-inspect.txt'
 
           echo '=== working tree before freeze ==='
           git status --short
