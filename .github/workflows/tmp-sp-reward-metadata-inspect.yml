@@ -14,13 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
+      - name: Runtime
+        run: node --version
       - name: Hydrate ConfigData source pack
-        run: npm run hydrate:configdata-source-pack
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs
       - name: Inspect reward skill rows
         shell: bash
         run: |
