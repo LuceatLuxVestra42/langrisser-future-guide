@@ -51,13 +51,21 @@ function indexUnique(rows, idField, label, errors, filter = () => true) {
   return map;
 }
 
-function skillSnapshot(row) {
+function skillSnapshot(row, presentation = null) {
   if (!row) return null;
-  return {
+  const snapshot = {
     skillId: row.ID,
     nameCn: row.Name ?? null,
     desc: row.Desc ?? null,
     iconPath: row.IconPath ?? row.Icon ?? null,
+  };
+  if (!presentation) return snapshot;
+  return {
+    ...snapshot,
+    displayType: presentation.displayType,
+    cooldown: presentation.cooldown,
+    range: presentation.range,
+    areaOrTarget: presentation.areaOrTarget,
   };
 }
 
@@ -270,6 +278,19 @@ function main() {
   if (!['PASS', 'REVIEW'].includes(jobTree.status)) errors.push(`Stage 4-3 status=${jobTree.status}`);
   if (!['PASS', 'REVIEW'].includes(skillAcquisition.status)) errors.push(`Stage 4-4 status=${skillAcquisition.status}`);
 
+  const stage44SkillInfoRows = Array.isArray(skillAcquisition.skillInfoPresentationCatalog)
+  ? skillAcquisition.skillInfoPresentationCatalog
+  : [];
+const stage44SkillInfoById = indexUnique(
+  stage44SkillInfoRows,
+  'skillId',
+  'Stage 4-4 skillInfoPresentationCatalog',
+  errors,
+);
+if (skillAcquisition.skillInfoPresentationCount !== stage44SkillInfoRows.length) {
+  errors.push(`Stage 4-4 skillInfoPresentationCount=${String(skillAcquisition.skillInfoPresentationCount)} rows=${stage44SkillInfoRows.length}`);
+}
+
   const canonicalIds = new Set((heroMaster.records || []).map((r) => r.heroId).filter(Number.isInteger));
   const treeIds = new Set((jobTree.records || []).map((r) => r.heroId).filter(Number.isInteger));
   const skillIds = new Set((skillAcquisition.records || []).map((r) => r.heroId).filter(Number.isInteger));
@@ -357,13 +378,25 @@ function main() {
         if (!Number.isInteger(level2SkillId) || level2SkillId <= 0) errors.push(`heroId ${treeHero.heroId}: invalid Level2SkillID=${level2SkillId}`);
         const awakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? skillIndex.get(level2SkillId) : null;
         if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !awakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from SkillInfo`);
+        const stage44AwakenSkill = Number.isInteger(level2SkillId) && level2SkillId > 0 ? stage44SkillInfoById.get(level2SkillId) : null;
+        if (Number.isInteger(level2SkillId) && level2SkillId > 0 && !stage44AwakenSkill) errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} missing from Stage 4-4 skillInfoPresentationCatalog`);
+        let metadataValid = Boolean(awakenSkill && stage44AwakenSkill);
+        if (stage44AwakenSkill) {
+          for (const field of ['displayType', 'cooldown', 'range', 'areaOrTarget']) {
+            if (!hasOwn(stage44AwakenSkill, field)) {
+              errors.push(`heroId ${treeHero.heroId}: awakening skill ${level2SkillId} Stage 4-4 missing ${field}`);
+              metadataValid = false;
+            }
+          }
+        }
+        const resolvedAwakenSkill = metadataValid ? skillSnapshot(awakenSkill, stage44AwakenSkill) : null;
         awakening = {
-          status: awakenSkill ? 'VERIFIED' : 'FAIL',
+          status: resolvedAwakenSkill ? 'VERIFIED' : 'FAIL',
           awakenId: awaken.ID,
           nameCn: awaken.Name ?? null,
-          level2Status: awakenSkill ? 'DEFINED' : 'UNRESOLVED',
+          level2Status: resolvedAwakenSkill ? 'DEFINED' : 'UNRESOLVED',
           level2SkillId: Number.isInteger(level2SkillId) && level2SkillId > 0 ? level2SkillId : null,
-          skill: skillSnapshot(awakenSkill),
+          skill: resolvedAwakenSkill,
         };
         if (awakening.status === 'VERIFIED') awakeningSummary.verifiedLevel2Skill += 1;
       } else {

@@ -46,13 +46,14 @@ function inspectTextAsset(asset, expectedName) {
 
 function sourceState(filename) {
   const fullPath = path.join(configDir, filename);
-  if (!fs.existsSync(fullPath)) return { filename, ok: false, issues: ['file missing'] };
+  if (!fs.existsSync(fullPath)) return { filename, ok: false, format: null, issues: ['file missing'] };
   try {
     const asset = loadJson(fullPath);
+    if (Array.isArray(asset)) return { filename, asset, ok: true, format: 'UNITYDATATOOL_DIRECT_ARRAY', issues: [] };
     const expectedName = path.basename(filename, '.json');
-    return { filename, asset, ...inspectTextAsset(asset, expectedName) };
+    return { filename, asset, format: 'LEGACY_TEXT_ASSET', ...inspectTextAsset(asset, expectedName) };
   } catch (error) {
-    return { filename, ok: false, issues: [error instanceof Error ? error.message : String(error)] };
+    return { filename, ok: false, format: null, issues: [error instanceof Error ? error.message : String(error)] };
   }
 }
 
@@ -230,9 +231,10 @@ function writeBlocked(status, upstream, sourceStates, blockers, contract) {
     pipelineStatus: 'READY_FOR_SOURCE_REPLACEMENT',
     upstreamStatus: upstream?.status || 'missing',
     generatedHeroCount: 0,
-    sourceHealth: sourceStates.map(({ filename, ok, issues }) => ({
+    sourceHealth: sourceStates.map(({ filename, ok, format, issues }) => ({
       filename,
       status: ok ? 'usable' : 'broken',
+      format,
       issues,
     })),
     blockers,
@@ -265,24 +267,42 @@ function main() {
   const connectionFields = contract.relationContract.jobConnectionInfo;
   const skillFields = contract.relationContract.skillInfo;
 
-  const heroSource = parseSourceRecords(byFilename.get('ConfigDataHeroInfo.json'))
-    .map((fields) => ({
+  const heroAsset = byFilename.get('ConfigDataHeroInfo.json');
+const connectionAsset = byFilename.get('ConfigDataJobConnectionInfo.json');
+const skillAsset = byFilename.get('ConfigDataSkillInfo.json');
+
+const heroSource = (Array.isArray(heroAsset)
+  ? heroAsset.map((row) => ({
+      id: row?.ID,
+      useable: row?.Useable === true,
+      skillIds: uniqueIntegers(Array.isArray(row?.Skills_ID) ? row.Skills_ID : []),
+      hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkills_ID) ? row.HiddenSkills_ID : []),
+    }))
+  : parseSourceRecords(heroAsset).map((fields) => ({
       id: firstVarint(fields, heroFields.id),
       useable: firstVarint(fields, heroFields.useable) === 1,
       skillIds: uniqueIntegers(integerValues(fields, heroFields.skillIds)),
       hiddenSkillIds: uniqueIntegers(integerValues(fields, heroFields.hiddenSkillIds)),
-    }))
-    .filter((record) => Number.isInteger(record.id) && record.useable);
+    })))
+  .filter((record) => Number.isInteger(record.id) && record.useable);
 
-  const connectionSource = parseSourceRecords(byFilename.get('ConfigDataJobConnectionInfo.json'))
-    .map((fields) => ({
-      id: firstVarint(fields, connectionFields.id),
-      talentSkillIds: uniqueIntegers(integerValues(fields, connectionFields.talentSkillIds)),
-    }))
-    .filter((record) => Number.isInteger(record.id));
+const connectionSource = (Array.isArray(connectionAsset)
+  ? connectionAsset.map((row) => ({ id: row?.ID, talentSkillIds: uniqueIntegers(Array.isArray(row?.TalentSkill_IDs) ? row.TalentSkill_IDs : []) }))
+  : parseSourceRecords(connectionAsset).map((fields) => ({ id: firstVarint(fields, connectionFields.id), talentSkillIds: uniqueIntegers(integerValues(fields, connectionFields.talentSkillIds)) })))
+  .filter((record) => Number.isInteger(record.id));
 
-  const skillSource = parseSourceRecords(byFilename.get('ConfigDataSkillInfo.json'))
-    .map((fields) => ({
+const skillSource = (Array.isArray(skillAsset)
+  ? skillAsset.map((row) => ({
+      id: row?.ID,
+      nameCn: row?.Name ?? null,
+      desc: row?.Desc ?? null,
+      iconPath: row?.Icon ?? row?.IconPath ?? null,
+      displayType: row?.TypeText ?? null,
+      cooldown: row?.CDText ?? null,
+      range: row?.DistanceText ?? null,
+      areaOrTarget: row?.RangeText ?? null,
+    }))
+  : parseSourceRecords(skillAsset).map((fields) => ({
       id: firstVarint(fields, skillFields.id),
       nameCn: firstString(fields, skillFields.name),
       desc: firstString(fields, skillFields.desc),
@@ -291,8 +311,8 @@ function main() {
       cooldown: firstDisplayValue(fields, skillFields.cooldown),
       range: firstDisplayValue(fields, skillFields.range),
       areaOrTarget: firstDisplayValue(fields, skillFields.areaOrTarget),
-    }))
-    .filter((record) => Number.isInteger(record.id));
+    })))
+  .filter((record) => Number.isInteger(record.id));
 
   const heroIndex = indexById(heroSource);
   const connectionIndex = indexById(connectionSource);
@@ -451,12 +471,23 @@ function main() {
   }
 
   const status = hardErrors.length ? 'FAIL' : review.length ? 'REVIEW' : 'PASS';
+  const skillInfoPresentationCatalog = hardErrors.length
+  ? []
+  : skillSource.map((skill) => ({
+      skillId: skill.id,
+      displayType: skill.displayType,
+      cooldown: skill.cooldown,
+      range: skill.range,
+      areaOrTarget: skill.areaOrTarget,
+    })).sort((a, b) => a.skillId - b.skillId);
   writeJson(outputPath, {
     version: 1,
     stage: '4-4',
     status,
     recordCount: hardErrors.length ? 0 : records.length,
     records: hardErrors.length ? [] : records,
+    skillInfoPresentationCount: skillInfoPresentationCatalog.length,
+    skillInfoPresentationCatalog,
   });
   writeJson(summaryPath, {
     version: 1,
@@ -464,6 +495,7 @@ function main() {
     status,
     upstreamStatus: upstream.status,
     generatedHeroCount: hardErrors.length ? 0 : records.length,
+    skillInfoPresentationCount: hardErrors.length ? 0 : skillSource.length,
     sourceRecordCounts: {
       playableHeroInfo: heroSource.length,
       jobConnectionInfo: connectionSource.length,
