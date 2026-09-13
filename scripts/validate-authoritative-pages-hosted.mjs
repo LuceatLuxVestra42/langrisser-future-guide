@@ -129,9 +129,11 @@ try {
   response = await page.goto(url("equipment/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Equipment list failed: ${response?.status()}`);
   await page.getByText("장비 종류", { exact: true }).waitFor({ state: "visible" });
-  for (const removedLabel of ["초기 장비", "이전 추가 장비", "장비패스"]) {
+  for (const removedLabel of ["초기 장비", "이전 추가 장비"]) {
     check(await page.getByRole("button", { name: removedLabel, exact: true }).count() === 0, `Removed Equipment top-level category is still visible: ${removedLabel}`);
   }
+  const equipmentPassFilter = page.getByRole("button", { name: "장비패스", exact: true });
+  check(await equipmentPassFilter.count() === 1, "Equipment pass presentation filter is missing or duplicated");
   const cardLinks = page.locator('section[aria-label="SSR 장비 이미지 목록"] a[href]');
   const cardCount = await cardLinks.count();
   check(cardCount === expectedGeneralEquipmentCount, `Equipment general list card count mismatch: ${cardCount}/${expectedGeneralEquipmentCount}`);
