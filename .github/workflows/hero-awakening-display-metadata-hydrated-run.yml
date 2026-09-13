@@ -48,10 +48,28 @@ jobs:
           bash /tmp/apply-awakening-metadata-patch.sh
 
       - name: Regenerate Stage 4-4 and Stage 4-5
+        id: regenerate
+        shell: bash
         run: |
-          set -euo pipefail
-          npm run inspect:hero-skills
-          npm run inspect:hero-combat
+          set +e
+          npm run inspect:hero-skills > /tmp/stage44.log 2>&1
+          stage44=$?
+          cat /tmp/stage44.log
+          if [ "$stage44" -ne 0 ]; then exit "$stage44"; fi
+          npm run inspect:hero-combat > /tmp/stage45.log 2>&1
+          stage45=$?
+          cat /tmp/stage45.log
+          exit "$stage45"
+
+      - name: Upload regeneration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: awakening-regeneration-evidence
+          path: |
+            /tmp/stage44.log
+            /tmp/stage45.log
+          if-no-files-found: ignore
 
       - name: Validate hero-canonical
         run: npm run validate:coverage:hero-canonical
