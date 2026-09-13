@@ -3,17 +3,21 @@
   "stage": "hero-page-5-6-stat-composition",
   "status": "CANDIDATE",
   "owner": "hero-canonical",
-  "purpose": "Materialize final Hero job display stats after Stage 4 base stats by applying explicit Hero Fetter percentage effects, SP second-stage Hero-stat percentage effects where released, and HeartFetter level-10 percentage/flat effects. Stage 6 consumes this artifact without semantic recomputation.",
+  "purpose": "Materialize final Hero job display stats after Stage 4 base stats by reusing the frozen B1 MAX normal Hero-bond multiplier, applying SP second-stage Hero-stat percentage effects where released, and applying HeartFetter level-10 percentage/flat effects. Stage 6 consumes this artifact without semantic recomputation.",
   "predecessors": {
     "stage4BaseStats": "data/generated/hero-basic-combat.v1.json",
     "stage51Bonds": "data/generated/hero-page-stage5-1-bonds-final.v1.json",
     "stage54Sp": "data/generated/hero-page-stage5-4-sp.v1.json",
-    "centralBondRule": "data/contracts/hero-central-bond-stat-effect-stage5.v1.json"
+    "centralBondRule": "data/contracts/hero-central-bond-stat-effect-stage5.v1.json",
+    "normalBondCompletedRule": "historical FROZEN B1 normal bonded consumer: bondProfile=MAX, bondSelfMul=2500"
   },
   "semanticRules": {
     "stage4BaseMeaningUnchanged": true,
     "stage4BaseExcludesBondEffects": true,
-    "normalBondSource": "Stage 5-1 gotSkillId -> ConfigDataSkillInfo.ID -> PassiveBuffs_ID -> ConfigDataBuffInfo.ID -> explicit Property1..4_ID/Value",
+    "normalBondSource": "Reuse completed/frozen B1 MAX normal Hero-bond rule: bondSelfMul=2500, equivalent to +25% for each of hp/at/magic/df/magicDf/dex. Stage 5-1 bond records remain relation/provenance evidence only and their GotSkills are not re-aggregated into Hero stat rates.",
+    "normalBondProfile": "MAX",
+    "normalBondSelfMul": 2500,
+    "normalBondRate": 0.25,
     "heroStatPropertyModifyIds": {
       "99": "hp",
       "100": "at",
@@ -40,6 +44,7 @@
     "filenameSimilarity": false,
     "stage4Recomputation": false,
     "stage6SemanticRecomputation": false,
+    "normalBondSkillReaggregation": false,
     "runtimeRawConfigDataRead": false,
     "sourcePackAccess": "maintenance-only through scripts/lib/configdata-direct.cjs and the pinned ConfigData source-pack contract"
   },
@@ -53,10 +58,10 @@
     "267 canonical Hero records are composed",
     "SP release parity is exactly 25 released Heroes",
     "all normal and SP values are non-negative integers",
+    "all 267 Hero records reuse bondProfile=MAX and bondSelfMul=2500 with normal Hero bond rate exactly 25% for all six Hero stats",
     "Leon SP Job 377 equals hp=4929, at=623, magic=233, df=300, magicDf=280, dex=130 with zero tolerance",
-    "Leon normal Hero bond rate resolves to 25% for all six Hero stats",
     "Leon SP second-stage bonus resolves to HP +5% and DEF +5%",
-    "no Stage 4 semantic mutation, name JOIN, ID arithmetic, or runtime raw ConfigData dependency is introduced"
+    "no Stage 4 semantic mutation, name JOIN, ID arithmetic, normal-bond GotSkill re-aggregation, or runtime raw ConfigData dependency is introduced"
   ],
   "promotionRule": "Promote from CANDIDATE only after the owning validator passes on repository-generated output. Stage 6 and frontend wiring remain non-scope until promotion."
 }
