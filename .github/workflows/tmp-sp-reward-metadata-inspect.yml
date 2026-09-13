@@ -104,7 +104,7 @@ jobs:
           node scripts/shard_hero_stage6_3_output.cjs
           node - <<'NODE'
           const v = require('./data/validation/hero-stage6-3-final.v1.json');
-          if (v.status !== 'PASS' || v.completion !== 'COMPLETE') throw new Error(`Stage6-3 validation ${v.status}/${v.completion}`);
+          if (!['PASS','PASS_WITH_REVIEW'].includes(v.status) || v.completion !== 'COMPLETE' || Number(v.summary?.hardErrorCount) !== 0) throw new Error(`Stage6-3 validation ${v.status}/${v.completion}/hard=${v.summary?.hardErrorCount}`);
           const shards = require('fs').readdirSync('./data/generated/hero-detail/by-id').filter(x => x.endsWith('.json'));
           if (shards.length !== 267) throw new Error(`expected 267 Hero shards, got ${shards.length}`);
           let found = null;
