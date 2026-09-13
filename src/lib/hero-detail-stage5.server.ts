@@ -131,6 +131,10 @@ type Stage6SpRewardSkill = {
   nameCn?: string | null;
   descCn?: string | null;
   icon?: string | null;
+  displayType?: string | null;
+  cooldown?: string | null;
+  range?: string | null;
+  areaOrTarget?: string | null;
   cost?: number | null;
 };
 
@@ -242,10 +246,10 @@ function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
     nameCn: skill.nameCn ?? null,
     desc: skill.descCn ?? null,
     iconPath: skill.icon ?? null,
-    displayType: null,
-    cooldown: null,
-    range: null,
-    areaOrTarget: null,
+    displayType: skill.displayType ?? null,
+    cooldown: skill.cooldown ?? null,
+    range: skill.range ?? null,
+    areaOrTarget: skill.areaOrTarget ?? null,
     cost: Number.isInteger(skill.cost) ? Number(skill.cost) : null,
   };
 }
