@@ -1,16 +1,16 @@
 # Hero Stage 6-5 Stat Consumer Refresh
 
-- Status: **FAIL / BLOCKED**
+- Status: **PASS / COMPLETE**
 - Stage 5-6 predecessor: **PASS / COMPLETE**
 - Production Hero shards: **267/267**
 - Normal jobs refreshed: **1388**
 - Normal parity mismatches: **0**
 - SP jobs refreshed: **25/25**
 - SP parity mismatches: **0**
-- Leon SP JobConnection 377 exact regression matches: **1**
+- Leon SP Job 377 exact regression matches: **1**
 - Frontend production shard consumer: **PASS**
 - Frontend normal final-job stat render: **PASS**
-- Hard errors: **1**
+- Hard errors: **0**
 
 ## Authority
 
