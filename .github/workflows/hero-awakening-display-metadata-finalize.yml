@@ -1,0 +1,157 @@
+name: hero-awakening-display-metadata-finalize
+on:
+  push:
+    branches: [hero-awakening-display-metadata]
+    paths: [.github/workflows/hero-awakening-display-metadata-finalize.yml]
+permissions:
+  contents: write
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Hydrate pinned ConfigData authority
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-hydrated"
+          test "$(find "$RUNNER_TEMP/configdata-hydrated/data/configdata" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "753"
+          test ! -e data/configdata
+          ln -s "$RUNNER_TEMP/configdata-hydrated/data/configdata" data/configdata
+      - name: Apply reviewed awakening patch
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('.github/workflows/hero-awakening-display-metadata-run.yml').read_text().splitlines()
+          start=source.index('      - name: Patch owning producers and validator')
+          run_index=next(i for i in range(start+1,len(source)) if source[i]=='        run: |')
+          body=[]
+          for line in source[run_index+1:]:
+              if line.startswith('      - name: '): break
+              body.append(line[10:] if line.startswith('          ') else line)
+          Path('/tmp/apply.sh').write_text('\n'.join(body)+'\n')
+          PY
+          bash /tmp/apply.sh
+      - name: Apply direct-source compatibility maintenance
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('scripts/prepare_hero_skill_acquisition_stage44.cjs')
+          t=p.read_text()
+          s=t.index('function sourceState(filename) {')
+          e=t.index('\nfunction splitLengthPrefixedMessages', s)
+          source_state="""function sourceState(filename) {
+            const fullPath = path.join(configDir, filename);
+            if (!fs.existsSync(fullPath)) return { filename, ok: false, format: null, issues: ['file missing'] };
+            try {
+              const asset = loadJson(fullPath);
+              if (Array.isArray(asset)) return { filename, asset, ok: true, format: 'UNITYDATATOOL_DIRECT_ARRAY', issues: [] };
+              const expectedName = path.basename(filename, '.json');
+              return { filename, asset, format: 'LEGACY_TEXT_ASSET', ...inspectTextAsset(asset, expectedName) };
+            } catch (error) {
+              return { filename, ok: false, format: null, issues: [error instanceof Error ? error.message : String(error)] };
+            }
+          }
+          """
+          t=t[:s]+source_state+t[e:]
+          s=t.index("  const heroSource = parseSourceRecords(byFilename.get('ConfigDataHeroInfo.json'))")
+          e=t.index('\n  const heroIndex = indexById(heroSource);', s)
+          decode="""  const heroAsset = byFilename.get('ConfigDataHeroInfo.json');
+          const connectionAsset = byFilename.get('ConfigDataJobConnectionInfo.json');
+          const skillAsset = byFilename.get('ConfigDataSkillInfo.json');
+
+          const heroSource = (Array.isArray(heroAsset)
+            ? heroAsset.map((row) => ({
+                id: row?.ID,
+                useable: row?.Useable === true,
+                skillIds: uniqueIntegers(Array.isArray(row?.Skill_IDs) ? row.Skill_IDs : []),
+                hiddenSkillIds: uniqueIntegers(Array.isArray(row?.HiddenSkill_IDs) ? row.HiddenSkill_IDs : []),
+              }))
+            : parseSourceRecords(heroAsset).map((fields) => ({
+                id: firstVarint(fields, heroFields.id),
+                useable: firstVarint(fields, heroFields.useable) === 1,
+                skillIds: uniqueIntegers(integerValues(fields, heroFields.skillIds)),
+                hiddenSkillIds: uniqueIntegers(integerValues(fields, heroFields.hiddenSkillIds)),
+              })))
+            .filter((record) => Number.isInteger(record.id) && record.useable);
+
+          const connectionSource = (Array.isArray(connectionAsset)
+            ? connectionAsset.map((row) => ({ id: row?.ID, talentSkillIds: uniqueIntegers(Array.isArray(row?.TalentSkill_IDs) ? row.TalentSkill_IDs : []) }))
+            : parseSourceRecords(connectionAsset).map((fields) => ({ id: firstVarint(fields, connectionFields.id), talentSkillIds: uniqueIntegers(integerValues(fields, connectionFields.talentSkillIds)) })))
+            .filter((record) => Number.isInteger(record.id));
+
+          const skillSource = (Array.isArray(skillAsset)
+            ? skillAsset.map((row) => ({
+                id: row?.ID,
+                nameCn: row?.Name ?? null,
+                desc: row?.Desc ?? null,
+                iconPath: row?.Icon ?? row?.IconPath ?? null,
+                displayType: row?.TypeText ?? null,
+                cooldown: row?.CDText ?? null,
+                range: row?.DistanceText ?? null,
+                areaOrTarget: row?.RangeText ?? null,
+              }))
+            : parseSourceRecords(skillAsset).map((fields) => ({
+                id: firstVarint(fields, skillFields.id),
+                nameCn: firstString(fields, skillFields.name),
+                desc: firstString(fields, skillFields.desc),
+                iconPath: firstString(fields, skillFields.iconPath),
+                displayType: firstDisplayValue(fields, skillFields.displayType),
+                cooldown: firstDisplayValue(fields, skillFields.cooldown),
+                range: firstDisplayValue(fields, skillFields.range),
+                areaOrTarget: firstDisplayValue(fields, skillFields.areaOrTarget),
+              })))
+            .filter((record) => Number.isInteger(record.id));
+          """
+          t=t[:s]+decode+t[e:]
+          old='sourceHealth: sourceStates.map(({ filename, ok, issues }) => ({'
+          if t.count(old)!=1: raise SystemExit(f'sourceHealth anchor count={t.count(old)}')
+          t=t.replace(old, 'sourceHealth: sourceStates.map(({ filename, ok, format, issues }) => ({', 1)
+          t=t.replace("      status: ok ? 'usable' : 'broken',\n      issues,", "      status: ok ? 'usable' : 'broken',\n      format,\n      issues,", 1)
+          p.write_text(t)
+
+          cp=Path('data/hero-skill-acquisition-stage4-4.v1.json')
+          c=json.loads(cp.read_text())
+          c['directSourceContract']={
+            'heroInfo': {'id':'ID','useable':'Useable','skillIds':'Skill_IDs','hiddenSkillIds':'HiddenSkill_IDs'},
+            'jobConnectionInfo': {'id':'ID','talentSkillIds':'TalentSkill_IDs'},
+            'skillInfo': {'id':'ID','name':'Name','desc':'Desc','iconPath':'Icon','displayType':'TypeText','cooldown':'CDText','range':'DistanceText','areaOrTarget':'RangeText'},
+          }
+          c['validationPolicy']['SOURCE_BLOCKED']=['HeroInfo, JobConnectionInfo, or SkillInfo source is missing or structurally invalid for the current UnityDataTool direct-array format or the preserved legacy TextAsset format.']
+          c['currentSourceState']={
+            'stage4-3':'PASS: 267/267 job-tree records generated',
+            'ConfigDataHeroInfo.json':'current hash-pinned source-pack payload; UnityDataTool direct JSON array',
+            'ConfigDataJobConnectionInfo.json':'current hash-pinned source-pack payload; UnityDataTool direct JSON array',
+            'ConfigDataSkillInfo.json':'current hash-pinned source-pack payload; UnityDataTool direct JSON array',
+          }
+          cp.write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Regenerate Stage 4-4
+        run: npm run inspect:hero-skills
+      - name: Regenerate Stage 4-5
+        run: npm run inspect:hero-combat
+      - name: Validate hero-canonical
+        run: npm run validate:coverage:hero-canonical
+      - name: Fail closed on unexpected mutation
+        run: |
+          set -euo pipefail
+          rm data/configdata
+          allowed='^(data/hero-skill-acquisition-stage4-4\.v1\.json|scripts/prepare_hero_skill_acquisition_stage44\.cjs|scripts/prepare_hero_basic_combat_stage45\.cjs|scripts/validate_hero_stage4_final\.cjs|data/generated/hero-skill-acquisition\.v1\.json|data/validation/hero-skill-stage4-4-summary\.v1\.json|data/generated/hero-basic-combat\.v1\.json|data/validation/hero-basic-combat-stage4-5-summary\.v1\.json|\.github/workflows/hero-awakening-display-metadata-(run|hydrated-run|patch-diagnose|finalize)\.yml)$'
+          unexpected="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          test -z "$unexpected" || { echo "$unexpected"; exit 1; }
+          git status --short
+      - name: Commit completion unit
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/hero-skill-acquisition-stage4-4.v1.json scripts/prepare_hero_skill_acquisition_stage44.cjs scripts/prepare_hero_basic_combat_stage45.cjs scripts/validate_hero_stage4_final.cjs data/generated/hero-skill-acquisition.v1.json data/validation/hero-skill-stage4-4-summary.v1.json data/generated/hero-basic-combat.v1.json data/validation/hero-basic-combat-stage4-5-summary.v1.json
+          git rm .github/workflows/hero-awakening-display-metadata-run.yml .github/workflows/hero-awakening-display-metadata-hydrated-run.yml .github/workflows/hero-awakening-display-metadata-patch-diagnose.yml .github/workflows/hero-awakening-display-metadata-finalize.yml
+          git commit -m 'feat(hero): preserve awakening skill display metadata'
+          git push origin HEAD:hero-awakening-display-metadata
