@@ -14,30 +14,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect and persist reward skill rows
+      - name: Inspect pipeline entrypoints
         shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          if [ -f .tmp-sp-reward-metadata-inspect.json ]; then
-            echo 'inspection report already present; no-op'
+          if [ -f .tmp-sp-pipeline-inspect.txt ]; then
+            echo 'pipeline inspection report already present; no-op'
             exit 0
           fi
-          node <<'NODE'
-          const fs = require('fs');
-          const { resolveConfigDataFile } = require('./scripts/configdata-source-pack-maintenance-root.cjs');
-          const p = resolveConfigDataFile('ConfigDataSkillInfo.json');
-          const d = JSON.parse(fs.readFileSync(p, 'utf8'));
-          const rows = Array.isArray(d) ? d : (d?.records || d?.rows || d?.data || []);
-          const skills = {};
-          for (const id of [12478, 12479]) {
-            const q = rows.find(x => Number(x?.ID) === id) || null;
-            skills[id] = q;
-          }
-          fs.writeFileSync('.tmp-sp-reward-metadata-inspect.json', JSON.stringify({rowCount: rows.length, skills}, null, 2) + '\n');
-          NODE
+          {
+            echo '=== stage5-4 references ==='
+            grep -RIl --exclude-dir=node_modules 'hero-page-stage5-4-sp.v1.json' scripts src .github 2>/dev/null || true
+            echo '=== stage6-1 output references ==='
+            grep -RIl --exclude-dir=node_modules 'hero-detail-stage6-1.v1.json' scripts src .github 2>/dev/null || true
+            echo '=== full hero detail output references ==='
+            grep -RIl --exclude-dir=node_modules 'hero-detail.v1.json' scripts src .github 2>/dev/null || true
+            echo '=== shard/by-id references ==='
+            grep -RIl --exclude-dir=node_modules 'hero-detail/by-id' scripts src .github 2>/dev/null || true
+            echo '=== preflight references ==='
+            grep -RIl --exclude-dir=node_modules -E 'preflight|Preflight' scripts package.json .github 2>/dev/null || true
+            echo '=== candidate hero generation scripts ==='
+            find scripts -maxdepth 1 -type f \( -name '*hero*stage6*' -o -name '*hero*detail*' -o -name '*hero*page*stage5*' \) -printf '%f\n' | sort
+          } > .tmp-sp-pipeline-inspect.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .tmp-sp-reward-metadata-inspect.json
-          git commit -m 'chore: capture SP reward skill metadata inspection'
+          git add .tmp-sp-pipeline-inspect.txt
+          git commit -m 'chore: capture SP pipeline entrypoints'
           git push
