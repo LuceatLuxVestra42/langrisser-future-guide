@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-ct7-job-activation-hypothesis-v1",
+  "status": "RESEARCH_HYPOTHESIS",
+  "owner": "hero-canonical-research",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "cccdd6d9c72f60afa26308a25714473b8e108821"
+  },
+  "purpose": "Record a reusable, explicitly non-canonical hypothesis for interpreting HeartFetter ConditionType=7 while authoritative runtime evaluator evidence is unavailable.",
+  "authoritativeReferences": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "jobParamConsistency": "data/validation/hero-heart-fetter-job-param-consistency.v1.json",
+    "levelPairingConsistency": "data/validation/hero-heart-fetter-level-pairing-consistency.v1.json",
+    "kaguraSourceDiagnostic": "data/validation/hero-heart-fetter-kagura-source-diagnostic.v1.json",
+    "semanticLineageEvidence": "data/validation/hero-heart-fetter-semantic-lineage-evidence.v1.json"
+  },
+  "observedEvidence": {
+    "conditionType": 7,
+    "conditionCount": 1158,
+    "paramCount": 1158,
+    "jobInfoMatchCount": 1158,
+    "sameHeroFrozenJobMatchCount": 1158,
+    "mismatchCount": 0,
+    "heroesWithType7": 267,
+    "heroesWithBothLv4AndLv7Type7": 267,
+    "heroesWithMatchingUniqueLv4Lv7JobParamSets": 266,
+    "heroesWithDifferentUniqueLv4Lv7JobParamSets": 1,
+    "sourceDescriptionDiagnostic": {
+      "heroId": 144,
+      "jobIds": [126, 307],
+      "descriptionsExplicitlyStateJobActivation": true,
+      "conditionParamsMatchNamedJobsInCorrespondingBuffRecords": true
+    }
+  },
+  "hypothesis": {
+    "statement": "For HeartFetter Lv4/Lv7 Buff records with ConditionType=7, each ConditionParam value is an explicit JobInfo.ID identifying the job/class under which that buff effect is intended to activate.",
+    "confidencePercent": 97,
+    "confidenceBasis": [
+      "All 1,158 observed ConditionType=7 params resolve to JobInfo.ID and belong to the same frozen hero's explicit normal/SP job set.",
+      "All 267 frozen heroes have ConditionType=7 evidence at both HeartFetter Lv4 and Lv7.",
+      "Hero 144 provides source-description evidence that explicitly names job activation and matches ConditionParam JobInfo IDs 126 and 307.",
+      "Published class-specific HeartFetter presentation and historical semantic-lineage evidence support a job/class relationship."
+    ],
+    "unresolvedDetails": [
+      "The exact runtime comparator or evaluator branch for ConditionType=7 is not directly observed.",
+      "Whether the runtime checks current active job, a derived class state, or an equivalent internal job predicate remains unproven.",
+      "This hypothesis must not be treated as proof of generic runtime implementation details beyond the job/class activation relation."
+    ]
+  },
+  "allowedUse": {
+    "researchProjection": true,
+    "diagnosticPresentation": true,
+    "canonicalRelationMutation": false,
+    "createApplicableJobIds": false,
+    "createJobRestricted": false,
+    "changeHeroJobCanonicalRelation": false,
+    "productionFrontendConsumption": false,
+    "rawConfigDataRuntimeFallback": false
+  },
+  "reopenConditions": [
+    "A post-HeartFetter runtime evaluator contradicts job/class activation semantics.",
+    "A current source-pack record with ConditionType=7 has a ConditionParam that does not resolve to the same hero's explicit JobInfo set.",
+    "A source/contract/schema change invalidates the referenced validation evidence."
+  ],
+  "completion": "A high-confidence, non-canonical CT7 job-activation hypothesis is recorded for research reuse without changing Hero canonical relations or production consumers."
+}
