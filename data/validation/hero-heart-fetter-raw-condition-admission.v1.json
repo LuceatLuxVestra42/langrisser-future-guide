@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-raw-condition-admission-v1",
+  "status": "PENDING_CI",
+  "owner": "hero-canonical",
+  "base": "c52c876976facdcaaef278b49bffc7a0cc936cd9",
+  "scope": "Read-only Lv4/Lv7 raw-condition producer and independent validator admission; generated publication deferred.",
+  "artifacts": [
+    "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "scripts/build-hero-heart-fetter-raw-condition-v1.cjs",
+    "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs",
+    ".github/workflows/hero-heart-fetter-raw-condition-v1.yml"
+  ],
+  "semanticBoundary": {
+    "conditionType7Meaning": "MANUAL_REVIEW",
+    "applicableJobIdsAllowed": false,
+    "jobRestrictedAllowed": false,
+    "heroJobRelationReopened": false
+  },
+  "next": "Run PR CI and close this admission only after raw parity, hero-canonical owner validation, Project Check, and tracked-mutation guards pass."
+}
