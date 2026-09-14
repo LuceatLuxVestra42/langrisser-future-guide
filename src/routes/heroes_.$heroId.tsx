@@ -483,6 +483,8 @@ function HeroDetailPage() {
           )}
         </section>
 
+        {detail.sp.released ? <HeroSpMissionSection missions={detail.sp.missions} /> : null}
+
         <HeroSoldierCommandSection soldierCommand={soldierCommand} />
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -660,6 +662,76 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
   );
 }
 
+type SpMissionView = {
+  missionId: number | null;
+  phase: string | null;
+  titleCn: string | null;
+  descCn: string | null;
+  missionType: number | null;
+  condition: {
+    kind: string | null;
+    items: Array<{ goodsType: number | null; sourceId: number | null; count: number | null }>;
+    equipmentId: number | null;
+    requiredLevel: number | null;
+    requiredHeroIds: number[];
+    stageId: number | null;
+    stageIds: number[];
+    clearCount: number | null;
+  };
+};
+
+function HeroSpMissionSection({ missions }: { missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] } }) {
+  if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
+  return (
+    <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-sp-missions="true" data-sp-first-stage-count={missions.firstStage.length} data-sp-second-stage-count={missions.secondStage.length}>
+      <SectionTitle title="SP 전직 미션" />
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <SpMissionPhase title="1차 전직" missions={missions.firstStage} />
+        <SpMissionPhase title="2차 전직" missions={missions.secondStage} />
+      </div>
+    </section>
+  );
+}
+
+function SpMissionPhase({ title, missions }: { title: string; missions: SpMissionView[] }) {
+  return (
+    <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm font-bold text-foreground">{title}</h3>
+        <span className="text-xs font-semibold tabular-nums text-muted-foreground">{missions.length}개</span>
+      </div>
+      <ol className="mt-3 space-y-2">
+        {missions.map((mission, index) => (
+          <li key={mission.missionId ?? index} className="rounded-lg border border-border bg-background px-3 py-3" data-sp-mission-id={mission.missionId ?? undefined}>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black tabular-nums text-muted-foreground">{index + 1}</span>
+              <span className="text-sm font-bold text-foreground">{mission.titleCn ?? ("Mission " + (mission.missionId ?? "?"))}</span>
+            </div>
+            {mission.descCn ? <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(mission.descCn)}</p> : null}
+            {mission.condition.items.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-1.5" aria-label="필요 재료">
+                {mission.condition.items.map((item, itemIndex) => (
+                  <span key={String(mission.missionId ?? index) + "-material-" + itemIndex} className="rounded-md border border-border bg-muted/30 px-2 py-1 text-[11px] font-semibold text-foreground">
+                    {"ID " + (item.sourceId ?? "?") + " ×" + (item.count ?? "?")}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {formatSpMissionCondition(mission) ? <p className="mt-2 text-xs font-semibold leading-5 text-foreground">{formatSpMissionCondition(mission)}</p> : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function formatSpMissionCondition(mission: SpMissionView) {
+  const condition = mission.condition;
+  if (condition.kind === "EXCLUSIVE_EQUIPMENT_LEVEL") return "전용장비 ID " + (condition.equipmentId ?? "?") + " · Lv." + (condition.requiredLevel ?? "?") + " 달성";
+  if (condition.kind === "CLEAR_STORY_STAGE_WITH_HEROES") return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · Stage " + (condition.stageId ?? "?") + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  if (condition.kind === "CLEAR_ACTIVITY_STAGE_WITH_HEROES" || condition.kind === "CLEAR_ACTIVITY_STAGE_SOLO_OR_SPECIFIED") return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · Stage " + condition.stageIds.join(", ") + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  return null;
+}
 function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {
   if (condition.favorability) {
     const targetName = condition.favorability.targetHeroNameKr ?? condition.favorability.targetHeroNameCn ?? condition.favorability.targetHeroNameEn ?? "영웅";
