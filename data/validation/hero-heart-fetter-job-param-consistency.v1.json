@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-job-param-consistency-v1",
+  "status": "PASS",
+  "owner": "hero-canonical",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "48e18e45415c5b0ffeb8cefcc64cb063747f609d"
+  },
+  "purpose": "Record non-semantic structural consistency evidence for HeartFetter Lv4/Lv7 ConditionType=7 parameters after correcting the frozen Hero SP-job validator path. This unit does not assign the runtime meaning of ConditionType=7 or ConditionParam.",
+  "currentAuthority": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "rawConditionPublicationValidation": "data/validation/hero-heart-fetter-raw-condition-publication.v1.json",
+    "semanticLineageValidation": "data/validation/hero-heart-fetter-semantic-lineage-evidence.v1.json",
+    "rawConditionValidator": "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs"
+  },
+  "validatorMaintenance": {
+    "pr": 911,
+    "validatedHead": "1854f9f40f2167878704bff61f76e45ebb3f45a6",
+    "mergedMain": "48e18e45415c5b0ffeb8cefcc64cb063747f609d",
+    "workflowRunId": 34825293588,
+    "projectCheckRunId": 34825293807,
+    "cause": "The consistency validator read SP jobs from shard.sp.jobTree.connections, while the current frozen Hero shard schema stores the released SP job at shard.sp.job.jobId.",
+    "mutation": "Collect normal jobs from normal.jobTree.connections and the explicit SP job from sp.job.jobId.",
+    "changedPath": "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs"
+  },
+  "evidence": {
+    "heroPopulationCount": 267,
+    "rawRecordCount": 1066,
+    "conditionType": 7,
+    "conditionCount": 1158,
+    "paramCount": 1158,
+    "jobInfoMatchCount": 1158,
+    "frozenHeroJobSetMatchCount": 1158,
+    "mismatchCount": 0,
+    "frozenHeroJobSetDefinition": [
+      "normal.jobTree.connections[].jobId",
+      "sp.job.jobId when present"
+    ],
+    "workflowConclusion": "success",
+    "projectCheckConclusion": "success",
+    "heroCanonicalOwnerValidator": "PASS",
+    "trackedPublicationParity": "PASS",
+    "repositoryMutationGuard": "PASS"
+  },
+  "validatedConclusions": {
+    "everyConditionType7ParamResolvesToJobInfoId": true,
+    "everyConditionType7ParamBelongsToTheSameFrozenHeroExplicitNormalOrSpJobSet": true,
+    "previous51MismatchRowsWereValidatorSchemaPathDrift": true,
+    "jobOrClassRelationshipStructurallyConfirmed": true,
+    "exactConditionType7RuntimePredicateResolved": false,
+    "conditionParamExactGameplayRoleResolved": false
+  },
+  "semanticBoundary": {
+    "conditionType7Meaning": "UNRESOLVED",
+    "conditionParamRuntimeComparator": "UNRESOLVED",
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayChangeHeroJobCanonicalRelation": false,
+    "mayUseNameJoin": false,
+    "mayUseIdArithmetic": false,
+    "mayInferCurrentActiveJobComparatorFromMembershipAlone": false
+  },
+  "completion": "JOB_PARAM_CONSISTENCY_COMPLETE",
+  "next": "Continue exact runtime-predicate resolution. Reuse the verified fact that all 1,158 ConditionType=7 params are explicit same-hero normal/SP JobInfo IDs; do not re-open the former 51 mismatch rows as semantic exceptions."
+}
