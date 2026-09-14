@@ -3,7 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const { ROOT } = require('./lib/configdata-direct.cjs');
+const { ROOT, loadArray } = require('./lib/configdata-direct.cjs');
 
 const RAW_PATH = path.join(ROOT, 'data/generated/hero-heart-fetter-raw-condition.v1.json');
 const HYPOTHESIS_PATH = path.join(ROOT, 'data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json');
@@ -18,6 +18,16 @@ function artifactPath(argv) {
 function positiveInteger(value, label) {
   assert(Number.isInteger(value) && value > 0, `${label}: expected positive integer`);
   return value;
+}
+function text(value) { return typeof value === 'string' && value.length > 0 ? value : null; }
+function indexUnique(records, label) {
+  const map = new Map();
+  records.forEach((record, sourceIndex) => {
+    const id = positiveInteger(record?.ID, `${label}[${sourceIndex}].ID`);
+    assert(!map.has(id), `${label}: duplicate ID ${id}`);
+    map.set(id, { record, sourceIndex });
+  });
+  return map;
 }
 function collectHeroJobs(heroId) {
   const shard = readJson(path.join(HERO_DIR, `${heroId}.json`));
@@ -41,6 +51,8 @@ function main() {
   const artifact = readJson(artifactPath(process.argv.slice(2)));
   const raw = readJson(RAW_PATH);
   const hypothesis = readJson(HYPOTHESIS_PATH);
+  const skills = indexUnique(loadArray('ConfigDataSkillInfo'), 'ConfigDataSkillInfo');
+  const buffs = indexUnique(loadArray('ConfigDataBuffInfo'), 'ConfigDataBuffInfo');
 
   assert.strictEqual(hypothesis.status, 'RESEARCH_HYPOTHESIS');
   assert.strictEqual(hypothesis.allowedUse.researchProjection, true);
@@ -68,6 +80,8 @@ function main() {
 
   const actualKeys = new Set();
   const heroCache = new Map();
+  let nonNullSkillDescriptions = 0;
+  let nonNullBuffDescriptions = 0;
   for (const row of artifact.effects || []) {
     const heroId = positiveInteger(row.heroId, 'row.heroId');
     assert(row.heartFetterLevel === 4 || row.heartFetterLevel === 7, `Hero ${heroId}: invalid level`);
@@ -81,6 +95,18 @@ function main() {
     assert.deepStrictEqual(row.identity, ctx.identity, `Hero ${heroId}: identity drift`);
     assert(ctx.jobs.has(jobId), `Hero ${heroId}: projected job ${jobId} not in frozen hero job set`);
     assert.strictEqual(row.job.nameCn, ctx.jobs.get(jobId), `Hero ${heroId}: job name drift`);
+
+    const skillHit = skills.get(skillId);
+    const buffHit = buffs.get(buffId);
+    assert(skillHit, `Hero ${heroId}: missing Skill ${skillId}`);
+    assert(buffHit, `Hero ${heroId}: missing Buff ${buffId}`);
+    assert.strictEqual(row.skill.sourceIndex, skillHit.sourceIndex, `Hero ${heroId}: Skill ${skillId} sourceIndex drift`);
+    assert.strictEqual(row.buff.sourceIndex, buffHit.sourceIndex, `Hero ${heroId}: Buff ${buffId} sourceIndex drift`);
+    assert.strictEqual(row.skill.descriptionCn, text(skillHit.record.Desc), `Hero ${heroId}: Skill ${skillId} Desc drift`);
+    assert.strictEqual(row.buff.descriptionCn, text(buffHit.record.Desc), `Hero ${heroId}: Buff ${buffId} Desc drift`);
+    if (row.skill.descriptionCn !== null) nonNullSkillDescriptions += 1;
+    if (row.buff.descriptionCn !== null) nonNullBuffDescriptions += 1;
+
     const key = [heroId, row.heartFetterLevel, jobId, skillId, buffId].join(':');
     assert(!actualKeys.has(key), `duplicate projection row ${key}`);
     actualKeys.add(key);
@@ -90,8 +116,10 @@ function main() {
   assert.strictEqual(artifact.effectRowCount, actualKeys.size);
   assert.strictEqual(artifact.heroPopulationCount, heroCache.size);
   assert.strictEqual(heroCache.size, 267);
+  assert(nonNullSkillDescriptions > 0, 'all Skill Desc projections are null');
+  assert(nonNullBuffDescriptions > 0, 'all Buff Desc projections are null');
 
-  process.stdout.write(`${JSON.stringify({status:'PASS_HERO_HEART_FETTER_JOB_EFFECT_RESEARCH_V1', heroPopulationCount:heroCache.size, effectRowCount:actualKeys.size})}\n`);
+  process.stdout.write(`${JSON.stringify({status:'PASS_HERO_HEART_FETTER_JOB_EFFECT_RESEARCH_V1', heroPopulationCount:heroCache.size, effectRowCount:actualKeys.size, nonNullSkillDescriptions, nonNullBuffDescriptions})}\n`);
 }
 
 main();
