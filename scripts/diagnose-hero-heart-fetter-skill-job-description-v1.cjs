@@ -26,16 +26,12 @@ function cleanToken(value) {
 }
 function extractJobToken(description) {
   if (typeof description !== 'string') return { status: 'MISSING_PATTERN', token: null, syntax: null };
-
   const standard = description.match(/职业为(.+?)生效/);
   if (standard) return { status: 'TOKEN', token: cleanToken(standard[1]), syntax: '职业为<TOKEN>生效' };
-
   const withoutWei = description.match(/职业([^为:：,，。]+?)生效/);
   if (withoutWei) return { status: 'TOKEN', token: cleanToken(withoutWei[1]), syntax: '职业<TOKEN>生效' };
-
   const colonOnly = description.match(/职业为([^:：,，。]+?)[:：]/);
   if (colonOnly) return { status: 'TOKEN', token: cleanToken(colonOnly[1]), syntax: '职业为<TOKEN>:' };
-
   return { status: 'MISSING_PATTERN', token: null, syntax: null };
 }
 function classifyToken(tokenResult, jobs) {
@@ -43,13 +39,11 @@ function classifyToken(tokenResult, jobs) {
   const token = tokenResult.token;
   const exact = [...jobs.entries()].find(([, nameCn]) => nameCn === token);
   if (exact) return { classification: 'EXACT_JOB_NAME', token, normalizedToken: token, syntax: tokenResult.syntax, job: { jobId: exact[0], nameCn: exact[1] }, excludedJob: null };
-
   if (token.endsWith('时')) {
     const normalizedToken = token.slice(0, -1).trim();
     const normalizedExact = [...jobs.entries()].find(([, nameCn]) => nameCn === normalizedToken);
     if (normalizedExact) return { classification: 'EXACT_JOB_NAME', token, normalizedToken, syntax: `${tokenResult.syntax}+TRAILING_时`, job: { jobId: normalizedExact[0], nameCn: normalizedExact[1] }, excludedJob: null };
   }
-
   const exclusion = token.match(/^除(.+?)以外高级职业$/);
   if (exclusion) {
     const excludedName = exclusion[1].trim();
@@ -82,6 +76,7 @@ function main() {
     exclusionRowsWhereConditionParamIsExcludedJob: 0,
     exclusionRowsWhereConditionParamIsOtherJob: 0,
   };
+  const exactConditionParamDifferences = [];
   const exactPolicyDifferences = [];
   const exclusions = [];
   const unresolvedLabels = [];
@@ -99,7 +94,21 @@ function main() {
     if (parsed.classification === 'EXACT_JOB_NAME') {
       summary.exactJobNameRows += 1;
       if (parsed.job.jobId === row.condition.conditionParamJobId) summary.exactSkillEqualsConditionParamRows += 1;
-      else summary.exactSkillDiffersFromConditionParamRows += 1;
+      else {
+        summary.exactSkillDiffersFromConditionParamRows += 1;
+        exactConditionParamDifferences.push({
+          heroId: row.heroId,
+          heroNameCn: row.identity?.nameCn ?? null,
+          heartFetterLevel: row.heartFetterLevel,
+          skillId: row.skill.skillId,
+          buffId: row.buff.buffId,
+          conditionParamJobId: row.condition.conditionParamJobId,
+          skillJob: parsed.job,
+          skillJobToken: parsed.token,
+          normalizedSkillJobToken: parsed.normalizedToken,
+          syntax: parsed.syntax,
+        });
+      }
       if (parsed.job.jobId === currentPolicyJobId) summary.exactSkillEqualsCurrentPolicyRows += 1;
       else {
         summary.exactSkillDiffersFromCurrentPolicyRows += 1;
@@ -174,6 +183,8 @@ function main() {
     relationMutationAllowed: false,
     parserRule: 'Parse explicit Skill job labels using supported 职业为<TOKEN>生效 / 职业<TOKEN>生效 / 职业为<TOKEN>: syntax, normalize trailing 时 only when the stripped token exactly equals a same-hero frozen Job name, and recognize 除<job>以外高级职业 as an exclusion set.',
     summary,
+    exactConditionParamDifferenceCount: exactConditionParamDifferences.length,
+    exactConditionParamDifferences,
     exactPolicyDifferenceCount: exactPolicyDifferences.length,
     exactPolicyDifferences,
     exclusionCount: exclusions.length,
