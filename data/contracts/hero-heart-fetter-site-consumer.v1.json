@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-site-consumer-v1",
+  "status": "PRODUCTION_PRESENTATION_CONTRACT",
+  "owner": "hero-canonical",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "ef7d23dc8785190f7e094bc739f053bc738ceed6"
+  },
+  "purpose": "Materialize the fully validated HeartFetter Lv4/Lv7 research presentation mapping as a small frozen production presentation consumer so Hero frontend code can render per-job effects without reading research policy, raw conditions or ConfigData and without deriving any new relation.",
+  "validatedInputs": {
+    "jobEffectResearch": "data/generated/hero-heart-fetter-job-effect-research.v1.json",
+    "presentationPolicy": "data/validation/hero-heart-fetter-presentation-policy.v1.json",
+    "skillJobTokenEvidence": "data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json",
+    "narmSourceConflict": "data/validation/hero-heart-fetter-narm-source-conflict.v1.json",
+    "heroFrozenShards": "data/generated/hero-detail/by-id/*.json"
+  },
+  "producer": {
+    "builder": "scripts/build-hero-heart-fetter-site-consumer-v1.cjs",
+    "validator": "scripts/validate-hero-heart-fetter-site-consumer-v1.cjs",
+    "researchPresentationBuilder": "scripts/build-hero-heart-fetter-presentation-research-v1.cjs",
+    "workflow": ".github/workflows/hero-heart-fetter-site-consumer-v1.yml"
+  },
+  "publication": {
+    "manifest": "data/generated/hero-heart-fetter-site-consumer/manifest.v1.json",
+    "shardDirectory": "data/generated/hero-heart-fetter-site-consumer",
+    "heroShardCount": 3,
+    "skillTextShardCount": 3,
+    "heroPopulationCount": 267,
+    "effectRowCount": 1158,
+    "uniqueSkillCount": 1066,
+    "productionConsumerAllowed": true,
+    "semanticAuthority": false,
+    "presentationAuthority": true
+  },
+  "consumerLookup": {
+    "heroLocator": "Find the manifest HERO_MAP shard whose explicit ids list contains heroId, then read heroes[String(heroId)].",
+    "heroRowTuple": ["heartFetterLevel", "presentationJobId", "skillId", "mappingMode"],
+    "skillTextLocator": "Find the manifest SKILL_TEXT shard whose explicit ids list contains skillId, then read skills[String(skillId)].",
+    "jobDisplayMetadata": "Resolve presentationJobId only against the already-loaded frozen Hero shard's exact jobId metadata; do not infer by name, order, arithmetic or source filenames.",
+    "effectText": "The SKILL_TEXT lookup preserves the validated Skill source descriptionCn exactly. Localization is a later presentation overlay and must not change the frozen job/effect relation."
+  },
+  "expectedMappingModes": {
+    "VALIDATED_DEFAULT": 1142,
+    "EXPLICIT_OVERRIDE": 6,
+    "EXCLUSION_SET_MEMBER": 8,
+    "SOURCE_CONFLICT_RESOLUTION": 2
+  },
+  "semanticBoundary": {
+    "genericConditionType7PredicateResolved": false,
+    "conditionParamUniversallyMeansActivationJob": false,
+    "conditionParamUniversallyMeansDisplayJob": false,
+    "createsApplicableJobIds": false,
+    "createsJobRestricted": false,
+    "changesHeroJobCanonicalRelation": false,
+    "usesNameJoin": false,
+    "usesIdArithmetic": false,
+    "usesFilenameSimilarity": false,
+    "frontendReadsResearchProjection": false,
+    "frontendReadsPresentationPolicy": false,
+    "frontendReadsRawConditionEvidence": false,
+    "frontendReadsConfigData": false
+  },
+  "productionBoundary": {
+    "frontendMayReadManifestAndConsumerShards": true,
+    "frontendMayResolveExactPresentationJobIdAgainstFrozenHeroShard": true,
+    "frontendMayJoinSkillIdWithinThisConsumer": true,
+    "frontendMayRecomputeMappingModeOrPresentationJob": false,
+    "frontendMayFallbackToResearchOrRawSources": false
+  },
+  "completionCriteria": [
+    "The tracked manifest and six shards reproduce exactly from the validated research presentation builder.",
+    "All 267 Heroes and all 1,158 Lv4/Lv7 effect rows are present exactly once.",
+    "All 1,066 referenced Skill IDs resolve to one exact source description in this consumer.",
+    "Mapping-mode counts are 1,142 default, six explicit override, eight Matthew exclusion-set and two Narm source-conflict resolution rows.",
+    "Every presentationJobId is already validated by the research presentation policy and no frontend relation reconstruction is required.",
+    "The consumer is production presentation authority only and does not resolve generic ConditionType=7 semantics or mutate canonical Hero relations."
+  ],
+  "reopenConditions": [
+    "Any validated HeartFetter research input or frozen Hero job identity changes.",
+    "The exact ConditionType=7 runtime predicate is authoritatively resolved and contradicts the presentation mapping.",
+    "A source/contract/schema change invalidates the published consumer lookup contract."
+  ]
+}
