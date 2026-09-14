@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-level-pairing-consistency-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical",
+  "purpose": "Record full-population, non-semantic consistency evidence for ConditionType=7 JobInfo parameter pairing between HeartFetter Lv4 and Lv7 without assigning runtime predicate meaning.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "933c6a9f84be089625b15d8c0203ccae918cbb99"
+  },
+  "references": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "rawConditionArtifact": "data/generated/hero-heart-fetter-raw-condition.v1.json",
+    "jobParamConsistency": "data/validation/hero-heart-fetter-job-param-consistency.v1.json",
+    "validator": "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs"
+  },
+  "fullPopulationEvidence": {
+    "heroPopulationCount": 267,
+    "recordCount": 1066,
+    "conditionType7": {
+      "conditionCount": 1158,
+      "paramCount": 1158,
+      "jobInfoMatchCount": 1158,
+      "sameHeroFrozenJobMatchCount": 1158,
+      "mismatchCount": 0
+    },
+    "levelPairing": {
+      "heroesWithType7": 267,
+      "heroesWithBothLevels": 267,
+      "level4ParamOccurrenceCount": 572,
+      "level7ParamOccurrenceCount": 586,
+      "identicalParamMultisetHeroCount": 228,
+      "differentParamMultisetHeroCount": 39,
+      "identicalUniqueParamSetHeroCount": 266,
+      "differentUniqueParamSetHeroCount": 1
+    }
+  },
+  "uniqueSetException": {
+    "heroId": 144,
+    "identity": {
+      "nameKr": "카구라",
+      "nameCn": "神乐",
+      "nameEn": "Kagura"
+    },
+    "level4UniqueJobInfoIds": [126],
+    "level7UniqueJobInfoIds": [307],
+    "level4Rows": [
+      {"skillId": 800033, "buffId": 800033, "conditionParams": [126]},
+      {"skillId": 800034, "buffId": 800035, "conditionParams": [126]}
+    ],
+    "level7Rows": [
+      {"skillId": 800035, "buffId": 800034, "conditionParams": [307]},
+      {"skillId": 800036, "buffId": 800036, "conditionParams": [307]}
+    ],
+    "interpretation": "EXPLICIT_SOURCE_STRUCTURE_REQUIRES_FURTHER_RUNTIME_SEMANTIC_RESOLUTION"
+  },
+  "validatedConclusions": {
+    "everyType7ParamResolvesToJobInfo": true,
+    "everyType7ParamBelongsToSameFrozenHeroNormalOrSpJobSet": true,
+    "everyHeroHasType7EvidenceAtBothLv4AndLv7": true,
+    "lv4AndLv7UniqueJobParamSetsAreUniversalIdentical": false,
+    "lv4AndLv7UniqueJobParamSetsMatchExceptHero144": true,
+    "multiplicityDifferencesMayDefineRuntimeMeaning": false,
+    "exactConditionType7RuntimePredicateResolved": false,
+    "conditionParamExactGameplayRoleResolved": false
+  },
+  "semanticBoundary": {
+    "conditionType7Meaning": "MANUAL_REVIEW",
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayCreateNewCanonicalRelation": false,
+    "mayInferRuntimePredicateFromPairingStatistics": false,
+    "mayUseNameJoin": false,
+    "mayUseIdArithmetic": false
+  },
+  "ciEvidence": {
+    "multisetStatisticsPr": 913,
+    "multisetStatisticsValidatedHead": "79fdd93909cdbbd2d5b2b3174a75eb2a010af07f",
+    "multisetStatisticsWorkflowRunId": 34826144545,
+    "uniqueSetDiagnosticsPr": 914,
+    "uniqueSetDiagnosticsValidatedHead": "4137248659fa7e89420ef98731b41cbc6b3e1552",
+    "uniqueSetDiagnosticsWorkflowRunId": 34826475320,
+    "projectCheckRunId": 34826475274,
+    "rawConditionValidation": "PASS",
+    "heroCanonicalOwnerValidation": "PASS",
+    "repositoryMutationGuard": "PASS",
+    "projectCheck": "PASS"
+  },
+  "nextEvidence": [
+    "Inspect version-linked ConfigData Skill/Buff/Job records for hero 144 to determine why Lv4 and Lv7 target different explicit jobs.",
+    "Prefer a post-HeartFetter runtime consumer that evaluates Buff ConditionType/ConditionParam against current hero job/class state.",
+    "Do not promote pairing statistics alone into applicableJobIds or jobRestricted semantics."
+  ],
+  "completion": "Full-population CT7 Lv4/Lv7 pairing evidence is recorded: all 1158 params are same-hero explicit JobInfo IDs; 266 of 267 heroes share the same unique JobInfo param set across Lv4/Lv7, while hero 144 has an explicit source-level Lv4=[126] versus Lv7=[307] exception. Exact runtime predicate remains unresolved."
+}
