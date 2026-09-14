@@ -1,9 +1,10 @@
 {
   "version": 1,
   "stage": "hero-heart-fetter-raw-condition-publication-v1",
-  "status": "PENDING_CI",
+  "status": "PASS",
   "owner": "hero-canonical",
   "base": "a499fcc863686b568e048cf236bb04984eb720c9",
+  "validatedHead": "dc48c02b0bd38c895ff31a97205c436668a747f8",
   "publication": {
     "path": "data/generated/hero-heart-fetter-raw-condition.v1.json",
     "byteLength": 733825,
@@ -11,19 +12,30 @@
     "heroPopulationCount": 267,
     "recordCount": 1066
   },
-  "requiredValidation": [
-    "fresh deterministic generation from pinned source pack",
-    "independent raw parity validator",
-    "byte-identical tracked publication parity",
-    "hero-canonical owner validator",
-    "Project Check",
-    "repository mutation guard"
-  ],
+  "validation": {
+    "workflowRunId": 34812081488,
+    "workflowConclusion": "success",
+    "projectCheckRunId": 34812081549,
+    "projectCheckConclusion": "success",
+    "freshGeneration": "PASS",
+    "independentRawParity": "PASS",
+    "trackedByteParity": "PASS",
+    "heroCanonical": "PASS",
+    "repositoryMutationGuard": "PASS"
+  },
   "semanticBoundary": {
     "conditionType7Meaning": "MANUAL_REVIEW",
     "applicableJobIdsAllowed": false,
     "jobRestrictedAllowed": false,
     "heroJobRelationReopened": false
   },
-  "next": "Close PASS only on the exact final publication head after all required CI and Project Check succeed."
+  "completion": "RAW_CONDITION_PUBLICATION_COMPLETE",
+  "reopenConditions": [
+    "pinned ConfigData source-pack identity changes",
+    "frozen Hero population contract changes",
+    "raw ConfigData field/schema changes",
+    "tracked artifact byte parity fails",
+    "independent raw-parity validator hard failure"
+  ],
+  "next": "Raw-condition publication is complete. ConditionType=7 semantic interpretation remains a separate MANUAL_REVIEW scope."
 }
