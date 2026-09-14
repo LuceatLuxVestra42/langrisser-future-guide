@@ -1,0 +1,51 @@
+name: Temp Stage6-2 Frozen Refresh
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.head_ref == 'fix/sp-reward-skill-cost'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/sp-reward-skill-cost
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regenerate Stage 6-2 fixture QA
+        run: node scripts/build_hero_stage6_2_fixture_qa.cjs
+      - name: Validate Stage 6-2 result
+        run: |
+          node - <<'NODE'
+          const v=require('./data/validation/hero-stage6-2-final.v1.json');
+          if(v.status!=='PASS'||v.completion!=='COMPLETE'||v.summary?.hardErrorCount!==0||v.summary?.failedCheckCount!==0){
+            console.error(v); process.exit(1);
+          }
+          console.log(JSON.stringify({status:v.status,completion:v.completion,total:v.summary.totalCheckCount,failed:v.summary.failedCheckCount,hard:v.summary.hardErrorCount}));
+          NODE
+      - name: Audit mutation scope
+        run: |
+          allowed='^(data/generated/hero-stage6-2-representative-fixtures\.v1\.json|data/validation/hero-stage6-2-final\.v1\.json|\.github/workflows/tmp-stage6-2-refresh\.yml)$'
+          bad="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
+          if [ -n "$bad" ]; then
+            echo 'Unexpected mutation:'
+            echo "$bad"
+            exit 1
+          fi
+          git status --short
+      - name: Commit refreshed frozen outputs
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/tmp-stage6-2-refresh.yml
+          git add data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json
+          git commit -m 'Refresh Hero Stage 6-2 frozen outputs'
+          git push origin HEAD:fix/sp-reward-skill-cost
