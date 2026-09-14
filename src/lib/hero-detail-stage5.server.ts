@@ -159,6 +159,24 @@ type Stage6SpRewardSkill = {
   cost?: number | null;
 };
 
+type Stage6SpMission = {
+  id?: number | null;
+  stage?: string | null;
+  titleCn?: string | null;
+  descCn?: string | null;
+  missionType?: number | null;
+  condition?: {
+    kind?: string | null;
+    items?: Array<{ GoodsType?: number | null; Id?: number | null; Count?: number | null }> | null;
+    equipmentId?: number | null;
+    requiredLevel?: number | null;
+    requiredHeroIds?: number[] | null;
+    stageId?: number | null;
+    stageIds?: number[] | null;
+    clearCount?: number | null;
+  } | null;
+};
+
 type Stage6Sp = {
   status?: string | null;
   job?: {
@@ -167,6 +185,10 @@ type Stage6Sp = {
     nameCn?: string | null;
   } | null;
   finalDisplayStats?: Stage6JobConnection["finalDisplayStats"];
+  missions?: {
+    firstStage?: Stage6SpMission[] | null;
+    secondStage?: Stage6SpMission[] | null;
+  } | null;
   secondStageRewards?: {
     skills?: Stage6SpRewardSkill[] | null;
   } | null;
@@ -479,6 +501,39 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectSpRewardSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const projectSpMission = (mission: Stage6SpMission) => ({
+    missionId: Number.isInteger(mission.id) ? Number(mission.id) : null,
+    phase: mission.stage ?? null,
+    titleCn: mission.titleCn ?? null,
+    descCn: mission.descCn ?? null,
+    missionType: Number.isInteger(mission.missionType) ? Number(mission.missionType) : null,
+    condition: {
+      kind: mission.condition?.kind ?? null,
+      items: Array.isArray(mission.condition?.items)
+        ? mission.condition.items.map((item) => ({
+            goodsType: Number.isInteger(item.GoodsType) ? Number(item.GoodsType) : null,
+            sourceId: Number.isInteger(item.Id) ? Number(item.Id) : null,
+            count: Number.isInteger(item.Count) ? Number(item.Count) : null,
+          }))
+        : [],
+      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition?.equipmentId) : null,
+      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition?.requiredLevel) : null,
+      requiredHeroIds: Array.isArray(mission.condition?.requiredHeroIds)
+        ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
+        : [],
+      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
+      stageIds: Array.isArray(mission.condition?.stageIds)
+        ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
+        : [],
+      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition?.clearCount) : null,
+    },
+  });
+  const spFirstStageMissions = Array.isArray(shard.sp?.missions?.firstStage)
+    ? shard.sp.missions.firstStage.map(projectSpMission)
+    : [];
+  const spSecondStageMissions = Array.isArray(shard.sp?.missions?.secondStage)
+    ? shard.sp.missions.secondStage.map(projectSpMission)
+    : [];
   const spFinalDisplayStats = shard.sp?.finalDisplayStats;
   const spFinalValues = spFinalDisplayStats?.values;
   const spFinalJob = shard.sp?.job && spFinalDisplayStats
@@ -564,6 +619,10 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       status: shard.sp?.status ?? null,
       released: isReleased(shard.sp),
       finalJob: spFinalJob,
+      missions: {
+        firstStage: spFirstStageMissions,
+        secondStage: spSecondStageMissions,
+      },
       secondStageRewards: {
         skills: spRewardSkills,
       },
