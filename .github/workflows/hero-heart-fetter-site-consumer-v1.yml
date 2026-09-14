@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - data/contracts/hero-heart-fetter-site-consumer.v1.json
+      - data/validation/hero-heart-fetter-site-consumer-producer.v1.json
       - data/generated/hero-heart-fetter-site-consumer/**
       - data/generated/hero-heart-fetter-job-effect-research.v1.json
       - data/validation/hero-heart-fetter-presentation-policy.v1.json
@@ -78,15 +79,19 @@ jobs:
           test -z "$(git status --porcelain)"
 
   explicit-producer:
-    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    if: >
+      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       startsWith(github.head_ref, 'publish/heart-fetter-site-consumer-'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout selected branch
+      - name: Checkout selected publication branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Setup Node 22
@@ -121,6 +126,7 @@ jobs:
         run: |
           set -euo pipefail
           TARGET=data/generated/hero-heart-fetter-site-consumer
+          TARGET_BRANCH="${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
           if test -z "$(git status --porcelain -- "$TARGET")"; then
             echo 'HeartFetter site consumer already frozen.'
             exit 0
@@ -134,5 +140,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add "$TARGET"
           git commit -m 'Freeze HeartFetter site consumer'
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git pull --rebase origin "$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
