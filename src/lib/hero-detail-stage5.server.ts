@@ -25,6 +25,27 @@ type Stage6JobConnection = {
       magicDf?: number | null;
       dex?: number | null;
     } | null;
+    components?: {
+      centralBond?: {
+        rate?: number | null;
+        percentDeltas?: {
+          hp?: number | null;
+          at?: number | null;
+          magic?: number | null;
+          df?: number | null;
+          magicDf?: number | null;
+          dex?: number | null;
+        } | null;
+        flat?: {
+          hp?: number | null;
+          at?: number | null;
+          magic?: number | null;
+          df?: number | null;
+          magicDf?: number | null;
+          dex?: number | null;
+        } | null;
+      } | null;
+    } | null;
   } | null;
 };
 
@@ -254,6 +275,27 @@ function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
   };
 }
 
+function projectCentralBondStats(finalDisplayStats: Stage6JobConnection["finalDisplayStats"]) {
+  const centralBond = finalDisplayStats?.components?.centralBond;
+  const percentDeltas = centralBond?.percentDeltas;
+  if (!percentDeltas) return null;
+  const flat = centralBond?.flat;
+  const total = (key: keyof NonNullable<typeof percentDeltas>) => {
+    const percent = percentDeltas[key];
+    if (typeof percent !== "number" || !Number.isFinite(percent)) return null;
+    const flatValue = flat?.[key];
+    return percent + (typeof flatValue === "number" && Number.isFinite(flatValue) ? flatValue : 0);
+  };
+  return {
+    HP: total("hp"),
+    ATK: total("at"),
+    INT: total("magic"),
+    DEF: total("df"),
+    MDEF: total("magicDf"),
+    DEX: total("dex"),
+  };
+}
+
 function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
   const branchIds = Array.isArray(jobTree?.branches) ? jobTree.branches : [];
   const connections = Array.isArray(jobTree?.connections) ? jobTree.connections : [];
@@ -270,6 +312,7 @@ function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
     }
     const capstone = jobs.at(-1) ?? null;
     const values = capstone?.finalDisplayStats?.values;
+    const centralBondStats = projectCentralBondStats(capstone?.finalDisplayStats);
 
     return {
       branchIndex: branchIndex + 1,
@@ -299,6 +342,7 @@ function projectJobBranches(jobTree: Stage6JobTree | null | undefined) {
               MDEF: values?.magicDf ?? null,
               DEX: values?.dex ?? null,
             },
+            centralBondStats,
           }
         : null,
     };
