@@ -27,14 +27,15 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set +e
-          node -e "const m=require('./scripts/configdata-source-pack-maintenance-root.cjs');process.stdout.write(m.resolveConfigDataSourceRoot())" > .tmp-sp-cost-hydrate.log 2>&1
+          mkdir -p data/evidence
+          node -e "const m=require('./scripts/configdata-source-pack-maintenance-root.cjs');process.stdout.write(m.resolveConfigDataSourceRoot())" > data/evidence/sp-cost-hydrate-diagnostic.txt 2>&1
           rc=$?
-          echo >> .tmp-sp-cost-hydrate.log
-          echo "EXIT_CODE=$rc" >> .tmp-sp-cost-hydrate.log
-          cat .tmp-sp-cost-hydrate.log
+          echo >> data/evidence/sp-cost-hydrate-diagnostic.txt
+          echo "EXIT_CODE=$rc" >> data/evidence/sp-cost-hydrate-diagnostic.txt
+          cat data/evidence/sp-cost-hydrate-diagnostic.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .tmp-sp-cost-hydrate.log
+          git add -f data/evidence/sp-cost-hydrate-diagnostic.txt
           git commit -m 'chore: capture SP cost hydrate diagnostic'
           git pull --rebase origin fix/sp-reward-skill-cost
           git push origin HEAD:fix/sp-reward-skill-cost
