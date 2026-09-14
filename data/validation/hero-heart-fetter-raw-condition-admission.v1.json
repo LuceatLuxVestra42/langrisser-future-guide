@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-raw-condition-admission-v1",
+  "status": "PASS",
+  "owner": "hero-canonical",
+  "base": "c52c876976facdcaaef278b49bffc7a0cc936cd9",
+  "validatedHead": "c417fc406dafce20ec5c79ea07023c26bc122fcb",
+  "scope": "Read-only Lv4/Lv7 raw-condition producer and independent validator admission; generated publication deferred.",
+  "artifacts": [
+    "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "scripts/build-hero-heart-fetter-raw-condition-v1.cjs",
+    "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs",
+    ".github/workflows/hero-heart-fetter-raw-condition-v1.yml"
+  ],
+  "validation": {
+    "workflowRunId": 34811581371,
+    "workflowConclusion": "success",
+    "projectCheckRunId": 34811581328,
+    "projectCheckConclusion": "success",
+    "heroCanonical": "PASS",
+    "repositoryMutationGuard": "PASS",
+    "heroPopulationCount": 267,
+    "recordCount": 1066
+  },
+  "consistencyEvidence": {
+    "conditionType7SemanticOwner": false,
+    "conditionCount": 1158,
+    "paramCount": 1158,
+    "jobInfoMatchCount": 1158,
+    "frozenHeroJobSetMatchCount": 1107,
+    "frozenHeroJobSetMismatchCount": 51,
+    "interpretation": "OBSERVATIONAL_ONLY"
+  },
+  "semanticBoundary": {
+    "conditionType7Meaning": "MANUAL_REVIEW",
+    "applicableJobIdsAllowed": false,
+    "jobRestrictedAllowed": false,
+    "heroJobRelationReopened": false
+  },
+  "completion": "RAW_CONDITION_PRODUCER_AND_VALIDATOR_ADMITTED",
+  "reopenConditions": [
+    "pinned ConfigData source-pack identity changes",
+    "frozen Hero population contract changes",
+    "raw ConfigData field/schema changes",
+    "independent raw-parity validator hard failure"
+  ],
+  "next": "Publish the validated raw-condition artifact as a separate hero-canonical unit without adding ConditionType semantic interpretation."
+}

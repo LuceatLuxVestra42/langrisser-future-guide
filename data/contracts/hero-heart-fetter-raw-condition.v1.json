@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-raw-condition-v1",
+  "status": "PASS",
+  "owner": "hero-canonical",
+  "purpose": "Preserve HeartFetter Lv4/Lv7 passive-buff condition fields as raw evidence without assigning gameplay meaning to ConditionType or ConditionParam.",
+  "expectedBase": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "headAtCreation": "c52c876976facdcaaef278b49bffc7a0cc936cd9"
+  },
+  "authoritativeInputs": {
+    "heroPopulation": "data/generated/hero-detail/by-id/*.json",
+    "heroPopulationValidation": "data/validation/hero-stage6-4-final.v1.json",
+    "configDataSourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "configDataResolver": "scripts/configdata-source-pack-maintenance-root.cjs",
+    "logicalConfigDataFiles": [
+      "data/configdata/ConfigDataHeroInfo.json",
+      "data/configdata/ConfigDataHeroInformationInfo.json",
+      "data/configdata/ConfigDataHeroHeartFetterInfo.json",
+      "data/configdata/ConfigDataSkillInfo.json",
+      "data/configdata/ConfigDataBuffInfo.json"
+    ],
+    "consistencyOnlyConfigDataFiles": [
+      "data/configdata/ConfigDataJobInfo.json"
+    ]
+  },
+  "relation": {
+    "chain": [
+      "frozen Hero heroId -> ConfigDataHeroInfo.ID",
+      "ConfigDataHeroInfo.HeroInformation_ID -> ConfigDataHeroInformationInfo.ID",
+      "ConfigDataHeroInformationInfo.HeroHeartFetterId -> ConfigDataHeroHeartFetterInfo.ID",
+      "ConfigDataHeroHeartFetterInfo.UnlockSkills_ID[].SkillId -> ConfigDataSkillInfo.ID for HeartFetterLevel 4 and 7 only",
+      "ConfigDataSkillInfo.PassiveBuffs_ID[] -> ConfigDataBuffInfo.ID"
+    ],
+    "arrayPolicy": {
+      "unlockSkills": "preserve every explicit Lv4/Lv7 UnlockSkills_ID entry",
+      "passiveBuffs": "preserve every PassiveBuffs_ID entry in source order; never assume Skill.ID equals Buff.ID",
+      "conditions": "one raw condition entry per preserved PassiveBuffs_ID entry in the same order"
+    }
+  },
+  "output": {
+    "publicationDeferred": true,
+    "ciOutput": "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json",
+    "recordFields": [
+      "heroId",
+      "heroHeartFetterId",
+      "heartFetterLevel",
+      "skillId",
+      "passiveBuffIds",
+      "conditions",
+      "sourceProvenance"
+    ],
+    "conditionFields": ["conditionType", "conditionParams"]
+  },
+  "semanticBoundary": {
+    "conditionTypeMeaningResolved": false,
+    "conditionType7MeaningResolved": false,
+    "conditionParamMeaningResolved": false,
+    "conditionType7JobChecksAreConsistencyEvidenceOnly": true,
+    "consistencyMismatchMayDefineSemanticMeaning": false,
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayCreateNewCanonicalRelation": false,
+    "mayUseNameJoin": false,
+    "mayUseIdArithmetic": false,
+    "mayUseFilenameSimilarity": false,
+    "rawConfigDataRuntimeFallback": false,
+    "productionRuntimeReadsRawConfigData": false,
+    "sourcePackHydrationRole": "READ_ONLY_BUILD_AND_VALIDATION_EVIDENCE_ONLY"
+  },
+  "validation": {
+    "producer": "scripts/build-hero-heart-fetter-raw-condition-v1.cjs",
+    "validator": "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs",
+    "ownerValidator": "npm run validate:coverage:hero-canonical",
+    "requiredChecks": [
+      "frozen Hero population resolves to explicit HeroInfo records",
+      "HeroInformation and HeroHeartFetter IDs resolve explicitly",
+      "all Lv4/Lv7 UnlockSkills_ID entries are preserved",
+      "every SkillId resolves",
+      "every PassiveBuffs_ID entry is preserved and resolves",
+      "raw ConditionType parity",
+      "raw ConditionParam[] parity",
+      "source-pack provenance is pinned and file hashes match",
+      "ConditionType=7 JobInfo.ID and existing frozen Hero->Job overlaps/mismatches are reported as non-semantic consistency evidence and do not gate raw parity",
+      "no applicableJobIds/jobRestricted or ConditionType semantic interpretation is emitted",
+      "repository remains unchanged during producer/validator execution"
+    ]
+  },
+  "admissionEvidence": {
+    "pr": 908,
+    "validatedHead": "c417fc406dafce20ec5c79ea07023c26bc122fcb",
+    "workflowRunId": 34811581371,
+    "workflowConclusion": "success",
+    "projectCheckRunId": 34811581328,
+    "projectCheckConclusion": "success",
+    "heroPopulationCount": 267,
+    "recordCount": 1066,
+    "conditionType7": {
+      "conditionCount": 1158,
+      "paramCount": 1158,
+      "jobInfoMatchCount": 1158,
+      "frozenHeroJobSetMatchCount": 1107,
+      "mismatchCount": 51,
+      "semanticOwner": false
+    }
+  },
+  "nonScope": [
+    "interpreting ConditionType=7",
+    "creating job/class applicability semantics",
+    "changing Hero->Job canonical relations",
+    "modifying ConfigData Lookup",
+    "modifying the ConfigData source pack",
+    "frontend consumption",
+    "publishing the generated artifact in this admission unit"
+  ],
+  "completion": "The read-only producer generates deterministic Lv4/Lv7 raw-condition evidence from the pinned ConfigData source pack for the frozen Hero population, an independent validator reproduces exact raw parity and reports non-semantic consistency evidence, hero-canonical owner validation and Project Check pass, and no repository mutation occurs during execution."
+}

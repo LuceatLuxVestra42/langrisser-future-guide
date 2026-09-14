@@ -1,0 +1,43 @@
+name: Hero HeartFetter Raw Condition V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data/contracts/hero-heart-fetter-raw-condition.v1.json
+      - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
+      - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
+      - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build raw-condition evidence in runner temp
+        run: node scripts/build-hero-heart-fetter-raw-condition-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+
+      - name: Validate independent raw parity and consistency evidence
+        run: node scripts/validate-hero-heart-fetter-raw-condition-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+
+      - name: Run hero-canonical owner validator
+        run: npm run validate:coverage:hero-canonical
+
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
