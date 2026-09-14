@@ -55,9 +55,12 @@ function frozenHeroPopulation() {
     if (seen.has(heroId)) throw new Error(`duplicate frozen heroId ${heroId}`);
     seen.add(heroId);
     const jobIds = new Set();
-    for (const branch of [shard?.normal?.jobTree?.connections, shard?.sp?.jobTree?.connections]) {
-      if (!Array.isArray(branch)) continue;
-      for (const connection of branch) jobIds.add(positiveInteger(connection?.jobId, `Hero ${heroId} jobId`));
+    const normalConnections = shard?.normal?.jobTree?.connections;
+    if (Array.isArray(normalConnections)) {
+      for (const connection of normalConnections) jobIds.add(positiveInteger(connection?.jobId, `Hero ${heroId} normal jobId`));
+    }
+    if (shard?.sp?.job != null) {
+      jobIds.add(positiveInteger(shard.sp.job.jobId, `Hero ${heroId} SP jobId`));
     }
     rows.push({ heroId, jobIds });
   }
