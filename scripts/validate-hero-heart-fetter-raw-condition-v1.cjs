@@ -99,6 +99,7 @@ function rawSourceInfo(sourcePack) {
 function expectedRecords(population, indexes, sourceCommitSha) {
   const expected = [];
   const type7ParamsByHeroLevel = new Map();
+  const type7RowsByHeroLevel = new Map();
   const type7Evidence = {
     semanticOwner: false,
     conditionCount: 0,
@@ -135,6 +136,12 @@ function expectedRecords(population, indexes, sourceCommitSha) {
             byLevel = { 4: [], 7: [] };
             type7ParamsByHeroLevel.set(heroId, byLevel);
           }
+          let rowsByLevel = type7RowsByHeroLevel.get(heroId);
+          if (!rowsByLevel) {
+            rowsByLevel = { 4: [], 7: [] };
+            type7RowsByHeroLevel.set(heroId, rowsByLevel);
+          }
+          rowsByLevel[level].push({ skillId, buffId, conditionParams });
           for (const param of conditionParams) {
             type7Evidence.paramCount += 1;
             byLevel[level].push(param);
@@ -179,11 +186,16 @@ function expectedRecords(population, indexes, sourceCommitSha) {
     level7ParamCount: 0,
     identicalParamMultisetCount: 0,
     differentParamMultisetCount: 0,
+    identicalUniqueParamSetCount: 0,
+    differentUniqueParamSetCount: 0,
     differences: [],
+    uniqueSetDifferences: [],
   };
   for (const [heroId, byLevel] of [...type7ParamsByHeroLevel.entries()].sort((a, b) => a[0] - b[0])) {
     const level4 = [...byLevel[4]].sort((a, b) => a - b);
     const level7 = [...byLevel[7]].sort((a, b) => a - b);
+    const level4Unique = [...new Set(level4)];
+    const level7Unique = [...new Set(level7)];
     levelPairingEvidence.heroesWithType7 += 1;
     levelPairingEvidence.level4ParamCount += level4.length;
     levelPairingEvidence.level7ParamCount += level7.length;
@@ -193,6 +205,19 @@ function expectedRecords(population, indexes, sourceCommitSha) {
     } else {
       levelPairingEvidence.differentParamMultisetCount += 1;
       levelPairingEvidence.differences.push({ heroId, level4, level7 });
+    }
+    if (JSON.stringify(level4Unique) === JSON.stringify(level7Unique)) {
+      levelPairingEvidence.identicalUniqueParamSetCount += 1;
+    } else {
+      levelPairingEvidence.differentUniqueParamSetCount += 1;
+      const rows = type7RowsByHeroLevel.get(heroId) || { 4: [], 7: [] };
+      levelPairingEvidence.uniqueSetDifferences.push({
+        heroId,
+        level4Unique,
+        level7Unique,
+        level4Rows: rows[4],
+        level7Rows: rows[7],
+      });
     }
   }
 
@@ -269,6 +294,8 @@ function main() {
       ...parity.levelPairingEvidence,
       differenceCount: parity.levelPairingEvidence.differences.length,
       differences: parity.levelPairingEvidence.differences.slice(0, 50),
+      uniqueSetDifferenceCount: parity.levelPairingEvidence.uniqueSetDifferences.length,
+      uniqueSetDifferences: parity.levelPairingEvidence.uniqueSetDifferences.slice(0, 50),
     },
   })}\n`);
 }
