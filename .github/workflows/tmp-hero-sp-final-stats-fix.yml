@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   apply-and-validate:
-    if: github.event.head_commit.message != 'fix(hero): restore SP final job stats with central bond'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
