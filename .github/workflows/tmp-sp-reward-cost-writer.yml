@@ -15,13 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
 
       - name: Materialize pinned ConfigData maintenance root
         shell: bash
@@ -95,8 +101,8 @@ jobs:
         run: |
           if [ -L data/configdata ]; then rm data/configdata; fi
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
 
       - name: Frontend preflight
         shell: bash
@@ -106,10 +112,14 @@ jobs:
           node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
           node scripts/validate-hero-card-icon-frontend.mjs
           node scripts/validate-hero-fusion-power-frontend.mjs
-          npx tsc --noEmit
+          bunx tsc --noEmit
 
-      - name: Build
-        run: npm run build
+      - name: Build authoritative static candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build-equipment-name-kr-presentation.mjs
+          bunx vite build --config vite.config.pages.ts
 
       - name: Audit and freeze final change set
         shell: bash
