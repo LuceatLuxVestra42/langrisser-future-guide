@@ -21,6 +21,8 @@ on:
       - scripts/build-hero-heart-fetter-job-effect-research-v1.cjs
       - scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs
       - scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
+      - scripts/build-hero-heart-fetter-presentation-research-v1.cjs
+      - scripts/validate-hero-heart-fetter-presentation-research-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -63,6 +65,12 @@ jobs:
       - name: Validate exception-aware research presentation policy
         run: node scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
 
+      - name: Build exception-aware presentation research projection
+        run: node scripts/build-hero-heart-fetter-presentation-research-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+
+      - name: Validate presentation research projection
+        run: node scripts/validate-hero-heart-fetter-presentation-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+
       - name: Verify tracked publication parity when present
         run: |
           set -euo pipefail
@@ -72,6 +80,9 @@ jobs:
           if test -f data/generated/hero-heart-fetter-job-effect-research.v1.json; then
             cmp data/generated/hero-heart-fetter-job-effect-research.v1.json "$RUNNER_TEMP/hero-heart-fetter-job-effect-research.v1.json"
           fi
+          if test -f data/generated/hero-heart-fetter-presentation-research.v1.json; then
+            cmp data/generated/hero-heart-fetter-presentation-research.v1.json "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+          fi
 
       - name: Upload validated HeartFetter evidence
         uses: actions/upload-artifact@v4
@@ -80,6 +91,7 @@ jobs:
           path: |
             ${{ runner.temp }}/hero-heart-fetter-raw-condition.v1.json
             ${{ runner.temp }}/hero-heart-fetter-job-effect-research.v1.json
+            ${{ runner.temp }}/hero-heart-fetter-presentation-research.v1.json
           if-no-files-found: error
           retention-days: 7
 
