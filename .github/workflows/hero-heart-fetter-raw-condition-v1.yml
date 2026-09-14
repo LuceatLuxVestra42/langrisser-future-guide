@@ -8,6 +8,7 @@ on:
       - data/contracts/hero-heart-fetter-raw-condition.v1.json
       - data/generated/hero-heart-fetter-raw-condition.v1.json
       - data/validation/hero-heart-fetter-raw-condition-admission.v1.json
+      - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
@@ -58,3 +59,46 @@ jobs:
           set -euo pipefail
           git diff --exit-code
           test -z "$(git status --porcelain)"
+
+  publish:
+    needs: validate
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Publish exact validated artifact when absent
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          TARGET_BRANCH: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          target='data/generated/hero-heart-fetter-raw-condition.v1.json'
+          if test -f "$target"; then
+            echo 'tracked publication already present; writer is a no-op'
+            exit 0
+          fi
+          git fetch --no-tags origin "$TARGET_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED_HEAD"
+          node scripts/build-hero-heart-fetter-raw-condition-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+          node scripts/validate-hero-heart-fetter-raw-condition-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+          mkdir -p "$(dirname "$target")"
+          cp "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json" "$target"
+          test "$(git status --porcelain | wc -l)" -eq 1
+          test "$(git status --porcelain | awk '{print $2}')" = "$target"
+          git add "$target"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Publish HeartFetter raw-condition artifact'
+          git push origin "HEAD:$TARGET_BRANCH"
