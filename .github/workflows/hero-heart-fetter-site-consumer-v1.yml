@@ -17,6 +17,9 @@ on:
       - scripts/build-hero-heart-fetter-site-consumer-v1.cjs
       - scripts/validate-hero-heart-fetter-site-consumer-v1.cjs
       - .github/workflows/hero-heart-fetter-site-consumer-v1.yml
+  push:
+    branches:
+      - 'produce/heart-fetter-site-consumer-*'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +35,7 @@ jobs:
           exit 1
 
   validate:
-    if: github.event_name != 'workflow_dispatch'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -78,7 +81,7 @@ jobs:
           test -z "$(git status --porcelain)"
 
   explicit-producer:
-    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main') || (github.event_name == 'push' && startsWith(github.ref_name, 'produce/heart-fetter-site-consumer-'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
