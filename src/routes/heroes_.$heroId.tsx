@@ -230,7 +230,14 @@ function HeroDetailPage() {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
-  const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);
+  const finalJobRows = [
+    ...detail.jobs.branches
+      .filter((branch) => branch.capstone?.rank === 4)
+      .map((branch) => ({ key: `normal-${branch.branchIndex}`, capstone: branch.capstone })),
+    ...(detail.sp.released && detail.sp.finalJob
+      ? [{ key: "sp", capstone: detail.sp.finalJob }]
+      : []),
+  ];
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
   const equipableSkillById = new Map<number, SkillView>();
   for (const skill of detail.skills.heroDirectSkills) equipableSkillById.set(skill.skillId, skill);
@@ -424,7 +431,7 @@ function HeroDetailPage() {
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="최종 직업 스탯" />
-          {finalJobBranches.length > 0 ? (
+          {finalJobRows.length > 0 ? (
             <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
               <table className="w-full min-w-[680px] border-collapse text-sm">
                 <thead className="bg-muted/50">
@@ -439,11 +446,10 @@ function HeroDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {finalJobBranches.map((branch) => {
-                    const capstone = branch.capstone;
+                  {finalJobRows.map(({ key, capstone }) => {
                     if (!capstone) return null;
                     return (
-                      <Fragment key={branch.branchIndex}>
+                      <Fragment key={key}>
                         <tr className="border-b border-border/60">
                           <th scope="row" className="px-4 pb-2 pt-3 text-left">
                             <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>

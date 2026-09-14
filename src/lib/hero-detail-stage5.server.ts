@@ -161,6 +161,12 @@ type Stage6SpRewardSkill = {
 
 type Stage6Sp = {
   status?: string | null;
+  job?: {
+    jobConnectionId?: number | null;
+    jobId?: number | null;
+    nameCn?: string | null;
+  } | null;
+  finalDisplayStats?: Stage6JobConnection["finalDisplayStats"];
   secondStageRewards?: {
     skills?: Stage6SpRewardSkill[] | null;
   } | null;
@@ -473,6 +479,27 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectSpRewardSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const spFinalDisplayStats = shard.sp?.finalDisplayStats;
+  const spFinalValues = spFinalDisplayStats?.values;
+  const spFinalJob = shard.sp?.job && spFinalDisplayStats
+    ? {
+        jobConnectionId: Number.isInteger(shard.sp.job.jobConnectionId) ? Number(shard.sp.job.jobConnectionId) : null,
+        jobId: Number.isInteger(shard.sp.job.jobId) ? Number(shard.sp.job.jobId) : null,
+        nameCn: shard.sp.job.nameCn ?? null,
+        heroLevel: spFinalDisplayStats.heroLevel ?? null,
+        star: spFinalDisplayStats.star ?? null,
+        statStatus: spFinalDisplayStats.status ?? null,
+        finalStats: {
+          HP: spFinalValues?.hp ?? null,
+          ATK: spFinalValues?.at ?? null,
+          INT: spFinalValues?.magic ?? null,
+          DEF: spFinalValues?.df ?? null,
+          MDEF: spFinalValues?.magicDf ?? null,
+          DEX: spFinalValues?.dex ?? null,
+        },
+        centralBondStats: projectCentralBondStats(spFinalDisplayStats),
+      }
+    : null;
   const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);
   const awakening = {
     status: shard.normal?.awakening?.status ?? "NONE",
@@ -536,6 +563,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
     sp: {
       status: shard.sp?.status ?? null,
       released: isReleased(shard.sp),
+      finalJob: spFinalJob,
       secondStageRewards: {
         skills: spRewardSkills,
       },
