@@ -1,0 +1,167 @@
+name: tmp-sp-reward-cost-writer
+
+on:
+  push:
+    branches:
+      - fix/sp-reward-skill-cost
+    paths:
+      - .github/workflows/tmp-sp-reward-cost-writer.yml
+
+permissions:
+  contents: write
+
+jobs:
+  write-validate-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Materialize pinned ConfigData maintenance root
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -e data/configdata ]; then
+            echo 'data/configdata unexpectedly exists in tracked checkout' >&2
+            exit 1
+          fi
+          CONFIG_ROOT="$(node -e "const m=require('./scripts/configdata-source-pack-maintenance-root.cjs');process.stdout.write(m.resolveConfigDataSourceRoot())")"
+          test -f "$CONFIG_ROOT/data/configdata/ConfigDataSkillInfo.json"
+          ln -s "$CONFIG_ROOT/data/configdata" data/configdata
+
+      - name: Regenerate and validate Stage 5-4
+        run: node scripts/build_hero_stage5_4_sp_v2.cjs
+
+      - name: Verify SP reward SkillCost projection
+        shell: bash
+        run: |
+          node <<'NODE'
+          const artifact = require('./data/generated/hero-page-stage5-4-sp.v1.json');
+          const validation = require('./data/validation/hero-page-stage5-4-final.v1.json');
+          if (validation.status !== 'PASS' || validation.completion !== 'COMPLETE') throw new Error(`Stage5-4 validation ${validation.status}/${validation.completion}`);
+          const skills = [];
+          for (const hero of artifact.records || []) {
+            for (const skill of hero?.sp?.secondStageRewards?.skills || []) skills.push({heroId: hero.heroId, ...skill});
+          }
+          if (skills.length !== 50) throw new Error(`expected 50 SP reward skills, got ${skills.length}`);
+          for (const skill of skills) {
+            if (!Number.isInteger(skill.cost) || ![1,2].includes(skill.cost)) throw new Error(`invalid SP reward cost ${skill.heroId}/${skill.skillId}: ${JSON.stringify(skill.cost)}`);
+          }
+          for (const id of [12478,12479]) {
+            const got = skills.find(x => Number(x.skillId) === id);
+            if (!got) throw new Error(`missing representative SP reward skill ${id}`);
+            console.log(`SP_COST ${id} ${got.cost} ${got.nameCn ?? ''}`);
+          }
+          NODE
+
+      - name: Regenerate and validate Stage 6-1
+        run: node scripts/build_hero_stage6_1_detail.cjs
+
+      - name: Regenerate full Hero detail and shards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+          node <<'NODE'
+          const v = require('./data/validation/hero-stage6-3-final.v1.json');
+          if (v.status !== 'PASS' || v.completion !== 'COMPLETE') throw new Error(`Stage6-3 validation ${v.status}/${v.completion}`);
+          const fs = require('fs');
+          const files = fs.readdirSync('./data/generated/hero-detail/by-id').filter(x => x.endsWith('.json'));
+          if (files.length !== 267) throw new Error(`expected 267 Hero shards, got ${files.length}`);
+          const costs = new Map();
+          for (const file of files) {
+            const hero = require(`./data/generated/hero-detail/by-id/${file}`);
+            for (const skill of hero?.sp?.secondStageRewards?.skills || []) costs.set(Number(skill.skillId), skill.cost);
+          }
+          for (const id of [12478,12479]) {
+            const cost = costs.get(id);
+            if (!Number.isInteger(cost) || ![1,2].includes(cost)) throw new Error(`Stage6 shard missing valid cost for ${id}: ${JSON.stringify(cost)}`);
+          }
+          NODE
+
+      - name: Remove temporary ConfigData link
+        if: always()
+        run: |
+          if [ -L data/configdata ]; then rm data/configdata; fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Frontend preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-skin-stage3-5-static-assets-readonly.mjs
+          node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          node scripts/validate-hero-card-icon-frontend.mjs
+          node scripts/validate-hero-fusion-power-frontend.mjs
+          npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      - name: Audit and freeze final change set
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -L data/configdata ]; then rm data/configdata; fi
+          git rm -f .github/workflows/tmp-sp-reward-cost-writer.yml
+
+          python3 <<'PY'
+          import subprocess, sys
+          allowed_exact = {
+              'data/generated/hero-page-stage5-4-sp.v1.json',
+              'data/validation/hero-page-stage5-4-final.v1.json',
+              'data/generated/hero-detail-stage6-1.v1.json',
+              'data/validation/hero-stage6-1-final.v1.json',
+              'data/generated/hero-detail.v1.json',
+              'data/generated/hero-detail-shared.v1.json',
+              'data/validation/hero-stage6-3-final.v1.json',
+              'data/checkpoints/hero-stage6-3-full-generation.json',
+              'data/checkpoints/hero-stage6-3-full-generation.md',
+              '.github/workflows/tmp-sp-reward-cost-writer.yml',
+          }
+          out = subprocess.check_output(['git','status','--porcelain'], text=True)
+          bad=[]
+          for line in out.splitlines():
+              p=line[3:]
+              if ' -> ' in p: p=p.split(' -> ',1)[1]
+              if p in allowed_exact or p.startswith('data/generated/hero-detail/by-id/'):
+                  continue
+              bad.append(line)
+          print(out)
+          if bad:
+              print('unexpected tracked mutation:', *bad, sep='\n', file=sys.stderr)
+              sys.exit(1)
+          PY
+
+          git add data/generated/hero-page-stage5-4-sp.v1.json \
+            data/validation/hero-page-stage5-4-final.v1.json \
+            data/generated/hero-detail-stage6-1.v1.json \
+            data/validation/hero-stage6-1-final.v1.json \
+            data/generated/hero-detail.v1.json \
+            data/generated/hero-detail-shared.v1.json \
+            data/generated/hero-detail/by-id \
+            data/validation/hero-stage6-3-final.v1.json \
+            data/checkpoints/hero-stage6-3-full-generation.json \
+            data/checkpoints/hero-stage6-3-full-generation.md \
+            .github/workflows/tmp-sp-reward-cost-writer.yml
+
+          git diff --cached --check
+          echo '=== staged paths ==='
+          git diff --cached --name-status
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(hero): materialize SP reward skill costs'
+          git pull --rebase origin fix/sp-reward-skill-cost
+          git push origin HEAD:fix/sp-reward-skill-cost
