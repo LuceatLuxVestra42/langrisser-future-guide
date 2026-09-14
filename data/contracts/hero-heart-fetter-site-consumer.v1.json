@@ -23,8 +23,9 @@
     "workflow": ".github/workflows/hero-heart-fetter-site-consumer-v1.yml"
   },
   "publication": {
-    "manifest": "data/generated/hero-heart-fetter-site-consumer/manifest.v1.json",
-    "shardDirectory": "data/generated/hero-heart-fetter-site-consumer",
+    "manifest": "data/generated/hero-heart-fetter-site-consumer-manifest.v1.json",
+    "shardDirectory": "data/generated",
+    "filePrefix": "hero-heart-fetter-site-consumer-",
     "heroShardCount": 3,
     "skillTextShardCount": 3,
     "heroPopulationCount": 267,
@@ -70,7 +71,7 @@
     "frontendMayFallbackToResearchOrRawSources": false
   },
   "completionCriteria": [
-    "The tracked manifest and six shards reproduce exactly from the validated research presentation builder.",
+    "The tracked manifest and six flat prefixed shards reproduce exactly from the validated research presentation builder.",
     "All 267 Heroes and all 1,158 Lv4/Lv7 effect rows are present exactly once.",
     "All 1,066 referenced Skill IDs resolve to one exact source description in this consumer.",
     "Mapping-mode counts are 1,142 default, six explicit override, eight Matthew exclusion-set and two Narm source-conflict resolution rows.",
