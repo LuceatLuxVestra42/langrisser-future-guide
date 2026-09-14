@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-semantic-lineage-evidence-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "5269cbf5868c113a27ded5f8b8c65fddeb90fd3f"
+  },
+  "purpose": "Record verified semantic-lineage evidence for HeartFetter without assigning unresolved ConditionType=7 gameplay meaning. This unit tests whether exact enum-number continuity with the public 2018-10 client snapshot is a valid requirement for interpreting later HeartFetter conditions.",
+  "currentAuthority": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "rawConditionPublicationValidation": "data/validation/hero-heart-fetter-raw-condition-publication.v1.json",
+    "publicationCompletion": "RAW_CONDITION_PUBLICATION_COMPLETE",
+    "conditionType7MeaningBeforeThisUnit": "MANUAL_REVIEW"
+  },
+  "directHistoricalClientEvidence": {
+    "repository": "leinlin/Langrisser",
+    "commit": "5829c8c74d2d9ecde8070ce71dd4e6b92eff0b7e",
+    "heroFetterSchema": {
+      "path": "MagicBattle/Assets/Source/BlackJack/ConfigData/ConfigDataHeroFetterInfo.cs",
+      "finding": "ConfigDataHeroFetterInfo contains GotSkills_ID as an explicit repeated skill-ID field."
+    },
+    "battleInjection": {
+      "path": "MagicBattle/Assets/Source/BlackJack/ProjectL/Common/BattleUtility.cs",
+      "finding": "For each owned Fetter, the client indexes GotSkills_ID by fetter level minus one, resolves ConfigDataSkillInfo, and injects the resolved skills into BattleActorSetup.FetterSkillInfos."
+    },
+    "buffConditionSchema": {
+      "path": "MagicBattle/Assets/Source/BlackJack/ConfigData/ConfigDataBuffInfo.cs",
+      "finding": "ConfigDataBuffInfo contains explicit ConditionType and repeated ConditionParam fields."
+    },
+    "buffConditionEnum": {
+      "path": "MagicBattle/Assets/Source/BlackJack/ConfigData/BuffConditionType.cs",
+      "snapshotModifiedDate": "2018-10-09",
+      "observedValues": [
+        "0=None",
+        "1=IsAlone",
+        "2=NotAlone",
+        "3=Terrain",
+        "4=HeroArmy",
+        "5=TerrainIsDF"
+      ]
+    }
+  },
+  "historicalChronologyCrossValidation": {
+    "role": "EXTERNAL_CROSS_VALIDATION_ONLY",
+    "findings": [
+      "Official Langrisser Mobile update material for 2018-11-22 describes a second wave of heroes receiving 心之羁绊, proving the feature existed by that date.",
+      "Official Langrisser Mobile update material for 2018-12-06 adds 心之羁绊 to additional heroes."
+    ],
+    "implication": "The public 2018-10-09 BuffConditionType snapshot predates the documented HeartFetter rollout window. Its observed enum range cannot be required to preserve the numeric value used by later HeartFetter condition records."
+  },
+  "classSpecificPresentationCrossValidation": {
+    "role": "EXTERNAL_CROSS_VALIDATION_ONLY",
+    "finding": "Published HeartFetter Lv4/Lv7 reference pages present distinct effects under different final job/class names for the same hero, strongly supporting job/class-dependent HeartFetter presentation semantics.",
+    "semanticAuthority": false
+  },
+  "validatedConclusions": {
+    "earlyFetterIsBattleSkillBased": true,
+    "exactEnumNumericContinuityAcrossVersionsRequired": false,
+    "old2018OctoberEnumMayDisproveCurrentConditionType7JobRelationship": false,
+    "jobOrClassRelationshipStronglySupported": true,
+    "exactConditionType7RuntimePredicateResolved": false,
+    "conditionParamExactGameplayRoleResolved": false
+  },
+  "semanticBoundary": {
+    "conditionType7Meaning": "MANUAL_REVIEW",
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayChangeHeroJobCanonicalRelation": false,
+    "mayUseNameJoin": false,
+    "mayUseIdArithmetic": false,
+    "mayInferFromEnumNumberContinuity": false
+  },
+  "nextEvidence": {
+    "preferred": [
+      "A post-HeartFetter client protobuf/enum definition that names the relevant BuffConditionType semantic, regardless of numeric value continuity with the 2018-10 snapshot.",
+      "A post-HeartFetter runtime consumer that evaluates BuffInfo.ConditionType/ConditionParam against hero job/class state.",
+      "A version-linked ConfigData/client pair allowing the same HeartFetter skill/buff behavior to be traced across versions."
+    ],
+    "numericValue7MatchRequired": false
+  },
+  "completion": "SEMANTIC_LINEAGE_EVIDENCE_PASS_WITH_REVIEW",
+  "next": "Continue ConditionType=7 semantic resolution using post-HeartFetter semantic lineage or runtime evidence. Do not require enum-number equality across client generations and do not create canonical job-restriction fields until the exact predicate is proven."
+}
