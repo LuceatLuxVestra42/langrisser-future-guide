@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-presentation-policy-v1",
+  "status": "RESEARCH_POLICY",
+  "owner": "hero-canonical-research",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "472474bc04b9a64b8681a9d7cdcae21e1e4c2f49"
+  },
+  "purpose": "Define an exception-aware, explicitly non-canonical research presentation policy for HeartFetter Lv4/Lv7 job-specific effects without treating ConditionParam as a universal activation/display job.",
+  "authoritativeReferences": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "ct7Boundary": "data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json",
+    "ainzDiagnostic": "data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json",
+    "researchProjection": "data/generated/hero-heart-fetter-job-effect-research.v1.json"
+  },
+  "policy": {
+    "scope": "RESEARCH_PRESENTATION_ONLY",
+    "defaultRule": "For a research projection row not listed in explicitOverrides, retain the row's ConditionParam JobInfo reference as presentationJobId only because the current full-population source diagnostic confirms that job name appears in at least one linked Skill/Buff source description.",
+    "defaultRuleRowCount": 1154,
+    "explicitOverrides": [
+      {"heroId": 134, "heartFetterLevel": 4, "skillId": 971602, "buffId": 971602, "conditionParamJobId": 733, "presentationJobId": 1030},
+      {"heroId": 134, "heartFetterLevel": 4, "skillId": 971601, "buffId": 971601, "conditionParamJobId": 1030, "presentationJobId": 733},
+      {"heroId": 134, "heartFetterLevel": 7, "skillId": 971604, "buffId": 971604, "conditionParamJobId": 733, "presentationJobId": 1030},
+      {"heroId": 134, "heartFetterLevel": 7, "skillId": 971603, "buffId": 971603, "conditionParamJobId": 1030, "presentationJobId": 733}
+    ],
+    "overrideRowCount": 4,
+    "totalMappedRowCount": 1158,
+    "mappingKey": ["heroId", "heartFetterLevel", "skillId", "buffId", "conditionParamJobId"],
+    "runtimeNameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "rawConfigDataRuntimeFallback": false
+  },
+  "validationBoundary": {
+    "sourceDescriptionNameMatchingRole": "VALIDATOR_EVIDENCE_ONLY",
+    "sourceDescriptionNameMatchingCreatesRelation": false,
+    "conditionParamAsUniversalActivationJob": false,
+    "conditionParamAsUniversalDisplayJob": false,
+    "canonicalRelationMutation": false,
+    "createApplicableJobIds": false,
+    "createJobRestricted": false,
+    "productionFrontendConsumption": false
+  },
+  "completionCriteria": [
+    "All 1,158 tracked research rows map exactly once.",
+    "Exactly 1,154 rows use the validated default rule.",
+    "Exactly four Ainz rows use explicit ID-keyed overrides.",
+    "Every mapped presentation JobInfo ID belongs to the same frozen hero explicit job set.",
+    "The four override presentation jobs are exactly the jobs named by both current Skill and Buff source descriptions.",
+    "No canonical or production-consumer field is introduced."
+  ],
+  "reopenConditions": [
+    "The tracked research projection or source-description diagnostic changes.",
+    "A post-HeartFetter runtime evaluator resolves the exact ConditionType=7 predicate.",
+    "A source/contract/schema change invalidates the four explicit Ainz overrides."
+  ],
+  "completion": "An explicit exception-aware research presentation policy is frozen: 1,154 validated default rows plus four ID-keyed Ainz overrides, with no canonical or production semantic promotion."
+}

@@ -12,6 +12,7 @@ on:
       - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json
       - data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json
+      - data/validation/hero-heart-fetter-presentation-policy.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
@@ -19,6 +20,7 @@ on:
       - scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
       - scripts/build-hero-heart-fetter-job-effect-research-v1.cjs
       - scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs
+      - scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -57,6 +59,9 @@ jobs:
 
       - name: Validate job-effect research projection
         run: node scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-job-effect-research.v1.json"
+
+      - name: Validate exception-aware research presentation policy
+        run: node scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
 
       - name: Verify tracked publication parity when present
         run: |
