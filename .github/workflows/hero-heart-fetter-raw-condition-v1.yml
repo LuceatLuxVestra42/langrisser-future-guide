@@ -14,6 +14,8 @@ on:
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
       - scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
+      - scripts/build-hero-heart-fetter-job-effect-research-v1.cjs
+      - scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -44,6 +46,12 @@ jobs:
       - name: Validate non-canonical CT7 job activation research hypothesis
         run: node scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
 
+      - name: Build non-canonical job-effect research projection
+        run: node scripts/build-hero-heart-fetter-job-effect-research-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-job-effect-research.v1.json"
+
+      - name: Validate job-effect research projection
+        run: node scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-job-effect-research.v1.json"
+
       - name: Verify tracked publication parity when present
         run: |
           set -euo pipefail
@@ -51,11 +59,13 @@ jobs:
             cmp data/generated/hero-heart-fetter-raw-condition.v1.json "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
           fi
 
-      - name: Upload validated raw-condition evidence
+      - name: Upload validated HeartFetter evidence
         uses: actions/upload-artifact@v4
         with:
-          name: hero-heart-fetter-raw-condition-v1
-          path: ${{ runner.temp }}/hero-heart-fetter-raw-condition.v1.json
+          name: hero-heart-fetter-evidence-v1
+          path: |
+            ${{ runner.temp }}/hero-heart-fetter-raw-condition.v1.json
+            ${{ runner.temp }}/hero-heart-fetter-job-effect-research.v1.json
           if-no-files-found: error
           retention-days: 7
 
