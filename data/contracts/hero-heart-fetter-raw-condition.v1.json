@@ -58,6 +58,7 @@
     "conditionType7MeaningResolved": false,
     "conditionParamMeaningResolved": false,
     "conditionType7JobChecksAreConsistencyEvidenceOnly": true,
+    "consistencyMismatchMayDefineSemanticMeaning": false,
     "mayCreateApplicableJobIds": false,
     "mayCreateJobRestricted": false,
     "mayCreateNewCanonicalRelation": false,
@@ -81,7 +82,7 @@
       "raw ConditionType parity",
       "raw ConditionParam[] parity",
       "source-pack provenance is pinned and file hashes match",
-      "ConditionType=7 params resolve to JobInfo.ID and the existing frozen Hero->Job set as consistency evidence only",
+      "ConditionType=7 JobInfo.ID and existing frozen Hero->Job overlaps/mismatches are reported as non-semantic consistency evidence and do not gate raw parity",
       "no applicableJobIds/jobRestricted or ConditionType semantic interpretation is emitted",
       "repository remains unchanged during producer/validator execution"
     ]
@@ -95,5 +96,5 @@
     "frontend consumption",
     "publishing the generated artifact in this admission unit"
   ],
-  "completion": "The read-only producer generates deterministic Lv4/Lv7 raw-condition evidence from the pinned ConfigData source pack for the frozen Hero population, an independent validator reproduces exact raw parity and consistency evidence, hero-canonical owner validation and Project Check pass, and no repository mutation occurs during execution."
+  "completion": "The read-only producer generates deterministic Lv4/Lv7 raw-condition evidence from the pinned ConfigData source pack for the frozen Hero population, an independent validator reproduces exact raw parity and reports non-semantic consistency evidence, hero-canonical owner validation and Project Check pass, and no repository mutation occurs during execution."
 }
