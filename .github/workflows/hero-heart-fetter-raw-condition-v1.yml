@@ -13,6 +13,7 @@ on:
       - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json
       - data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json
+      - data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json
       - data/validation/hero-heart-fetter-presentation-policy.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
@@ -27,6 +28,7 @@ on:
       - scripts/build-hero-heart-fetter-presentation-map-research-v1.cjs
       - scripts/validate-hero-heart-fetter-presentation-map-research-v1.cjs
       - scripts/diagnose-hero-heart-fetter-skill-job-description-v1.cjs
+      - scripts/validate-hero-heart-fetter-skill-job-token-diagnostic-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -83,6 +85,9 @@ jobs:
 
       - name: Diagnose Skill-description job presentation relation
         run: node scripts/diagnose-hero-heart-fetter-skill-job-description-v1.cjs
+
+      - name: Validate frozen Skill job-token diagnostic evidence
+        run: node scripts/validate-hero-heart-fetter-skill-job-token-diagnostic-v1.cjs
 
       - name: Verify tracked publication parity when present
         run: |
