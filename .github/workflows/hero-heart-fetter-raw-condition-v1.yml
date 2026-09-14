@@ -7,6 +7,7 @@ on:
     paths:
       - data/contracts/hero-heart-fetter-raw-condition.v1.json
       - data/generated/hero-heart-fetter-raw-condition.v1.json
+      - data/generated/hero-heart-fetter-job-effect-research.v1.json
       - data/validation/hero-heart-fetter-raw-condition-admission.v1.json
       - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json
@@ -57,6 +58,9 @@ jobs:
           set -euo pipefail
           if test -f data/generated/hero-heart-fetter-raw-condition.v1.json; then
             cmp data/generated/hero-heart-fetter-raw-condition.v1.json "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+          fi
+          if test -f data/generated/hero-heart-fetter-job-effect-research.v1.json; then
+            cmp data/generated/hero-heart-fetter-job-effect-research.v1.json "$RUNNER_TEMP/hero-heart-fetter-job-effect-research.v1.json"
           fi
 
       - name: Upload validated HeartFetter evidence
