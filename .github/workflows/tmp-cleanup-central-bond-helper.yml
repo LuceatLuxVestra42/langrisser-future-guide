@@ -1,0 +1,29 @@
+name: Temporary Cleanup Central Bond Helper
+
+on:
+  push:
+    branches:
+      - 'work/restore-central-bond-final-stats-20260914'
+    paths:
+      - '.github/workflows/tmp-cleanup-central-bond-helper.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - name: Remove temporary helper artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f scripts/tmp_apply_central_bond_stat_presentation.py .github/workflows/tmp-cleanup-central-bond-helper.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(hero): clean temporary central bond helpers"
+          git push origin HEAD:${{ github.ref_name }}
