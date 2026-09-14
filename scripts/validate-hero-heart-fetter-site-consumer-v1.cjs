@@ -7,6 +7,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const HERO_DIR = path.join(ROOT, 'data/generated/hero-detail/by-id');
+const PREFIX = 'hero-heart-fetter-site-consumer-';
 function arg(name, fallback) {
   const i = process.argv.indexOf(name);
   return i === -1 ? fallback : path.resolve(process.argv[i + 1]);
@@ -23,12 +24,12 @@ function collectHeroJobIds(heroId) {
 
 function main() {
   const inputPath = arg('--input', path.join(ROOT, 'data/generated/hero-heart-fetter-presentation-research.v1.json'));
-  const consumerDir = arg('--consumer-dir', path.join(ROOT, 'data/generated/hero-heart-fetter-site-consumer'));
+  const consumerDir = arg('--consumer-dir', path.join(ROOT, 'data/generated'));
   if (!fs.existsSync(inputPath)) throw new Error(`missing presentation research input: ${inputPath}`);
   if (!fs.existsSync(consumerDir)) throw new Error(`missing consumer directory: ${consumerDir}`);
 
   const input = readJson(inputPath);
-  const manifestPath = path.join(consumerDir, 'manifest.v1.json');
+  const manifestPath = path.join(consumerDir, `${PREFIX}manifest.v1.json`);
   const manifest = readJson(manifestPath);
   assert.equal(input.status, 'RESEARCH_PROJECTION');
   assert.equal(input.semanticAuthority, false);
@@ -53,9 +54,9 @@ function main() {
   assert.equal(manifest.heroShards.length, 3);
   assert.equal(manifest.skillTextShards.length, 3);
 
-  const expectedFiles = new Set(['manifest.v1.json', ...manifest.heroShards.map((x) => x.path), ...manifest.skillTextShards.map((x) => x.path)]);
-  const actualFiles = new Set(fs.readdirSync(consumerDir).filter((x) => fs.statSync(path.join(consumerDir, x)).isFile()));
-  assert.deepStrictEqual([...actualFiles].sort(), [...expectedFiles].sort(), 'consumer directory contains missing or unexpected files');
+  const expectedFiles = new Set([`${PREFIX}manifest.v1.json`, ...manifest.heroShards.map((x) => x.path), ...manifest.skillTextShards.map((x) => x.path)]);
+  const actualFiles = new Set(fs.readdirSync(consumerDir).filter((x) => x.startsWith(PREFIX) && fs.statSync(path.join(consumerDir, x)).isFile()));
+  assert.deepStrictEqual([...actualFiles].sort(), [...expectedFiles].sort(), 'consumer publication contains missing or unexpected prefixed files');
 
   const actualHeroes = new Map();
   const seenHeroIds = new Set();
