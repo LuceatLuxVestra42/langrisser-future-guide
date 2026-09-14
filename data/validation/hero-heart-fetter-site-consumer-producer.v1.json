@@ -1,9 +1,9 @@
 {
   "version": 1,
   "stage": "hero-heart-fetter-site-consumer-producer-v1",
-  "status": "IMPLEMENTED_PENDING_PUBLICATION",
+  "status": "PUBLICATION_REQUESTED",
   "owner": "hero-canonical",
-  "baseHead": "8a3d6c678412ba55eaf21b31b7a7b9faae80353d",
+  "baseHead": "6b79dfce074decae43e4f86a8eb4fe0e40d2d3e5",
   "contract": "data/contracts/hero-heart-fetter-site-consumer.v1.json",
   "builder": "scripts/build-hero-heart-fetter-site-consumer-v1.cjs",
   "validator": "scripts/validate-hero-heart-fetter-site-consumer-v1.cjs",
@@ -13,7 +13,7 @@
     "trackedConsumerPublished": false,
     "frontendConsumptionAdmitted": false
   },
-  "nextRequiredAction": "Run the workflow_dispatch explicit-producer job on the non-main branch, then validate the resulting tracked consumer on a fresh PR head before frontend integration.",
+  "nextRequiredAction": "Run the guarded same-repository publication PR producer, freeze the generated consumer on this branch, then validate tracked-byte parity and owner gates before frontend integration.",
   "semanticBoundary": {
     "conditionType7RuntimeMeaningResolved": false,
     "newCanonicalHeroJobRelation": false,
