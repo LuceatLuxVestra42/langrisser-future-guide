@@ -14,12 +14,8 @@ function outputPath(argv) {
   if (i === -1 || !argv[i + 1]) throw new Error('Usage: node scripts/build-hero-heart-fetter-presentation-research-v1.cjs --output <path>');
   return path.resolve(argv[i + 1]);
 }
-function sourceKey(row) {
-  return [row.heroId, row.heartFetterLevel, row.skill.skillId, row.buff.buffId, row.condition.conditionParamJobId].join(':');
-}
-function overrideKey(row) {
-  return [row.heroId, row.heartFetterLevel, row.skillId, row.buffId, row.conditionParamJobId].join(':');
-}
+function sourceKey(row) { return [row.heroId, row.heartFetterLevel, row.skill.skillId, row.buff.buffId, row.condition.conditionParamJobId].join(':'); }
+function policyKey(row) { return [row.heroId, row.heartFetterLevel, row.skillId, row.buffId, row.conditionParamJobId].join(':'); }
 function heroJobs(heroId) {
   const shard = read(path.join(HERO_DIR, `${heroId}.json`));
   const jobs = new Map();
@@ -31,16 +27,15 @@ function heroJobs(heroId) {
       source: 'normal.jobTree.connections',
     });
   }
-  if (shard?.sp?.job?.jobId) {
-    jobs.set(shard.sp.job.jobId, {
-      jobId: shard.sp.job.jobId,
-      nameCn: shard.sp.job.nameCn ?? null,
-      rank: Number.isInteger(shard.sp.job.rank) ? shard.sp.job.rank : null,
-      source: 'sp.job',
-    });
-  }
+  if (shard?.sp?.job?.jobId) jobs.set(shard.sp.job.jobId, {
+    jobId: shard.sp.job.jobId,
+    nameCn: shard.sp.job.nameCn ?? null,
+    rank: Number.isInteger(shard.sp.job.rank) ? shard.sp.job.rank : null,
+    source: 'sp.job',
+  });
   return jobs;
 }
+function mapByKey(rows) { return new Map(rows.map((row) => [policyKey(row), row])); }
 
 function main() {
   const source = read(SOURCE_PATH);
@@ -48,30 +43,38 @@ function main() {
   if (source.status !== 'RESEARCH_PROJECTION' || source.productionConsumerAllowed !== false) throw new Error('job-effect research projection boundary changed');
   if (policy.status !== 'RESEARCH_POLICY' || policy.validationBoundary?.productionFrontendConsumption !== false) throw new Error('presentation policy boundary changed');
 
-  const overrides = new Map(policy.policy.explicitOverrides.map((row) => [overrideKey(row), row]));
+  const overrides = mapByKey(policy.policy.explicitOverrides);
+  const exclusions = mapByKey(policy.policy.exclusionSetRows);
+  const reviews = mapByKey(policy.policy.reviewFallbacks);
   const heroCache = new Map();
   const effects = [];
-  let defaultRows = 0;
-  let overrideRows = 0;
+  const counts = { VALIDATED_DEFAULT: 0, EXPLICIT_OVERRIDE: 0, EXCLUSION_SET_MEMBER: 0, REVIEW_FALLBACK: 0 };
 
   for (const row of source.effects || []) {
     const k = sourceKey(row);
-    const override = overrides.get(k);
-    const presentationJobId = override ? override.presentationJobId : row.condition.conditionParamJobId;
+    const mapping = overrides.get(k)
+      ? { mode: 'EXPLICIT_OVERRIDE', row: overrides.get(k) }
+      : exclusions.get(k)
+        ? { mode: 'EXCLUSION_SET_MEMBER', row: exclusions.get(k) }
+        : reviews.get(k)
+          ? { mode: 'REVIEW_FALLBACK', row: reviews.get(k) }
+          : { mode: 'VALIDATED_DEFAULT', row: null };
+    const presentationJobId = mapping.row ? mapping.row.presentationJobId : row.condition.conditionParamJobId;
     let jobs = heroCache.get(row.heroId);
     if (!jobs) { jobs = heroJobs(row.heroId); heroCache.set(row.heroId, jobs); }
     const presentationJob = jobs.get(presentationJobId);
     if (!presentationJob) throw new Error(`Hero ${row.heroId}: unresolved presentation Job ${presentationJobId}`);
-    if (override) overrideRows += 1;
-    else defaultRows += 1;
+    counts[mapping.mode] += 1;
 
     effects.push({
       heroId: row.heroId,
       identity: row.identity,
       heartFetterLevel: row.heartFetterLevel,
-      mappingMode: override ? 'EXPLICIT_OVERRIDE' : 'VALIDATED_DEFAULT',
+      mappingMode: mapping.mode,
       conditionJobReference: row.job,
       presentationJob,
+      reviewReason: mapping.mode === 'REVIEW_FALLBACK' ? mapping.row.reviewReason : null,
+      excludedJobId: mapping.mode === 'EXCLUSION_SET_MEMBER' ? mapping.row.excludedJobId : null,
       skill: row.skill,
       buff: row.buff,
       condition: row.condition,
@@ -79,8 +82,10 @@ function main() {
     });
   }
 
-  if (defaultRows !== policy.policy.defaultRuleRowCount) throw new Error(`default row count mismatch: ${defaultRows}`);
-  if (overrideRows !== policy.policy.overrideRowCount) throw new Error(`override row count mismatch: ${overrideRows}`);
+  if (counts.VALIDATED_DEFAULT !== policy.policy.defaultRuleRowCount) throw new Error(`default row count mismatch: ${counts.VALIDATED_DEFAULT}`);
+  if (counts.EXPLICIT_OVERRIDE !== policy.policy.overrideRowCount) throw new Error(`override row count mismatch: ${counts.EXPLICIT_OVERRIDE}`);
+  if (counts.EXCLUSION_SET_MEMBER !== policy.policy.exclusionSetRowCount) throw new Error(`exclusion row count mismatch: ${counts.EXCLUSION_SET_MEMBER}`);
+  if (counts.REVIEW_FALLBACK !== policy.policy.reviewFallbackRowCount) throw new Error(`review row count mismatch: ${counts.REVIEW_FALLBACK}`);
   if (effects.length !== policy.policy.totalMappedRowCount) throw new Error(`mapped row count mismatch: ${effects.length}`);
 
   const output = {
@@ -93,12 +98,15 @@ function main() {
     presentationPolicy: 'data/validation/hero-heart-fetter-presentation-policy.v1.json',
     heroPopulationCount: new Set(effects.map((row) => row.heroId)).size,
     effectRowCount: effects.length,
-    defaultRuleRowCount: defaultRows,
-    overrideRowCount: overrideRows,
+    defaultRuleRowCount: counts.VALIDATED_DEFAULT,
+    overrideRowCount: counts.EXPLICIT_OVERRIDE,
+    exclusionSetRowCount: counts.EXCLUSION_SET_MEMBER,
+    reviewFallbackRowCount: counts.REVIEW_FALLBACK,
     levels: [4, 7],
     notes: [
-      'presentationJob is a research-only projection governed by the exception-aware presentation policy.',
-      'No runtime name JOIN is used to create presentationJob; the four Ainz exceptions are explicit ID-keyed overrides.',
+      'presentationJob is a research-only projection governed by the frozen Skill job-label evidence and exception-aware presentation policy.',
+      'Six exact Skill-vs-ConditionParam differences use explicit ID-keyed overrides: Ainz 4 and Kagura 2.',
+      'Eight Matthew rows are explicit exclusion-set members and two Narm rows remain REVIEW_FALLBACK.',
       'conditionJobReference remains preserved separately and must not be treated as a universal activation/display job.',
       'This artifact must not be consumed by production frontend code or promoted into Hero canonical relations.'
     ],
