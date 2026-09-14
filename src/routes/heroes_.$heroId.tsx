@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -15,6 +15,7 @@ import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-sec
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { HeroFinalJobStatsSection } from "@/lib/hero-final-job-stats-section";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
@@ -217,7 +218,6 @@ function HeroDetailPage() {
     if (visuals.length <= 1) return;
     setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
   };
-
   const visibleTalentProgression = detail.talent.starProgression
     .filter((row) => detail.talent.initialStar == null || row.star >= detail.talent.initialStar)
     .sort((a, b) => a.star - b.star);
@@ -438,59 +438,7 @@ function HeroDetailPage() {
           ) : null}
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle title="최종 직업 스탯" />
-          {finalJobRows.length > 0 ? (
-            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
-              <table className="w-full min-w-[680px] border-collapse text-sm">
-                <thead className="bg-muted/50">
-                  <tr className="border-b border-border">
-                    <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">생명</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">공격</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">지력</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">방어</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">마방</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">기술</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {finalJobRows.map(({ key, capstone }) => {
-                    if (!capstone) return null;
-                    return (
-                      <Fragment key={key}>
-                        <tr className="border-b border-border/60">
-                          <th scope="row" className="px-4 pb-2 pt-3 text-left">
-                            <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
-                          </th>
-                          <JobStatCell value={capstone.finalStats.HP} />
-                          <JobStatCell value={capstone.finalStats.ATK} />
-                          <JobStatCell value={capstone.finalStats.INT} />
-                          <JobStatCell value={capstone.finalStats.DEF} />
-                          <JobStatCell value={capstone.finalStats.MDEF} />
-                          <JobStatCell value={capstone.finalStats.DEX} />
-                        </tr>
-                        {capstone.centralBondStats ? (
-                          <tr className="border-b border-border last:border-b-0 bg-muted/20" data-hero-central-bond-stat-row="true">
-                            <th scope="row" className="px-4 pb-3 pt-2 text-left text-xs font-semibold text-muted-foreground">└ 중앙유대</th>
-                            <JobStatBonusCell value={capstone.centralBondStats.HP} />
-                            <JobStatBonusCell value={capstone.centralBondStats.ATK} />
-                            <JobStatBonusCell value={capstone.centralBondStats.INT} />
-                            <JobStatBonusCell value={capstone.centralBondStats.DEF} />
-                            <JobStatBonusCell value={capstone.centralBondStats.MDEF} />
-                            <JobStatBonusCell value={capstone.centralBondStats.DEX} />
-                          </tr>
-                        ) : null}
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
-          )}
-        </section>
+        <HeroFinalJobStatsSection rows={finalJobRows} />
 
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
@@ -796,6 +744,4 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 }
 
 function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
-function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
-function JobStatBonusCell({ value }: { value: number | null }) { return <td className="px-4 pb-3 pt-2 text-right text-xs font-semibold tabular-nums text-muted-foreground">{value == null ? "-" : `+${value}`}</td>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
