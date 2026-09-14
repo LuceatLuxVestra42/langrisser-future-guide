@@ -76,14 +76,14 @@ for (const file of files) {
     const capstoneId = Number(branch.at(-1));
     const row = byConnectionId.get(capstoneId);
     if (!row) throw new Error(`Missing capstone connection hero=${heroId} branch=${index + 1} connection=${capstoneId}`);
-    if (row?.finalDisplayStats?.status !== "PASS") {
-      throw new Error(`Non-PASS capstone stats hero=${heroId} branch=${index + 1} connection=${capstoneId}`);
+    if (row?.finalDisplayStats?.status !== "VERIFIED") {
+      throw new Error(`Non-VERIFIED capstone stats hero=${heroId} branch=${index + 1} connection=${capstoneId}`);
     }
     candidates.push(toCandidate(heroId, "NORMAL", index + 1, row, row.finalDisplayStats.values));
   });
 
   if (shard?.sp?.status === "RELEASED") {
-    if (shard?.sp?.finalDisplayStats?.status !== "PASS") throw new Error(`Released SP missing PASS stats hero=${heroId}`);
+    if (shard?.sp?.finalDisplayStats?.status !== "VERIFIED") throw new Error(`Released SP missing VERIFIED stats hero=${heroId}`);
     const row = shard.sp.job ?? {};
     candidates.push(toCandidate(heroId, "SP", null, row, shard.sp.finalDisplayStats.values));
   }
