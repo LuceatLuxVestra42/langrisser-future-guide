@@ -26,6 +26,7 @@ on:
       - scripts/validate-hero-heart-fetter-presentation-research-v1.cjs
       - scripts/build-hero-heart-fetter-presentation-map-research-v1.cjs
       - scripts/validate-hero-heart-fetter-presentation-map-research-v1.cjs
+      - scripts/diagnose-hero-heart-fetter-skill-job-description-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -79,6 +80,9 @@ jobs:
 
       - name: Validate compact presentation map research projection
         run: node scripts/validate-hero-heart-fetter-presentation-map-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-presentation-map-research.v1.json"
+
+      - name: Diagnose Skill-description job presentation relation
+        run: node scripts/diagnose-hero-heart-fetter-skill-job-description-v1.cjs
 
       - name: Verify tracked publication parity when present
         run: |
