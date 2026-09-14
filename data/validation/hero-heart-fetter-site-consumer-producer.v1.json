@@ -1,19 +1,32 @@
 {
   "version": 1,
   "stage": "hero-heart-fetter-site-consumer-producer-v1",
-  "status": "PUBLICATION_REQUESTED",
+  "status": "PUBLISHED_VALIDATED",
   "owner": "hero-canonical",
   "baseHead": "6b79dfce074decae43e4f86a8eb4fe0e40d2d3e5",
+  "publicationHead": "e71347f17f25c49059b8b707ff68a45134210b14",
   "contract": "data/contracts/hero-heart-fetter-site-consumer.v1.json",
   "builder": "scripts/build-hero-heart-fetter-site-consumer-v1.cjs",
   "validator": "scripts/validate-hero-heart-fetter-site-consumer-v1.cjs",
   "workflow": ".github/workflows/hero-heart-fetter-site-consumer-v1.yml",
+  "publication": {
+    "manifest": "data/generated/hero-heart-fetter-site-consumer/manifest.v1.json",
+    "heroPopulation": 267,
+    "effectRows": 1158,
+    "uniqueSkills": 1066,
+    "mappingModes": {
+      "VALIDATED_DEFAULT": 1142,
+      "EXPLICIT_OVERRIDE": 6,
+      "EXCLUSION_SET_MEMBER": 8,
+      "SOURCE_CONFLICT_RESOLUTION": 2
+    }
+  },
   "completionBoundary": {
     "producerMachineryImplemented": true,
-    "trackedConsumerPublished": false,
+    "trackedConsumerPublished": true,
     "frontendConsumptionAdmitted": false
   },
-  "nextRequiredAction": "Run the guarded same-repository publication PR producer, freeze the generated consumer on this branch, then validate tracked-byte parity and owner gates before frontend integration.",
+  "nextRequiredAction": "Integrate the frozen HeartFetter site consumer in the hero frontend without reading research/raw sources or recomputing presentation relations.",
   "semanticBoundary": {
     "conditionType7RuntimeMeaningResolved": false,
     "newCanonicalHeroJobRelation": false,
