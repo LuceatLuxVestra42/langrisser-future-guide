@@ -276,23 +276,23 @@ function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
 }
 
 function projectCentralBondStats(finalDisplayStats: Stage6JobConnection["finalDisplayStats"]) {
-  const centralBond = finalDisplayStats?.components?.centralBond;
-  const percentDeltas = centralBond?.percentDeltas;
-  if (!percentDeltas) return null;
-  const flat = centralBond?.flat;
-  const total = (key: keyof NonNullable<typeof percentDeltas>) => {
-    const percent = percentDeltas[key];
-    if (typeof percent !== "number" || !Number.isFinite(percent)) return null;
-    const flatValue = flat?.[key];
-    return percent + (typeof flatValue === "number" && Number.isFinite(flatValue) ? flatValue : 0);
+  const flat = finalDisplayStats?.components?.centralBond?.flat;
+  if (!flat) return null;
+  const flatValue = (key: keyof NonNullable<typeof flat>) => {
+    const value = flat[key];
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
   };
+  const HP = flatValue("hp");
+  const DEF = flatValue("df");
+  const MDEF = flatValue("magicDf");
+  if (HP === null && DEF === null && MDEF === null) return null;
   return {
-    HP: total("hp"),
-    ATK: total("at"),
-    INT: total("magic"),
-    DEF: total("df"),
-    MDEF: total("magicDf"),
-    DEX: total("dex"),
+    HP,
+    ATK: null,
+    INT: null,
+    DEF,
+    MDEF,
+    DEX: null,
   };
 }
 
