@@ -11,6 +11,7 @@ on:
       - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
+      - scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
   workflow_dispatch:
 
@@ -34,6 +35,9 @@ jobs:
 
       - name: Validate independent raw parity and consistency evidence
         run: node scripts/validate-hero-heart-fetter-raw-condition-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+
+      - name: Diagnose Kagura source records without semantic interpretation
+        run: node scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
 
       - name: Verify tracked publication parity when present
         run: |
