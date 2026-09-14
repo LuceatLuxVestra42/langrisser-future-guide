@@ -1,0 +1,141 @@
+name: Hero HeartFetter Site Consumer V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data/contracts/hero-heart-fetter-site-consumer.v1.json
+      - data/generated/hero-heart-fetter-site-consumer-*.json
+      - data/generated/hero-heart-fetter-job-effect-research.v1.json
+      - data/validation/hero-heart-fetter-presentation-policy.v1.json
+      - data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json
+      - data/validation/hero-heart-fetter-narm-source-conflict.v1.json
+      - data/generated/hero-detail/**
+      - scripts/build-hero-heart-fetter-presentation-research-v1.cjs
+      - scripts/validate-hero-heart-fetter-presentation-research-v1.cjs
+      - scripts/build-hero-heart-fetter-site-consumer-v1.cjs
+      - scripts/validate-hero-heart-fetter-site-consumer-v1.cjs
+      - .github/workflows/hero-heart-fetter-site-consumer-v1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reject-main-dispatch:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'Explicit HeartFetter site-consumer publication must target a non-main branch.'
+          exit 1
+
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate presentation policy
+        run: node scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
+
+      - name: Build presentation research projection in runner temp
+        run: node scripts/build-hero-heart-fetter-presentation-research-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+
+      - name: Validate presentation research projection
+        run: node scripts/validate-hero-heart-fetter-presentation-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+
+      - name: Build site consumer in runner temp
+        run: node scripts/build-hero-heart-fetter-site-consumer-v1.cjs --input "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json" --output-dir "$RUNNER_TEMP/hero-heart-fetter-site-consumer"
+
+      - name: Independently validate generated site consumer
+        run: node scripts/validate-hero-heart-fetter-site-consumer-v1.cjs --input "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json" --consumer-dir "$RUNNER_TEMP/hero-heart-fetter-site-consumer"
+
+      - name: Verify tracked publication parity when present
+        run: |
+          set -euo pipefail
+          for file in "$RUNNER_TEMP"/hero-heart-fetter-site-consumer/*.json; do
+            base="$(basename "$file")"
+            tracked="data/generated/$base"
+            if test -f "$tracked"; then
+              cmp "$tracked" "$file"
+            fi
+          done
+
+      - name: Run hero-canonical owner validator
+        run: npm run validate:coverage:hero-canonical
+
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
+
+  explicit-producer:
+    if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate presentation policy
+        run: node scripts/validate-hero-heart-fetter-presentation-policy-v1.cjs
+
+      - name: Build and validate presentation research projection
+        run: |
+          set -euo pipefail
+          node scripts/build-hero-heart-fetter-presentation-research-v1.cjs --output "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+          node scripts/validate-hero-heart-fetter-presentation-research-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json"
+
+      - name: Build and validate site consumer
+        run: |
+          set -euo pipefail
+          node scripts/build-hero-heart-fetter-site-consumer-v1.cjs --input "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json" --output-dir "$RUNNER_TEMP/hero-heart-fetter-site-consumer"
+          node scripts/validate-hero-heart-fetter-site-consumer-v1.cjs --input "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json" --consumer-dir "$RUNNER_TEMP/hero-heart-fetter-site-consumer"
+
+      - name: Freeze generated consumer
+        run: |
+          set -euo pipefail
+          rm -f data/generated/hero-heart-fetter-site-consumer-*.json
+          cp "$RUNNER_TEMP"/hero-heart-fetter-site-consumer/*.json data/generated/
+          node scripts/validate-hero-heart-fetter-site-consumer-v1.cjs --input "$RUNNER_TEMP/hero-heart-fetter-presentation-research.v1.json" --consumer-dir data/generated --tracked-prefix hero-heart-fetter-site-consumer-
+
+      - name: Commit frozen consumer when changed
+        run: |
+          set -euo pipefail
+          PREFIX='data/generated/hero-heart-fetter-site-consumer-'
+          if test -z "$(git status --porcelain -- ${PREFIX}*.json)"; then
+            echo 'HeartFetter site consumer already frozen.'
+            exit 0
+          fi
+          if test -n "$(git status --porcelain | grep -v '^.. data/generated/hero-heart-fetter-site-consumer-' || true)"; then
+            echo 'Unexpected repository mutation outside HeartFetter site consumer.'
+            git status --short
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ${PREFIX}*.json
+          git commit -m 'Freeze HeartFetter site consumer'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
