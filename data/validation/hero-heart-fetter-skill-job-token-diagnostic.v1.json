@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-skill-job-token-diagnostic-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical-research",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "1468c69312b11f8db29c326961b2c8248dd3d897"
+  },
+  "purpose": "Freeze reusable full-population research evidence for the job/class label explicitly stated by HeartFetter Skill descriptions, without promoting the result into Hero canonical relations or production frontend consumption.",
+  "references": {
+    "researchProjection": "data/generated/hero-heart-fetter-job-effect-research.v1.json",
+    "presentationPolicy": "data/validation/hero-heart-fetter-presentation-policy.v1.json",
+    "ainzDiagnostic": "data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json",
+    "kaguraDiagnostic": "data/validation/hero-heart-fetter-kagura-source-diagnostic.v1.json",
+    "diagnosticScript": "scripts/diagnose-hero-heart-fetter-skill-job-description-v1.cjs"
+  },
+  "parserBoundary": {
+    "acceptedSyntax": [
+      "职业为<TOKEN>生效",
+      "职业<TOKEN>生效",
+      "职业为<TOKEN>:"
+    ],
+    "trailingShiNormalization": "Strip trailing 时 only when the stripped token exactly equals a same-hero frozen Job name.",
+    "exclusionSyntax": "除<job>以外高级职业",
+    "mayUseSubstringNameJoin": false,
+    "mayCreateRelationFromUnresolvedLabel": false
+  },
+  "fullPopulationEvidence": {
+    "rowCount": 1158,
+    "exactJobNameRows": 1148,
+    "exclusionAdvancedJobSetRows": 8,
+    "unresolvedSourceJobLabelRows": 2,
+    "missingPatternRows": 0,
+    "exactSkillEqualsConditionParamRows": 1142,
+    "exactSkillDiffersFromConditionParamRows": 6,
+    "exactSkillEqualsCurrentPolicyRows": 1146,
+    "exactSkillDiffersFromCurrentPolicyRows": 2,
+    "exclusionRowsWhereConditionParamIsExcludedJob": 0,
+    "exclusionRowsWhereConditionParamIsOtherJob": 8
+  },
+  "exactConditionParamDifferences": {
+    "count": 6,
+    "ainzRows": 4,
+    "kaguraRows": 2,
+    "note": "The four Ainz rows are already covered by the current explicit presentation overrides; the two Kagura rows are the remaining exact Skill-label contradictions to the current research presentation policy."
+  },
+  "kaguraPolicyContradictions": [
+    {"heroId": 144, "heartFetterLevel": 4, "skillId": 800034, "buffId": 800035, "conditionParamJobId": 126, "currentPolicyJobId": 126, "skillJobId": 307, "skillJobNameCn": "突击骑士"},
+    {"heroId": 144, "heartFetterLevel": 7, "skillId": 800035, "buffId": 800034, "conditionParamJobId": 307, "currentPolicyJobId": 307, "skillJobId": 126, "skillJobNameCn": "星海公主"}
+  ],
+  "matthewExclusionRows": {
+    "heroId": 1,
+    "excludedJobId": 206,
+    "excludedJobNameCn": "英雄",
+    "rowCount": 8,
+    "conditionParamIsExcludedJobCount": 0,
+    "conditionParamIsOtherExplicitJobCount": 8,
+    "rows": [
+      {"heartFetterLevel": 4, "skillId": 70234, "buffId": 70234, "conditionParamJobId": 307},
+      {"heartFetterLevel": 4, "skillId": 70235, "buffId": 70235, "conditionParamJobId": 405},
+      {"heartFetterLevel": 4, "skillId": 70237, "buffId": 70237, "conditionParamJobId": 604},
+      {"heartFetterLevel": 4, "skillId": 70236, "buffId": 70236, "conditionParamJobId": 1104},
+      {"heartFetterLevel": 7, "skillId": 70239, "buffId": 70239, "conditionParamJobId": 307},
+      {"heartFetterLevel": 7, "skillId": 70240, "buffId": 70240, "conditionParamJobId": 405},
+      {"heartFetterLevel": 7, "skillId": 70242, "buffId": 70242, "conditionParamJobId": 604},
+      {"heartFetterLevel": 7, "skillId": 70241, "buffId": 70241, "conditionParamJobId": 1104}
+    ]
+  },
+  "unresolvedSourceLabels": [
+    {"heroId": 11, "heroNameCn": "娜姆", "heartFetterLevel": 4, "skillId": 971965, "buffId": 971965, "conditionParamJobId": 622, "skillJobLabelCn": "游侠统帅", "conditionParamJobNameCn": "游侠将军"},
+    {"heroId": 11, "heroNameCn": "娜姆", "heartFetterLevel": 7, "skillId": 971966, "buffId": 971966, "conditionParamJobId": 622, "skillJobLabelCn": "游侠统帅", "conditionParamJobNameCn": "游侠将军"}
+  ],
+  "validatedConclusions": {
+    "skillDescriptionJobLabelIsExactSameHeroFrozenJobFor1148Rows": true,
+    "currentResearchPresentationPolicyHasTwoRemainingExactContradictions": true,
+    "thoseTwoContradictionsAreKaguraRows": true,
+    "matthewExclusionRowsSupportRowSpecificNonExcludedJobPresentation": true,
+    "narmSourceLabelMismatchRequiresReview": true,
+    "exactRuntimeConditionType7PredicateResolved": false
+  },
+  "semanticBoundary": {
+    "semanticAuthority": false,
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayChangeHeroJobCanonicalRelation": false,
+    "productionFrontendConsumption": false,
+    "unresolvedNarmLabelMayBeSilentlyNormalized": false
+  },
+  "completion": "Full-population Skill job-label evidence is frozen for presentation-policy maintenance: 1,148 exact rows, 8 Matthew exclusion-set rows, 2 Narm unresolved source-label rows, and zero unparsed rows. The current research presentation policy is contradicted only by two exact Kagura rows after its existing four Ainz overrides."
+}
