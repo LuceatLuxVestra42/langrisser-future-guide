@@ -14,11 +14,13 @@ on:
       - data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json
       - data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json
       - data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json
+      - data/validation/hero-heart-fetter-narm-source-conflict.v1.json
       - data/validation/hero-heart-fetter-presentation-policy.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
       - scripts/validate-hero-heart-fetter-ainz-ct7-source-diagnostic-v1.cjs
+      - scripts/validate-hero-heart-fetter-narm-source-conflict-v1.cjs
       - scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
       - scripts/build-hero-heart-fetter-job-effect-research-v1.cjs
       - scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs
@@ -58,6 +60,9 @@ jobs:
 
       - name: Diagnose Ainz CT7 source-description exception
         run: node scripts/validate-hero-heart-fetter-ainz-ct7-source-diagnostic-v1.cjs
+
+      - name: Validate Narm source-label conflict
+        run: node scripts/validate-hero-heart-fetter-narm-source-conflict-v1.cjs
 
       - name: Validate revised CT7 structural job-reference boundary
         run: node scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs

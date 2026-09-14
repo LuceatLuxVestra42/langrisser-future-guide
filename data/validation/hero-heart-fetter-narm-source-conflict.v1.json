@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-narm-source-conflict-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical-research",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "6f34078e97a9568fbc27e6515fc5f8e704cc1664"
+  },
+  "purpose": "Freeze the two Narm HeartFetter rows where the Skill source job label conflicts with Buff, ConditionParam and frozen same-hero Job evidence, without assigning generic ConditionType=7 runtime meaning.",
+  "authoritativeReferences": {
+    "researchProjection": "data/generated/hero-heart-fetter-job-effect-research.v1.json",
+    "skillJobTokenEvidence": "data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json",
+    "frozenHeroShard": "data/generated/hero-detail/by-id/11.json"
+  },
+  "hero": {
+    "heroId": 11,
+    "nameCn": "娜姆",
+    "resolvedFrozenJob": {"jobId": 622, "nameCn": "游侠将军"},
+    "conflictingSkillLabelCn": "游侠统帅"
+  },
+  "rows": [
+    {"heartFetterLevel": 4, "skillId": 971965, "buffId": 971965, "conditionParamJobId": 622, "skillJobLabelCn": "游侠统帅", "buffJobLabelCn": "游侠将军", "resolvedPresentationJobId": 622},
+    {"heartFetterLevel": 7, "skillId": 971966, "buffId": 971966, "conditionParamJobId": 622, "skillJobLabelCn": "游侠统帅", "buffJobLabelCn": "游侠将军", "resolvedPresentationJobId": 622}
+  ],
+  "internalFinding": "For both rows, the frozen same-hero Job ID 622 is 游侠将军, ConditionParam is 622, and the linked Buff description explicitly names 游侠将军; only the linked Skill description uses 游侠统帅.",
+  "externalCrossValidation": {
+    "role": "EXTERNAL_CROSS_VALIDATION_ONLY",
+    "semanticAuthority": false,
+    "sources": [
+      "https://wiki.biligame.com/langrisser/娜姆",
+      "https://wiki.biligame.com/langrisser/心之羁绊数据表"
+    ],
+    "finding": "Both published pages list Narm's corresponding Lv4/Lv7 SP HeartFetter effects under 游侠将军, matching Buff/ConditionParam/frozen Job 622 rather than the conflicting Skill label 游侠统帅."
+  },
+  "validatedConclusions": {
+    "skillLabelConflictsWithFrozenJobName": true,
+    "buffLabelMatchesFrozenJobName": true,
+    "conditionParamMatchesFrozenJobId": true,
+    "externalCrossValidationMatchesBuffAndFrozenJob": true,
+    "presentationResolutionToJob622Supported": true,
+    "genericConditionType7PredicateResolved": false
+  },
+  "semanticBoundary": {
+    "semanticAuthority": false,
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayChangeHeroJobCanonicalRelation": false,
+    "mayUseNameSimilarityToResolveRelation": false,
+    "productionFrontendConsumption": false
+  },
+  "completion": "The Narm source conflict is isolated to the Skill job label text. Presentation job 622 游侠将军 is supported by frozen Job identity, ConditionParam, linked Buff text and external cross-validation, while generic ConditionType=7 runtime semantics remain unresolved."
+}
