@@ -71,24 +71,6 @@ jobs:
             data/generated/hero-stage6-2-representative-fixtures.v1.json
             data/validation/hero-stage6-2-final.v1.json
 
-      - name: Materialize Stage 6-2 frozen outputs for SP cost PR
-        if: github.event_name == 'pull_request' && github.head_ref == 'fix/sp-reward-skill-cost'
-        run: |
-          node - <<'NODE'
-          const v=require('./data/validation/hero-stage6-2-final.v1.json');
-          if(v.status!=='PASS'||v.completion!=='COMPLETE'||v.summary?.hardErrorCount!==0||v.summary?.failedCheckCount!==0){ console.error(v); process.exit(1); }
-          NODE
-          git rm .github/workflows/tmp-stage6-2-refresh.yml
-          git checkout origin/main -- .github/workflows/hero-stage6-2-fixture-qa.yml
-          allowed='^(data/generated/hero-stage6-2-representative-fixtures\.v1\.json|data/validation/hero-stage6-2-final\.v1\.json|\.github/workflows/hero-stage6-2-fixture-qa\.yml|\.github/workflows/tmp-stage6-2-refresh\.yml)$'
-          bad="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          if [ -n "$bad" ]; then echo 'Unexpected mutation:'; echo "$bad"; exit 1; fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json .github/workflows/hero-stage6-2-fixture-qa.yml .github/workflows/tmp-stage6-2-refresh.yml
-          git commit -m 'Refresh Hero Stage 6-2 frozen outputs'
-          git push origin HEAD:fix/sp-reward-skill-cost
-
       - name: Commit generated QA outputs on work branch
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/work/')
         run: |
@@ -104,7 +86,7 @@ jobs:
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Verify frozen outputs on PR or main
-        if: (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') && github.head_ref != 'fix/sp-reward-skill-cost'
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
         run: |
           if [ -n "$(git status --porcelain -- data/generated/hero-stage6-2-representative-fixtures.v1.json data/validation/hero-stage6-2-final.v1.json)" ]; then
             echo 'Stage 6-2 generated outputs are not frozen or are stale.'
