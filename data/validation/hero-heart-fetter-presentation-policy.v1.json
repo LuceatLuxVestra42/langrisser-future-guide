@@ -6,15 +6,16 @@
   "baseline": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "ref": "main",
-    "expectedHead": "463c536a604463de0fd3e3f40a3dd967a74431ad"
+    "expectedHead": "5ad2214a630df27c1f6cbf0822fc494cf68e1435"
   },
-  "purpose": "Define an exception-aware, explicitly non-canonical research presentation policy for HeartFetter Lv4/Lv7 job-specific effects using frozen Skill job-label evidence without promoting ConditionType=7 runtime semantics.",
+  "purpose": "Define a complete exception-aware, explicitly non-canonical research presentation policy for HeartFetter Lv4/Lv7 job-specific effects using frozen Skill job-label and source-conflict evidence without promoting ConditionType=7 runtime semantics.",
   "authoritativeReferences": {
     "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
     "ct7Boundary": "data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json",
     "skillJobTokenEvidence": "data/validation/hero-heart-fetter-skill-job-token-diagnostic.v1.json",
     "ainzDiagnostic": "data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json",
     "kaguraDiagnostic": "data/validation/hero-heart-fetter-kagura-source-diagnostic.v1.json",
+    "narmSourceConflict": "data/validation/hero-heart-fetter-narm-source-conflict.v1.json",
     "researchProjection": "data/generated/hero-heart-fetter-job-effect-research.v1.json"
   },
   "policy": {
@@ -42,11 +43,12 @@
       {"heroId": 1, "heartFetterLevel": 7, "skillId": 70241, "buffId": 70241, "conditionParamJobId": 1104, "presentationJobId": 1104, "excludedJobId": 206}
     ],
     "exclusionSetRowCount": 8,
-    "reviewFallbacks": [
-      {"heroId": 11, "heartFetterLevel": 4, "skillId": 971965, "buffId": 971965, "conditionParamJobId": 622, "presentationJobId": 622, "reviewReason": "SKILL_LABEL_UNRESOLVED_AGAINST_FROZEN_JOB_SET"},
-      {"heroId": 11, "heartFetterLevel": 7, "skillId": 971966, "buffId": 971966, "conditionParamJobId": 622, "presentationJobId": 622, "reviewReason": "SKILL_LABEL_UNRESOLVED_AGAINST_FROZEN_JOB_SET"}
+    "sourceConflictResolutions": [
+      {"heroId": 11, "heartFetterLevel": 4, "skillId": 971965, "buffId": 971965, "conditionParamJobId": 622, "presentationJobId": 622, "resolutionEvidence": "NARM_BUFF_CONDITIONPARAM_FROZEN_JOB_AND_EXTERNAL_CROSS_VALIDATION"},
+      {"heroId": 11, "heartFetterLevel": 7, "skillId": 971966, "buffId": 971966, "conditionParamJobId": 622, "presentationJobId": 622, "resolutionEvidence": "NARM_BUFF_CONDITIONPARAM_FROZEN_JOB_AND_EXTERNAL_CROSS_VALIDATION"}
     ],
-    "reviewFallbackRowCount": 2,
+    "sourceConflictResolutionRowCount": 2,
+    "unresolvedPresentationRowCount": 0,
     "totalMappedRowCount": 1158,
     "runtimeNameJoin": false,
     "idArithmetic": false,
@@ -56,28 +58,29 @@
   "validationBoundary": {
     "skillJobLabelParsingRole": "VALIDATOR_EVIDENCE_ONLY",
     "skillJobLabelParsingCreatesCanonicalRelation": false,
+    "sourceConflictResolutionCreatesCanonicalRelation": false,
     "conditionParamAsUniversalActivationJob": false,
     "conditionParamAsUniversalDisplayJob": false,
     "canonicalRelationMutation": false,
     "createApplicableJobIds": false,
     "createJobRestricted": false,
-    "productionFrontendConsumption": false,
-    "reviewFallbackMayBePromotedWithoutNewEvidence": false
+    "productionFrontendConsumption": false
   },
   "completionCriteria": [
     "All 1,158 tracked research rows map exactly once.",
     "Exactly 1,142 rows use the exact Skill-label-equals-ConditionParam default rule.",
     "Exactly six exact Skill-vs-ConditionParam differences use ID-keyed overrides: four Ainz rows and two Kagura rows.",
     "Exactly eight Matthew rows are explicit members of the Skill-declared advanced-job set excluding Hero job 206.",
-    "Exactly two Narm rows remain REVIEW_FALLBACK because Skill label 游侠统帅 does not resolve to the frozen same-hero job set while Buff/ConditionParam identify job 622 游侠将军.",
+    "Exactly two Narm rows use explicit source-conflict resolution to frozen Job 622 游侠将军 based on Buff, ConditionParam, frozen Job identity and separately recorded external cross-validation.",
+    "No presentation rows remain unresolved.",
     "Every mapped presentation JobInfo ID belongs to the same frozen hero explicit job set.",
     "No canonical or production-consumer field is introduced."
   ],
   "reopenConditions": [
     "The tracked research projection or frozen Skill job-token evidence changes.",
     "A post-HeartFetter runtime evaluator resolves the exact ConditionType=7 predicate.",
-    "New authoritative evidence resolves or contradicts the Narm source-label mismatch.",
+    "New authoritative evidence contradicts the Narm source-conflict resolution.",
     "A source/contract/schema change invalidates any explicit ID-keyed mapping."
   ],
-  "completion": "The research presentation policy classifies all 1,158 rows as 1,142 exact defaults, six explicit Skill-job overrides, eight Matthew exclusion-set members, and two Narm review fallbacks, without canonical or production semantic promotion."
+  "completion": "The research presentation policy resolves all 1,158 rows as 1,142 exact defaults, six explicit Skill-job overrides, eight Matthew exclusion-set members, and two Narm source-conflict resolutions, with zero unresolved presentation rows and no canonical or production semantic promotion."
 }
