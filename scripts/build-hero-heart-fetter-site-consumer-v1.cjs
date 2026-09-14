@@ -4,12 +4,12 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
+const PREFIX = 'hero-heart-fetter-site-consumer-';
 function arg(name) {
   const i = process.argv.indexOf(name);
   if (i === -1 || !process.argv[i + 1]) throw new Error(`Missing ${name}`);
   return path.resolve(process.argv[i + 1]);
 }
-function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
 function stableJson(value) { return `${JSON.stringify(value, null, 2)}\n`; }
 function sha256Bytes(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function writeJson(file, value) {
@@ -69,13 +69,13 @@ function main() {
   const skillTextShards = [];
 
   chunk(heroIds, 3).forEach((ids, index) => {
-    const name = `hero-map-${String(index + 1).padStart(3, '0')}.json`;
+    const name = `${PREFIX}hero-map-${String(index + 1).padStart(3, '0')}.json`;
     const payload = { schemaVersion: 1, kind: 'HERO_MAP', ids, heroes: Object.fromEntries(ids.map((id) => [String(id), heroRows.get(id)])) };
     const sha256 = writeJson(path.join(outputDir, name), payload);
     heroShards.push({ path: name, ids, sha256 });
   });
   chunk(skillIds, 3).forEach((ids, index) => {
-    const name = `skill-text-${String(index + 1).padStart(3, '0')}.json`;
+    const name = `${PREFIX}skill-text-${String(index + 1).padStart(3, '0')}.json`;
     const payload = { schemaVersion: 1, kind: 'SKILL_TEXT', ids, skills: Object.fromEntries(ids.map((id) => [String(id), skillTexts.get(id)])) };
     const sha256 = writeJson(path.join(outputDir, name), payload);
     skillTextShards.push({ path: name, ids, sha256 });
@@ -101,7 +101,7 @@ function main() {
     heroShards,
     skillTextShards,
   };
-  writeJson(path.join(outputDir, 'manifest.v1.json'), manifest);
+  writeJson(path.join(outputDir, `${PREFIX}manifest.v1.json`), manifest);
   console.log(JSON.stringify({ status: 'PASS', outputDir, counts: manifest.counts }, null, 2));
 }
 
