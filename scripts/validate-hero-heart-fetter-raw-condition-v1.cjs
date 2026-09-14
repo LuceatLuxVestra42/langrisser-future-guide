@@ -98,6 +98,7 @@ function rawSourceInfo(sourcePack) {
 
 function expectedRecords(population, indexes, sourceCommitSha) {
   const expected = [];
+  const type7ParamsByHeroLevel = new Map();
   const type7Evidence = {
     semanticOwner: false,
     conditionCount: 0,
@@ -129,8 +130,14 @@ function expectedRecords(population, indexes, sourceCommitSha) {
         const conditionParams = integerArray(buffHit.record.ConditionParam, `Buff ${buffId}.ConditionParam`);
         if (conditionType === 7) {
           type7Evidence.conditionCount += 1;
+          let byLevel = type7ParamsByHeroLevel.get(heroId);
+          if (!byLevel) {
+            byLevel = { 4: [], 7: [] };
+            type7ParamsByHeroLevel.set(heroId, byLevel);
+          }
           for (const param of conditionParams) {
             type7Evidence.paramCount += 1;
+            byLevel[level].push(param);
             const inJobInfo = indexes.jobs.has(param);
             const inFrozenHeroJobSet = jobIds.has(param);
             if (inJobInfo) type7Evidence.jobInfoMatchCount += 1;
@@ -163,7 +170,33 @@ function expectedRecords(population, indexes, sourceCommitSha) {
     }
   }
   expected.sort((a, b) => a.heroId - b.heroId || a.heartFetterLevel - b.heartFetterLevel || a.skillId - b.skillId);
-  return { expected, type7Evidence };
+
+  const levelPairingEvidence = {
+    semanticOwner: false,
+    heroesWithType7: 0,
+    heroesWithBothLevels: 0,
+    level4ParamCount: 0,
+    level7ParamCount: 0,
+    identicalParamMultisetCount: 0,
+    differentParamMultisetCount: 0,
+    differences: [],
+  };
+  for (const [heroId, byLevel] of [...type7ParamsByHeroLevel.entries()].sort((a, b) => a[0] - b[0])) {
+    const level4 = [...byLevel[4]].sort((a, b) => a - b);
+    const level7 = [...byLevel[7]].sort((a, b) => a - b);
+    levelPairingEvidence.heroesWithType7 += 1;
+    levelPairingEvidence.level4ParamCount += level4.length;
+    levelPairingEvidence.level7ParamCount += level7.length;
+    if (level4.length > 0 && level7.length > 0) levelPairingEvidence.heroesWithBothLevels += 1;
+    if (JSON.stringify(level4) === JSON.stringify(level7)) {
+      levelPairingEvidence.identicalParamMultisetCount += 1;
+    } else {
+      levelPairingEvidence.differentParamMultisetCount += 1;
+      levelPairingEvidence.differences.push({ heroId, level4, level7 });
+    }
+  }
+
+  return { expected, type7Evidence, levelPairingEvidence };
 }
 
 function assertNoForbiddenSemanticFields(value, location = '$') {
@@ -231,6 +264,11 @@ function main() {
       ...parity.type7Evidence,
       mismatchCount: parity.type7Evidence.mismatches.length,
       mismatches: parity.type7Evidence.mismatches.slice(0, 50),
+    },
+    type7LevelPairingEvidence: {
+      ...parity.levelPairingEvidence,
+      differenceCount: parity.levelPairingEvidence.differences.length,
+      differences: parity.levelPairingEvidence.differences.slice(0, 50),
     },
   })}\n`);
 }
