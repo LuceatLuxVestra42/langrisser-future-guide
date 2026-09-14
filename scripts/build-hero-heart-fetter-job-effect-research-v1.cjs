@@ -93,12 +93,12 @@ function main() {
           job,
           skill: {
             skillId: record.skillId,
-            descriptionCn: text(skillHit.record.Description),
+            descriptionCn: text(skillHit.record.Desc),
             sourceIndex: skillHit.sourceIndex,
           },
           buff: {
             buffId,
-            descriptionCn: text(buffHit.record.Description),
+            descriptionCn: text(buffHit.record.Desc),
             sourceIndex: buffHit.sourceIndex,
           },
           condition: { conditionType: 7, conditionParamJobId: jobId },
@@ -123,7 +123,7 @@ function main() {
     levels: [4, 7],
     notes: [
       'Job association is a non-canonical research projection derived only from the validated CT7 job-activation hypothesis.',
-      'Skill and Buff descriptions are preserved independently and are not reconciled when source cross-links differ.',
+      'Skill and Buff descriptions are preserved independently from their ConfigData Desc fields and are not reconciled when source cross-links differ.',
       'This artifact must not create applicableJobIds, jobRestricted, or a new Hero-to-Job canonical relation.'
     ],
     effects,
