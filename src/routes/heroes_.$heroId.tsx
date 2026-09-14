@@ -15,6 +15,7 @@ import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-sec
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (!Number.isSafeInteger(heroId) || heroId <= 0) throw notFound();
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
+    const finalJobStatBars = await getHeroFinalJobStatBarPresentationData();
     const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
     const fusionPowers = await getHeroFusionPowerIndex();
     if (
@@ -86,7 +88,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (soldierCards.length !== data.detail.soldiers.count) {
       throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
     }
-    return { ...data, exclusiveEquipment, factionMarks, soldierCards };
+    return { ...data, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -169,7 +171,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, soldierCommand, heartFetter, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const { hero, detail, soldierCommand, heartFetter, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[hero.rarity.baseLabel] ?? null;
   const soldierDetailById = useMemo(
@@ -441,7 +443,7 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="최종 직업 스탯" />
           {finalJobRows.length > 0 ? (
-            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true">
+            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
               <table className="w-full min-w-[680px] border-collapse text-sm">
                 <thead className="bg-muted/50">
                   <tr className="border-b border-border">
@@ -463,12 +465,12 @@ function HeroDetailPage() {
                           <th scope="row" className="px-4 pb-2 pt-3 text-left">
                             <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
                           </th>
-                          <JobStatCell value={capstone.finalStats.HP} />
-                          <JobStatCell value={capstone.finalStats.ATK} />
-                          <JobStatCell value={capstone.finalStats.INT} />
-                          <JobStatCell value={capstone.finalStats.DEF} />
-                          <JobStatCell value={capstone.finalStats.MDEF} />
-                          <JobStatCell value={capstone.finalStats.DEX} />
+                          <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
+                          <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
+                          <JobStatCell stat="INT" value={capstone.finalStats.INT} domain={finalJobStatBars.domains.INT} />
+                          <JobStatCell stat="DEF" value={capstone.finalStats.DEF} domain={finalJobStatBars.domains.DEF} />
+                          <JobStatCell stat="MDEF" value={capstone.finalStats.MDEF} domain={finalJobStatBars.domains.MDEF} />
+                          <JobStatCell stat="DEX" value={capstone.finalStats.DEX} domain={finalJobStatBars.domains.DEX} />
                         </tr>
                         {capstone.centralBondStats ? (
                           <tr className="border-b border-border last:border-b-0 bg-muted/20" data-hero-central-bond-stat-row="true">
@@ -796,6 +798,28 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 }
 
 function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
-function JobStatCell({ value }: { value: number | null }) { return <td className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground">{value ?? "-"}</td>; }
+type JobStatBarDomain = { min: number; max: number };
+function getJobStatBarPercent(value: number, domain: JobStatBarDomain) {
+  const normalized = (value - domain.min) / (domain.max - domain.min);
+  return Math.min(100, Math.max(25, 25 + (75 * normalized)));
+}
+function JobStatCell({ stat, value, domain }: { stat: string; value: number | null; domain: JobStatBarDomain }) {
+  if (value == null) return <td className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground">-</td>;
+  const barPercent = getJobStatBarPercent(value, domain);
+  return (
+    <td
+      className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground"
+      data-hero-final-job-stat={stat}
+      data-stat-domain-min={domain.min}
+      data-stat-domain-max={domain.max}
+      data-stat-bar-percent={barPercent.toFixed(3)}
+    >
+      <div className="relative min-w-[4.5rem] overflow-hidden rounded-md bg-muted/30 px-2 py-1.5">
+        <div className="absolute inset-y-0 left-0 bg-foreground/10" style={{ width: `${barPercent}%` }} aria-hidden="true" />
+        <span className="relative z-10">{value}</span>
+      </div>
+    </td>
+  );
+}
 function JobStatBonusCell({ value }: { value: number | null }) { return <td className="px-4 pb-3 pt-2 text-right text-xs font-semibold tabular-nums text-muted-foreground">{value == null ? "-" : `+${value}`}</td>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
