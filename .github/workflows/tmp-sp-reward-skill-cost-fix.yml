@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  repair-validate-freeze:
+  repair-validate-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -30,29 +30,23 @@ jobs:
         run: |
           python3 <<'PY'
           from pathlib import Path
-
           p = Path('scripts/build_hero_stage5_4_sp_v2.cjs')
           text = p.read_text()
-
           old_cost = 'cost:q?.Cost??null'
           new_cost = 'cost:q?.SkillCost??null'
           if text.count(old_cost) != 1:
               raise SystemExit(f'expected one Stage5-4 q.Cost projection, found {text.count(old_cost)}')
           text = text.replace(old_cost, new_cost, 1)
-
           old_guard = "if(!q)err.push(`Hero ${id} Skill ${x} unresolved`);return{skillId:x"
           new_guard = "if(!q)err.push(`Hero ${id} Skill ${x} unresolved`);if(q&&!Number.isInteger(q.SkillCost))err.push(`Hero ${id} Skill ${x} invalid SkillCost ${JSON.stringify(q.SkillCost)}`);return{skillId:x"
           if text.count(old_guard) != 1:
               raise SystemExit(f'expected one Stage5-4 reward skill guard, found {text.count(old_guard)}')
           text = text.replace(old_guard, new_guard, 1)
-
           old_policy = "sourcePolicy:'Current direct ConfigData is authoritative. SPHeroInfo.ID is canonical Hero ID."
           new_policy = "sourcePolicy:'Current direct ConfigData is authoritative. SP reward skill cost is projected only from ConfigDataSkillInfo.SkillCost by exact SecondStageRewardSkills skillId; missing/non-integer SkillCost is a hard error. SPHeroInfo.ID is canonical Hero ID."
           if text.count(old_policy) != 1:
               raise SystemExit(f'expected one Stage5-4 source policy, found {text.count(old_policy)}')
-          text = text.replace(old_policy, new_policy, 1)
-
-          p.write_text(text)
+          p.write_text(text.replace(old_policy, new_policy, 1))
           PY
 
       - name: Regenerate and validate Stage 5-4
@@ -75,7 +69,6 @@ jobs:
             if (!got) throw new Error(`missing representative SP reward skill ${id}`);
             if (got.cost !== cost) throw new Error(`${id}.cost ${JSON.stringify(got.cost)} != ${cost}`);
           }
-          console.log(JSON.stringify({status:'PASS',skillCount:skills.length,representative:{12478:byId.get(12478).cost,12479:byId.get(12479).cost}},null,2));
           NODE
 
       - name: Regenerate Stage 6 consumers
@@ -113,45 +106,20 @@ jobs:
           bunx tsc --noEmit
           bunx vite build --config vite.config.pages.ts
 
-      - name: Audit and freeze intended change set
+      - name: Capture exact mutation audit
         shell: bash
         run: |
           set -euo pipefail
-          git rm -f .github/workflows/tmp-sp-reward-skill-cost-fix.yml
-
-          allowed='^(scripts/build_hero_stage5_4_sp_v2\.cjs|data/generated/hero-page-stage5-4-sp\.v1\.json|data/validation/hero-page-stage5-4-final\.v1\.json|data/generated/hero-detail-stage6-1\.v1\.json|data/validation/hero-stage6-1-final\.v1\.json|data/generated/hero-detail\.v1\.json|data/generated/hero-detail-shared\.v1\.json|data/generated/hero-detail/by-id/.*\.json|data/validation/hero-stage6-3-final\.v1\.json|data/checkpoints/hero-stage6-3-full-generation\.(json|md)|\.github/workflows/tmp-sp-reward-skill-cost-fix\.yml)$'
-          unexpected="$(git status --porcelain | sed -E 's/^.. //' | grep -Ev "$allowed" || true)"
-          if [ -n "$unexpected" ]; then
-            echo 'unexpected tracked/untracked mutation:' >&2
-            printf '%s\n' "$unexpected" >&2
-            git status --short >&2
-            exit 1
-          fi
-
-          git add scripts/build_hero_stage5_4_sp_v2.cjs \
-            data/generated/hero-page-stage5-4-sp.v1.json \
-            data/validation/hero-page-stage5-4-final.v1.json \
-            data/generated/hero-detail-stage6-1.v1.json \
-            data/validation/hero-stage6-1-final.v1.json \
-            data/generated/hero-detail.v1.json \
-            data/generated/hero-detail-shared.v1.json \
-            data/generated/hero-detail/by-id \
-            data/validation/hero-stage6-3-final.v1.json \
-            data/checkpoints/hero-stage6-3-full-generation.json \
-            data/checkpoints/hero-stage6-3-full-generation.md \
-            .github/workflows/tmp-sp-reward-skill-cost-fix.yml
-
-          git diff --cached --check
-          echo '=== staged paths ==='
-          git diff --cached --name-status
-          if git diff --cached --quiet; then
-            echo 'No repair changes produced.'
-            exit 0
-          fi
-
+          {
+            echo '=== git status --short ==='
+            git status --short
+            echo '=== git diff --name-status ==='
+            git diff --name-status
+          } > .tmp-sp-reward-skill-cost-status.txt
+          git add .tmp-sp-reward-skill-cost-status.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Fix SP reward skill cost projection'
+          git commit -m 'chore: capture SP reward skill cost mutation audit'
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}"
           git push origin HEAD:${GITHUB_REF_NAME}
