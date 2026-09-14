@@ -409,7 +409,7 @@ function projectCentralDiscipline(centralDiscipline: Stage6CentralDiscipline) {
   return {
     status: centralDiscipline?.status ?? null,
     released: isReleased(centralDiscipline),
-    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline.skillId) : null,
+    skillId: Number.isInteger(centralDiscipline?.skillId) ? Number(centralDiscipline?.skillId) : null,
     nameCn: centralDiscipline?.nameCn ?? null,
     descCn: centralDiscipline?.descCn ?? null,
     iconPath: centralDiscipline?.icon ?? null,
