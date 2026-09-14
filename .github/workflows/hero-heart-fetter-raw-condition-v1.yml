@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - data/contracts/hero-heart-fetter-raw-condition.v1.json
+      - data/generated/hero-heart-fetter-raw-condition.v1.json
+      - data/validation/hero-heart-fetter-raw-condition-admission.v1.json
+      - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - .github/workflows/hero-heart-fetter-raw-condition-v1.yml
@@ -31,6 +34,21 @@ jobs:
 
       - name: Validate independent raw parity and consistency evidence
         run: node scripts/validate-hero-heart-fetter-raw-condition-v1.cjs --artifact "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+
+      - name: Verify tracked publication parity when present
+        run: |
+          set -euo pipefail
+          if test -f data/generated/hero-heart-fetter-raw-condition.v1.json; then
+            cmp data/generated/hero-heart-fetter-raw-condition.v1.json "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json"
+          fi
+
+      - name: Upload validated raw-condition evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-heart-fetter-raw-condition-v1
+          path: ${{ runner.temp }}/hero-heart-fetter-raw-condition.v1.json
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Run hero-canonical owner validator
         run: npm run validate:coverage:hero-canonical

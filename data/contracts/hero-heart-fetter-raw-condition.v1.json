@@ -7,7 +7,8 @@
   "expectedBase": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "ref": "main",
-    "headAtCreation": "c52c876976facdcaaef278b49bffc7a0cc936cd9"
+    "admissionHeadAtCreation": "c52c876976facdcaaef278b49bffc7a0cc936cd9",
+    "publicationBaseHead": "a499fcc863686b568e048cf236bb04984eb720c9"
   },
   "authoritativeInputs": {
     "heroPopulation": "data/generated/hero-detail/by-id/*.json",
@@ -40,7 +41,10 @@
     }
   },
   "output": {
-    "publicationDeferred": true,
+    "publicationDeferred": false,
+    "publicationPath": "data/generated/hero-heart-fetter-raw-condition.v1.json",
+    "expectedByteLength": 733825,
+    "expectedSha256": "9a3c66c1cd135231244b8b290857d918af163e25ea51d5906a1bdca39ea1f47a",
     "ciOutput": "$RUNNER_TEMP/hero-heart-fetter-raw-condition.v1.json",
     "recordFields": [
       "heroId",
@@ -73,6 +77,7 @@
     "producer": "scripts/build-hero-heart-fetter-raw-condition-v1.cjs",
     "validator": "scripts/validate-hero-heart-fetter-raw-condition-v1.cjs",
     "ownerValidator": "npm run validate:coverage:hero-canonical",
+    "publicationParity": "byte-identical tracked publication versus fresh runner-temp generation",
     "requiredChecks": [
       "frozen Hero population resolves to explicit HeroInfo records",
       "HeroInformation and HeroHeartFetter IDs resolve explicitly",
@@ -83,16 +88,18 @@
       "raw ConditionParam[] parity",
       "source-pack provenance is pinned and file hashes match",
       "ConditionType=7 JobInfo.ID and existing frozen Hero->Job overlaps/mismatches are reported as non-semantic consistency evidence and do not gate raw parity",
+      "tracked publication is byte-identical to a fresh deterministic generation",
       "no applicableJobIds/jobRestricted or ConditionType semantic interpretation is emitted",
       "repository remains unchanged during producer/validator execution"
     ]
   },
   "admissionEvidence": {
     "pr": 908,
-    "validatedHead": "c417fc406dafce20ec5c79ea07023c26bc122fcb",
-    "workflowRunId": 34811581371,
+    "validatedHead": "7f117da4b4986517211efd0f80d09ed4a2bb5630",
+    "mergedMain": "a499fcc863686b568e048cf236bb04984eb720c9",
+    "workflowRunId": 34811673649,
     "workflowConclusion": "success",
-    "projectCheckRunId": 34811581328,
+    "projectCheckRunId": 34811673614,
     "projectCheckConclusion": "success",
     "heroPopulationCount": 267,
     "recordCount": 1066,
@@ -105,14 +112,24 @@
       "semanticOwner": false
     }
   },
+  "publicationEvidence": {
+    "pr": 909,
+    "validatedHead": "dc48c02b0bd38c895ff31a97205c436668a747f8",
+    "workflowRunId": 34812081488,
+    "workflowConclusion": "success",
+    "projectCheckRunId": 34812081549,
+    "projectCheckConclusion": "success",
+    "trackedByteParity": true,
+    "heroCanonical": "PASS",
+    "repositoryMutationGuard": "PASS"
+  },
   "nonScope": [
     "interpreting ConditionType=7",
     "creating job/class applicability semantics",
     "changing Hero->Job canonical relations",
     "modifying ConfigData Lookup",
     "modifying the ConfigData source pack",
-    "frontend consumption",
-    "publishing the generated artifact in this admission unit"
+    "frontend consumption"
   ],
-  "completion": "The read-only producer generates deterministic Lv4/Lv7 raw-condition evidence from the pinned ConfigData source pack for the frozen Hero population, an independent validator reproduces exact raw parity and reports non-semantic consistency evidence, hero-canonical owner validation and Project Check pass, and no repository mutation occurs during execution."
+  "completion": "The tracked raw-condition artifact is a deterministic byte-identical publication of validated Lv4/Lv7 raw evidence from the pinned ConfigData source pack for the frozen Hero population; independent raw parity, hero-canonical owner validation, Project Check, and repository mutation guards pass without assigning ConditionType semantic meaning."
 }
