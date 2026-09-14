@@ -21,28 +21,42 @@ function heroJobs(heroId) {
   if (Number.isInteger(shard?.sp?.job?.jobId) && typeof shard?.sp?.job?.nameCn === 'string' && shard.sp.job.nameCn.length > 0) jobs.set(shard.sp.job.jobId, shard.sp.job.nameCn);
   return jobs;
 }
+function cleanToken(value) {
+  return String(value || '').trim().replace(/[：:,，。\s]+$/g, '').trim();
+}
 function extractJobToken(description) {
-  if (typeof description !== 'string') return { status: 'MISSING_PATTERN', token: null };
-  const start = description.indexOf('职业为');
-  if (start === -1) return { status: 'MISSING_PATTERN', token: null };
-  const after = description.slice(start + '职业为'.length);
-  const end = after.indexOf('生效');
-  if (end === -1) return { status: 'MISSING_PATTERN', token: null };
-  const token = after.slice(0, end).trim().replace(/[：:,，。\s]+$/g, '').trim();
-  return token ? { status: 'TOKEN', token } : { status: 'MISSING_PATTERN', token: null };
+  if (typeof description !== 'string') return { status: 'MISSING_PATTERN', token: null, syntax: null };
+
+  const standard = description.match(/职业为(.+?)生效/);
+  if (standard) return { status: 'TOKEN', token: cleanToken(standard[1]), syntax: '职业为<TOKEN>生效' };
+
+  const withoutWei = description.match(/职业([^为:：,，。]+?)生效/);
+  if (withoutWei) return { status: 'TOKEN', token: cleanToken(withoutWei[1]), syntax: '职业<TOKEN>生效' };
+
+  const colonOnly = description.match(/职业为([^:：,，。]+?)[:：]/);
+  if (colonOnly) return { status: 'TOKEN', token: cleanToken(colonOnly[1]), syntax: '职业为<TOKEN>:' };
+
+  return { status: 'MISSING_PATTERN', token: null, syntax: null };
 }
 function classifyToken(tokenResult, jobs) {
-  if (tokenResult.status !== 'TOKEN') return { classification: 'MISSING_PATTERN', token: null, job: null, excludedJob: null };
+  if (tokenResult.status !== 'TOKEN') return { classification: 'MISSING_PATTERN', token: null, normalizedToken: null, syntax: null, job: null, excludedJob: null };
   const token = tokenResult.token;
   const exact = [...jobs.entries()].find(([, nameCn]) => nameCn === token);
-  if (exact) return { classification: 'EXACT_JOB_NAME', token, job: { jobId: exact[0], nameCn: exact[1] }, excludedJob: null };
+  if (exact) return { classification: 'EXACT_JOB_NAME', token, normalizedToken: token, syntax: tokenResult.syntax, job: { jobId: exact[0], nameCn: exact[1] }, excludedJob: null };
+
+  if (token.endsWith('时')) {
+    const normalizedToken = token.slice(0, -1).trim();
+    const normalizedExact = [...jobs.entries()].find(([, nameCn]) => nameCn === normalizedToken);
+    if (normalizedExact) return { classification: 'EXACT_JOB_NAME', token, normalizedToken, syntax: `${tokenResult.syntax}+TRAILING_时`, job: { jobId: normalizedExact[0], nameCn: normalizedExact[1] }, excludedJob: null };
+  }
+
   const exclusion = token.match(/^除(.+?)以外高级职业$/);
   if (exclusion) {
     const excludedName = exclusion[1].trim();
     const excluded = [...jobs.entries()].find(([, nameCn]) => nameCn === excludedName);
-    if (excluded) return { classification: 'EXCLUSION_ADVANCED_JOB_SET', token, job: null, excludedJob: { jobId: excluded[0], nameCn: excluded[1] } };
+    if (excluded) return { classification: 'EXCLUSION_ADVANCED_JOB_SET', token, normalizedToken: token, syntax: tokenResult.syntax, job: null, excludedJob: { jobId: excluded[0], nameCn: excluded[1] } };
   }
-  return { classification: 'UNRESOLVED_SOURCE_JOB_LABEL', token, job: null, excludedJob: null };
+  return { classification: 'UNRESOLVED_SOURCE_JOB_LABEL', token, normalizedToken: token, syntax: tokenResult.syntax, job: null, excludedJob: null };
 }
 
 function main() {
@@ -99,6 +113,8 @@ function main() {
           currentPolicyJobId,
           skillJob: parsed.job,
           skillJobToken: parsed.token,
+          normalizedSkillJobToken: parsed.normalizedToken,
+          syntax: parsed.syntax,
           skillDescriptionCn: row.skill.descriptionCn,
           buffDescriptionCn: row.buff.descriptionCn,
         });
@@ -131,6 +147,7 @@ function main() {
         conditionParamJobId: row.condition.conditionParamJobId,
         currentPolicyJobId,
         token: parsed.token,
+        syntax: parsed.syntax,
         frozenJobs: [...jobs.entries()].map(([jobId, nameCn]) => ({ jobId, nameCn })),
         skillDescriptionCn: row.skill.descriptionCn,
         buffDescriptionCn: row.buff.descriptionCn,
@@ -155,7 +172,7 @@ function main() {
     status: 'PASS_TOKEN_DIAGNOSTIC_ONLY',
     semanticAuthority: false,
     relationMutationAllowed: false,
-    parserRule: 'Extract the literal token between 职业为 and 生效, then compare by exact same-hero frozen Job name; recognize 除<job>以外高级职业 as an exclusion set.',
+    parserRule: 'Parse explicit Skill job labels using supported 职业为<TOKEN>生效 / 职业<TOKEN>生效 / 职业为<TOKEN>: syntax, normalize trailing 时 only when the stripped token exactly equals a same-hero frozen Job name, and recognize 除<job>以外高级职业 as an exclusion set.',
     summary,
     exactPolicyDifferenceCount: exactPolicyDifferences.length,
     exactPolicyDifferences,
