@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-ainz-ct7-source-diagnostic-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical-research",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "c1f1e1464811709dc51a2f63debfa10e4776de25"
+  },
+  "purpose": "Record the full-population source-description consistency exception showing that ConditionType=7 ConditionParam JobInfo references cannot be universally promoted to the source-named HeartFetter activation/display job.",
+  "authoritativeReferences": {
+    "trackedResearchProjection": "data/generated/hero-heart-fetter-job-effect-research.v1.json",
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "jobParamConsistency": "data/validation/hero-heart-fetter-job-param-consistency.v1.json",
+    "ct7ResearchHypothesis": "data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json"
+  },
+  "fullPopulationDiagnostic": {
+    "effectRowCount": 1158,
+    "rowsWhereConditionParamJobNameAppearsInSkillOrBuffDescription": 1154,
+    "rowsWhereConditionParamJobNameAppearsInNeitherDescription": 4,
+    "exceptionHeroCount": 1,
+    "exceptionHeroId": 134
+  },
+  "hero134": {
+    "identity": {
+      "nameKr": "아인즈 울 고운",
+      "nameCn": "安兹·乌尔·恭",
+      "nameEn": "AinzOoalGown"
+    },
+    "explicitFinalJobs": [
+      {"jobId": 733, "nameCn": "巅峰不死者"},
+      {"jobId": 1030, "nameCn": "死之统治者"}
+    ],
+    "exceptionRows": [
+      {"heartFetterLevel": 4, "conditionParamJobId": 733, "conditionParamJobNameCn": "巅峰不死者", "skillId": 971602, "buffId": 971602, "sourceDescriptionNamesJobCn": "死之统治者"},
+      {"heartFetterLevel": 4, "conditionParamJobId": 1030, "conditionParamJobNameCn": "死之统治者", "skillId": 971601, "buffId": 971601, "sourceDescriptionNamesJobCn": "巅峰不死者"},
+      {"heartFetterLevel": 7, "conditionParamJobId": 733, "conditionParamJobNameCn": "巅峰不死者", "skillId": 971604, "buffId": 971604, "sourceDescriptionNamesJobCn": "死之统治者"},
+      {"heartFetterLevel": 7, "conditionParamJobId": 1030, "conditionParamJobNameCn": "死之统治者", "skillId": 971603, "buffId": 971603, "sourceDescriptionNamesJobCn": "巅峰不死者"}
+    ],
+    "finding": "All four Ainz Lv4/Lv7 CT7 rows reference one explicit final JobInfo ID in ConditionParam while both Skill and Buff source descriptions explicitly name the other final job."
+  },
+  "externalCrossValidation": {
+    "role": "EXTERNAL_CROSS_VALIDATION_ONLY",
+    "sources": [
+      "https://wiki.biligame.com/langrisser/安兹·乌尔·恭",
+      "https://wiki.biligame.com/langrisser/心之羁绊数据表"
+    ],
+    "finding": "Published HeartFetter tables assign the Ainz Lv4/Lv7 effects to the same jobs named by the current Skill/Buff source descriptions, not to the opposite ConditionParam JobInfo reference.",
+    "semanticAuthority": false
+  },
+  "validatedConclusions": {
+    "conditionType7ParamsRemainExplicitSameHeroJobInfoReferences": true,
+    "conditionParamUniversallyEqualsSourceNamedActivationJob": false,
+    "conditionParamMayBeUsedAsUniversalDisplayJob": false,
+    "previousUniversalActivationJobHypothesisRejected": true,
+    "exactConditionType7RuntimePredicateResolved": false,
+    "sourceDescriptionExceptionIsolatedToHero134InCurrentPopulation": true
+  },
+  "semanticBoundary": {
+    "diagnosticNameMatchingCreatesSemanticRelation": false,
+    "mayCreateApplicableJobIds": false,
+    "mayCreateJobRestricted": false,
+    "mayCreateNewCanonicalRelation": false,
+    "mayUseConditionParamAsUniversalPresentationJob": false,
+    "productionFrontendConsumption": false
+  },
+  "completion": "The universal CT7 ConditionParam-to-activation/display-job interpretation is rejected by four version-linked Ainz source rows. CT7 remains a structurally confirmed same-hero JobInfo reference, but its exact runtime role and presentation mapping require an explicit exception-aware owning layer."
+}
