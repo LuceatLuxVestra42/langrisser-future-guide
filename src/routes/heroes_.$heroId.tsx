@@ -169,7 +169,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, soldierCommand, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const { hero, detail, soldierCommand, heartFetter, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[hero.rarity.baseLabel] ?? null;
   const soldierDetailById = useMemo(
@@ -238,6 +238,15 @@ function HeroDetailPage() {
       ? [{ key: "sp", capstone: detail.sp.finalJob }]
       : []),
   ];
+  const finalJobNameById = new Map<number, string>();
+  for (const { capstone } of finalJobRows) {
+    if (capstone?.jobId != null) finalJobNameById.set(capstone.jobId, capstone.nameCn ?? `Job ${capstone.jobId}`);
+  }
+  const heartFetterRows = [...new Set(heartFetter.effects.map((effect) => effect.jobId))].map((jobId) => ({
+    jobId,
+    jobName: finalJobNameById.get(jobId) ?? `Job ${jobId}`,
+    effects: heartFetter.effects.filter((effect) => effect.jobId === jobId).sort((a, b) => a.level - b.level || a.skillId - b.skillId),
+  }));
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
   const equipableSkillById = new Map<number, SkillView>();
   for (const skill of detail.skills.heroDirectSkills) equipableSkillById.set(skill.skillId, skill);
@@ -480,6 +489,43 @@ function HeroDetailPage() {
             </div>
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
+          )}
+        </section>
+
+        <section
+          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+          data-hero-heart-fetter="true"
+          data-heart-fetter-effect-count={heartFetter.effects.length}
+        >
+          <SectionTitle title="유대 Lv4 / Lv7 효과" />
+          <p className="mt-2 text-xs font-semibold text-muted-foreground">한국어 설명 준비 중 · 검증된 중국 서버 presentation consumer 원문</p>
+          {heartFetterRows.length > 0 ? (
+            <div className="mt-5 grid gap-3 lg:grid-cols-2">
+              {heartFetterRows.map((row) => (
+                <article key={row.jobId} className="rounded-xl border border-border bg-muted/20 p-4" data-heart-fetter-job-id={row.jobId}>
+                  <h3 className="font-bold text-foreground">{row.jobName}</h3>
+                  <div className="mt-3 space-y-2">
+                    {row.effects.map((effect) => (
+                      <div
+                        key={`${effect.level}-${effect.skillId}`}
+                        className="rounded-lg border border-border bg-background px-3 py-3"
+                        data-heart-fetter-level={effect.level}
+                        data-heart-fetter-skill-id={effect.skillId}
+                        data-heart-fetter-mapping-mode={effect.mappingMode}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="rounded bg-muted px-2 py-1 text-[11px] font-black text-foreground">Lv.{effect.level}</span>
+                          <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">Skill {effect.skillId}</span>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 Lv4/Lv7 효과 없음</p>
           )}
         </section>
 
