@@ -108,7 +108,7 @@ jobs:
             if (await ch4Button.count() !== 1) throw new Error('Ch.4 origin filter button missing or ambiguous');
             await ch4Button.click();
 
-            const heroList = page.getByRole('region', { name: '영웅 목록' });
+            const heroList = page.getByRole('region', { name: '영웅 목록', exact: true });
             await heroList.waitFor({ timeout: 10000 });
             const visibleCards = heroList.locator('a[href*="/heroes/"]');
             const visibleCount = await visibleCards.count();
