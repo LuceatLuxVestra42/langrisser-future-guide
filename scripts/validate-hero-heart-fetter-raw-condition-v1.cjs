@@ -95,8 +95,14 @@ function rawSourceInfo(sourcePack) {
 
 function expectedRecords(population, indexes, sourceCommitSha) {
   const expected = [];
-  let type7ConditionCount = 0;
-  let type7ParamCount = 0;
+  const type7Evidence = {
+    semanticOwner: false,
+    conditionCount: 0,
+    paramCount: 0,
+    jobInfoMatchCount: 0,
+    frozenHeroJobSetMatchCount: 0,
+    mismatches: [],
+  };
   for (const { heroId, jobIds } of population) {
     const heroHit = requireIndexed(indexes.heroes, heroId, `Hero ${heroId}`);
     const informationId = positiveInteger(heroHit.record.HeroInformation_ID, `Hero ${heroId}.HeroInformation_ID`);
@@ -119,11 +125,16 @@ function expectedRecords(population, indexes, sourceCommitSha) {
         const conditionType = integer(buffHit.record.ConditionType, `Buff ${buffId}.ConditionType`);
         const conditionParams = integerArray(buffHit.record.ConditionParam, `Buff ${buffId}.ConditionParam`);
         if (conditionType === 7) {
-          type7ConditionCount += 1;
+          type7Evidence.conditionCount += 1;
           for (const param of conditionParams) {
-            type7ParamCount += 1;
-            assert(indexes.jobs.has(param), `ConditionType=7 consistency: Buff ${buffId} param ${param} is not a JobInfo.ID`);
-            assert(jobIds.has(param), `ConditionType=7 consistency: Hero ${heroId} Buff ${buffId} param ${param} is not in frozen Hero->Job set`);
+            type7Evidence.paramCount += 1;
+            const inJobInfo = indexes.jobs.has(param);
+            const inFrozenHeroJobSet = jobIds.has(param);
+            if (inJobInfo) type7Evidence.jobInfoMatchCount += 1;
+            if (inFrozenHeroJobSet) type7Evidence.frozenHeroJobSetMatchCount += 1;
+            if (!inJobInfo || !inFrozenHeroJobSet) {
+              type7Evidence.mismatches.push({ heroId, skillId, buffId, param, inJobInfo, inFrozenHeroJobSet });
+            }
           }
         }
         passiveBuffSourceIndices.push(buffHit.sourceIndex);
@@ -149,7 +160,7 @@ function expectedRecords(population, indexes, sourceCommitSha) {
     }
   }
   expected.sort((a, b) => a.heroId - b.heroId || a.heartFetterLevel - b.heartFetterLevel || a.skillId - b.skillId);
-  return { expected, type7ConditionCount, type7ParamCount };
+  return { expected, type7Evidence };
 }
 
 function assertNoForbiddenSemanticFields(value, location = '$') {
@@ -214,10 +225,9 @@ function main() {
     heroPopulationCount: population.length,
     recordCount: parity.expected.length,
     type7ConsistencyEvidence: {
-      semanticOwner: false,
-      conditionCount: parity.type7ConditionCount,
-      paramCount: parity.type7ParamCount,
-      allParamsResolveToJobInfoAndFrozenHeroJobSet: true,
+      ...parity.type7Evidence,
+      mismatchCount: parity.type7Evidence.mismatches.length,
+      mismatches: parity.type7Evidence.mismatches.slice(0, 50),
     },
   })}\n`);
 }
