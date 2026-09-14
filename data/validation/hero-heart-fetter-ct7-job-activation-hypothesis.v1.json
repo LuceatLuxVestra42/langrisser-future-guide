@@ -6,14 +6,15 @@
   "baseline": {
     "repository": "LuceatLuxVestra42/langrisser-future-guide",
     "ref": "main",
-    "expectedHead": "cccdd6d9c72f60afa26308a25714473b8e108821"
+    "expectedHead": "c1f1e1464811709dc51a2f63debfa10e4776de25"
   },
-  "purpose": "Record a reusable, explicitly non-canonical hypothesis for interpreting HeartFetter ConditionType=7 while authoritative runtime evaluator evidence is unavailable.",
+  "purpose": "Record the reusable non-canonical interpretation boundary for HeartFetter ConditionType=7 after full-population source-description cross-validation rejected a universal ConditionParam-to-activation-job mapping.",
   "authoritativeReferences": {
     "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
     "jobParamConsistency": "data/validation/hero-heart-fetter-job-param-consistency.v1.json",
     "levelPairingConsistency": "data/validation/hero-heart-fetter-level-pairing-consistency.v1.json",
     "kaguraSourceDiagnostic": "data/validation/hero-heart-fetter-kagura-source-diagnostic.v1.json",
+    "ainzSourceDiagnostic": "data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json",
     "semanticLineageEvidence": "data/validation/hero-heart-fetter-semantic-lineage-evidence.v1.json"
   },
   "observedEvidence": {
@@ -27,7 +28,12 @@
     "heroesWithBothLv4AndLv7Type7": 267,
     "heroesWithMatchingUniqueLv4Lv7JobParamSets": 266,
     "heroesWithDifferentUniqueLv4Lv7JobParamSets": 1,
-    "sourceDescriptionDiagnostic": {
+    "sourceDescriptionConsistency": {
+      "rowsWhereConditionParamJobNameAppearsInSkillOrBuffDescription": 1154,
+      "rowsWhereConditionParamJobNameAppearsInNeitherDescription": 4,
+      "exceptionHeroId": 134
+    },
+    "kaguraDiagnostic": {
       "heroId": 144,
       "jobIds": [126, 307],
       "descriptionsExplicitlyStateJobActivation": true,
@@ -35,23 +41,27 @@
     }
   },
   "hypothesis": {
-    "statement": "For HeartFetter Lv4/Lv7 Buff records with ConditionType=7, each ConditionParam value is an explicit JobInfo.ID identifying the job/class under which that buff effect is intended to activate.",
-    "confidencePercent": 97,
+    "statement": "For HeartFetter Lv4/Lv7 ConditionType=7 records, each ConditionParam is a structurally confirmed same-hero explicit JobInfo reference. It has a strong job/class relationship but is not universally the source-named activation or display job.",
+    "structuralJobReferenceConfidencePercent": 100,
+    "activationJobMappingStatus": "REJECTED_AS_UNIVERSAL",
     "confidenceBasis": [
-      "All 1,158 observed ConditionType=7 params resolve to JobInfo.ID and belong to the same frozen hero's explicit normal/SP job set.",
-      "All 267 frozen heroes have ConditionType=7 evidence at both HeartFetter Lv4 and Lv7.",
-      "Hero 144 provides source-description evidence that explicitly names job activation and matches ConditionParam JobInfo IDs 126 and 307.",
-      "Published class-specific HeartFetter presentation and historical semantic-lineage evidence support a job/class relationship."
+      "All 1,158 ConditionType=7 params resolve to JobInfo.ID and belong to the same frozen hero's explicit normal/SP job set.",
+      "1,154 of 1,158 current projection rows contain the ConditionParam job name in at least one linked Skill/Buff source description.",
+      "Four Ainz rows explicitly name the opposite final job in both Skill and Buff source descriptions, so ConditionParam cannot be universally treated as the activation/display job.",
+      "Kagura still provides direct evidence of job/class-specific HeartFetter behavior while also demonstrating Skill/Buff cross-link differences."
     ],
     "unresolvedDetails": [
       "The exact runtime comparator or evaluator branch for ConditionType=7 is not directly observed.",
-      "Whether the runtime checks current active job, a derived class state, or an equivalent internal job predicate remains unproven.",
-      "This hypothesis must not be treated as proof of generic runtime implementation details beyond the job/class activation relation."
+      "The exact reason the four Ainz ConditionParam references point to the opposite source-named final job remains unresolved.",
+      "A presentation mapping must be exception-aware and independently owned; it must not silently equate ConditionParam with activation/display job."
     ]
   },
   "allowedUse": {
     "researchProjection": true,
     "diagnosticPresentation": true,
+    "conditionParamJobReferenceProjection": true,
+    "conditionParamAsUniversalActivationJob": false,
+    "conditionParamAsUniversalDisplayJob": false,
     "canonicalRelationMutation": false,
     "createApplicableJobIds": false,
     "createJobRestricted": false,
@@ -60,9 +70,9 @@
     "rawConfigDataRuntimeFallback": false
   },
   "reopenConditions": [
-    "A post-HeartFetter runtime evaluator contradicts job/class activation semantics.",
+    "A post-HeartFetter runtime evaluator resolves the exact ConditionType=7 comparator or explains the Ainz inverse references.",
     "A current source-pack record with ConditionType=7 has a ConditionParam that does not resolve to the same hero's explicit JobInfo set.",
     "A source/contract/schema change invalidates the referenced validation evidence."
   ],
-  "completion": "A high-confidence, non-canonical CT7 job-activation hypothesis is recorded for research reuse without changing Hero canonical relations or production consumers."
+  "completion": "CT7 is retained as a 100% structurally confirmed same-hero JobInfo reference, while the former universal activation/display-job hypothesis is explicitly rejected. Canonical and production consumers remain closed pending an exception-aware presentation mapping or exact runtime semantics."
 }
