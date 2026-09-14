@@ -1,0 +1,80 @@
+name: Temporary Hero SP final stats fix
+
+on:
+  push:
+    branches:
+      - fix/hero-sp-final-stats-central-bond-20260914
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    if: github.event.head_commit.message != 'fix(hero): restore SP final job stats with central bond'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/hero-sp-final-stats-central-bond-20260914
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+      - name: Apply scoped frontend patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          server = Path('src/lib/hero-detail-stage5.server.ts')
+          text = server.read_text()
+          old = '''type Stage6Sp = {\n  status?: string | null;\n  secondStageRewards?: {\n    skills?: Stage6SpRewardSkill[] | null;\n  } | null;\n} | null | undefined;'''
+          new = '''type Stage6Sp = {\n  status?: string | null;\n  job?: {\n    jobConnectionId?: number | null;\n    jobId?: number | null;\n    nameCn?: string | null;\n  } | null;\n  finalDisplayStats?: Stage6JobConnection["finalDisplayStats"];\n  secondStageRewards?: {\n    skills?: Stage6SpRewardSkill[] | null;\n  } | null;\n} | null | undefined;'''
+          if old not in text:
+              raise SystemExit('Stage6Sp type anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''  const spRewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)\n    ? shard.sp.secondStageRewards.skills\n        .map(projectSpRewardSkill)\n        .filter((skill): skill is NonNullable<typeof skill> => skill !== null)\n    : [];\n  const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);'''
+          new = '''  const spRewardSkills = Array.isArray(shard.sp?.secondStageRewards?.skills)\n    ? shard.sp.secondStageRewards.skills\n        .map(projectSpRewardSkill)\n        .filter((skill): skill is NonNullable<typeof skill> => skill !== null)\n    : [];\n  const spFinalDisplayStats = shard.sp?.finalDisplayStats;\n  const spFinalValues = spFinalDisplayStats?.values;\n  const spFinalJob = shard.sp?.job && spFinalDisplayStats\n    ? {\n        jobConnectionId: Number.isInteger(shard.sp.job.jobConnectionId) ? Number(shard.sp.job.jobConnectionId) : null,\n        jobId: Number.isInteger(shard.sp.job.jobId) ? Number(shard.sp.job.jobId) : null,\n        nameCn: shard.sp.job.nameCn ?? null,\n        heroLevel: spFinalDisplayStats.heroLevel ?? null,\n        star: spFinalDisplayStats.star ?? null,\n        statStatus: spFinalDisplayStats.status ?? null,\n        finalStats: {\n          HP: spFinalValues?.hp ?? null,\n          ATK: spFinalValues?.at ?? null,\n          INT: spFinalValues?.magic ?? null,\n          DEF: spFinalValues?.df ?? null,\n          MDEF: spFinalValues?.magicDf ?? null,\n          DEX: spFinalValues?.dex ?? null,\n        },\n        centralBondStats: projectCentralBondStats(spFinalDisplayStats),\n      }\n    : null;\n  const awakeningSkill = projectSkill(shard.normal?.awakening?.skill);'''
+          if old not in text:
+              raise SystemExit('SP reward projection anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''    sp: {\n      status: shard.sp?.status ?? null,\n      released: isReleased(shard.sp),\n      secondStageRewards: {\n        skills: spRewardSkills,\n      },\n    },'''
+          new = '''    sp: {\n      status: shard.sp?.status ?? null,\n      released: isReleased(shard.sp),\n      finalJob: spFinalJob,\n      secondStageRewards: {\n        skills: spRewardSkills,\n      },\n    },'''
+          if old not in text:
+              raise SystemExit('SP return projection anchor not found')
+          server.write_text(text.replace(old, new, 1))
+
+          route = Path('src/routes/heroes_.$heroId.tsx')
+          text = route.read_text()
+          old = '''  const finalJobBranches = detail.jobs.branches.filter((branch) => branch.capstone?.rank === 4);'''
+          new = '''  const finalJobRows = [\n    ...detail.jobs.branches\n      .filter((branch) => branch.capstone?.rank === 4)\n      .map((branch) => ({ key: `normal-${branch.branchIndex}`, capstone: branch.capstone })),\n    ...(detail.sp.released && detail.sp.finalJob\n      ? [{ key: "sp", capstone: detail.sp.finalJob }]\n      : []),\n  ];'''
+          if old not in text:
+              raise SystemExit('finalJobBranches anchor not found')
+          text = text.replace(old, new, 1)
+          text = text.replace('{finalJobBranches.length > 0 ? (', '{finalJobRows.length > 0 ? (', 1)
+          old = '''                  {finalJobBranches.map((branch) => {\n                    const capstone = branch.capstone;\n                    if (!capstone) return null;\n                    return (\n                      <Fragment key={branch.branchIndex}>'''
+          new = '''                  {finalJobRows.map(({ key, capstone }) => {\n                    if (!capstone) return null;\n                    return (\n                      <Fragment key={key}>'''
+          if old not in text:
+              raise SystemExit('finalJobBranches map anchor not found')
+          route.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+          mapfile -t changed < <(git diff --name-only | sort)
+          expected=("src/lib/hero-detail-stage5.server.ts" 'src/routes/heroes_.$heroId.tsx')
+          if [[ "${changed[*]}" != "${expected[*]}" ]]; then
+            printf 'Unexpected changed paths:\n%s\n' "${changed[@]}"
+            exit 1
+          fi
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Production build
+        run: bun run build
+      - name: Commit validated patch and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/tmp-hero-sp-final-stats-fix.yml
+          git add src/lib/hero-detail-stage5.server.ts 'src/routes/heroes_.$heroId.tsx'
+          git commit -m 'fix(hero): restore SP final job stats with central bond'
+          git push origin HEAD:fix/hero-sp-final-stats-central-bond-20260914
