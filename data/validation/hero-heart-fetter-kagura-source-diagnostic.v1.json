@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "stage": "hero-heart-fetter-kagura-source-diagnostic-v1",
+  "status": "PASS_WITH_REVIEW",
+  "owner": "hero-canonical",
+  "purpose": "Record reusable, version-linked non-semantic source evidence for the hero 144 HeartFetter Lv4/Lv7 ConditionType=7 unique JobInfo-set exception without assigning runtime predicate meaning.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "86a1693e3536b29eda3a97a3d44ac3eb3a131dc3",
+    "heartFetterDiagnosticPredecessor": "678e9b6b66b193c4e354dfa4169530dd946fa37d"
+  },
+  "references": {
+    "rawConditionContract": "data/contracts/hero-heart-fetter-raw-condition.v1.json",
+    "pairingEvidence": "data/validation/hero-heart-fetter-level-pairing-consistency.v1.json",
+    "diagnosticScript": "scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs",
+    "workflow": ".github/workflows/hero-heart-fetter-raw-condition-v1.yml",
+    "heroShard": "data/generated/hero-detail/by-id/144.json"
+  },
+  "validatedRun": {
+    "pr": 916,
+    "validatedHead": "e656ab5379c9c2b4ac13080488e2d8e176cff637",
+    "mergeCommit": "678e9b6b66b193c4e354dfa4169530dd946fa37d",
+    "workflowRunId": 34827072166,
+    "workflowConclusion": "success",
+    "diagnosticStep": "PASS",
+    "rawConditionValidation": "PASS",
+    "heroCanonicalOwnerValidation": "PASS",
+    "repositoryMutationGuard": "PASS",
+    "projectCheck": "PASS"
+  },
+  "hero144": {
+    "identity": {
+      "heroId": 144,
+      "nameKr": "카구라",
+      "nameCn": "神乐",
+      "nameEn": "Kagura"
+    },
+    "normalJobIds": [124, 125, 303, 126, 307],
+    "spJob": null,
+    "targetJobs": [
+      {"jobId": 126, "nameCn": "星海公主", "rank": 4},
+      {"jobId": 307, "nameCn": "突击骑士", "rank": 4}
+    ],
+    "heartFetterRows": [
+      {
+        "heartFetterLevel": 4,
+        "skillId": 800033,
+        "skillDescription": "职业为星海公主生效：遭受范围伤害降低<color=#DC143C>10%</color>。",
+        "buffId": 800033,
+        "buffDescription": "职业为星海公主生效：遭受范围伤害降低10%。",
+        "conditionType": 7,
+        "conditionParams": [126]
+      },
+      {
+        "heartFetterLevel": 4,
+        "skillId": 800034,
+        "skillDescription": "职业为突击骑士生效：主动攻击进入战斗时，部队遭受伤害降低<color=#DC143C>10%</color>。",
+        "buffId": 800035,
+        "buffDescription": "职业为星海公主生效：受到攻击进入战斗时，伤害提升10%。",
+        "conditionType": 7,
+        "conditionParams": [126]
+      },
+      {
+        "heartFetterLevel": 7,
+        "skillId": 800035,
+        "skillDescription": "职业为星海公主生效：受到攻击进入战斗时，伤害提升<color=#DC143C>10%</color>。",
+        "buffId": 800034,
+        "buffDescription": "职业为突击骑士生效：主动攻击进入战斗时，部队遭受伤害降低10%。",
+        "conditionType": 7,
+        "conditionParams": [307]
+      },
+      {
+        "heartFetterLevel": 7,
+        "skillId": 800036,
+        "skillDescription": "职业为突击骑士生效：部队血量低于70%时，进入战斗后伤害提升<color=#DC143C>10%</color>。",
+        "buffId": 800036,
+        "buffDescription": "职业为突击骑士生效：部队血量低于70%时，进入战斗后伤害提升10%。",
+        "conditionType": 7,
+        "conditionParams": [307]
+      }
+    ]
+  },
+  "currentHeadCompatibility": {
+    "checkedHead": "86a1693e3536b29eda3a97a3d44ac3eb3a131dc3",
+    "interveningPr": 917,
+    "hero144ShardChanged": true,
+    "jobTreeIdentityPreserved": true,
+    "observedCurrentJobIdsInclude126And307": true,
+    "interveningChangeOwner": "SP reward skill cost projection / generated hero-detail refresh",
+    "diagnosticScriptOrHeartFetterContractChangedByInterveningPr": false,
+    "note": "PR #917 regenerated hero-detail shards and changed stat projection content, but the inspected current hero 144 job tree still preserves explicit JobInfo IDs 126 and 307. This compatibility check does not substitute for runtime ConditionType semantic evidence."
+  },
+  "validatedConclusions": {
+    "sourceDescriptionsExplicitlyStateJobActivation": true,
+    "conditionType7ParamsMatchTheNamedExplicitJobsInTheCorrespondingBuffRecords": true,
+    "jobIds126And307AreExplicitHero144FinalNormalJobs": true,
+    "exactConditionType7RuntimePredicateResolved": false,
+    "conditionParamExactGameplayRoleResolved": false,
+    "mayPromoteToApplicableJobIds": false,
+    "mayPromoteToJobRestricted": false
+  },
+  "semanticBoundary": {
+    "conditionType7Meaning": "MANUAL_REVIEW",
+    "sourceTextIsSemanticEvidenceForTheseFourRecords": true,
+    "sourceTextAloneDefinesGenericRuntimeEvaluator": false,
+    "mayCreateNewCanonicalRelation": false,
+    "mayUseNameJoin": false,
+    "mayUseIdArithmetic": false,
+    "mayInferGenericPredicateFromHero144Alone": false
+  },
+  "nextEvidence": [
+    "Locate a post-HeartFetter runtime consumer or evaluator that branches on Buff ConditionType/ConditionParam and compares against current hero job/class state.",
+    "If that evaluator is not present in the current repository/source pack, keep generic ConditionType=7 semantics unresolved and hand off as MANUAL_REVIEW rather than inferring from descriptions or pairing statistics."
+  ],
+  "completion": "The version-linked hero 144 Skill/Buff/Job source diagnostic is frozen as reusable evidence: JobInfo 126/307 are explicit hero 144 final jobs, the four target Buff records use ConditionType=7 with [126] or [307], and their source descriptions explicitly name the corresponding job activation. Generic runtime predicate semantics remain unresolved."
+}
