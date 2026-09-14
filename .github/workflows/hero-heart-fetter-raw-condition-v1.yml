@@ -11,9 +11,11 @@ on:
       - data/validation/hero-heart-fetter-raw-condition-admission.v1.json
       - data/validation/hero-heart-fetter-raw-condition-publication.v1.json
       - data/validation/hero-heart-fetter-ct7-job-activation-hypothesis.v1.json
+      - data/validation/hero-heart-fetter-ainz-ct7-source-diagnostic.v1.json
       - scripts/build-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-raw-condition-v1.cjs
       - scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
+      - scripts/validate-hero-heart-fetter-ainz-ct7-source-diagnostic-v1.cjs
       - scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
       - scripts/build-hero-heart-fetter-job-effect-research-v1.cjs
       - scripts/validate-hero-heart-fetter-job-effect-research-v1.cjs
@@ -44,7 +46,10 @@ jobs:
       - name: Diagnose Kagura source records without semantic interpretation
         run: node scripts/validate-hero-heart-fetter-kagura-source-diagnostic-v1.cjs
 
-      - name: Validate non-canonical CT7 job activation research hypothesis
+      - name: Diagnose Ainz CT7 source-description exception
+        run: node scripts/validate-hero-heart-fetter-ainz-ct7-source-diagnostic-v1.cjs
+
+      - name: Validate revised CT7 structural job-reference boundary
         run: node scripts/validate-hero-heart-fetter-ct7-job-activation-hypothesis-v1.cjs
 
       - name: Build non-canonical job-effect research projection
