@@ -159,7 +159,7 @@ function build() {
           heroInfoSourceIndex: heroHit.sourceIndex,
           heroInformationSourceIndex: informationHit.sourceIndex,
           heroHeartFetterSourceIndex: heartHit.sourceIndex,
-          unlockSkillSourceIndex,
+          unlockSkillSourceIndex: unlockSourceIndex,
           skillSourceIndex: skillHit.sourceIndex,
           passiveBuffSourceIndices,
         },
