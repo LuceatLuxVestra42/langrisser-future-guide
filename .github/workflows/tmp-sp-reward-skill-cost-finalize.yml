@@ -1,0 +1,177 @@
+name: tmp-sp-reward-skill-cost-finalize
+
+on:
+  push:
+    branches:
+      - fix/sp-reward-skill-cost-projection-current-20260914
+
+permissions:
+  contents: write
+
+jobs:
+  repair-validate-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.1
+
+      - name: Patch Stage 5-4 SkillCost projection
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p = Path('scripts/build_hero_stage5_4_sp_v2.cjs')
+          text = p.read_text()
+          old_cost = 'cost:q?.Cost??null'
+          new_cost = 'cost:q?.SkillCost??null'
+          if text.count(old_cost) != 1:
+              raise SystemExit(f'expected one Stage5-4 q.Cost projection, found {text.count(old_cost)}')
+          text = text.replace(old_cost, new_cost, 1)
+          old_guard = "if(!q)err.push(`Hero ${id} Skill ${x} unresolved`);return{skillId:x"
+          new_guard = "if(!q)err.push(`Hero ${id} Skill ${x} unresolved`);if(q&&!Number.isInteger(q.SkillCost))err.push(`Hero ${id} Skill ${x} invalid SkillCost ${JSON.stringify(q.SkillCost)}`);return{skillId:x"
+          if text.count(old_guard) != 1:
+              raise SystemExit(f'expected one Stage5-4 reward skill guard, found {text.count(old_guard)}')
+          text = text.replace(old_guard, new_guard, 1)
+          old_policy = "sourcePolicy:'Current direct ConfigData is authoritative. SPHeroInfo.ID is canonical Hero ID."
+          new_policy = "sourcePolicy:'Current direct ConfigData is authoritative. SP reward skill cost is projected only from ConfigDataSkillInfo.SkillCost by exact SecondStageRewardSkills skillId; missing/non-integer SkillCost is a hard error. SPHeroInfo.ID is canonical Hero ID."
+          if text.count(old_policy) != 1:
+              raise SystemExit(f'expected one Stage5-4 source policy, found {text.count(old_policy)}')
+          p.write_text(text.replace(old_policy, new_policy, 1))
+          PY
+
+      - name: Regenerate and validate Stage 5-4
+        run: node scripts/build_hero_stage5_4_sp_v2.cjs
+
+      - name: Validate SP reward SkillCost parity
+        shell: bash
+        run: |
+          node <<'NODE'
+          const artifact = require('./data/generated/hero-page-stage5-4-sp.v1.json');
+          const validation = require('./data/validation/hero-page-stage5-4-final.v1.json');
+          if (validation.status !== 'PASS' || validation.completion !== 'COMPLETE') throw new Error(`Stage5-4 validation ${validation.status}/${validation.completion}`);
+          const skills = [];
+          for (const hero of artifact.records || []) for (const skill of hero?.sp?.secondStageRewards?.skills || []) skills.push({heroId: hero.heroId, ...skill});
+          if (skills.length !== 50) throw new Error(`expected 50 SP reward skills, got ${skills.length}`);
+          for (const skill of skills) if (!Number.isInteger(skill.cost)) throw new Error(`invalid projected SkillCost ${skill.heroId}/${skill.skillId}: ${JSON.stringify(skill.cost)}`);
+          const byId = new Map(skills.map(x => [Number(x.skillId), x]));
+          for (const [id, cost] of [[12478,1],[12479,2]]) {
+            const got = byId.get(id);
+            if (!got) throw new Error(`missing representative SP reward skill ${id}`);
+            if (got.cost !== cost) throw new Error(`${id}.cost ${JSON.stringify(got.cost)} != ${cost}`);
+          }
+          NODE
+
+      - name: Regenerate Stage 6 consumers
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build_hero_stage6_1_detail.cjs
+          node scripts/run_hero_stage6_3_full_generation.cjs
+          node scripts/shard_hero_stage6_3_output.cjs
+          node <<'NODE'
+          const fs = require('fs');
+          const v61 = require('./data/validation/hero-stage6-1-final.v1.json');
+          if (v61.status !== 'PASS' || v61.completion !== 'COMPLETE') throw new Error(`Stage6-1 validation ${v61.status}/${v61.completion}`);
+          const v63 = require('./data/validation/hero-stage6-3-final.v1.json');
+          if (!['PASS','PASS_WITH_REVIEW'].includes(v63.status) || v63.completion !== 'COMPLETE' || Number(v63.summary?.hardErrorCount) !== 0) throw new Error(`Stage6-3 validation ${v63.status}/${v63.completion}/hard=${v63.summary?.hardErrorCount}`);
+          const shards = fs.readdirSync('./data/generated/hero-detail/by-id').filter(x => x.endsWith('.json'));
+          if (shards.length !== 267) throw new Error(`expected 267 Hero shards, got ${shards.length}`);
+          const found = new Map();
+          for (const file of shards) {
+            const hero = require(`./data/generated/hero-detail/by-id/${file}`);
+            for (const skill of hero?.sp?.secondStageRewards?.skills || []) if ([12478,12479].includes(Number(skill.skillId))) found.set(Number(skill.skillId), skill);
+          }
+          for (const [id,cost] of [[12478,1],[12479,2]]) if (found.get(id)?.cost !== cost) throw new Error(`Hero detail shard ${id}.cost ${JSON.stringify(found.get(id)?.cost)} != ${cost}`);
+          NODE
+
+      - name: Frontend preflight and build
+        shell: bash
+        run: |
+          set -euo pipefail
+          bun install --frozen-lockfile
+          node scripts/validate-skin-stage3-5-static-assets-readonly.mjs
+          node scripts/validate-skin-stage3-6-hero-detail-consumer.mjs
+          node scripts/validate-hero-card-icon-frontend.mjs
+          node scripts/validate-hero-fusion-power-frontend.mjs
+          bunx tsc --noEmit
+          bunx vite build --config vite.config.pages.ts
+
+      - name: Audit, freeze, and push intended change set
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import subprocess, re, sys
+          allowed_exact = {
+            'scripts/build_hero_stage5_4_sp_v2.cjs',
+            'data/generated/hero-page-stage5-4-sp.v1.json',
+            'data/validation/hero-page-stage5-4-final.v1.json',
+            'data/generated/hero-detail-stage6-1.v1.json',
+            'data/validation/hero-stage6-1-final.v1.json',
+            'data/generated/hero-detail.v1.json',
+            'data/generated/hero-detail-shared.v1.json',
+            'data/validation/hero-stage6-3-final.v1.json',
+            'data/checkpoints/hero-stage6-3-full-generation.json',
+            'data/checkpoints/hero-stage6-3-full-generation.md',
+          }
+          allowed_re = re.compile(r'^data/generated/hero-detail/by-id/[^/]+\.json$')
+          out = subprocess.check_output(['git','status','--porcelain=v1'], text=True)
+          paths = []
+          for line in out.splitlines():
+              raw = line[3:]
+              if ' -> ' in raw:
+                  raw = raw.split(' -> ',1)[1]
+              paths.append(raw)
+          bad = [p for p in paths if p not in allowed_exact and not allowed_re.match(p)]
+          if bad:
+              print('unexpected mutation paths:', *bad, sep='\n  ', file=sys.stderr)
+              sys.exit(1)
+          if 'scripts/build_hero_stage5_4_sp_v2.cjs' not in paths:
+              raise SystemExit('producer did not change')
+          if 'data/generated/hero-page-stage5-4-sp.v1.json' not in paths:
+              raise SystemExit('Stage5-4 frozen output did not change')
+          print(f'approved mutation paths: {len(paths)}')
+          PY
+          rm .github/workflows/tmp-sp-reward-skill-cost-finalize.yml
+          remote_head="$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)"
+          if [ "$remote_head" != "$GITHUB_SHA" ]; then
+            echo "remote head changed: expected $GITHUB_SHA got $remote_head" >&2
+            exit 1
+          fi
+          git add -A
+          git diff --cached --check
+          python3 <<'PY'
+          import subprocess, re, sys
+          allowed_exact = {
+            'scripts/build_hero_stage5_4_sp_v2.cjs',
+            'data/generated/hero-page-stage5-4-sp.v1.json',
+            'data/validation/hero-page-stage5-4-final.v1.json',
+            'data/generated/hero-detail-stage6-1.v1.json',
+            'data/validation/hero-stage6-1-final.v1.json',
+            'data/generated/hero-detail.v1.json',
+            'data/generated/hero-detail-shared.v1.json',
+            'data/validation/hero-stage6-3-final.v1.json',
+            'data/checkpoints/hero-stage6-3-full-generation.json',
+            'data/checkpoints/hero-stage6-3-full-generation.md',
+            '.github/workflows/tmp-sp-reward-skill-cost-finalize.yml',
+          }
+          allowed_re = re.compile(r'^data/generated/hero-detail/by-id/[^/]+\.json$')
+          paths = subprocess.check_output(['git','diff','--cached','--name-only'], text=True).splitlines()
+          bad = [p for p in paths if p not in allowed_exact and not allowed_re.match(p)]
+          if bad:
+              print('unexpected staged paths:', *bad, sep='\n  ', file=sys.stderr)
+              sys.exit(1)
+          print(f'approved staged paths: {len(paths)}')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Fix SP reward skill cost projection'
+          git push origin HEAD:${GITHUB_REF_NAME}
