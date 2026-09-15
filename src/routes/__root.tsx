@@ -229,6 +229,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <style>{`[data-hero-central-bond-stat-row="true"] { display: none; }`}</style>
       </head>
       <body>
         {children}
