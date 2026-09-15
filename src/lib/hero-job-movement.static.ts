@@ -107,7 +107,7 @@ for (const hero of heroJobLinks.records) {
     if (!definition) {
       throw new Error(`Hero Job ${jobId} references undefined MoveType ${String(movementEntry.moveType)}.`);
     }
-    if (!Number.isFinite(movementEntry.movePoint) || movementEntry.movePoint == null || movementEntry.movePoint < 0) {
+    if (movementEntry.movePoint == null || !Number.isFinite(movementEntry.movePoint) || movementEntry.movePoint < 0) {
       throw new Error(`Hero Job ${jobId} has invalid BF_MovePoint ${String(movementEntry.movePoint)}.`);
     }
 
