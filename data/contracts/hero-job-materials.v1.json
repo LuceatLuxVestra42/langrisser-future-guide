@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "contract": "hero-job-materials",
+  "owner": "hero-canonical",
+  "status": "ACTIVE",
+  "purpose": "Attach normal hero JobLevel advancement materials from the pinned UnityDataTool parsed ConfigData snapshot without introducing inferred identity or relation edges.",
+  "primaryKey": "heroId",
+  "upstream": "data/generated/hero-job-links.v1.json",
+  "authoritativeSourceContract": "data/contracts/configdata-source-pack-contract.v1.json",
+  "requiredSources": [
+    "ConfigDataJobLevelInfo",
+    "ConfigDataJobMaterialInfo"
+  ],
+  "relationContract": {
+    "heroJobLevel": "hero-job-links.records[].connections[].jobLevelIds[] -> ConfigDataJobLevelInfo.ID",
+    "materialList": "ConfigDataJobLevelInfo.Materials[] preserved in source order",
+    "jobMaterial": "Materials[].GoodsType == 5: Materials[].Id -> ConfigDataJobMaterialInfo.ID"
+  },
+  "normalizationRules": [
+    "Consume only hero-job-links status PASS.",
+    "Preserve hero, JobConnection, JobLevel and Materials source order.",
+    "Resolve JobLevel only by explicit numeric ID equality.",
+    "Resolve JobMaterial only when GoodsType is exactly 5 and only by explicit numeric ID equality.",
+    "Do not join by names, numeric ranges, ID arithmetic, filename similarity, UI order, or historical output.",
+    "Do not synthesize a material when ConfigDataJobLevelInfo.Materials is absent or empty.",
+    "Fail closed on malformed Goods records, duplicate source IDs, unresolved JobLevel IDs, unresolved JobMaterial IDs, or unsupported GoodsType values in canonical hero JobLevels.",
+    "Preserve source GoodsType, Id and Count alongside the resolved JobMaterial snapshot."
+  ],
+  "jobMaterialSnapshotFields": [
+    "ID",
+    "Name",
+    "Desc",
+    "Rank",
+    "Icon"
+  ],
+  "validationPolicy": {
+    "PASS": [
+      "The canonical hero set exactly matches hero-job-links.",
+      "Every referenced JobLevel resolves exactly once.",
+      "Every canonical JobLevel material record has GoodsType 5 with positive integer Id and Count.",
+      "Every referenced JobMaterial resolves exactly once.",
+      "Generated ordering and resolved snapshots exactly match the pinned source records."
+    ],
+    "FAIL": [
+      "Any upstream, source identity, cardinality, ordering, GoodsType, count, or snapshot mismatch occurs."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-job-materials.v1.json",
+    "summary": "data/validation/hero-job-materials-summary.v1.json"
+  },
+  "producer": "scripts/build_hero_job_materials.cjs",
+  "validator": "scripts/validate_hero_job_materials.cjs",
+  "completionRule": "Run the producer against the current pinned ConfigData source-pack, then run the independent validator. Completion requires generated status PASS, summary status PASS, validator PASS, no hard errors, and no unexpected repository mutation."
+}
