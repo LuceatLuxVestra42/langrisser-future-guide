@@ -2,7 +2,7 @@
   "version": 1,
   "stage": "hero-page-5-4",
   "status": "COMPLETE",
-  "sourcePolicy": "Current direct ConfigData is authoritative. SP reward skill cost is projected only from ConfigDataSkillInfo.SkillCost by exact SecondStageRewardSkills skillId; missing/non-integer SkillCost is a hard error. SPHeroInfo.ID is canonical Hero ID. SP job uses JobConnection_ID -> ConfigDataJobConnectionInfo.ID -> Job_ID -> ConfigDataJobInfo.ID. Mission Goods retain their own GoodsType/Id namespaces without universal ItemInfo coercion. Stage 5-2 and Stage 5-3 frozen outputs are reused for exclusive-equipment and Soldier cross-checks.",
+  "sourcePolicy": "Current direct ConfigData is authoritative. SP talent progression is projected only by exact SPHeroInfo.JobConnection_ID -> ConfigDataJobConnectionInfo.ID -> TalentSkill_IDs[star - 1] -> ConfigDataSkillInfo.ID; TalentSkill_IDs must contain exactly six resolvable IDs. SP reward skills remain a separate projection from exact SecondStageRewardSkills skillId, and SkillCost is projected only from ConfigDataSkillInfo.SkillCost; missing/non-integer SkillCost is a hard error. SPHeroInfo.ID is canonical Hero ID. SP job uses JobConnection_ID -> ConfigDataJobConnectionInfo.ID -> Job_ID -> ConfigDataJobInfo.ID. Mission Goods retain their own GoodsType/Id namespaces without universal ItemInfo coercion. Stage 5-2 and Stage 5-3 frozen outputs are reused for exclusive-equipment and Soldier cross-checks.",
   "sources": [
     "data/hero-name-master.v1.json",
     "data/configdata/ConfigDataSPHeroInfo.json",
@@ -31,6 +31,7 @@
       "81": 119
     },
     "missionExtResolvedCount": 350,
+    "spTalentResolvedCount": 25,
     "rewardBuffResolvedCount": 25,
     "rewardSkillResolvedCount": 50,
     "rewardSoldierResolvedCount": 25,
@@ -55,6 +56,72 @@
           "jobConnectionId": 22,
           "jobId": 262,
           "nameCn": "孤刃逆旅"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4118,
+              "skill": {
+                "skillId": 4118,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>1%</color>（最高<color=#DC143C>5%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>5</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4119,
+              "skill": {
+                "skillId": 4119,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>2%</color>（最高<color=#DC143C>10%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>4</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4120,
+              "skill": {
+                "skillId": 4120,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>2%</color>（最高<color=#DC143C>10%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>4</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4121,
+              "skill": {
+                "skillId": 4121,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>3%</color>（最高<color=#DC143C>15%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>3</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4122,
+              "skill": {
+                "skillId": 4122,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>4%</color>（最高<color=#DC143C>20%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>3</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4123,
+              "skill": {
+                "skillId": 4123,
+                "nameCn": "交错的羁绊",
+                "desc": "携带技能无视COST限制。全场每有<color=#DC143C>1</color>个友军部队，则攻防提升<color=#DC143C>5%</color>（最高<color=#DC143C>25%</color>）。\n若本回合攻击过，行动结束时可以额外使用技能[回到过去]：回到行动开始时的状态（使用后需要间隔<color=#DC143C>2</color>回合才能再次使用）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPMathew.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1500,
@@ -705,6 +772,72 @@
           "jobId": 633,
           "nameCn": "啸风骑将"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4056,
+              "skill": {
+                "skillId": 4056,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>50%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>5%</color>，遭受物理伤害降低<color=#DC143C>2%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>2</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4057,
+              "skill": {
+                "skillId": 4057,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>60%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>6%</color>，遭受物理伤害降低<color=#DC143C>3%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>2</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4058,
+              "skill": {
+                "skillId": 4058,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>70%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>7%</color>，遭受物理伤害降低<color=#DC143C>3%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>2</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4059,
+              "skill": {
+                "skillId": 4059,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>80%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>8%</color>，遭受物理伤害降低<color=#DC143C>4%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>2</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4060,
+              "skill": {
+                "skillId": 4060,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>90%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>9%</color>，遭受物理伤害降低<color=#DC143C>4%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>2</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4061,
+              "skill": {
+                "skillId": 4061,
+                "nameCn": "勇者的坚韧",
+                "desc": "被攻击进入战斗前，<color=#DC143C>100%</color>的概率获得[坚忍的反击]：攻击，防御提升<color=#DC143C>10%</color>，遭受物理伤害降低<color=#DC143C>5%</color>，持续<color=#DC143C>2</color>回合，不可驱散，可以累积，最高可以累积<color=#DC143C>3</color>个。当自身拥有<color=#DC143C>3</color>个及以上强化效果时，部队攻击不受近战伤害减免影响。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPGrenier.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1000,
           "ATStar": [
@@ -1346,6 +1479,72 @@
           "jobConnectionId": 47,
           "jobId": 769,
           "nameCn": "曙光的恩眷"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4260,
+              "skill": {
+                "skillId": 4260,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>1</color>倍，同时驱散<color=#DC143C>1</color>个弱化效果。并对距离自身最近的<color=#DC143C>1</color>个敌军施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4261,
+              "skill": {
+                "skillId": 4261,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>1.3</color>倍，同时驱散<color=#DC143C>1</color>个弱化效果。并对距离自身最近的<color=#DC143C>1</color>个敌军施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4262,
+              "skill": {
+                "skillId": 4262,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>1.6</color>倍，同时驱散<color=#DC143C>1</color>个弱化效果。并对距离自身最近的<color=#DC143C>2</color>个敌军施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4263,
+              "skill": {
+                "skillId": 4263,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>2</color>倍，同时驱散<color=#DC143C>2</color>个弱化效果。并对距离自身最近的<color=#DC143C>2</color>个敌军施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4264,
+              "skill": {
+                "skillId": 4264,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>2.5</color>倍，同时驱散<color=#DC143C>2</color>个弱化效果。并对距离自身最近的<color=#DC143C>2</color>个敌军施加<color=#DC143C>2</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4265,
+              "skill": {
+                "skillId": 4265,
+                "nameCn": "女神超正经！",
+                "desc": "行动结束时，为生命值最低的友军部队恢复生命，恢复量为艾梅达智力的<color=#DC143C>3</color>倍，同时驱散<color=#DC143C>2</color>个弱化效果。并对距离自身最近的<color=#DC143C>2</color>个敌军施加<color=#DC143C>2</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPAimeeda.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 500,
@@ -2005,6 +2204,72 @@
           "jobId": 377,
           "nameCn": "湮黯青龙"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4167,
+              "skill": {
+                "skillId": 4167,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>10%</color>。英雄遭受物理伤害降低<color=#DC143C>10%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>1</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4167,
+              "skill": {
+                "skillId": 4167,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>10%</color>。英雄遭受物理伤害降低<color=#DC143C>10%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>1</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4167,
+              "skill": {
+                "skillId": 4167,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>10%</color>。英雄遭受物理伤害降低<color=#DC143C>10%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>1</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4168,
+              "skill": {
+                "skillId": 4168,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>15%</color>。英雄遭受物理伤害降低<color=#DC143C>15%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>1</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4169,
+              "skill": {
+                "skillId": 4169,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>20%</color>。英雄遭受物理伤害降低<color=#DC143C>20%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>1</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4170,
+              "skill": {
+                "skillId": 4170,
+                "nameCn": "复归的青龙",
+                "desc": "技能携带无视COST限制。造成伤害提升<color=#DC143C>30%</color>。英雄遭受物理伤害降低<color=#DC143C>30%</color>，主动攻击时此效果翻倍。\n移动无视敌军单位阻挡，攻击后可以再移动<color=#DC143C>3</color>格，在行动结束时，使自身本回合经过的所有格子获得<color=#DC143C>2</color>回合的特殊效果[冥火]：\"当敌军单位移动至其上，在行动结束时，受到施加者攻击<color=#DC143C>1</color>倍的[固定伤害]并获得“造成伤害降低<color=#DC143C>20%</color>”，持续<color=#DC143C>2</color>回合。\"",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLeon.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -2652,6 +2917,72 @@
           "jobConnectionId": 76,
           "jobId": 1214,
           "nameCn": "统黯帝皇"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4240,
+              "skill": {
+                "skillId": 4240,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>5%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4240,
+              "skill": {
+                "skillId": 4240,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>5%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4240,
+              "skill": {
+                "skillId": 4240,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>5%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4241,
+              "skill": {
+                "skillId": 4241,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>13%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>8%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4242,
+              "skill": {
+                "skillId": 4242,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>16%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>11%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4243,
+              "skill": {
+                "skillId": 4243,
+                "nameCn": "渊狱的霸者",
+                "desc": "携带技能无视COST限制。进入战斗时，造成伤害和防御提升<color=#DC143C>20%</color>。\n周围<color=#DC143C>2</color>格内所有敌军攻防降低<color=#DC143C>15%</color>，行动结束时，随机失去<color=#DC143C>1</color>个强化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPBernhardt.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1000,
@@ -3303,6 +3634,72 @@
           "jobId": 864,
           "nameCn": "裁罪圣者"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3968,
+              "skill": {
+                "skillId": 3968,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>4%</color>，最高<color=#DC143C>20%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3968,
+              "skill": {
+                "skillId": 3968,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>4%</color>，最高<color=#DC143C>20%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3968,
+              "skill": {
+                "skillId": 3968,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>4%</color>，最高<color=#DC143C>20%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3969,
+              "skill": {
+                "skillId": 3969,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>5%</color>，最高<color=#DC143C>25%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3970,
+              "skill": {
+                "skillId": 3970,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>6%</color>，最高<color=#DC143C>30%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3971,
+              "skill": {
+                "skillId": 3971,
+                "nameCn": "暗光的圣裁",
+                "desc": "自身每有一个强化效果，则伤害提升<color=#DC143C>7%</color>，最高<color=#DC143C>35%</color>。\n携带近战士兵时，范围技能范围<color=#DC143C>+1</color>、射程<color=#DC143C>+1</color>。携带远程士兵时，使用需要进入战斗的远程技能时部队射程<color=#DC143C>+1</color>。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLana.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -3952,6 +4349,72 @@
           "jobId": 1097,
           "nameCn": "至黯魔王"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4461,
+              "skill": {
+                "skillId": 4461,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>4</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4461,
+              "skill": {
+                "skillId": 4461,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>4</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4461,
+              "skill": {
+                "skillId": 4461,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>4</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4462,
+              "skill": {
+                "skillId": 4462,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>4</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4463,
+              "skill": {
+                "skillId": 4463,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>3</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4464,
+              "skill": {
+                "skillId": 4464,
+                "nameCn": "黯魔主宰",
+                "desc": "携带技能无视COST限制。部队无视兵种克制，将自身魔防的<color=#DC143C>1.5</color>倍代替智力。释放技能时，全场拥有<color=#DC143C>3</color>个及以上弱化效果的敌军，其所在位置均视为自身技能可达射程，且攻击时远程士兵会一同攻击。对敌军造成伤害后，对其施加<color=#DC143C>1</color>个随机的弱化效果。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_BozelSP.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 2000,
           "ATStar": [
@@ -4593,6 +5056,72 @@
           "jobConnectionId": 106,
           "jobId": 878,
           "nameCn": "神选君王"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4094,
+              "skill": {
+                "skillId": 4094,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>10%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>30%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4094,
+              "skill": {
+                "skillId": 4094,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>10%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>30%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4094,
+              "skill": {
+                "skillId": 4094,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>10%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>30%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4095,
+              "skill": {
+                "skillId": 4095,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>15%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>40%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4096,
+              "skill": {
+                "skillId": 4096,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>20%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>50%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4097,
+              "skill": {
+                "skillId": 4097,
+                "nameCn": "神王的意志",
+                "desc": "遭受伤害降低<color=#DC143C>25%</color>，替自身<color=#DC143C>1</color>圈范围内的友军承受所有攻击。被近战攻击时，可以攻击<color=#DC143C>2</color>次，并且有<color=#DC143C>70%</color>概率先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPLading.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATStar": [
@@ -5243,6 +5772,72 @@
           "jobId": 622,
           "nameCn": "游侠将军"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3955,
+              "skill": {
+                "skillId": 3955,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>5%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>3</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3955,
+              "skill": {
+                "skillId": 3955,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>5%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>3</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3956,
+              "skill": {
+                "skillId": 3956,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>7%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>3</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3957,
+              "skill": {
+                "skillId": 3957,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>10%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>2</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3958,
+              "skill": {
+                "skillId": 3958,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>12%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>2</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3959,
+              "skill": {
+                "skillId": 3959,
+                "nameCn": "开国的圣矢",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。主动攻击进入战斗时，攻击提升<color=#DC143C>15%</color>，战后使敌方“英雄移动力<color=#DC143C>-1</color>”和“受到来自SP娜姆的伤害提升<color=#DC143C>15%</color>，可叠加，最多<color=#DC143C>2</color>层”，不可驱散。（[触发冷却]该效果需要间隔<color=#DC143C>1</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPNurm.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -5886,6 +6481,72 @@
           "jobId": 368,
           "nameCn": "光龙统帅"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3834,
+              "skill": {
+                "skillId": 3834,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>10%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>10%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3834,
+              "skill": {
+                "skillId": 3834,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>10%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>10%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3834,
+              "skill": {
+                "skillId": 3834,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>10%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>10%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3835,
+              "skill": {
+                "skillId": 3835,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>15%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>13%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3836,
+              "skill": {
+                "skillId": 3836,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>20%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>16%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3837,
+              "skill": {
+                "skillId": 3837,
+                "nameCn": "光龙的意志",
+                "desc": "主动攻击时，造成伤害和防御提升<color=#DC143C>25%</color>。自身<color=#DC143C>2</color>格范围没有友军时无法被一击致命（每场战斗最多触发<color=#DC143C>1</color>次）\n进入战斗前每移动<color=#DC143C>1</color>格，战前恢复自身<color=#DC143C>20%</color>生命，大于等于<color=#DC143C>4</color>格时会先于敌军进行攻击。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPElwin.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1000,
           "ATStar": [
@@ -6525,6 +7186,72 @@
           "jobConnectionId": 136,
           "jobId": 744,
           "nameCn": "黑龙魔导师"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3888,
+              "skill": {
+                "skillId": 3888,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>2%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>1</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3888,
+              "skill": {
+                "skillId": 3888,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>2%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>1</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3889,
+              "skill": {
+                "skillId": 3889,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>3%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>1</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3890,
+              "skill": {
+                "skillId": 3890,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>4%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>1</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3891,
+              "skill": {
+                "skillId": 3891,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>5%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>2</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3892,
+              "skill": {
+                "skillId": 3892,
+                "nameCn": "黑龙的学识",
+                "desc": "每次行动结束时，获得[累积的知识]：智力提升<color=#DC143C>6%</color>，可以累积，最高可以累积<color=#DC143C>4</color>个。每场战斗开始时自身获得<color=#DC143C>2</color>层[累积的知识]。\n每次行动结束时，随机获得[雷]：“遭受伤害降低<color=#DC143C>2%</color>，可累积”或[炎]：“暴击率提升<color=#DC143C>2%</color>，可累积”，最多<color=#DC143C>2</color>个，每种元素最高可以累积<color=#DC143C>4</color>个，不可驱散。每场战斗开始时自身获得<color=#DC143C>2</color>层[雷]和[炎]。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPHein.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1500,
@@ -7168,6 +7895,72 @@
           "jobConnectionId": 146,
           "jobId": 858,
           "nameCn": "公主"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3926,
+              "skill": {
+                "skillId": 3926,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>10%</color>。主动攻击进入战斗攻击提升<color=#DC143C>10%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>4</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3926,
+              "skill": {
+                "skillId": 3926,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>10%</color>。主动攻击进入战斗攻击提升<color=#DC143C>10%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>4</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3926,
+              "skill": {
+                "skillId": 3926,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>10%</color>。主动攻击进入战斗攻击提升<color=#DC143C>10%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>4</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3927,
+              "skill": {
+                "skillId": 3927,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>13%</color>。主动攻击进入战斗攻击提升<color=#DC143C>15%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3928,
+              "skill": {
+                "skillId": 3928,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>16%</color>。主动攻击进入战斗攻击提升<color=#DC143C>20%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3929,
+              "skill": {
+                "skillId": 3929,
+                "nameCn": "复国之公主",
+                "desc": "移动时部队可以通过的地形都视为\"平地\"。被攻击进入战斗时遭受伤害降低<color=#DC143C>20%</color>。主动攻击进入战斗攻击提升<color=#DC143C>25%</color>，战后自身<color=#DC143C>2</color>格范围内敌军数量小于等于<color=#DC143C>1</color>时，可以额外行动<color=#DC143C>1</color>次。（[触发冷却]再行动效果需要间隔<color=#DC143C>2</color>回合才可以再次触发。）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSherry.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 2000,
@@ -7910,6 +8703,72 @@
           "jobId": 414,
           "nameCn": "天穹魔龙"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3901,
+              "skill": {
+                "skillId": 3901,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>5%</color>，遭受物理伤害降低<color=#DC143C>2%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3901,
+              "skill": {
+                "skillId": 3901,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>5%</color>，遭受物理伤害降低<color=#DC143C>2%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3901,
+              "skill": {
+                "skillId": 3901,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>5%</color>，遭受物理伤害降低<color=#DC143C>2%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3902,
+              "skill": {
+                "skillId": 3902,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>6%</color>，遭受物理伤害降低<color=#DC143C>3%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3903,
+              "skill": {
+                "skillId": 3903,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>7%</color>，遭受物理伤害降低<color=#DC143C>4%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3904,
+              "skill": {
+                "skillId": 3904,
+                "nameCn": "无双的天龙",
+                "desc": "携带技能无视cost限制。回合开始时和进入战斗前，获得[无双]：“攻击提升<color=#DC143C>8%</color>，遭受物理伤害降低<color=#DC143C>5%</color>，持续<color=#DC143C>3</color>回合。”可累积，最高可以累积<color=#DC143C>4</color>层，每有<color=#DC143C>1</color>名敌军死亡时，额外获得<color=#DC143C>1</color>层[无双]，且最高累积层数提高<color=#DC143C>1</color>（最大提高<color=#DC143C>2</color>层）。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPAlutemurat.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -8556,6 +9415,72 @@
           "jobId": 437,
           "nameCn": "月辉领主"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4429,
+              "skill": {
+                "skillId": 4429,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>10%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4429,
+              "skill": {
+                "skillId": 4429,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>10%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4429,
+              "skill": {
+                "skillId": 4429,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>10%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4430,
+              "skill": {
+                "skillId": 4430,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>15%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>13%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4431,
+              "skill": {
+                "skillId": 4431,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>20%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>16%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4432,
+              "skill": {
+                "skillId": 4432,
+                "nameCn": "皎月佑护",
+                "desc": "魔防提升<color=#DC143C>25%</color>。\n周围<color=#DC143C>2</color>格友军遭受远程伤害降低<color=#DC143C>20%</color>。使用技能后，在自身位置施加持续<color=#DC143C>2</color>回合的地形效果[月影]:“该地形额外视为自身拥有的所有指挥效果中心”。（[月影]拥有较高的地形覆盖优先级）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLuna.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -9197,6 +10122,72 @@
           "jobConnectionId": 276,
           "jobId": 373,
           "nameCn": "异邦豪侠"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4031,
+              "skill": {
+                "skillId": 4031,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>10%</color>。\n自身<color=#DC143C>2</color>格范围有女性时，遭受伤害降低<color=#DC143C>10%</color>，行动结束时恢复部队<color=#DC143C>10%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4031,
+              "skill": {
+                "skillId": 4031,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>10%</color>。\n自身<color=#DC143C>2</color>格范围有女性时，遭受伤害降低<color=#DC143C>10%</color>，行动结束时恢复部队<color=#DC143C>10%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4031,
+              "skill": {
+                "skillId": 4031,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>10%</color>。\n自身<color=#DC143C>2</color>格范围有女性时，遭受伤害降低<color=#DC143C>10%</color>，行动结束时恢复部队<color=#DC143C>10%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4032,
+              "skill": {
+                "skillId": 4032,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>15%</color>。\n自身<color=#DC143C>2</color>格范围有女性时，遭受伤害降低<color=#DC143C>12%</color>，行动结束时恢复部队<color=#DC143C>15%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4033,
+              "skill": {
+                "skillId": 4033,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>20%</color>。\n自身<color=#DC143C>3</color>格范围有女性时，遭受伤害降低<color=#DC143C>15%</color>，行动结束时恢复部队<color=#DC143C>20%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4034,
+              "skill": {
+                "skillId": 4034,
+                "nameCn": "诚情的意志",
+                "desc": "暴击率，暴击伤害提升<color=#DC143C>25%</color>。\n自身<color=#DC143C>3</color>格范围有女性时，遭受伤害降低<color=#DC143C>20%</color>，行动结束时恢复部队<color=#DC143C>25%</color>生命值。\n击杀敌军后，可以获得再次移动<color=#DC143C>2</color>格的机会。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPDehault.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1000,
@@ -9854,6 +10845,72 @@
           "jobConnectionId": 296,
           "jobId": 20811,
           "nameCn": "黎明圣骑"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4393,
+              "skill": {
+                "skillId": 4393,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>50%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4393,
+              "skill": {
+                "skillId": 4393,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>50%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4393,
+              "skill": {
+                "skillId": 4393,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>50%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4394,
+              "skill": {
+                "skillId": 4394,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>60%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4395,
+              "skill": {
+                "skillId": 4395,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>80%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4396,
+              "skill": {
+                "skillId": 4396,
+                "nameCn": "永世的颂歌",
+                "desc": "行动结束时，使周围<color=#DC143C>3</color>格的友军获得[疗愈]:“受到伤害后<color=#DC143C>100%</color>概率恢复施加者智力<color=#DC143C>2.5</color>倍的生命，持续<color=#DC143C>2</color>回合”。\n对友军释放技能时，施加不可驱散的[治愈之盾]：“可以抵挡施加者智力<color=#DC143C>3</color>倍的伤害”，每命中<color=#DC143C>1</color>名友军，当前冷却时间最长的技能冷却时间减少<color=#DC143C>1</color>回合（最多<color=#DC143C>3</color>回合）。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPTialice.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1000,
@@ -10532,6 +11589,72 @@
           "jobId": 841,
           "nameCn": "蔷薇女王"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3842,
+              "skill": {
+                "skillId": 3842,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>5%</color>，遭受暴击率降低<color=#DC143C>15%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>50%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3842,
+              "skill": {
+                "skillId": 3842,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>5%</color>，遭受暴击率降低<color=#DC143C>15%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>50%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3843,
+              "skill": {
+                "skillId": 3843,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>7%</color>，遭受暴击率降低<color=#DC143C>18%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>60%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3844,
+              "skill": {
+                "skillId": 3844,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>9%</color>，遭受暴击率降低<color=#DC143C>22%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>70%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3845,
+              "skill": {
+                "skillId": 3845,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>12%</color>，遭受暴击率降低<color=#DC143C>26%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>80%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3846,
+              "skill": {
+                "skillId": 3846,
+                "nameCn": "盛绽的蔷薇",
+                "desc": "遭受伤害降低<color=#DC143C>15%</color>，遭受暴击率降低<color=#DC143C>30%</color>。周围<color=#DC143C>2</color>格范围内，所有敌军造成伤害前<color=#DC143C>100%</color>的概率受到<color=#DC143C>1</color>次芙蕾雅\"防御\"+\"魔防\"<color=#DC143C>1</color>倍的[固定伤害]，如果敌军为[混合部队]，则此次伤害无法被免疫。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPFreya.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATStar": [
             2220,
@@ -11195,6 +12318,72 @@
           "jobId": 1220,
           "nameCn": "魔导圣兽"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4600,
+              "skill": {
+                "skillId": 4600,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>2</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>30%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4600,
+              "skill": {
+                "skillId": 4600,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>2</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>30%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4600,
+              "skill": {
+                "skillId": 4600,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>2</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>30%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4601,
+              "skill": {
+                "skillId": 4601,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>2</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>25%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4602,
+              "skill": {
+                "skillId": 4602,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>3</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>20%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4603,
+              "skill": {
+                "skillId": 4603,
+                "nameCn": "机械圣龙",
+                "desc": "部队移动时所有可通过地形都视为“平地”。\n士兵生命越高，部队遭受伤害越低，最大<color=#DC143C>20%</color>。\n被攻击受到伤害后，为其他友军驱散<color=#DC143C>1</color>个弱化效果，并恢复其生命。（恢复量为古巨拉攻击的<color=#DC143C>3</color>倍）\n死亡时会在原地召唤<color=#DC143C>1</color>个重铸体，最多触发<color=#DC143C>3</color>次，重铸体继承自身施加的全部效果且额外施加<color=#DC143C>1</color>层[碎裂]：“治疗效果降低<color=#DC143C>30%</color>”和“英雄最大生命降低<color=#DC143C>15%</color>”（以上效果均无法免疫，不可驱散）。对敌军造成伤害后，使其无法选择除施加者外其他友军作为普通攻击或技能的目标（无法免疫，不可驱散），持续<color=#DC143C>2</color>回合，非竞技模式中，替换为“造成伤害降低<color=#DC143C>30%</color>”。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPZillagod.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 500,
           "ATStar": [
@@ -11854,6 +13043,72 @@
           "jobConnectionId": 405,
           "jobId": 128,
           "nameCn": "源初的君王"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4005,
+              "skill": {
+                "skillId": 4005,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>10%</color>，被攻击进入战斗前，及主动攻击进入战斗后恢复部队<color=#DC143C>10%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4005,
+              "skill": {
+                "skillId": 4005,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>10%</color>，被攻击进入战斗前，及主动攻击进入战斗后恢复部队<color=#DC143C>10%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4006,
+              "skill": {
+                "skillId": 4006,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>15%</color>，被攻击进入战斗前，及主动攻击进入战斗后恢复部队<color=#DC143C>15%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4007,
+              "skill": {
+                "skillId": 4007,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>20%</color>，被攻击进入战斗前，及主动攻击进入战斗后恢复部队<color=#DC143C>20%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4008,
+              "skill": {
+                "skillId": 4008,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>25%</color>，被攻击进入战斗前，及主动攻击进入战斗后恢复部队<color=#DC143C>25%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4009,
+              "skill": {
+                "skillId": 4009,
+                "nameCn": "光之先祖",
+                "desc": "攻击、防御提升<color=#DC143C>30%</color>，被攻击进入战斗前及主动攻击进入战斗后恢复部队<color=#DC143C>30%</color>生命值。",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPRune.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 500,
@@ -12587,6 +13842,72 @@
           "jobId": 426,
           "nameCn": "崇辉智将"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 994306,
+              "skill": {
+                "skillId": 994306,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>5%</color>，[混合部队]友军额外提升<color=#DC143C>1%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 994306,
+              "skill": {
+                "skillId": 994306,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>5%</color>，[混合部队]友军额外提升<color=#DC143C>1%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 994306,
+              "skill": {
+                "skillId": 994306,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>5%</color>，[混合部队]友军额外提升<color=#DC143C>1%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4306,
+              "skill": {
+                "skillId": 4306,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>13%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>8%</color>，[混合部队]友军额外提升<color=#DC143C>2%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4307,
+              "skill": {
+                "skillId": 4307,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>16%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>11%</color>，[混合部队]友军额外提升<color=#DC143C>3%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4308,
+              "skill": {
+                "skillId": 4308,
+                "nameCn": "贤威元帅",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>20%</color>。\n周围<color=#DC143C>2</color>格范围内友军除生命外全属性提升<color=#DC143C>15%</color>，[混合部队]友军额外提升<color=#DC143C>5%</color>且主动攻击进入战斗时先于敌军进行攻击。行动结束时，可以选择将英雄兵种变为[枪兵]，移动方式变为步行且移动力<color=#DC143C>-2</color>，同时遭受伤害降低<color=#DC143C>20%</color>（不可驱散，无法免疫）。（再次释放该技能后取消）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_Ranford_SP_1.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1500,
           "ATStar": [
@@ -13244,6 +14565,72 @@
           "jobId": 390,
           "nameCn": "魔能圣骑"
         },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4409,
+              "skill": {
+                "skillId": 4409,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>10%</color>，并将攻击的<color=#DC143C>5%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>20%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4409,
+              "skill": {
+                "skillId": 4409,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>10%</color>，并将攻击的<color=#DC143C>5%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>20%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4409,
+              "skill": {
+                "skillId": 4409,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>10%</color>，并将攻击的<color=#DC143C>5%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>20%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4410,
+              "skill": {
+                "skillId": 4410,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>13%</color>，并将攻击的<color=#DC143C>8%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>30%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4411,
+              "skill": {
+                "skillId": 4411,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>16%</color>，并将攻击的<color=#DC143C>11%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>40%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4412,
+              "skill": {
+                "skillId": 4412,
+                "nameCn": "魔导圣壁",
+                "desc": "技能携带无视COST限制。攻击提升<color=#DC143C>20%</color>，并将攻击的<color=#DC143C>15%</color>增加到防御和魔防上。\n受到致命伤害时不会死亡，之后生命值恢复<color=#DC143C>50%</color>，该效果每场战斗最多触发<color=#DC143C>1</color>次。\n行动结束时若周围<color=#DC143C>3</color>格范围内存在友军，自身获得<color=#DC143C>1</color>层[荣耀共鸣]：“遭受远程伤害降低<color=#DC143C>10%</color>，被攻击进入战斗时反弹部队受到伤害的<color=#DC143C>10%</color>”，可累积<color=#DC143C>3</color>层，持续<color=#DC143C>2</color>回合。",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPLandius.png"
+              }
+            }
+          ]
+        },
         "stats": {
           "ATCmd_INI": 1000,
           "ATStar": [
@@ -13892,6 +15279,72 @@
           "jobConnectionId": 566,
           "jobId": 20707,
           "nameCn": "初绽的圣约"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4525,
+              "skill": {
+                "skillId": 4525,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4525,
+              "skill": {
+                "skillId": 4525,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4525,
+              "skill": {
+                "skillId": 4525,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>10%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4526,
+              "skill": {
+                "skillId": 4526,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>15%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>3</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4527,
+              "skill": {
+                "skillId": 4527,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>20%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>2</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4528,
+              "skill": {
+                "skillId": 4528,
+                "nameCn": "自然魔导学",
+                "desc": "携带技能无视cost限制。造成伤害提升<color=#DC143C>30%</color>。\n初始拥有<color=#DC143C>1</color>层[自然魔种]。回合开始时获得<color=#DC143C>1</color>层[自然魔种]，可叠加<color=#DC143C>3</color>层。行动结束时，可以消耗[自然魔种]，在最多<color=#DC143C>2</color>个目标位置生成<color=#DC143C>2</color>回合的特殊效果[荆棘]或[果实]，若本回合未造成过伤害，可以再次攻击（[触发冷却]再行动效果需要间隔<color=#DC143C>2</color>回合才可以再次触发）。敌军死亡时，会在所在位置生成特殊效果[果实]。\n[荆棘]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军进入战斗前，对目标造成自身攻击+智力<color=#DC143C>1</color>倍的[固定伤害]。”\n[果实]:“[指挥]周围<color=#DC143C>2</color>格范围内的友军，行动结束时驱散<color=#DC143C>2</color>个弱化效果，并恢复施加者智力<color=#DC143C>3</color>倍的生命值。”\n上述地形效果同样拥有：“[指挥]周围<color=#DC143C>2</color>格范围内的敌军无法触发再行动效果，受到的[固定伤害]无法免疫并使友方SP蕾伽尔随机技能冷却时间<color=#DC143C>-1</color>”。（拥有较高地形覆盖优先级，无法免疫效果对百分比[固定伤害]无效）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPRachel.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1000,
@@ -14562,6 +16015,72 @@
           "jobConnectionId": 606,
           "jobId": 1119,
           "nameCn": "超越者之刃"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 3863,
+              "skill": {
+                "skillId": 3863,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>5%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+1</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 3863,
+              "skill": {
+                "skillId": 3863,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>5%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+1</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 3863,
+              "skill": {
+                "skillId": 3863,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>5%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+1</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 3864,
+              "skill": {
+                "skillId": 3864,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>8%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+1</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 3865,
+              "skill": {
+                "skillId": 3865,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>11%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+2</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 3866,
+              "skill": {
+                "skillId": 3866,
+                "nameCn": "超越者的意志",
+                "desc": "进入战斗时，攻击提升<color=#DC143C>15%</color>。\n如果本回合没有进行攻击，行动结束时，获得“弑影”效果：部队射程<color=#DC143C>+2</color>，移动力<color=#DC143C>+1</color>。\n主动攻击后，失去“弑影”效果，且自身遭受物理伤害降低<color=#DC143C>30%</color>，持续<color=#DC143C>1</color>回合。（[弑影]效果无法被驱散）",
+                "iconPath": "UI/Icon/Skill_ABS/Gift_SPSigma.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1000,
@@ -15264,6 +16783,72 @@
           "jobConnectionId": 676,
           "jobId": 20243,
           "nameCn": "无上极剑"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4556,
+              "skill": {
+                "skillId": 4556,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>10%</color>，暴击伤害提升<color=#DC143C>5%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>2</color>格范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4556,
+              "skill": {
+                "skillId": 4556,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>10%</color>，暴击伤害提升<color=#DC143C>5%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>2</color>格范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4556,
+              "skill": {
+                "skillId": 4556,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>10%</color>，暴击伤害提升<color=#DC143C>5%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>2</color>格范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4557,
+              "skill": {
+                "skillId": 4557,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>13%</color>，暴击伤害提升<color=#DC143C>8%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>2</color>格范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4558,
+              "skill": {
+                "skillId": 4558,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>16%</color>，暴击伤害提升<color=#DC143C>11%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>3</color>圈范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4559,
+              "skill": {
+                "skillId": 4559,
+                "nameCn": "极剑幻影",
+                "desc": "进入战斗时攻击与暴击率提升<color=#DC143C>20%</color>，暴击伤害提升<color=#DC143C>15%</color>。\n主动攻击进入战斗后恢复造成伤害数值<color=#DC143C>20%</color>的生命值并获得[极剑领域]，之后可传送至自身周围<color=#DC143C>6</color>格范围内任意格子。[极剑领域]：“行动结束时若处于危险范围内则获得‘无法被敌军技能选中为目标，被攻击进入战斗后移除’；双方人数不相等时自身周围<color=#DC143C>3</color>圈范围内的敌军无法先于我军进行攻击。”（持续<color=#DC143C>3</color>回合，以上效果均无法免疫，不可驱散）\n拥有[极剑领域]时，遭受致命伤害后不会死亡，之后驱散自身所有弱化效果恢复生命值<color=#DC143C>30%</color>。（每场战斗仅触发<color=#DC143C>1</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPOmega.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1500,
@@ -16087,6 +17672,72 @@
           "jobConnectionId": 895,
           "jobId": 20229,
           "nameCn": "辉煌圣女"
+        },
+        "talent": {
+          "status": "VERIFIED",
+          "selectionRule": "TalentSkill_IDs[star - 1]",
+          "starProgression": [
+            {
+              "star": 1,
+              "skillId": 4489,
+              "skill": {
+                "skillId": 4489,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>10%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>10%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            },
+            {
+              "star": 2,
+              "skillId": 4489,
+              "skill": {
+                "skillId": 4489,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>10%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>10%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            },
+            {
+              "star": 3,
+              "skillId": 4489,
+              "skill": {
+                "skillId": 4489,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>10%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>10%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            },
+            {
+              "star": 4,
+              "skillId": 4490,
+              "skill": {
+                "skillId": 4490,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>15%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>15%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            },
+            {
+              "star": 5,
+              "skillId": 4491,
+              "skill": {
+                "skillId": 4491,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>20%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>20%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            },
+            {
+              "star": 6,
+              "skillId": 4492,
+              "skill": {
+                "skillId": 4492,
+                "nameCn": "神炉之心",
+                "desc": "造成伤害提升<color=#DC143C>30%</color>；技能携带无视COST限制；战后使自身恢复造成伤害数值<color=#DC143C>30%</color>的生命值。\n战斗开始时及处于[危险范围]内行动结束时，获得<color=#DC143C>1</color>层[剑之回响]：防御，魔防提升<color=#DC143C>5%</color>，最多叠加<color=#DC143C>10</color>层，无法免疫，不可驱散。行动结束时可以选择释放“神火加护”获得<color=#DC143C>3</color>回合的“智力提升<color=#DC143C>20%</color>且移动时无视敌军阻挡，战斗后获得<color=#DC143C>2</color>层[剑之回响]”；“行动结束时移除<color=#DC143C>3</color>层[剑之回响]并可再次攻击，触发后移除”，以上效果均不可驱散。（[触发冷却]需要间隔<color=#DC143C>4</color>回合才可以再次释放）\n遭受致命伤害后不会死亡，之后恢复生命值<color=#DC143C>30%</color>。（初始拥有<color=#DC143C>2</color>次，触发天赋再攻击时额外获得<color=#DC143C>1</color>次，最多存储<color=#DC143C>3</color>次）",
+                "iconPath": "UI/Icon/Skill2_ABS/Gift_SPYulia_1_1.png"
+              }
+            }
+          ]
         },
         "stats": {
           "ATCmd_INI": 1500,
