@@ -40,12 +40,12 @@ jobs:
 
       - name: Build hero job attack range projection
         env:
-          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source/data/configdata
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source
         run: node scripts/build_hero_job_attack_range.cjs
 
       - name: Validate hero job attack range parity
         env:
-          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source/data/configdata
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source
         run: node scripts/validate_hero_job_attack_range.cjs
 
       - name: Upload generated projection for review
