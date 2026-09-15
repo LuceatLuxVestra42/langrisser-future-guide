@@ -29,42 +29,41 @@ function main() {
   if (upstream.status !== 'PASS') errors.push(`upstream status=${upstream.status}`);
   if (output.version !== 1 || output.domain !== 'hero-job-attack-range' || output.status !== 'PASS') errors.push('generated artifact is not PASS v1');
   if (summary.version !== 1 || summary.domain !== 'hero-job-attack-range' || summary.status !== 'PASS') errors.push('summary is not PASS v1');
+  if (!output.ranges || Array.isArray(output.ranges) || typeof output.ranges !== 'object') errors.push('generated ranges is not an object');
 
-  const expectedHeroes = upstream.records || [];
-  const actualHeroes = output.records || [];
-  if (actualHeroes.length !== expectedHeroes.length) errors.push(`hero count=${actualHeroes.length}, expected=${expectedHeroes.length}`);
-
-  const actualByHero = new Map();
-  for (const hero of actualHeroes) {
-    if (!Number.isInteger(hero?.heroId) || hero.heroId <= 0) { errors.push(`invalid generated heroId=${String(hero?.heroId)}`); continue; }
-    if (actualByHero.has(hero.heroId)) errors.push(`duplicate generated heroId=${hero.heroId}`);
-    else actualByHero.set(hero.heroId, hero);
+  const actualRangeByJobId = new Map();
+  for (const [rawRange, jobIds] of Object.entries(output.ranges || {})) {
+    const range = Number(rawRange);
+    if (!Number.isSafeInteger(range) || range <= 0 || String(range) !== rawRange) {
+      errors.push(`invalid generated range key=${rawRange}`);
+      continue;
+    }
+    if (!Array.isArray(jobIds)) {
+      errors.push(`generated range ${rawRange} is not an array`);
+      continue;
+    }
+    let previousJobId = 0;
+    for (const jobId of jobIds) {
+      if (!Number.isSafeInteger(jobId) || jobId <= 0) {
+        errors.push(`generated range ${range}: invalid jobId=${String(jobId)}`);
+        continue;
+      }
+      if (jobId <= previousJobId) errors.push(`generated range ${range}: job IDs are not strictly ascending at ${jobId}`);
+      previousJobId = jobId;
+      if (actualRangeByJobId.has(jobId)) errors.push(`generated JobInfo ${jobId} appears in multiple range groups`);
+      else actualRangeByJobId.set(jobId, range);
+    }
   }
 
   let connectionCount = 0;
   const referencedJobIds = new Set();
   const rangeHistogram = new Map();
-
-  for (const expectedHero of expectedHeroes) {
-    const actualHero = actualByHero.get(expectedHero.heroId);
-    if (!actualHero) { errors.push(`missing heroId=${expectedHero.heroId}`); continue; }
-    const expectedConnections = expectedHero.connections || [];
-    const actualConnections = actualHero.connections || [];
-    if (actualConnections.length !== expectedConnections.length) {
-      errors.push(`heroId ${expectedHero.heroId}: connection count mismatch`);
-      continue;
-    }
-    for (let index = 0; index < expectedConnections.length; index += 1) {
+  for (const hero of upstream.records || []) {
+    for (const connection of hero.connections || []) {
       connectionCount += 1;
-      const expectedConnection = expectedConnections[index];
-      const actual = actualConnections[index];
-      if (actual?.jobConnectionId !== expectedConnection.jobConnectionId || actual?.jobId !== expectedConnection.jobId) {
-        errors.push(`heroId ${expectedHero.heroId} connection[${index}]: identity/order mismatch`);
-        continue;
-      }
-      const jobId = expectedConnection.jobId;
+      const jobId = connection.jobId;
       if (!Number.isInteger(jobId) || jobId <= 0) {
-        errors.push(`heroId ${expectedHero.heroId} JobConnection ${expectedConnection.jobConnectionId}: invalid upstream jobId=${String(jobId)}`);
+        errors.push(`heroId ${hero.heroId} JobConnection ${connection.jobConnectionId}: invalid upstream jobId=${String(jobId)}`);
         continue;
       }
       referencedJobIds.add(jobId);
@@ -79,14 +78,21 @@ function main() {
         continue;
       }
       rangeHistogram.set(expectedRange, (rangeHistogram.get(expectedRange) || 0) + 1);
-      if (actual.basicAttackRange !== expectedRange) {
-        errors.push(`heroId ${expectedHero.heroId} JobConnection ${expectedConnection.jobConnectionId}: range=${String(actual.basicAttackRange)}, expected=${expectedRange}`);
+      if (actualRangeByJobId.get(jobId) !== expectedRange) {
+        errors.push(`heroId ${hero.heroId} JobConnection ${connection.jobConnectionId}: range=${String(actualRangeByJobId.get(jobId))}, expected=${expectedRange}`);
       }
     }
   }
 
+  for (const jobId of actualRangeByJobId.keys()) {
+    if (!referencedJobIds.has(jobId)) errors.push(`generated range has unreferenced JobInfo ${jobId}`);
+  }
+  if (output.jobCount !== referencedJobIds.size) errors.push(`output.jobCount=${output.jobCount}, expected=${referencedJobIds.size}`);
+  if (actualRangeByJobId.size !== referencedJobIds.size) errors.push(`generated job count=${actualRangeByJobId.size}, expected=${referencedJobIds.size}`);
+
   const expectedHistogram = Object.fromEntries([...rangeHistogram.entries()].sort((a, b) => a[0] - b[0]).map(([key, value]) => [String(key), value]));
-  if (summary.heroCount !== expectedHeroes.length) errors.push(`summary.heroCount=${summary.heroCount}, expected=${expectedHeroes.length}`);
+  const heroCount = (upstream.records || []).length;
+  if (summary.heroCount !== heroCount) errors.push(`summary.heroCount=${summary.heroCount}, expected=${heroCount}`);
   if (summary.connectionCount !== connectionCount) errors.push(`summary.connectionCount=${summary.connectionCount}, expected=${connectionCount}`);
   if (summary.distinctReferencedJobCount !== referencedJobIds.size) errors.push(`summary.distinctReferencedJobCount=${summary.distinctReferencedJobCount}, expected=${referencedJobIds.size}`);
   if (summary.sourceJobInfoCount !== jobRows.length) errors.push(`summary.sourceJobInfoCount=${summary.sourceJobInfoCount}, expected=${jobRows.length}`);
@@ -94,7 +100,7 @@ function main() {
   if ((summary.hardErrors || []).length !== 0) errors.push(`summary hardErrors=${summary.hardErrors.length}`);
 
   console.log(`HERO JOB ATTACK RANGE VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-  console.log(`heroes=${expectedHeroes.length} connections=${connectionCount} distinctJobs=${referencedJobIds.size} sourceJobs=${jobRows.length} ranges=${JSON.stringify(expectedHistogram)} errors=${errors.length}`);
+  console.log(`heroes=${heroCount} connections=${connectionCount} distinctJobs=${referencedJobIds.size} sourceJobs=${jobRows.length} ranges=${JSON.stringify(expectedHistogram)} errors=${errors.length}`);
   if (errors.length) {
     for (const error of errors.slice(0, 100)) console.error(`- ${error}`);
     process.exitCode = 1;

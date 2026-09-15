@@ -11,9 +11,9 @@ const OUTPUT = P('data/generated/hero-job-attack-range.v1.json');
 const SUMMARY = P('data/validation/hero-job-attack-range-summary.v1.json');
 
 function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
-function writeJson(file, value) {
+function writeJson(file, value, compact = false) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+  fs.writeFileSync(file, `${compact ? JSON.stringify(value) : JSON.stringify(value, null, 2)}\n`);
 }
 
 function main() {
@@ -30,44 +30,48 @@ function main() {
   }
 
   const hardErrors = [];
-  if (duplicateJobIds.size) {
-    hardErrors.push(`ConfigDataJobInfo duplicate IDs: ${[...duplicateJobIds].sort((a, b) => a - b).join(', ')}`);
-  }
+  if (duplicateJobIds.size) hardErrors.push(`ConfigDataJobInfo duplicate IDs: ${[...duplicateJobIds].sort((a, b) => a - b).join(', ')}`);
 
   let connectionCount = 0;
   const referencedJobIds = new Set();
+  const rangeByJobId = new Map();
   const rangeHistogram = new Map();
 
-  const records = (upstream.records || []).map((hero) => ({
-    heroId: hero.heroId,
-    connections: (hero.connections || []).map((connection) => {
+  for (const hero of upstream.records || []) {
+    for (const connection of hero.connections || []) {
       connectionCount += 1;
       const jobId = connection.jobId;
       if (!Number.isInteger(jobId) || jobId <= 0) {
         hardErrors.push(`heroId ${hero.heroId} JobConnection ${connection.jobConnectionId}: invalid jobId=${String(jobId)}`);
-        return {
-          jobConnectionId: connection.jobConnectionId,
-          jobId: Number.isInteger(jobId) ? jobId : null,
-          basicAttackRange: null,
-        };
+        continue;
       }
       referencedJobIds.add(jobId);
       const sourceJob = jobById.get(jobId);
       if (!sourceJob) {
         hardErrors.push(`heroId ${hero.heroId} JobConnection ${connection.jobConnectionId}: missing JobInfo ${jobId}`);
-        return { jobConnectionId: connection.jobConnectionId, jobId, basicAttackRange: null };
+        continue;
       }
       const range = sourceJob.BF_AttackDistance;
       if (!Number.isInteger(range) || range <= 0) {
         hardErrors.push(`JobInfo ${jobId}: invalid BF_AttackDistance=${String(range)}`);
-        return { jobConnectionId: connection.jobConnectionId, jobId, basicAttackRange: null };
+        continue;
       }
+      const existing = rangeByJobId.get(jobId);
+      if (existing != null && existing !== range) {
+        hardErrors.push(`JobInfo ${jobId}: conflicting BF_AttackDistance ${existing} != ${range}`);
+        continue;
+      }
+      rangeByJobId.set(jobId, range);
       rangeHistogram.set(range, (rangeHistogram.get(range) || 0) + 1);
-      return { jobConnectionId: connection.jobConnectionId, jobId, basicAttackRange: range };
-    }),
-  }));
+    }
+  }
 
   const status = hardErrors.length ? 'FAIL' : 'PASS';
+  const distinctRanges = [...new Set(rangeByJobId.values())].sort((a, b) => a - b);
+  const ranges = Object.fromEntries(distinctRanges.map((range) => [
+    String(range),
+    [...rangeByJobId.entries()].filter(([, value]) => value === range).map(([jobId]) => jobId).sort((a, b) => a - b),
+  ]));
   const output = {
     version: 1,
     domain: 'hero-job-attack-range',
@@ -79,14 +83,14 @@ function main() {
       idField: 'ID',
       rangeField: 'BF_AttackDistance',
     },
-    recordCount: records.length,
-    records,
+    jobCount: rangeByJobId.size,
+    ranges,
   };
   const summary = {
     version: 1,
     domain: 'hero-job-attack-range',
     status,
-    heroCount: records.length,
+    heroCount: (upstream.records || []).length,
     connectionCount,
     distinctReferencedJobCount: referencedJobIds.size,
     sourceJobInfoCount: jobRows.length,
@@ -94,10 +98,10 @@ function main() {
     hardErrors,
   };
 
-  writeJson(OUTPUT, output);
+  writeJson(OUTPUT, output, true);
   writeJson(SUMMARY, summary);
   console.log(`HERO JOB ATTACK RANGE BUILD: ${status}`);
-  console.log(`heroes=${records.length} connections=${connectionCount} distinctJobs=${referencedJobIds.size} sourceJobs=${jobRows.length} ranges=${JSON.stringify(summary.rangeHistogram)} errors=${hardErrors.length}`);
+  console.log(`heroes=${summary.heroCount} connections=${connectionCount} distinctJobs=${referencedJobIds.size} sourceJobs=${jobRows.length} ranges=${JSON.stringify(summary.rangeHistogram)} errors=${hardErrors.length}`);
   if (hardErrors.length) {
     for (const error of hardErrors.slice(0, 100)) console.error(`- ${error}`);
     process.exitCode = 1;

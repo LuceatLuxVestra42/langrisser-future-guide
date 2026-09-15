@@ -48,6 +48,9 @@ jobs:
           CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source
         run: node scripts/validate_hero_job_attack_range.cjs
 
+      - name: Verify committed projection freshness
+        run: git diff --exit-code -- data/generated/hero-job-attack-range.v1.json data/validation/hero-job-attack-range-summary.v1.json
+
       - name: Upload generated projection for review
         uses: actions/upload-artifact@v4
         with:
