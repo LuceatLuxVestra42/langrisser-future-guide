@@ -84,7 +84,7 @@ for (const hero of heroJobLinks.records) {
     }
     seenConnectionIds.add(connection.jobConnectionId);
     const jobId = connection.jobId;
-    if (!Number.isSafeInteger(jobId) || jobId <= 0 || connection.job?.id !== jobId) {
+    if (typeof jobId !== "number" || !Number.isSafeInteger(jobId) || jobId <= 0 || connection.job?.id !== jobId) {
       throw new Error(`Hero ${hero.heroId} JobConnection ${connection.jobConnectionId} has invalid frozen Job identity.`);
     }
     const basicAttackRange = rangeByJobId.get(jobId);
