@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "contract": "hero-job-material-terminal-sentinel",
+  "owner": "hero-canonical",
+  "status": "ACTIVE",
+  "purpose": "Classify the non-consumable terminal JobLevel marker in the frozen canonical hero job-material consumer without treating Count, name, ID, or UI position as an independent semantic heuristic.",
+  "authoritativePredecessor": "data/generated/hero-job-materials.v1.json",
+  "sourceContract": "data/contracts/hero-job-materials.v1.json",
+  "classification": {
+    "scope": "canonical hero-job-materials connections only",
+    "terminalRelation": "final level in the source-order-preserved connection.levels array",
+    "materialIdentity": {
+      "goodsType": 5,
+      "jobMaterialId": 40,
+      "count": 999
+    },
+    "requiredInvariant": [
+      "Every canonical hero JobConnection has exactly one matching material entry.",
+      "The matching entry belongs to the terminal source-order-preserved JobLevel.",
+      "The terminal JobLevel contains only that matching marker entry.",
+      "No other Count 999 material entry exists in the canonical hero JobConnection population.",
+      "JobMaterial ID 40 with any other count remains a normal material and is not excluded."
+    ],
+    "presentationEligibility": "Exclude only the validated terminal marker entry; all other material entries remain eligible."
+  },
+  "forbiddenInference": [
+    "Count 999 alone",
+    "JobMaterial ID 40 alone",
+    "Chinese or localized material name",
+    "screen or rendered order",
+    "ID arithmetic",
+    "filename similarity"
+  ],
+  "policyArtifact": "data/generated/hero-job-material-presentation-policy.v1.json",
+  "validator": "scripts/validate_hero_job_material_terminal_sentinel.cjs",
+  "completionRule": "The independent validator must prove the invariant over the current frozen hero-job-material artifact with zero errors before frontend presentation may exclude the marker."
+}
