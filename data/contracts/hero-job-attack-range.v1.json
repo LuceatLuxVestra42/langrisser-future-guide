@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "contract": "hero-job-attack-range",
+  "status": "FINAL_FROZEN",
+  "owner": "hero-canonical",
+  "purpose": "Project each frozen Hero Job connection to the JobInfo-owned base normal-attack distance without deriving a Skill relation.",
+  "authoritativeInputs": {
+    "heroJobLinks": "data/generated/hero-job-links.v1.json",
+    "configDataSourcePack": "data/contracts/configdata-source-pack-contract.v1.json",
+    "rawTable": "ConfigDataJobInfo"
+  },
+  "join": {
+    "left": "hero-job-links.records[].connections[].jobId",
+    "right": "ConfigDataJobInfo.ID",
+    "cardinality": "MANY_CONNECTIONS_TO_ONE_JOB",
+    "required": true
+  },
+  "semanticField": {
+    "source": "ConfigDataJobInfo.BF_AttackDistance",
+    "consumerName": "basicAttackRange",
+    "type": "positive integer",
+    "meaning": "Job/Class base normal-attack distance",
+    "directField": true
+  },
+  "prohibitedFallbacks": [
+    "SkillInfo range inference",
+    "SoldierInfo BF_AttackDistance reuse",
+    "class-type melee/ranged heuristic",
+    "name JOIN",
+    "ID arithmetic",
+    "display-order mapping",
+    "filename similarity"
+  ],
+  "productionBoundary": {
+    "frontendReadsGeneratedArtifactOnly": true,
+    "frontendReadsRawConfigData": false,
+    "frontendCreatesSemanticRelation": false
+  },
+  "completionCriteria": [
+    "every frozen hero-job connection has exactly one positive integer BF_AttackDistance through exact JobInfo.ID",
+    "no missing or duplicate JobInfo IDs for referenced jobs",
+    "generated artifact is byte-for-byte reproducible from pinned inputs",
+    "independent validator reports PASS"
+  ]
+}
