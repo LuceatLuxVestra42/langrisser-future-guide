@@ -8,7 +8,6 @@ const CONTRACT_PATH = path.join(ROOT, 'data/contracts/hero-final-job-attack-rang
 const MANIFEST_PATH = path.join(ROOT, 'data/generated/hero-detail.v1.json');
 const OUTPUT_PATH = path.join(ROOT, 'data/generated/hero-final-job-attack-range.v1.json');
 const VALIDATION_PATH = path.join(ROOT, 'data/validation/hero-final-job-attack-range.v1.json');
-const CHECKPOINT_PATH = path.join(ROOT, 'data/checkpoints/hero-final-job-attack-range.md');
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -148,6 +147,7 @@ function build() {
     status: 'PASS',
     completion: 'COMPLETE',
     owner: 'hero-canonical',
+    expectedBaseHead: contract.expectedBaseHead,
     summary: {
       finalJobIdCount: records.length,
       normalReferenceCount: refs.normalReferenceCount,
@@ -159,12 +159,10 @@ function build() {
     },
     consumer: 'data/generated/hero-final-job-attack-range.v1.json',
     validator: 'scripts/validate_hero_final_job_attack_range_consumer.cjs',
+    nextOwner: 'hero-frontend',
     decision: 'Current Stage 6 final-job JobIDs resolve by exact numeric ID to pinned ConfigDataJobInfo.BF_AttackDistance with no heuristic mapping.',
   };
   writeJson(VALIDATION_PATH, validation);
-
-  fs.mkdirSync(path.dirname(CHECKPOINT_PATH), { recursive: true });
-  fs.writeFileSync(CHECKPOINT_PATH, `# Hero final-job attack-range consumer\n\n- owner: hero-canonical\n- source: pinned ConfigData source pack + current Stage 6 Hero shards\n- status: COMPLETE / PASS\n- final JobIDs: ${records.length}\n- normal references: ${refs.normalReferenceCount}\n- released SP references: ${refs.spReferenceCount}\n- consumer: data/generated/hero-final-job-attack-range.v1.json\n- validator: scripts/validate_hero_final_job_attack_range_consumer.cjs\n- next owner: hero-frontend\n- reopen only on source snapshot, Stage 6 final-job population, schema/contract change, or validator hard failure.\n`);
 }
 
 try {
