@@ -1,0 +1,27 @@
+name: Hero Job Material Terminal Sentinel
+
+on:
+  pull_request:
+    paths:
+      - "data/contracts/hero-job-material-terminal-sentinel.v1.json"
+      - "data/generated/hero-job-material-presentation-policy.v1.json"
+      - "data/generated/hero-job-materials.v1.json"
+      - "data/validation/hero-job-materials-summary.v1.json"
+      - "scripts/validate_hero_job_material_terminal_sentinel.cjs"
+      - "src/lib/hero-job-materials.static.ts"
+      - ".github/workflows/hero-job-material-terminal-sentinel.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-terminal-sentinel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate terminal sentinel invariant
+        run: node scripts/validate_hero_job_material_terminal_sentinel.cjs
