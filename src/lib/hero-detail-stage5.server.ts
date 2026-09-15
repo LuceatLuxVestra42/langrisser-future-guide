@@ -184,6 +184,7 @@ type Stage6Sp = {
     jobId?: number | null;
     nameCn?: string | null;
   } | null;
+  talent?: Stage6Talent | null;
   finalDisplayStats?: Stage6JobConnection["finalDisplayStats"];
   missions?: {
     firstStage?: Stage6SpMission[] | null;
@@ -516,16 +517,16 @@ function projectStage6Shard(shard: Stage6HeroShard) {
             count: Number.isInteger(item.Count) ? Number(item.Count) : null,
           }))
         : [],
-      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition?.equipmentId) : null,
-      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition?.requiredLevel) : null,
+      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition.equipmentId) : null,
+      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition.requiredLevel) : null,
       requiredHeroIds: Array.isArray(mission.condition?.requiredHeroIds)
         ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
         : [],
-      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
+      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition.stageId) : null,
       stageIds: Array.isArray(mission.condition?.stageIds)
         ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
         : [],
-      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition?.clearCount) : null,
+      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition.clearCount) : null,
     },
   });
   const spFirstStageMissions = Array.isArray(shard.sp?.missions?.firstStage)
@@ -565,6 +566,19 @@ function projectStage6Shard(shard: Stage6HeroShard) {
   };
   const talentProgression = Array.isArray(shard.normal?.talent?.starProgression)
     ? shard.normal.talent.starProgression
+        .map((row) => {
+          const skill = projectSkill(row.skill);
+          if (!skill || !Number.isInteger(row.star)) return null;
+          return {
+            star: Number(row.star),
+            skillId: row.skillId ?? skill.skillId,
+            skill,
+          };
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null)
+    : [];
+  const spTalentProgression = Array.isArray(shard.sp?.talent?.starProgression)
+    ? shard.sp.talent.starProgression
         .map((row) => {
           const skill = projectSkill(row.skill);
           if (!skill || !Number.isInteger(row.star)) return null;
@@ -619,6 +633,11 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       status: shard.sp?.status ?? null,
       released: isReleased(shard.sp),
       finalJob: spFinalJob,
+      talent: {
+        status: shard.sp?.talent?.status ?? null,
+        selectionRule: shard.sp?.talent?.selectionRule ?? null,
+        starProgression: spTalentProgression,
+      },
       missions: {
         firstStage: spFirstStageMissions,
         secondStage: spSecondStageMissions,
