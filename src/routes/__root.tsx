@@ -229,7 +229,105 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
-        <style>{`[data-hero-central-bond-stat-row="true"] { display: none; }`}</style>
+        <style>{`
+          [data-hero-central-bond-stat-row="true"] { display: none; }
+
+          [data-hero-final-job-stats="true"] {
+            overflow: visible !important;
+            border: 0 !important;
+          }
+
+          [data-hero-final-job-stats="true"] table {
+            display: block;
+            min-width: 0 !important;
+            width: 100%;
+          }
+
+          [data-hero-final-job-stats="true"] thead {
+            display: none;
+          }
+
+          [data-hero-final-job-stats="true"] tbody {
+            display: grid;
+            gap: 1rem;
+          }
+
+          [data-hero-final-job-stats="true"] tbody > tr:not([data-hero-central-bond-stat-row="true"]) {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0;
+            padding: 0.9rem 1rem 1rem;
+            border: 1px solid var(--border) !important;
+            border-radius: 0.75rem;
+            background: var(--card);
+          }
+
+          [data-hero-final-job-stats="true"] tbody > tr:not([data-hero-central-bond-stat-row="true"]) > th {
+            display: block;
+            width: 100%;
+            padding: 0 0 0.7rem !important;
+            margin-bottom: 0.35rem;
+            border-bottom: 1px solid var(--border);
+          }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] {
+            display: grid;
+            grid-template-columns: 4.25rem minmax(0, 1fr);
+            align-items: center;
+            gap: 0.85rem;
+            width: 100%;
+            padding: 0.4rem 0 !important;
+            text-align: left !important;
+          }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat]::before {
+            font-weight: 700;
+            color: var(--foreground);
+          }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"]::before { content: "생명"; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="ATK"]::before { content: "공격"; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="INT"]::before { content: "지력"; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEF"]::before { content: "방어"; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="MDEF"]::before { content: "마방"; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEX"]::before { content: "기술"; }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div {
+            min-width: 0 !important;
+            width: 100%;
+            height: 1.7rem;
+            padding: 0 0.65rem !important;
+            border-radius: 0.4rem !important;
+            background: oklch(0.94 0 0) !important;
+          }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div > div {
+            background: oklch(0.74 0 0) !important;
+          }
+
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div > span {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            justify-content: flex-end;
+            color: var(--foreground);
+          }
+
+          .dark [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div {
+            background: oklch(0.3 0 0) !important;
+          }
+
+          .dark [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div > div {
+            background: oklch(0.52 0 0) !important;
+          }
+
+          @media (max-width: 39.99rem) {
+            [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] {
+              grid-template-columns: 3.5rem minmax(0, 1fr);
+              gap: 0.65rem;
+            }
+          }
+        `}</style>
       </head>
       <body>
         {children}
