@@ -1,0 +1,90 @@
+name: Hero Awakening Materials Frontend
+
+on:
+  push:
+    branches:
+      - 'feat/hero-awakening-materials-*'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Patch hero detail route
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('src/routes/heroes_.$heroId.tsx')
+          text = path.read_text()
+          import_old = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";'
+          import_new = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";'
+          render_old = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">'
+          render_new = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n        <HeroAwakeningMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">'
+          if text.count(import_old) != 1:
+              raise SystemExit(f'import anchor count={text.count(import_old)}')
+          if text.count(render_old) != 1:
+              raise SystemExit(f'render anchor count={text.count(render_old)}')
+          text = text.replace(import_old, import_new).replace(render_old, render_new)
+          path.write_text(text)
+          PY
+
+      - name: Reject unrelated patch mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed='^src/routes/heroes_\.\$heroId\.tsx$'
+          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
+          if [[ -n "$unexpected" ]]; then
+            printf 'Unexpected mutation before build:\n%s\n' "$unexpected" >&2
+            exit 1
+          fi
+          git diff --check
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Reject build mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed='^src/routes/heroes_\.\$heroId\.tsx$'
+          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
+          if [[ -n "$unexpected" ]]; then
+            printf 'Unexpected mutation after build:\n%s\n' "$unexpected" >&2
+            exit 1
+          fi
+          git diff --check
+
+      - name: Commit route integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add 'src/routes/heroes_.$heroId.tsx'
+          if git diff --cached --quiet; then
+            echo 'Route integration already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Render hero awakening materials on detail page'
+          git push origin HEAD:${GITHUB_REF_NAME}
