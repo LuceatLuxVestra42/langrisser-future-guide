@@ -29,8 +29,7 @@
   },
   "outputs": {
     "consumer": "data/generated/hero-final-job-attack-range.v1.json",
-    "validation": "data/validation/hero-final-job-attack-range.v1.json",
-    "checkpoint": "data/checkpoints/hero-final-job-attack-range.md"
+    "validation": "data/validation/hero-final-job-attack-range.v1.json"
   },
   "producer": "scripts/build_hero_final_job_attack_range_consumer.cjs",
   "validator": "scripts/validate_hero_final_job_attack_range_consumer.cjs",
@@ -42,5 +41,6 @@
     "Independent validator reports zero missing, duplicate, invalid-range, or parity mismatches.",
     "No paths outside the declared producer outputs are mutated by producer execution."
   ],
+  "resumeEvidence": "The validation output is the owned completion and resume evidence for this unit; no separate checkpoint path is required.",
   "nextScope": "After this consumer is frozen, hero-frontend may read it by exact final-job JobID and render the base attack range."
 }
