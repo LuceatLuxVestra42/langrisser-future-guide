@@ -135,9 +135,11 @@ for (const record of artifact.records) {
       );
     }
 
-    const [match] = matchingEntries;
+    const match = matchingEntries[0];
     const terminalLevel = connection.levels[terminalLevelIndex];
     if (
+      !match ||
+      !terminalLevel ||
       match.levelIndex !== terminalLevelIndex ||
       match.materialIndex !== 0 ||
       terminalLevel.materials.length !== 1
