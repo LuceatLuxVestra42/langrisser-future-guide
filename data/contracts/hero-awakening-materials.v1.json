@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "contract": "hero-awakening-materials",
+  "owner": "hero-canonical",
+  "status": "ACTIVE",
+  "purpose": "Attach the materials required to learn each hero's explicit Level2 awakening skill from the pinned UnityDataTool parsed ConfigData snapshot without inferred identity or relation edges.",
+  "primaryKey": "heroId",
+  "upstream": "data/generated/hero-basic-combat.v1.json",
+  "authoritativeSourceContract": "data/contracts/configdata-source-pack-contract.v1.json",
+  "requiredSources": [
+    "ConfigDataAwakenInfo",
+    "ConfigDataItemInfo"
+  ],
+  "relationContract": {
+    "heroAwaken": "hero-basic-combat.records[].heroId -> ConfigDataAwakenInfo.ID by explicit numeric equality",
+    "awakeningSkill": "ConfigDataAwakenInfo.Level2SkillID when it is a positive integer",
+    "materialList": "The same ConfigDataAwakenInfo row's Awaken2Material[] preserved in source order",
+    "item": "Awaken2Material[].GoodsType == 6: Awaken2Material[].Id -> ConfigDataItemInfo.ID"
+  },
+  "normalizationRules": [
+    "Consume only hero-basic-combat status PASS with the current canonical hero population.",
+    "Resolve ConfigDataAwakenInfo only by explicit hero ID equality.",
+    "A hero has a displayable awakening skill only when Level2SkillID is a positive integer.",
+    "Do not use Awaken2Unlock as the awakening-skill admission gate; it is preserved only as source evidence when present.",
+    "For a defined Level2SkillID, preserve Awaken2Material source order and require a non-empty material list.",
+    "Resolve items only when GoodsType is exactly 6 and only by explicit numeric ID equality to ConfigDataItemInfo.ID.",
+    "Do not join by names, numeric ranges, ID arithmetic, filename similarity, UI order, or historical output.",
+    "Do not synthesize Level2SkillID or materials for heroes where the source does not define them.",
+    "Fail closed on duplicate source IDs, malformed goods, missing AwakenInfo for a defined canonical relation, unresolved Item IDs, unsupported GoodsType, or generated/source mismatch."
+  ],
+  "itemSnapshotFields": [
+    "ID",
+    "Name",
+    "Desc",
+    "Rank",
+    "Icon",
+    "GetPathDesc"
+  ],
+  "validationPolicy": {
+    "PASS": [
+      "The generated hero population exactly matches hero-basic-combat.",
+      "Each canonical hero is resolved only by heroId -> ConfigDataAwakenInfo.ID.",
+      "Each positive Level2SkillID preserves the same-row Awaken2Material list in source order.",
+      "Every material has GoodsType 6, positive integer Id and Count, and resolves exactly once to ConfigDataItemInfo.ID.",
+      "Heroes without a positive Level2SkillID remain explicit non-display records without inferred fallback."
+    ],
+    "FAIL": [
+      "Any upstream, identity, cardinality, ordering, GoodsType, material count, Item snapshot, or source parity mismatch occurs."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-awakening-materials.v1.json",
+    "summary": "data/validation/hero-awakening-materials-summary.v1.json"
+  },
+  "producer": "scripts/build_hero_awakening_materials.cjs",
+  "validator": "scripts/validate_hero_awakening_materials.cjs",
+  "completionRule": "Run the producer against the current pinned ConfigData source-pack, then run the independent validator. Completion requires generated status PASS, summary status PASS, validator PASS, no hard errors, and no unexpected repository mutation."
+}
