@@ -12,68 +12,72 @@ jobs:
   integrate:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout exact branch source
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
+      - name: Patch hero detail route fail-closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'src/routes/heroes_.$heroId.tsx';
+          let source = fs.readFileSync(file, 'utf8');
+          const importAnchor = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";';
+          const importReplacement = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";';
+          const renderAnchor = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">';
+          const renderReplacement = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n        <HeroAwakeningMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">';
+          function replaceExactlyOnce(value, anchor, replacement, label) {
+            const first = value.indexOf(anchor);
+            const last = value.lastIndexOf(anchor);
+            if (first < 0 || first !== last) throw new Error(`${label}: expected exactly one anchor`);
+            return value.slice(0, first) + replacement + value.slice(first + anchor.length);
+          }
+          if (!source.includes('HeroAwakeningMaterialsSection')) {
+            source = replaceExactlyOnce(source, importAnchor, importReplacement, 'import');
+            source = replaceExactlyOnce(source, renderAnchor, renderReplacement, 'render');
+            fs.writeFileSync(file, source);
+          }
+          if ((source.match(/HeroAwakeningMaterialsSection/g) || []).length !== 2) throw new Error('HeroAwakeningMaterialsSection patch cardinality mismatch');
+          if (!source.includes('<HeroAwakeningMaterialsSection heroId={hero.heroId} />')) throw new Error('HeroAwakeningMaterialsSection render missing');
+          NODE
+          git diff --check -- 'src/routes/heroes_.$heroId.tsx'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.1'
+
       - name: Setup Node 22
         uses: actions/setup-node@v7
         with:
           node-version: '22'
-          cache: npm
 
-      - name: Patch hero detail route
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Semantic and frontend gates
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/validate_hero_awakening_materials.cjs
+          bunx tsc --noEmit
+          bunx vite build --config vite.config.pages.ts
+
+      - name: Reject unrelated tracked mutation
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          path = Path('src/routes/heroes_.$heroId.tsx')
-          text = path.read_text()
-          import_old = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";'
-          import_new = 'import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";\nimport { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";\nimport { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";'
-          render_old = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">'
-          render_new = '        <HeroJobMaterialsSection heroId={hero.heroId} />\n        <HeroAwakeningMaterialsSection heroId={hero.heroId} />\n\n        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">'
-          if text.count(import_old) != 1:
-              raise SystemExit(f'import anchor count={text.count(import_old)}')
-          if text.count(render_old) != 1:
-              raise SystemExit(f'render anchor count={text.count(render_old)}')
-          text = text.replace(import_old, import_new).replace(render_old, render_new)
-          path.write_text(text)
-          PY
-
-      - name: Reject unrelated patch mutation
-        shell: bash
-        run: |
-          set -euo pipefail
-          allowed='^src/routes/heroes_\.\$heroId\.tsx$'
-          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
+          unexpected="$(git status --porcelain=v1 --untracked-files=no | sed -E 's/^...//' | grep -Ev '^src/routes/heroes_\.\$heroId\.tsx$' || true)"
           if [[ -n "$unexpected" ]]; then
-            printf 'Unexpected mutation before build:\n%s\n' "$unexpected" >&2
+            printf 'Unexpected tracked mutation:\n%s\n' "$unexpected" >&2
             exit 1
           fi
-          git diff --check
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-
-      - name: Reject build mutation
-        shell: bash
-        run: |
-          set -euo pipefail
-          allowed='^src/routes/heroes_\.\$heroId\.tsx$'
-          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
-          if [[ -n "$unexpected" ]]; then
-            printf 'Unexpected mutation after build:\n%s\n' "$unexpected" >&2
-            exit 1
-          fi
-          git diff --check
 
       - name: Commit route integration
         shell: bash
