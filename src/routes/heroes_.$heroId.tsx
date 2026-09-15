@@ -11,6 +11,7 @@ import {
 
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
+import { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";
 import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
@@ -439,6 +440,8 @@ function HeroDetailPage() {
             </div>
           ) : null}
         </section>
+
+        <HeroJobMaterialsSection heroId={hero.heroId} />
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="최종 직업 스탯" />
