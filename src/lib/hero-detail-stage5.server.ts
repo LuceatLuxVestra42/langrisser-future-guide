@@ -517,16 +517,16 @@ function projectStage6Shard(shard: Stage6HeroShard) {
             count: Number.isInteger(item.Count) ? Number(item.Count) : null,
           }))
         : [],
-      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition.equipmentId) : null,
-      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition.requiredLevel) : null,
+      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition?.equipmentId) : null,
+      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition?.requiredLevel) : null,
       requiredHeroIds: Array.isArray(mission.condition?.requiredHeroIds)
         ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
         : [],
-      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition.stageId) : null,
+      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
       stageIds: Array.isArray(mission.condition?.stageIds)
         ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
         : [],
-      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition.clearCount) : null,
+      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition?.clearCount) : null,
     },
   });
   const spFirstStageMissions = Array.isArray(shard.sp?.missions?.firstStage)
