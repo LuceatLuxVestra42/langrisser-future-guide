@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
+import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
@@ -124,6 +125,64 @@ function HeroSpTalentSection({
   );
 }
 
+function HeroJobMovementSection({ heroId }: { heroId: number }) {
+  const movementRows = getStaticHeroJobMovement(heroId);
+  if (!movementRows) {
+    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+  }
+
+  return (
+    <section
+      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+      data-hero-job-movement="true"
+      data-hero-job-movement-count={movementRows.length}
+    >
+      <div>
+        <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 이동 정보</h2>
+        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+          검증된 전직별 이동력 · 이동타입
+        </p>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {movementRows.map((row, index) => (
+          <article
+            key={row.jobConnectionId}
+            className="rounded-xl border border-border bg-muted/20 p-4"
+            data-job-connection-id={row.jobConnectionId}
+            data-job-id={row.jobId}
+            data-move-type={row.moveType}
+            data-move-point={row.movePoint}
+          >
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
+                <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
+                  {row.nameCn ?? `Job ${row.jobId}`}
+                </h3>
+              </div>
+              <span className="shrink-0 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                Job {row.jobId}
+              </span>
+            </div>
+
+            <dl className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
+                <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+              </div>
+              <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
+                <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
@@ -152,6 +211,8 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
           talent={detail.sp.talent}
         />
       ) : null}
+
+      <HeroJobMovementSection heroId={heroId} />
 
       <section
         className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
