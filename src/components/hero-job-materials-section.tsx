@@ -1,3 +1,4 @@
+import { getStaticHeroJobAttackRanges } from "@/lib/hero-job-attack-range.static";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 
 function stripConfigMarkup(value: string) {
@@ -8,6 +9,10 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
   const hero = getStaticHeroJobMaterials(heroId);
   if (!hero) {
     throw new Error(`Hero ${heroId} has no frozen job-material record.`);
+  }
+  const attackRanges = getStaticHeroJobAttackRanges(heroId);
+  if (!attackRanges) {
+    throw new Error(`Hero ${heroId} has no frozen job attack-range record.`);
   }
 
   const connections = hero.connections
@@ -27,16 +32,51 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
       className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
       data-hero-job-materials="true"
       data-job-material-entry-count={materialEntryCount}
+      data-job-attack-range-count={attackRanges.length}
     >
       <div>
-        <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 재료</h2>
+        <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 정보</h2>
         <p className="mt-1 text-xs font-semibold text-muted-foreground">
-          검증된 중국 서버 ConfigData 기준 · 재료명은 중국 서버 원문
+          검증된 중국 서버 ConfigData 기준 · 전직별 일반공격 사거리와 승급 재료
         </p>
       </div>
 
+      <div className="mt-5">
+        <h3 className="text-sm font-extrabold text-foreground">전직별 일반공격 사거리</h3>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {attackRanges.map((job) => (
+            <div
+              key={job.jobConnectionId}
+              className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-muted/20 px-3 py-2.5"
+              data-job-attack-range="true"
+              data-job-connection-id={job.jobConnectionId}
+              data-job-id={job.jobId}
+              data-basic-attack-range={job.basicAttackRange}
+            >
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-foreground">
+                  {job.nameCn ?? job.nameEn ?? `Job ${job.jobId}`}
+                </p>
+                {job.rank != null ? (
+                  <p className="mt-0.5 text-[11px] font-semibold text-muted-foreground">Rank {job.rank}</p>
+                ) : null}
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">사거리</p>
+                <p className="text-base font-extrabold tabular-nums text-foreground">{job.basicAttackRange}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-border pt-5">
+        <h3 className="text-sm font-extrabold text-foreground">전직 재료</h3>
+        <p className="mt-1 text-xs font-semibold text-muted-foreground">재료명은 중국 서버 원문</p>
+      </div>
+
       {connections.length > 0 ? (
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {connections.map((connection) => (
             <article
               key={connection.jobConnectionId}

@@ -1,0 +1,61 @@
+name: Hero Job Attack Range Contract
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-job-attack-range.v1.json'
+      - 'data/generated/hero-job-attack-range.v1.json'
+      - 'data/validation/hero-job-attack-range-summary.v1.json'
+      - 'data/generated/hero-job-links.v1.json'
+      - 'scripts/build_hero_job_attack_range.cjs'
+      - 'scripts/validate_hero_job_attack_range.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - '.github/workflows/hero-job-attack-range-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Hydrate pinned ConfigData source pack
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/hydrate-configdata-source-pack-v1.mjs --target-dir "$RUNNER_TEMP/configdata-source"
+
+      - name: Build hero job attack range projection
+        env:
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source
+        run: node scripts/build_hero_job_attack_range.cjs
+
+      - name: Validate hero job attack range parity
+        env:
+          CONFIGDATA_SOURCE_ROOT: ${{ runner.temp }}/configdata-source
+        run: node scripts/validate_hero_job_attack_range.cjs
+
+      - name: Verify committed projection freshness
+        run: git diff --exit-code -- data/generated/hero-job-attack-range.v1.json data/validation/hero-job-attack-range-summary.v1.json
+
+      - name: Upload generated projection for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-job-attack-range-generated
+          path: |
+            data/generated/hero-job-attack-range.v1.json
+            data/validation/hero-job-attack-range-summary.v1.json
+          if-no-files-found: error
