@@ -184,6 +184,7 @@ type Stage6Sp = {
     jobId?: number | null;
     nameCn?: string | null;
   } | null;
+  talent?: Stage6Talent | null;
   finalDisplayStats?: Stage6JobConnection["finalDisplayStats"];
   missions?: {
     firstStage?: Stage6SpMission[] | null;
@@ -576,6 +577,19 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         })
         .filter((row): row is NonNullable<typeof row> => row !== null)
     : [];
+  const spTalentProgression = Array.isArray(shard.sp?.talent?.starProgression)
+    ? shard.sp.talent.starProgression
+        .map((row) => {
+          const skill = projectSkill(row.skill);
+          if (!skill || !Number.isInteger(row.star)) return null;
+          return {
+            star: Number(row.star),
+            skillId: row.skillId ?? skill.skillId,
+            skill,
+          };
+        })
+        .filter((row): row is NonNullable<typeof row> => row !== null)
+    : [];
 
   return {
     identity: {
@@ -619,6 +633,11 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       status: shard.sp?.status ?? null,
       released: isReleased(shard.sp),
       finalJob: spFinalJob,
+      talent: {
+        status: shard.sp?.talent?.status ?? null,
+        selectionRule: shard.sp?.talent?.selectionRule ?? null,
+        starProgression: spTalentProgression,
+      },
       missions: {
         firstStage: spFirstStageMissions,
         secondStage: spSecondStageMissions,
