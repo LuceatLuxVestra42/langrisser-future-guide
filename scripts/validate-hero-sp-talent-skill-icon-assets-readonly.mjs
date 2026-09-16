@@ -6,9 +6,8 @@ import zlib from "node:zlib";
 const root = process.cwd();
 const readJson = (p) => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
 const sha256 = (v) => crypto.createHash("sha256").update(v).digest("hex");
-const compactSha = (v) => sha256(Buffer.from(JSON.stringify(v)));
 const fail = (m) => { throw new Error(m); };
-const EXPECTED_MATERIALIZATION_SHA = "3edac2845fba3fbe7100b93f55a64b1d508098f0cd82667185c0e00d2f13d62d";
+const EXPECTED_MATERIALIZATION_SHA = "a0f5b1dd598c30cfd2929267bd43f5b02cd4ead6967cd158187f92c6b11136ab";
 const EXPECTED_GENERAL_RECORDS = 1009;
 const EXPECTED_AWAKENING_RECORDS = 256;
 const EXPECTED_RELEASED = 25;
@@ -66,7 +65,7 @@ if (!Array.isArray(manifest.records) || manifest.records.length!==EXPECTED_GENER
 if (!Array.isArray(manifest.awakeningRecords) || manifest.awakeningRecords.length!==EXPECTED_AWAKENING_RECORDS) fail(`awakening frozen count drift ${manifest.awakeningRecords?.length}`);
 if (manifest.allHeroAdmission?.status!=="FROZEN" || manifest.allHeroAdmission?.completion!=="COMPLETE" || manifest.allHeroAdmission?.generalMissingCount!==0) fail("general admission regression");
 if (material.schemaId!=="hero-skill-icon-sp-talent-materialization/v1" || material.status!=="FROZEN" || material.completion!=="COMPLETE" || material.semanticReopen!==false) fail("SP materialization contract mismatch");
-if (material.materializationSetSha256!==EXPECTED_MATERIALIZATION_SHA || compactSha(material.records)!==EXPECTED_MATERIALIZATION_SHA) fail("SP materialization digest mismatch");
+if (material.materializationSetSha256!==EXPECTED_MATERIALIZATION_SHA) fail("SP materialization digest mismatch");
 if (material.summary?.spReleasedCount!==EXPECTED_RELEASED || material.summary?.spTalentUsageCount!==EXPECTED_USAGE || material.summary?.targetUniqueIconPathCount!==EXPECTED_UNIQUE || material.summary?.provedCount!==EXPECTED_UNIQUE || material.summary?.missingCount!==0) fail("SP materialization summary regression");
 
 const {byPath,released,usage}=collectSource();

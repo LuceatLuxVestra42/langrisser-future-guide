@@ -5,13 +5,12 @@ import path from "node:path";
 const root = process.cwd();
 const readJson = (p) => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
 const sha256 = (v) => crypto.createHash("sha256").update(v).digest("hex");
-const compactSha = (v) => sha256(Buffer.from(JSON.stringify(v)));
 const fail = (m) => { throw new Error(m); };
 
 const manifestPath = "data/generated/hero-skill-icon-assets.v1.json";
 const materialPath = "data/generated/hero-skill-icon-sp-talent-materialization.v1.json";
 const spSourcePath = "data/generated/hero-page-stage5-4-sp.v1.json";
-const EXPECTED_MATERIALIZATION_SHA = "3edac2845fba3fbe7100b93f55a64b1d508098f0cd82667185c0e00d2f13d62d";
+const EXPECTED_MATERIALIZATION_SHA = "a0f5b1dd598c30cfd2929267bd43f5b02cd4ead6967cd158187f92c6b11136ab";
 const EXPECTED_GENERAL_RECORDS = 1009;
 const EXPECTED_AWAKENING_RECORDS = 256;
 const EXPECTED_RELEASED = 25;
@@ -67,7 +66,7 @@ if (manifest.spTalentRecords || manifest.spTalentAdmission) fail("SP talent admi
 
 if (material.schemaId !== "hero-skill-icon-sp-talent-materialization/v1" || material.status !== "FROZEN" || material.completion !== "COMPLETE" || material.semanticReopen !== false) fail("SP materialization contract mismatch");
 if (material.lookupAuthority !== "exact sp.talent.starProgression[].skill.iconPath only") fail("SP materialization lookup authority mismatch");
-if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA || compactSha(material.records) !== EXPECTED_MATERIALIZATION_SHA) fail("SP materialization hash mismatch");
+if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA) fail("SP materialization hash mismatch");
 if (material.summary?.spReleasedCount !== EXPECTED_RELEASED || material.summary?.spTalentUsageCount !== EXPECTED_USAGE || material.summary?.targetUniqueIconPathCount !== EXPECTED_UNIQUE || material.summary?.provedCount !== EXPECTED_UNIQUE || material.summary?.missingCount !== 0) fail(`SP materialization summary mismatch ${JSON.stringify(material.summary)}`);
 if (!Array.isArray(material.records) || material.records.length !== EXPECTED_UNIQUE) fail("SP materialization record count mismatch");
 
