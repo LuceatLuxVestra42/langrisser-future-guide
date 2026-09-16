@@ -32,6 +32,22 @@ async function fetchWithRetry(path, attempts = 5) {
   throw new Error(`${path} did not become healthy: ${last instanceof Response ? last.status : String(last)}`);
 }
 
+async function clickUntilText(page, control, expectedText, label, attempts = 5) {
+  const expected = page.getByText(expectedText, { exact: true });
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await control.click();
+    try {
+      await expected.waitFor({ state: "visible", timeout: 1000 });
+      return;
+    } catch (error) {
+      if (attempt === attempts) {
+        throw new Error(`${label} did not reach expected state after ${attempts} attempts: ${expectedText}`, { cause: error });
+      }
+      await page.waitForTimeout(250);
+    }
+  }
+}
+
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
@@ -96,9 +112,13 @@ try {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
     check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
-    await hero6Next.click();
-    await page.waitForTimeout(100);
-    await page.getByText(expectedLabel, { exact: true }).waitFor();
+    if (index === 0) {
+      await clickUntilText(page, hero6Next, expectedLabel, "Hero 6 desktop first artwork interaction");
+    } else {
+      await hero6Next.click();
+      await page.waitForTimeout(100);
+      await page.getByText(expectedLabel, { exact: true }).waitFor();
+    }
     const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
     check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
     await image.evaluate((node) => node.decode());
@@ -169,12 +189,10 @@ try {
     check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
     check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
     const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
-    await mobileNext.click();
-    await mobilePage.waitForTimeout(100);
     const firstSkinId = hero6FullartIds[0];
     const firstSkinLabel = hero6SkinPresentationLabels.get(firstSkinId);
     check(firstSkinLabel, `Hero 6 Skin ${firstSkinId} presentation label is not registered`);
-    await mobilePage.getByText(firstSkinLabel, { exact: true }).waitFor();
+    await clickUntilText(mobilePage, mobileNext, firstSkinLabel, "Hero 6 mobile first artwork interaction");
     const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${firstSkinId}.webp"]`);
     check(await mobileFullart.count() === 1, "Hero 6 mobile first fullart Skin missing or duplicated");
     await mobileFullart.evaluate((node) => node.decode());
