@@ -2,12 +2,24 @@ import { useLoaderData } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
   if (!value) return "-";
   return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
+}
+
+function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
+  const iconUrl = getHeroJobMaterialIconUrl(sourcePath);
+  if (!iconUrl) return null;
+
+  return (
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-background p-1 shadow-sm">
+      <img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+    </div>
+  );
 }
 
 type SpTalentSkill = {
@@ -295,13 +307,18 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
                             className="rounded-md border border-border/70 bg-card px-3 py-2"
                             data-job-material-id={material.id}
                           >
-                            <div className="flex items-baseline justify-between gap-3">
-                              <span className="text-sm font-bold text-foreground">{material.jobMaterial.nameCn}</span>
-                              <span className="shrink-0 text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
+                            <div className="flex items-start gap-3">
+                              <HeroJobMaterialIcon sourcePath={material.jobMaterial.icon} />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-baseline justify-between gap-3">
+                                  <span className="text-sm font-bold text-foreground">{material.jobMaterial.nameCn}</span>
+                                  <span className="shrink-0 text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
+                                </div>
+                                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                                  {stripConfigMarkup(material.jobMaterial.descriptionCn)}
+                                </p>
+                              </div>
                             </div>
-                            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                              {stripConfigMarkup(material.jobMaterial.descriptionCn)}
-                            </p>
                           </li>
                         ))}
                       </ul>
