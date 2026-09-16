@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
-import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
@@ -26,6 +25,15 @@ type SpTalentView = {
     skillId: number;
     skill: SpTalentSkill;
   }>;
+};
+
+type HeroJobMovementRowView = {
+  jobConnectionId: number;
+  jobId: number;
+  nameCn: string | null;
+  moveType: number;
+  moveTypeNameKr: string;
+  movePoint: number;
 };
 
 function HeroSpTalentSection({
@@ -126,51 +134,82 @@ function HeroSpTalentSection({
 }
 
 function HeroJobMovementSection({ heroId }: { heroId: number }) {
-  const movementRows = getStaticHeroJobMovement(heroId);
-  if (!movementRows) {
-    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+  const [movementRows, setMovementRows] = useState<HeroJobMovementRowView[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setMovementRows(null);
+    setLoadError(null);
+
+    void import("@/lib/hero-job-movement.static")
+      .then(({ getStaticHeroJobMovement }) => {
+        const rows = getStaticHeroJobMovement(heroId);
+        if (!rows) {
+          throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+        }
+        if (!cancelled) setMovementRows(rows);
+      })
+      .catch((error) => {
+        if (!cancelled) setLoadError(String(error instanceof Error ? error.message : error));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [heroId]);
+
+  if (loadError) {
+    throw new Error(loadError);
   }
 
   return (
     <section
       className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
       data-hero-job-movement="true"
-      data-hero-job-movement-count={movementRows.length}
+      data-hero-job-movement-count={movementRows?.length ?? 0}
+      data-hero-job-movement-status={movementRows ? "ready" : "loading"}
     >
       <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 이동 정보</h2>
       <p className="mt-1 text-xs font-semibold text-muted-foreground">검증된 전직별 이동력 · 이동타입</p>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-border">
-        <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
-          <thead className="bg-muted/40 text-xs text-muted-foreground">
-            <tr>
-              <th className="px-3 py-2 font-bold">전직</th>
-              <th className="px-3 py-2 font-bold">Job ID</th>
-              <th className="px-3 py-2 font-bold">이동력</th>
-              <th className="px-3 py-2 font-bold">이동타입</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {movementRows.map((row, index) => (
-              <tr
-                key={row.jobConnectionId}
-                data-job-connection-id={row.jobConnectionId}
-                data-job-id={row.jobId}
-                data-move-type={row.moveType}
-                data-move-point={row.movePoint}
-              >
-                <td className="px-3 py-2.5 font-bold text-foreground">
-                  <span className="mr-2 text-[11px] text-muted-foreground">{index + 1}</span>
-                  {row.nameCn ?? `Job ${row.jobId}`}
-                </td>
-                <td className="px-3 py-2.5 tabular-nums text-muted-foreground">{row.jobId}</td>
-                <td className="px-3 py-2.5 font-extrabold tabular-nums text-foreground">{row.movePoint}</td>
-                <td className="px-3 py-2.5 font-bold text-foreground">{row.moveTypeNameKr}</td>
+      {movementRows ? (
+        <div className="mt-4 overflow-x-auto rounded-xl border border-border">
+          <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
+            <thead className="bg-muted/40 text-xs text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 font-bold">전직</th>
+                <th className="px-3 py-2 font-bold">Job ID</th>
+                <th className="px-3 py-2 font-bold">이동력</th>
+                <th className="px-3 py-2 font-bold">이동타입</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {movementRows.map((row, index) => (
+                <tr
+                  key={row.jobConnectionId}
+                  data-job-connection-id={row.jobConnectionId}
+                  data-job-id={row.jobId}
+                  data-move-type={row.moveType}
+                  data-move-point={row.movePoint}
+                >
+                  <td className="px-3 py-2.5 font-bold text-foreground">
+                    <span className="mr-2 text-[11px] text-muted-foreground">{index + 1}</span>
+                    {row.nameCn ?? `Job ${row.jobId}`}
+                  </td>
+                  <td className="px-3 py-2.5 tabular-nums text-muted-foreground">{row.jobId}</td>
+                  <td className="px-3 py-2.5 font-extrabold tabular-nums text-foreground">{row.movePoint}</td>
+                  <td className="px-3 py-2.5 font-bold text-foreground">{row.moveTypeNameKr}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          전직 이동 정보를 불러오는 중이야.
+        </p>
+      )}
     </section>
   );
 }
