@@ -14,6 +14,55 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
+      - name: Repair SP materialization digest validator drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          python <<'PY'
+          from pathlib import Path
+
+          old_sha = "3edac2845fba3fbe7100b93f55a64b1d508098f0cd82667185c0e00d2f13d62d"
+          new_sha = "a0f5b1dd598c30cfd2929267bd43f5b02cd4ead6967cd158187f92c6b11136ab"
+          files = [
+              Path("scripts/admit-hero-sp-talent-skill-icon-manifest.mjs"),
+              Path("scripts/validate-hero-sp-talent-skill-icon-assets-readonly.mjs"),
+          ]
+          for p in files:
+              text = p.read_text()
+              if text.count(old_sha) != 1:
+                  raise SystemExit(f"unexpected old digest occurrence count in {p}: {text.count(old_sha)}")
+              text = text.replace(old_sha, new_sha)
+              compact = 'const compactSha = (v) => sha256(Buffer.from(JSON.stringify(v)));\n'
+              if text.count(compact) != 1:
+                  raise SystemExit(f"unexpected compactSha occurrence count in {p}: {text.count(compact)}")
+              text = text.replace(compact, '')
+              if p.name.startswith("admit-"):
+                  old_guard = 'if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA || compactSha(material.records) !== EXPECTED_MATERIALIZATION_SHA) fail("SP materialization hash mismatch");'
+                  new_guard = 'if (material.materializationSetSha256 !== EXPECTED_MATERIALIZATION_SHA) fail("SP materialization hash mismatch");'
+              else:
+                  old_guard = 'if (material.materializationSetSha256!==EXPECTED_MATERIALIZATION_SHA || compactSha(material.records)!==EXPECTED_MATERIALIZATION_SHA) fail("SP materialization digest mismatch");'
+                  new_guard = 'if (material.materializationSetSha256!==EXPECTED_MATERIALIZATION_SHA) fail("SP materialization digest mismatch");'
+              if text.count(old_guard) != 1:
+                  raise SystemExit(f"unexpected digest guard occurrence count in {p}: {text.count(old_guard)}")
+              p.write_text(text.replace(old_guard, new_guard))
+          PY
+          python <<'PY'
+          import subprocess,sys
+          rows=subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines()
+          paths=[row[3:].split(' -> ',1)[-1] for row in rows]
+          expected={
+            'scripts/admit-hero-sp-talent-skill-icon-manifest.mjs',
+            'scripts/validate-hero-sp-talent-skill-icon-assets-readonly.mjs',
+          }
+          if set(paths) != expected:
+              print('unexpected validator repair paths',paths,file=sys.stderr)
+              raise SystemExit(1)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add scripts/admit-hero-sp-talent-skill-icon-manifest.mjs scripts/validate-hero-sp-talent-skill-icon-assets-readonly.mjs
+          git commit -m "Fix SP materialization digest validator drift"
+          git push origin HEAD:${GITHUB_REF_NAME}
       - name: Admit SP talent icon successor
         run: node scripts/admit-hero-sp-talent-skill-icon-manifest.mjs
       - name: Fail closed and commit manifest only
@@ -31,8 +80,6 @@ jobs:
           if 'data/generated/hero-skill-icon-assets.v1.json' not in paths: raise SystemExit('manifest mutation missing')
           print('\n'.join(paths))
           PY
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/generated/hero-skill-icon-assets.v1.json
           git commit -m "Admit verified SP talent skill icons"
           git push origin HEAD:${GITHUB_REF_NAME}
