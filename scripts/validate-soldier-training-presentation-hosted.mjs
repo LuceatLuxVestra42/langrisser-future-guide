@@ -94,7 +94,7 @@ async function runDesktop(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
   const response = await page.goto(`${trainingUrl}?qa=${Date.now()}`, {
-    waitUntil: "domcontentloaded",
+    waitUntil: "load",
     timeout: 30000,
   });
   const directStatus = response?.status() ?? null;
@@ -141,7 +141,7 @@ async function runMobile(browser) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(`${trainingUrl}?qaMobile=${Date.now()}`, {
-    waitUntil: "domcontentloaded",
+    waitUntil: "load",
     timeout: 30000,
   });
 
