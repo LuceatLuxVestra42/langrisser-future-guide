@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
-import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
@@ -26,6 +25,15 @@ type SpTalentView = {
     skillId: number;
     skill: SpTalentSkill;
   }>;
+};
+
+type HeroJobMovementRowView = {
+  jobConnectionId: number;
+  jobId: number;
+  nameCn: string | null;
+  moveType: number;
+  moveTypeNameKr: string;
+  movePoint: number;
 };
 
 function HeroSpTalentSection({
@@ -126,16 +134,41 @@ function HeroSpTalentSection({
 }
 
 function HeroJobMovementSection({ heroId }: { heroId: number }) {
-  const movementRows = getStaticHeroJobMovement(heroId);
-  if (!movementRows) {
-    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+  const [movementRows, setMovementRows] = useState<HeroJobMovementRowView[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setMovementRows(null);
+    setLoadError(null);
+
+    void import("@/lib/hero-job-movement.static")
+      .then(({ getStaticHeroJobMovement }) => {
+        const rows = getStaticHeroJobMovement(heroId);
+        if (!rows) {
+          throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+        }
+        if (!cancelled) setMovementRows(rows);
+      })
+      .catch((error) => {
+        if (!cancelled) setLoadError(String(error instanceof Error ? error.message : error));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [heroId]);
+
+  if (loadError) {
+    throw new Error(loadError);
   }
 
   return (
     <section
       className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
       data-hero-job-movement="true"
-      data-hero-job-movement-count={movementRows.length}
+      data-hero-job-movement-count={movementRows?.length ?? 0}
+      data-hero-job-movement-status={movementRows ? "ready" : "loading"}
     >
       <div>
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 이동 정보</h2>
@@ -144,41 +177,47 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
         </p>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {movementRows.map((row, index) => (
-          <article
-            key={row.jobConnectionId}
-            className="rounded-xl border border-border bg-muted/20 p-4"
-            data-job-connection-id={row.jobConnectionId}
-            data-job-id={row.jobId}
-            data-move-type={row.moveType}
-            data-move-point={row.movePoint}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
-                <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                  {row.nameCn ?? `Job ${row.jobId}`}
-                </h3>
+      {movementRows ? (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {movementRows.map((row, index) => (
+            <article
+              key={row.jobConnectionId}
+              className="rounded-xl border border-border bg-muted/20 p-4"
+              data-job-connection-id={row.jobConnectionId}
+              data-job-id={row.jobId}
+              data-move-type={row.moveType}
+              data-move-point={row.movePoint}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
+                  <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
+                    {row.nameCn ?? `Job ${row.jobId}`}
+                  </h3>
+                </div>
+                <span className="shrink-0 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                  Job {row.jobId}
+                </span>
               </div>
-              <span className="shrink-0 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
-                Job {row.jobId}
-              </span>
-            </div>
 
-            <dl className="mt-4 grid grid-cols-2 gap-2">
-              <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
-                <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
-              </div>
-              <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-                <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
-              </div>
-            </dl>
-          </article>
-        ))}
-      </div>
+              <dl className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                  <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
+                  <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+                </div>
+                <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                  <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          전직 이동 정보를 불러오는 중이야.
+        </p>
+      )}
     </section>
   );
 }
