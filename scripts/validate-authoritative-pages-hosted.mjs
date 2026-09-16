@@ -32,6 +32,26 @@ async function fetchWithRetry(path, attempts = 5) {
   throw new Error(`${path} did not become healthy: ${last instanceof Response ? last.status : String(last)}`);
 }
 
+async function clickAndWaitForCarouselIndex(targetPage, button, { fromIndex, toIndex, total, label }) {
+  const fromCounter = targetPage.getByText(`${fromIndex} / ${total}`, { exact: true });
+  const toCounter = targetPage.getByText(`${toIndex} / ${total}`, { exact: true });
+
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    await button.click();
+    try {
+      await toCounter.waitFor({ state: "visible", timeout: 2000 });
+      return;
+    } catch (error) {
+      if (await toCounter.isVisible()) return;
+      const stillAtFrom = await fromCounter.isVisible();
+      check(stillAtFrom, `${label} moved away from ${fromIndex}/${total} without reaching ${toIndex}/${total}`);
+      if (attempt === 5) {
+        throw new Error(`${label} did not advance from ${fromIndex}/${total} to ${toIndex}/${total} after ${attempt} interaction attempts`);
+      }
+    }
+  }
+}
+
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
@@ -96,8 +116,12 @@ try {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
     check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
-    await hero6Next.click();
-    await page.waitForTimeout(100);
+    await clickAndWaitForCarouselIndex(page, hero6Next, {
+      fromIndex: index + 1,
+      toIndex: index + 2,
+      total: hero6VisualCount,
+      label: `Hero 6 Skin ${skinId} carousel`,
+    });
     await page.getByText(expectedLabel, { exact: true }).waitFor();
     const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
     check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
@@ -107,10 +131,13 @@ try {
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
     check(await page.locator(`img[src*="/images/skins/${skinId}.png"]`).count() === 0, `Hero 6 reintroduced legacy static Skin ${skinId}`);
   }
-  await hero6Next.click();
-  await page.waitForTimeout(100);
+  await clickAndWaitForCarouselIndex(page, hero6Next, {
+    fromIndex: hero6VisualCount,
+    toIndex: 1,
+    total: hero6VisualCount,
+    label: "Hero 6 carousel wrap",
+  });
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
-  await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
   check((await page.locator('img[alt="레온 대표 일러스트"]').getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 carousel did not wrap back to representative artwork");
 
   const exclusiveHeading = page.getByRole("heading", { name: "전용장비", exact: true });
@@ -169,8 +196,12 @@ try {
     check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
     check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
     const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
-    await mobileNext.click();
-    await mobilePage.waitForTimeout(100);
+    await clickAndWaitForCarouselIndex(mobilePage, mobileNext, {
+      fromIndex: 1,
+      toIndex: 2,
+      total: hero6VisualCount,
+      label: "Hero 6 mobile first Skin carousel",
+    });
     const firstSkinId = hero6FullartIds[0];
     const firstSkinLabel = hero6SkinPresentationLabels.get(firstSkinId);
     check(firstSkinLabel, `Hero 6 Skin ${firstSkinId} presentation label is not registered`);
