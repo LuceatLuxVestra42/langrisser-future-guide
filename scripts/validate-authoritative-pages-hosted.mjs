@@ -35,8 +35,8 @@ async function fetchWithRetry(path, attempts = 5) {
 async function clickUntilText(page, control, expectedText, label, attempts = 5) {
   const expected = page.getByText(expectedText, { exact: true });
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    await control.click();
     try {
+      await control.click();
       await expected.waitFor({ state: "visible", timeout: 1000 });
       return;
     } catch (error) {
