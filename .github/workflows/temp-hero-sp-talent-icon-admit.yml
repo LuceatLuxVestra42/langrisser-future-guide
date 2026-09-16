@@ -1,0 +1,38 @@
+name: Temporary Hero SP Talent Icon Admission
+
+on:
+  push:
+    branches: [work/hero-sp-talent-icons-proof-20260916]
+    paths: [.github/workflows/temp-hero-sp-talent-icon-admit.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  admit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Admit SP talent icon successor
+        run: node scripts/admit-hero-sp-talent-skill-icon-manifest.mjs
+      - name: Fail closed and commit manifest only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/temp-hero-sp-talent-icon-admit.yml
+          python <<'PY'
+          import subprocess,sys
+          rows=subprocess.check_output(['git','status','--porcelain','--untracked-files=all'],text=True).splitlines()
+          paths=[row[3:].split(' -> ',1)[-1] for row in rows]
+          allowed={'.github/workflows/temp-hero-sp-talent-icon-admit.yml','data/generated/hero-skill-icon-assets.v1.json'}
+          bad=[p for p in paths if p not in allowed]
+          if bad: print('unexpected paths',bad,file=sys.stderr); raise SystemExit(1)
+          if 'data/generated/hero-skill-icon-assets.v1.json' not in paths: raise SystemExit('manifest mutation missing')
+          print('\n'.join(paths))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/generated/hero-skill-icon-assets.v1.json
+          git commit -m "Admit verified SP talent skill icons"
+          git push origin HEAD:${GITHUB_REF_NAME}
