@@ -1,0 +1,183 @@
+name: Temporary Hero SP Talent Icon Official Proof
+
+on:
+  push:
+    branches: [work/hero-sp-talent-icons-proof-20260916]
+    paths: [.github/workflows/temp-hero-sp-talent-icon-proof.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact Unity decoder
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow
+      - name: Prove exact SP talent icon paths and materialize PNGs
+        shell: bash
+        run: |
+          set +e
+          python <<'PY'
+          import binascii, hashlib, json, pathlib, struct, traceback, urllib.error, urllib.request, zlib
+          import UnityPy
+          OUT=pathlib.Path('out/hero-sp-talent-icon-proof'); OUT.mkdir(parents=True,exist_ok=True)
+          RESULT=OUT/'hero-sp-talent-icon-proof.json'; EXIT=OUT/'exit-code.txt'
+          MATERIAL=pathlib.Path('data/generated/hero-skill-icon-sp-talent-materialization.v1.json')
+          ROOT_PREFIX='assets/gameproject/runtimeassets'; UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36'; MAX_PART=90; MISS_BREAK=8
+          PREFIX_TO_STEM={'UI/Icon/Skill_ABS/':'ui_icon_skill_abs','UI/Icon/Skill2_ABS/':'ui_icon_skill2_abs'}
+          def read_json(p): return json.loads(pathlib.Path(p).read_text(encoding='utf-8'))
+          def norm(v): return str(v).replace('\\','/').strip('/').lower()
+          def sha256(data): return hashlib.sha256(data).hexdigest()
+          def compact_sha(v): return sha256(json.dumps(v,ensure_ascii=False,separators=(',',':')).encode())
+          def request(url,start=None,end=None):
+              headers={'User-Agent':UA,'Accept-Encoding':'identity'}
+              if start is not None: headers['Range']=f'bytes={start}-{end}'
+              req=urllib.request.Request(url,headers=headers)
+              with urllib.request.urlopen(req,timeout=90) as response: data=response.read()
+              if start is not None and len(data)!=end-start+1: raise RuntimeError(f'range mismatch {len(data)} != {end-start+1}')
+              return data
+          def head_size(url):
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept-Encoding':'identity'},method='HEAD')
+              try:
+                  with urllib.request.urlopen(req,timeout=45) as response: return int(response.headers['Content-Length'])
+              except urllib.error.HTTPError as e:
+                  if e.code in (403,404): return None
+                  raise
+          def zip_directory(url,total):
+              tail_size=min(131072,total); tail=request(url,total-tail_size,total-1); eocd=tail.rfind(b'PK\x05\x06')
+              if eocd<0: raise RuntimeError(f'EOCD missing: {url}')
+              _,_,_,_,central_size,central_offset,_=struct.unpack_from('<HHHHIIH',tail,eocd+4)
+              central=request(url,central_offset,central_offset+central_size-1); entries=[]; i=0
+              while i+46<=len(central) and central[i:i+4]==b'PK\x01\x02':
+                  flags,method=struct.unpack_from('<HH',central,i+8); crc,compressed,uncompressed=struct.unpack_from('<III',central,i+16)
+                  fn_len,extra_len,comment_len=struct.unpack_from('<HHH',central,i+28); local_offset=struct.unpack_from('<I',central,i+42)[0]
+                  name_bytes=central[i+46:i+46+fn_len]; name=name_bytes.decode('utf-8' if flags&0x800 else 'cp437','replace')
+                  entries.append({'name':name,'method':method,'crc32':f'{crc:08X}','compressedBytes':compressed,'uncompressedBytes':uncompressed,'localOffset':local_offset})
+                  i+=46+fn_len+extra_len+comment_len
+              return entries
+          def fetch_zip_entry(url,entry):
+              offset=entry['localOffset']; header=request(url,offset,offset+4095)
+              if header[:4]!=b'PK\x03\x04': raise RuntimeError('local header missing')
+              method=struct.unpack_from('<H',header,8)[0]; fn_len,extra_len=struct.unpack_from('<HH',header,26); start=offset+30+fn_len+extra_len
+              compressed=request(url,start,start+entry['compressedBytes']-1)
+              raw=compressed if method==0 else zlib.decompress(compressed,-15) if method==8 else None
+              if raw is None: raise RuntimeError(f'unsupported ZIP compression {method}')
+              if len(raw)!=entry['uncompressedBytes']: raise RuntimeError('uncompressed size mismatch')
+              if f'{binascii.crc32(raw)&0xffffffff:08X}'!=entry['crc32']: raise RuntimeError('CRC mismatch')
+              return raw
+          def runtime_relative(path):
+              actual,prefix=norm(path),norm(ROOT_PREFIX); return actual[len(prefix)+1:] if actual.startswith(prefix+'/') else None
+          def reader_of(value): return value.deref() if hasattr(value,'deref') else value
+          result={'version':1,'schemaId':'hero-sp-talent-icon-official-proof/v1','status':'RUNNING','blockers':[],'reviews':[]}; exit_code=0
+          try:
+              sp_source=read_json('data/generated/hero-page-stage5-4-sp.v1.json'); base_manifest=read_json('data/generated/hero-skill-icon-assets.v1.json'); source=base_manifest.get('source') or {}
+              if source.get('kind')!='OFFICIAL_INSTALLER' or not source.get('installVersion') or not source.get('base'): raise RuntimeError('base asset official source contract missing')
+              version=str(source['installVersion']); base=str(source['base']).rstrip('/'); by_path={}; released=0; usages=0
+              for hero in sp_source.get('records',[]):
+                  sp=hero.get('sp') or {}
+                  if sp.get('status')!='RELEASED': continue
+                  released+=1; hero_id=hero.get('heroId'); progression=((sp.get('talent') or {}).get('starProgression') or [])
+                  if len(progression)!=6: raise RuntimeError(f'SP progression count mismatch hero={hero_id} count={len(progression)}')
+                  for row in progression:
+                      usages+=1; skill=row.get('skill') or {}; source_path=skill.get('iconPath'); skill_id=row.get('skillId'); star=row.get('star')
+                      if not isinstance(source_path,str) or not source_path: raise RuntimeError(f'missing SP iconPath hero={hero_id} star={star}')
+                      stem=next((v for p,v in PREFIX_TO_STEM.items() if source_path.startswith(p)),None)
+                      if stem is None: raise RuntimeError(f'unsupported SP iconPath prefix: {source_path}')
+                      item=by_path.setdefault(source_path,{'sourcePath':source_path,'bundleStem':stem,'heroIds':set(),'skillIds':set(),'stars':set(),'usageCount':0})
+                      if item['bundleStem']!=stem: raise RuntimeError(f'bundle routing conflict: {source_path}')
+                      item['heroIds'].add(int(hero_id)); item['skillIds'].add(int(skill_id)); item['stars'].add(int(star)); item['usageCount']+=1
+              if released!=25: raise RuntimeError(f'SP released population drift {released}/25')
+              if usages!=150: raise RuntimeError(f'SP talent usage drift {usages}/150')
+              targets={norm(k):v for k,v in by_path.items()}
+              if len(targets)!=len(by_path): raise RuntimeError('normalized SP sourcePath collision')
+              basename_owner={}
+              for source_path in by_path:
+                  key=pathlib.PurePosixPath(source_path).name.lower()
+                  if key in basename_owner and basename_owner[key]!=source_path: raise RuntimeError(f'public basename collision {source_path} / {basename_owner[key]}')
+                  basename_owner[key]=source_path
+              hits={k:[] for k in targets}; packages=[]; candidates=[]; seen=False; missing_after_seen=0; stems=set(v['bundleStem'] for v in targets.values())
+              for part in range(1,MAX_PART+1):
+                  package_name=f'InstallPage_{version}_{part}.zip'; url=f'{base}/{package_name}'; total=head_size(url)
+                  if total is None:
+                      if seen:
+                          missing_after_seen+=1
+                          if missing_after_seen>=MISS_BREAK: break
+                      continue
+                  seen=True; missing_after_seen=0; entries=zip_directory(url,total); matches=[]
+                  for entry in entries:
+                      basename=norm(entry['name']).rsplit('/',1)[-1]; matched_stem=next((stem for stem in stems if basename.endswith(stem+'.b')),None)
+                      if matched_stem: matches.append(entry); candidates.append((part,package_name,url,entry,basename,matched_stem))
+                  packages.append({'part':part,'packageName':package_name,'sizeBytes':total,'entryCount':len(entries),'matchingBundleEntries':len(matches)})
+              bundle_reports=[]
+              for part,package_name,url,entry,basename,matched_stem in candidates:
+                  raw=fetch_zip_entry(url,entry); bundle_sha=sha256(raw); env=UnityPy.load(raw); container=list(env.container.items())
+                  report={'packagePart':part,'packageName':package_name,'bundleEntry':entry['name'],'bundleBasename':basename,'bundleStem':matched_stem,'bundleBytes':len(raw),'bundleSha256':bundle_sha,'containerCount':len(container),'exactHitCount':0}
+                  for container_path,value in container:
+                      rel=runtime_relative(container_path); target=targets.get(rel)
+                      if target is None or target['bundleStem']!=matched_stem: continue
+                      item={'packagePart':part,'packageName':package_name,'bundleEntry':entry['name'],'bundleBasename':basename,'bundleSha256':bundle_sha,'containerPath':str(container_path).replace('\\','/'),'normalizedRuntimePath':rel}
+                      try:
+                          reader=reader_of(value); raw_obj=reader.get_raw_data(); data=reader.read(); image=data.image.convert('RGBA'); rgba=image.tobytes(); alpha_bbox=image.getchannel('A').getbbox(); public_path='/images/heroes/skill-icons/'+pathlib.PurePosixPath(target['sourcePath']).name; fs_path=pathlib.Path('public'+public_path); fs_path.parent.mkdir(parents=True,exist_ok=True); image.save(fs_path); png_bytes=fs_path.read_bytes()
+                          item.update({'objectType':getattr(getattr(reader,'type',None),'name',None),'pathId':int(getattr(reader,'path_id',0) or 0),'rawObjectBytes':len(raw_obj),'rawObjectSha256':sha256(raw_obj),'decodeStatus':'PASS','width':image.width,'height':image.height,'mode':'RGBA','rgbaSha256':sha256(rgba),'alphaBbox':list(alpha_bbox) if alpha_bbox else None,'nonEmptyAlpha':alpha_bbox is not None,'publicPath':public_path,'pngBytes':len(png_bytes),'pngSha256':sha256(png_bytes)})
+                      except Exception as exc: item.update({'decodeStatus':'FAIL','decodeError':f'{type(exc).__name__}: {exc}'})
+                      hits[rel].append(item); report['exactHitCount']+=1
+                  bundle_reports.append(report)
+              blockers=[]; reviews=[]; records=[]
+              for rel,target in sorted(targets.items(),key=lambda kv:kv[1]['sourcePath']):
+                  row_hits=hits[rel]; raw_keys={(h.get('rawObjectBytes'),h.get('rawObjectSha256')) for h in row_hits if h.get('rawObjectSha256')}; render_keys={(h.get('width'),h.get('height'),h.get('rgbaSha256')) for h in row_hits if h.get('decodeStatus')=='PASS'}
+                  if not row_hits: blockers.append(f"NO_EXACT_HIT:{target['sourcePath']}"); continue
+                  if any(h.get('decodeStatus')!='PASS' for h in row_hits): blockers.append(f"DECODE_FAIL:{target['sourcePath']}"); continue
+                  if any(h.get('objectType')!='Sprite' for h in row_hits): blockers.append(f"NON_SPRITE_EXACT_HIT:{target['sourcePath']}"); continue
+                  if any(not h.get('nonEmptyAlpha') for h in row_hits): blockers.append(f"EMPTY_ALPHA:{target['sourcePath']}"); continue
+                  if len(raw_keys)>1 and len(render_keys)>1: blockers.append(f"AMBIGUOUS_NON_EQUIVALENT_EXACT_SOURCES:{target['sourcePath']}"); continue
+                  if len(raw_keys)>1: reviews.append(f"MULTIPLE_RAW_VARIANTS_RENDER_EQUIVALENT:{target['sourcePath']}")
+                  chosen=sorted(row_hits,key=lambda h:(h['packagePart'],h['bundleEntry'],h['containerPath']))[0]
+                  records.append({'role':'sp-talent','sourcePath':target['sourcePath'],'usageCount':target['usageCount'],'heroIds':sorted(target['heroIds']),'skillIds':sorted(target['skillIds']),'stars':sorted(target['stars']),'verificationOwner':'OFFICIAL_INSTALLER_EXACT_RUNTIME_PATH_UNITY_SPRITE','packagePart':chosen['packagePart'],'packageName':chosen['packageName'],'bundleEntry':chosen['bundleEntry'],'bundleSha256':chosen['bundleSha256'],'containerPath':chosen['containerPath'],'objectType':chosen['objectType'],'pathId':chosen['pathId'],'rawObjectSha256':chosen['rawObjectSha256'],'rgbaSha256':chosen['rgbaSha256'],'width':chosen['width'],'height':chosen['height'],'publicPath':chosen['publicPath'],'pngBytes':chosen['pngBytes'],'pngSha256':chosen['pngSha256']})
+              result.update({'source':{'kind':'OFFICIAL_INSTALLER','installVersion':version,'base':base,'unityParser':'UnityPy==1.25.3','unityContainerRootPrefix':ROOT_PREFIX},'authority':{'spSource':'data/generated/hero-page-stage5-4-sp.v1.json','exactField':'sp.talent.starProgression[].skill.iconPath','semanticRecomputation':False,'nameJoin':False,'idArithmetic':False},'summary':{'spReleasedCount':released,'spTalentUsageCount':usages,'targetUniqueIconPathCount':len(targets),'provedCount':len(records),'missingCount':len(blockers)},'packageCatalog':{'officialPackageCount':len(packages),'candidateBundleCount':len(candidates),'candidateBundles':bundle_reports},'blockers':blockers,'reviews':reviews})
+              if blockers: result['status']='BLOCKER'; exit_code=2
+              else:
+                  material={'version':1,'schemaId':'hero-skill-icon-sp-talent-materialization/v1','status':'FROZEN','completion':'COMPLETE','semanticReopen':False,'lookupAuthority':'exact sp.talent.starProgression[].skill.iconPath only','source':result['source'],'authority':result['authority'],'summary':result['summary'],'records':records}; material['materializationSetSha256']=compact_sha(records); MATERIAL.write_text(json.dumps(material,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); result['materializationSetSha256']=material['materializationSetSha256']; result['status']='PASS'
+              RESULT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          except Exception as exc:
+              result['status']='DIAGNOSTIC_ERROR'; result['blockers']=[f'DIAGNOSTIC_ERROR:{type(exc).__name__}:{exc}']; result['traceback']=traceback.format_exc(); RESULT.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8'); exit_code=3
+          EXIT.write_text(str(exit_code)+'\n',encoding='utf-8'); print(json.dumps({'status':result.get('status'),'summary':result.get('summary'),'blockers':result.get('blockers'),'reviews':result.get('reviews')},ensure_ascii=False,indent=2))
+          PY
+          exit 0
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: hero-sp-talent-icon-official-proof, path: out/hero-sp-talent-icon-proof, if-no-files-found: error, retention-days: 7}
+      - name: Fail closed or commit proven materialization
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="$(cat out/hero-sp-talent-icon-proof/exit-code.txt 2>/dev/null || echo 99)"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if [ "$code" != "0" ]; then
+            git rm .github/workflows/temp-hero-sp-talent-icon-proof.yml
+            git commit -m "Remove failed temporary SP talent icon proof"
+            git push origin HEAD:${GITHUB_REF_NAME}
+            exit "$code"
+          fi
+          git rm .github/workflows/temp-hero-sp-talent-icon-proof.yml
+          python <<'PY'
+          import subprocess,sys
+          rows=subprocess.check_output(['git','status','--porcelain'],text=True).splitlines(); paths=[]
+          for row in rows:
+              p=row[3:]; p=p.split(' -> ',1)[-1]; paths.append(p)
+          allowed=lambda p:p=='.github/workflows/temp-hero-sp-talent-icon-proof.yml' or p=='data/generated/hero-skill-icon-sp-talent-materialization.v1.json' or p.startswith('public/images/heroes/skill-icons/')
+          unexpected=[p for p in paths if not allowed(p)]
+          if unexpected: print('Unexpected changed paths:',unexpected,file=sys.stderr); raise SystemExit(1)
+          if 'data/generated/hero-skill-icon-sp-talent-materialization.v1.json' not in paths: raise SystemExit('materialization missing from mutation set')
+          print('\n'.join(paths))
+          PY
+          git add data/generated/hero-skill-icon-sp-talent-materialization.v1.json public/images/heroes/skill-icons
+          git commit -m "Materialize verified SP talent skill icons"
+          git push origin HEAD:${GITHUB_REF_NAME}
