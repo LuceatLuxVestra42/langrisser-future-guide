@@ -32,6 +32,16 @@ async function fetchWithRetry(path, attempts = 5) {
   throw new Error(`${path} did not become healthy: ${last instanceof Response ? last.status : String(last)}`);
 }
 
+async function waitForHeroInteractionHydration(page, label) {
+  const movementSection = page.locator('[data-hero-job-movement="true"]');
+  check(await movementSection.count() === 1, `Hero 6 ${label} hydration marker missing or duplicated`);
+  await page.waitForFunction(
+    () => document.querySelector('[data-hero-job-movement="true"]')?.getAttribute("data-hero-job-movement-status") === "ready",
+    null,
+    { timeout: 45000 },
+  );
+}
+
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
@@ -92,6 +102,7 @@ try {
   const hero6Next = page.getByRole("button", { name: "다음 일러스트" });
   const hero6Prev = page.getByRole("button", { name: "이전 일러스트" });
   check(await hero6Next.count() === 1 && await hero6Prev.count() === 1, "Hero 6 artwork controls missing or duplicated");
+  await waitForHeroInteractionHydration(page, "desktop");
   for (let index = 0; index < hero6FullartIds.length; index += 1) {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
@@ -168,6 +179,7 @@ try {
     const mobileHeroArtwork = mobilePage.locator('img[alt="레온 대표 일러스트"]');
     check(await mobileHeroArtwork.count() === 1, "Hero 6 mobile representative artwork missing or duplicated");
     check((await mobileHeroArtwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 mobile representative artwork source mismatch");
+    await waitForHeroInteractionHydration(mobilePage, "mobile");
     const mobileNext = mobilePage.getByRole("button", { name: "다음 일러스트" });
     await mobileNext.click();
     await mobilePage.waitForTimeout(100);
