@@ -12,6 +12,7 @@ const expectedGeneralEquipmentCount = Number(equipmentPublicAdmission.expectedPu
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
+const browserUrl = (path) => url(`${path}${path.includes("?") ? "&" : "?"}qa-browser=${Date.now()}`);
 
 check(equipmentPublicAdmission.status === "FROZEN", "Equipment public-admission correction must be FROZEN");
 check(Number.isInteger(expectedGeneralEquipmentCount) && expectedGeneralEquipmentCount > 0, "Equipment public general count is invalid");
@@ -80,7 +81,7 @@ page.on("pageerror", (error) => pageErrors.push(String(error)));
 page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
 
 try {
-  let response = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
+  let response = await page.goto(browserUrl("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
   await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
@@ -126,7 +127,7 @@ try {
   check(await exclusiveImage.count() === 1, "Hero 6 exclusive Equipment image missing or duplicated");
   check((await exclusiveImage.getAttribute("src"))?.includes("/images/equipment/416.png"), "Hero 6 exclusive Equipment image source mismatch");
 
-  response = await page.goto(url("equipment/"), { waitUntil: "networkidle", timeout: 45000 });
+  response = await page.goto(browserUrl("equipment/"), { waitUntil: "networkidle", timeout: 45000 });
   check(response && response.status() < 400, `Equipment list failed: ${response?.status()}`);
   await page.getByText("장비 종류", { exact: true }).waitFor({ state: "visible" });
   for (const removedLabel of ["초기 장비", "이전 추가 장비"]) {
@@ -145,7 +146,7 @@ try {
   check(weaponCardCount > 0 && weaponCardCount < cardCount, `Equipment weapon filter did not narrow the list: ${weaponCardCount}/${cardCount}`);
 
   for (const equipmentId of [642, 299]) {
-    response = await page.goto(url(`equipment/${equipmentId}/`), { waitUntil: "networkidle", timeout: 45000 });
+    response = await page.goto(browserUrl(`equipment/${equipmentId}/`), { waitUntil: "networkidle", timeout: 45000 });
     check(response && response.status() < 400, `Equipment ${equipmentId} detail failed: ${response?.status()}`);
     check(await page.locator("main h1").count() === 1, `Equipment ${equipmentId} detail heading missing or duplicated`);
   }
@@ -160,7 +161,7 @@ try {
   mobilePage.on("pageerror", (error) => mobilePageErrors.push(String(error)));
   mobilePage.on("console", (message) => { if (message.type() === "error") mobileConsoleErrors.push(message.text()); });
   try {
-    response = await mobilePage.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
+    response = await mobilePage.goto(browserUrl("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
     check(response && response.status() < 400, `Hero 6 mobile detail failed: ${response?.status()}`);
     await mobilePage.getByText("대표 일러스트", { exact: true }).waitFor();
     await mobilePage.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
