@@ -13,6 +13,17 @@ const expectedHero6SoldierIds = [
   300,
 ];
 
+// Regression fixture for the Hero 6 frozen Job movement consumer. This verifies
+// browser hydration only; semantic ownership remains with the frozen movement artifacts.
+const expectedHero6MovementRows = [
+  { jobId: 301, moveType: 1, movePoint: 5 },
+  { jobId: 303, moveType: 1, movePoint: 5 },
+  { jobId: 302, moveType: 1, movePoint: 5 },
+  { jobId: 202, moveType: 2, movePoint: 3 },
+  { jobId: 307, moveType: 1, movePoint: 5 },
+  { jobId: 306, moveType: 1, movePoint: 5 },
+];
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
@@ -46,10 +57,35 @@ for (const [path, label] of [
   }
 }
 
+async function verifyHeroJobMovement(page, label) {
+  const section = page.locator('[data-hero-job-movement="true"]');
+  check(await section.count() === 1, `Hero 6 ${label} Job movement section missing or duplicated`);
+
+  await page.waitForFunction(
+    () => document.querySelector('[data-hero-job-movement="true"]')?.getAttribute("data-hero-job-movement-status") === "ready",
+    null,
+    { timeout: 45000 },
+  );
+
+  check(await section.getAttribute("data-hero-job-movement-count") === String(expectedHero6MovementRows.length), `Hero 6 ${label} Job movement count mismatch`);
+  const rows = section.locator("[data-job-id][data-move-type][data-move-point]");
+  check(await rows.count() === expectedHero6MovementRows.length, `Hero 6 ${label} hydrated Job movement row count mismatch`);
+
+  const actualRows = await rows.evaluateAll((nodes) => nodes.map((node) => ({
+    jobId: Number(node.getAttribute("data-job-id")),
+    moveType: Number(node.getAttribute("data-move-type")),
+    movePoint: Number(node.getAttribute("data-move-point")),
+  })));
+  check(JSON.stringify(actualRows) === JSON.stringify(expectedHero6MovementRows), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
+  const text = await section.innerText();
+  check(text.includes("기마 이동") && text.includes("보행 이동"), `Hero 6 ${label} Job movement Korean labels missing`);
+}
+
 async function verifyHeroSoldierCards(page, label) {
   const navigation = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(navigation && navigation.status() < 400, `Hero 6 ${label} detail failed: ${navigation?.status()}`);
   await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
+  await verifyHeroJobMovement(page, label);
 
   const section = page.locator('[data-hero-soldier-cards="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Soldier card section missing or duplicated`);
@@ -147,9 +183,16 @@ try {
   await mobileContext.close();
 
   console.log(JSON.stringify({
-    status: "PASS_HERO_SOLDIER_CARDS_HOSTED_BROWSER_QA",
+    status: "PASS_HERO_SOLDIER_CARDS_AND_JOB_MOVEMENT_HOSTED_BROWSER_QA",
     sourceSha: expectedSourceSha,
     heroId: 6,
+    jobMovement: {
+      hydratedRowCount: expectedHero6MovementRows.length,
+      identityMoveTypeMovePointParity: "PASS",
+      localizedMoveTypeLabels: "PASS",
+      desktop: "PASS",
+      mobile: "PASS",
+    },
     soldierCards: {
       relationCount: expectedHero6SoldierIds.length,
       ids: expectedHero6SoldierIds,
