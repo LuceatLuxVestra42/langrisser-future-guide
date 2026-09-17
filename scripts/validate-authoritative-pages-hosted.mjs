@@ -58,13 +58,20 @@ async function readExpectedHeroFullartState(page, expected, skinId) {
   }
 }
 
+async function clickHostedArtworkControl(control) {
+  await control.evaluate((node) => {
+    if (!(node instanceof HTMLButtonElement)) throw new Error("hosted artwork control is not a button");
+    node.click();
+  });
+}
+
 async function clickUntilVisualState(page, control, expectedText, skinId, label, attempts = 5) {
   const expected = page.getByText(expectedText, { exact: true });
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       const currentState = await readExpectedHeroFullartState(page, expected, skinId);
       if (currentState) return currentState;
-      await control.click();
+      await clickHostedArtworkControl(control);
       for (let probe = 0; probe < 10; probe += 1) {
         const imageState = await readExpectedHeroFullartState(page, expected, skinId);
         if (imageState) return imageState;
@@ -96,7 +103,7 @@ async function clickUntilRepresentativeArtworkState(page, control, visualCount, 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       if (await hasRepresentativeArtworkState(page, visualCount)) return;
-      await control.click();
+      await clickHostedArtworkControl(control);
       for (let probe = 0; probe < 10; probe += 1) {
         if (await hasRepresentativeArtworkState(page, visualCount)) return;
         await page.waitForTimeout(100);
