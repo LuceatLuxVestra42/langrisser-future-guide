@@ -128,15 +128,20 @@ async function readEquipmentFilterState(control, cardLinks, baselineCount) {
   };
 }
 
-async function ensureEquipmentFilterState(page, control, cardLinks, baselineCount, label, probes = 20) {
+async function ensureEquipmentFilterState(page, control, cardLinks, baselineCount, label, attempts = 5, probesPerAttempt = 10) {
   let state = await readEquipmentFilterState(control, cardLinks, baselineCount);
   if (state.ready) return state.count;
-  if (state.pressed !== "true") await clickHostedArtworkControl(control);
-  for (let probe = 0; probe < probes; probe += 1) {
-    state = await readEquipmentFilterState(control, cardLinks, baselineCount);
-    if (state.ready) return state.count;
-    await page.waitForTimeout(100);
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (state.pressed !== "true") await clickHostedArtworkControl(control);
+    for (let probe = 0; probe < probesPerAttempt; probe += 1) {
+      state = await readEquipmentFilterState(control, cardLinks, baselineCount);
+      if (state.ready) return state.count;
+      await page.waitForTimeout(100);
+    }
+    if (attempt < attempts) await page.waitForTimeout(250);
   }
+
   throw new Error(`${label} did not reach expected filter state: aria-pressed=${state.pressed} cards=${state.count}/${baselineCount}`);
 }
 
