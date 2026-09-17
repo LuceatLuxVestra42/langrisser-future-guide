@@ -16,6 +16,9 @@ const EXPECTED_MATERIALIZATION_SHA = "bdad69dcd040534749d44b94d39557b8d49a49be39
 const EXPECTED_GENERAL_NEW = 996;
 const EXPECTED_GENERAL_UNIQUE = 1006;
 const EXPECTED_AWAKENING_RECORDS = 256;
+const EXPECTED_SP_TALENT_RECORDS = 25;
+const FRONTEND_RESOLVER = "src/lib/hero-skill-icon-assets.ts";
+const SP_TALENT_COMPONENT = "src/components/hero-job-materials-section.tsx";
 
 const expected = new Map([
   ["UI/Icon/Skill_ABS/Gift_Knight.png", { skillIds: [3067, 3072, 3077, 3082], part: 27, bundle: "5ca1962b06355b48fe0ca6531e002a13a63a1d35e42f558471aace39d4298adf", raw: "2dd27910f983fc8da35a1b21fbd492babbba105b724913f4bf378365a64e3d77", rgba: "a153365f9ad2a903456543b07beddb9ae976bcd045b5ef29c54d67f5bdb59b6d", width: 175, height: 158 }],
@@ -143,6 +146,7 @@ if (manifest.source?.verificationArtifactDigest !== "sha256:25c1b2dfdec1887c38c5
 if (manifest.source?.unityContainerRootPrefix !== "assets/gameproject/runtimeassets") fail("container root mismatch");
 if (!Array.isArray(manifest.records) || manifest.records.length !== 1009) fail(`record count mismatch ${manifest.records?.length}/1009`);
 if (!Array.isArray(manifest.awakeningRecords) || manifest.awakeningRecords.length !== EXPECTED_AWAKENING_RECORDS) fail(`awakening record count mismatch ${manifest.awakeningRecords?.length}/${EXPECTED_AWAKENING_RECORDS}`);
+if (!Array.isArray(manifest.spTalentRecords) || manifest.spTalentRecords.length !== EXPECTED_SP_TALENT_RECORDS) fail(`SP talent record count mismatch ${manifest.spTalentRecords?.length}/${EXPECTED_SP_TALENT_RECORDS}`);
 
 const current = new Map();
 const addCurrent = (sourcePath, skillId) => {
@@ -206,12 +210,19 @@ for (const record of generalRecords) {
   assertPng(record);
 }
 
-const allManifestRecords = [...manifest.records, ...manifest.awakeningRecords];
+const frontendResolverSource = fs.readFileSync(path.join(repoRoot, FRONTEND_RESOLVER), "utf8");
+if (!frontendResolverSource.includes("...manifest.spTalentRecords")) fail("frontend resolver does not admit frozen SP talent icon records");
+if (!frontendResolverSource.includes("bySourcePath.get(sourcePath)")) fail("frontend resolver exact sourcePath lookup contract missing");
+const spTalentComponentSource = fs.readFileSync(path.join(repoRoot, SP_TALENT_COMPONENT), "utf8");
+if (!spTalentComponentSource.includes('data-hero-sp-talent="true"')) fail("SP talent detail section wiring missing");
+if (!spTalentComponentSource.includes("getHeroSkillIconUrl(heroId, activeRow.skill.iconPath)")) fail("SP talent detail icon resolver wiring missing");
+
+const allManifestRecords = [...manifest.records, ...manifest.awakeningRecords, ...manifest.spTalentRecords];
 const sourcePaths = allManifestRecords.map((record) => record.sourcePath);
-if (new Set(sourcePaths).size !== sourcePaths.length) fail("manifest sourcePath duplicate across records/awakeningRecords");
+if (new Set(sourcePaths).size !== sourcePaths.length) fail("manifest sourcePath duplicate across records/awakeningRecords/spTalentRecords");
 const admitted = new Set(sourcePaths);
 const missingGeneral = [...stage6General.keys()].filter((sourcePath) => !admitted.has(sourcePath));
 if (missingGeneral.length !== 0) fail(`Stage6 general manifest coverage missing ${missingGeneral.length}`);
 if ([...stage6General.keys()].filter((sourcePath) => expected.has(sourcePath)).length !== 10) fail("legacy Stage6 general overlap drift");
 
-console.log(`[hero-skill-icon-assets] PASS legacy=${legacyRecords.length} general=${generalRecords.length} stage6=${stage6General.size}/${EXPECTED_GENERAL_UNIQUE} missing=0 awakening=${manifest.awakeningRecords.length} official=1.1.113`);
+console.log(`[hero-skill-icon-assets] PASS legacy=${legacyRecords.length} general=${generalRecords.length} stage6=${stage6General.size}/${EXPECTED_GENERAL_UNIQUE} missing=0 awakening=${manifest.awakeningRecords.length} spTalent=${manifest.spTalentRecords.length} official=1.1.113`);
