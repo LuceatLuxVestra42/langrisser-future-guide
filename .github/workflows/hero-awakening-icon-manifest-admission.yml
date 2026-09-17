@@ -3,7 +3,6 @@ name: Hero Awakening Icon Manifest Admission
 on:
   pull_request:
     branches:
-      - work/awakening-skill-icon-a7-1-materialize-20260910
       - main
     paths:
       - data/generated/hero-skill-icon-assets.v1.json
@@ -12,9 +11,6 @@ on:
       - scripts/admit-hero-awakening-icon-manifest.py
       - scripts/validate-hero-skill-icon-assets-readonly.mjs
       - .github/workflows/hero-awakening-icon-manifest-admission.yml
-  push:
-    branches:
-      - work/awakening-skill-icon-a7-2-manifest-admission-20260910
   workflow_dispatch:
 
 permissions:
