@@ -1,12 +1,15 @@
 name: Hero Awakening Icon Frontend Integration
 
 on:
-  push:
-    branches:
-      - work/awakening-skill-icon-a8-frontend-integration-20260910
   pull_request:
     branches:
-      - work/awakening-skill-icon-a7-3-asset-validator-20260910
+      - main
+    paths:
+      - '.github/workflows/hero-awakening-icon-frontend-integration.yml'
+      - 'scripts/validate-hero-awakening-icon-frontend-integration.mjs'
+      - 'src/lib/hero-skill-icon-assets.ts'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'data/generated/hero-awakening-icon-asset-validation.v1.json'
   workflow_dispatch:
 
 permissions:
