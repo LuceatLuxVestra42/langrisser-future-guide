@@ -60,13 +60,16 @@ async function readDecodedHeroFullartState(page, skinId) {
   }, { expectedSkinId: skinId });
 }
 
-async function readExpectedHeroFullartState(page, expected, skinId) {
+async function readExpectedHeroFullartState(page, expected, skinId, probes = 20) {
   if (await expected.count() !== 1 || !await expected.isVisible()) return null;
-  try {
-    return await readDecodedHeroFullartState(page, skinId);
-  } catch {
-    return null;
+  for (let probe = 0; probe < probes; probe += 1) {
+    try {
+      const state = await readDecodedHeroFullartState(page, skinId);
+      if (state?.complete && state.naturalWidth > 0 && state.naturalHeight > 0 && state.objectFit === "contain") return state;
+    } catch {}
+    if (probe < probes - 1) await page.waitForTimeout(100);
   }
+  return null;
 }
 
 async function clickHostedArtworkControl(control) {
