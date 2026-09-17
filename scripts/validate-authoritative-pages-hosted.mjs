@@ -118,6 +118,28 @@ async function clickUntilRepresentativeArtworkState(page, control, visualCount, 
   }
 }
 
+async function readEquipmentFilterState(control, cardLinks, baselineCount) {
+  const pressed = await control.getAttribute("aria-pressed");
+  const count = await cardLinks.count();
+  return {
+    pressed,
+    count,
+    ready: pressed === "true" && count > 0 && count < baselineCount,
+  };
+}
+
+async function ensureEquipmentFilterState(page, control, cardLinks, baselineCount, label, probes = 20) {
+  let state = await readEquipmentFilterState(control, cardLinks, baselineCount);
+  if (state.ready) return state.count;
+  if (state.pressed !== "true") await control.click();
+  for (let probe = 0; probe < probes; probe += 1) {
+    state = await readEquipmentFilterState(control, cardLinks, baselineCount);
+    if (state.ready) return state.count;
+    await page.waitForTimeout(100);
+  }
+  throw new Error(`${label} did not reach expected filter state: aria-pressed=${state.pressed} cards=${state.count}/${baselineCount}`);
+}
+
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
@@ -220,9 +242,7 @@ try {
   check(cardCount === expectedGeneralEquipmentCount, `Equipment general list card count mismatch: ${cardCount}/${expectedGeneralEquipmentCount}`);
   const weaponFilter = page.getByRole("button", { name: "무기", exact: true });
   check(await weaponFilter.count() === 1, "Equipment weapon filter is missing or duplicated");
-  await weaponFilter.click();
-  await page.waitForTimeout(100);
-  const weaponCardCount = await cardLinks.count();
+  const weaponCardCount = await ensureEquipmentFilterState(page, weaponFilter, cardLinks, cardCount, "Equipment weapon filter");
   check(weaponCardCount > 0 && weaponCardCount < cardCount, `Equipment weapon filter did not narrow the list: ${weaponCardCount}/${cardCount}`);
 
   for (const equipmentId of [642, 299]) {
