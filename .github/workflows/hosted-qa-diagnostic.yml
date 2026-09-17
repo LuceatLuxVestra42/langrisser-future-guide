@@ -1,0 +1,99 @@
+name: Hosted QA Diagnostic
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+
+jobs:
+  diagnose-hosted-validators:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies and Chromium
+        run: |
+          set -euo pipefail
+          bun install --frozen-lockfile
+          bun add --no-save playwright@1.55.0
+          bunx playwright install --with-deps chromium
+
+      - name: Wait for exact deployed source
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 36); do
+            probe="${HOSTED_BASE_URL}authoritative-pages-source.json?diag=${GITHUB_RUN_ID}-${attempt}-$(date +%s)"
+            live_sha="$(curl --silent --show-error --fail --location --max-time 20 "$probe" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{process.stdout.write(String(JSON.parse(s).sourceSha||''))}catch{}})")" || true
+            if [[ "$live_sha" == "$EXPECTED_SOURCE_SHA" ]]; then
+              printf 'DIAG_READINESS_PASS expected=%s\n' "$EXPECTED_SOURCE_SHA"
+              exit 0
+            fi
+            printf 'DIAG_READINESS_RETRY attempt=%s expected=%s live=%s\n' "$attempt" "$EXPECTED_SOURCE_SHA" "${live_sha:-<missing>}"
+            sleep 10
+          done
+          exit 1
+
+      - name: Run hosted validators with persistent logs
+        id: hosted-diagnostic
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p hosted-qa-diagnostic
+          failed=0
+
+          run_one() {
+            local name="$1"
+            shift
+            printf 'DIAG_START validator=%s\n' "$name" | tee -a hosted-qa-diagnostic/summary.log
+            set +e
+            "$@" 2>&1 | tee "hosted-qa-diagnostic/${name}.log"
+            local status=${PIPESTATUS[0]}
+            set -e
+            printf 'DIAG_RESULT validator=%s exit=%s\n' "$name" "$status" | tee -a hosted-qa-diagnostic/summary.log
+            if [[ "$status" -ne 0 ]]; then
+              failed=1
+            fi
+          }
+
+          run_one route-hosted-qa-strict node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SOURCE_SHA"
+          run_one authoritative-pages node scripts/validate-authoritative-pages-hosted.mjs
+          run_one hero-central-discipline node scripts/validate-hero-central-discipline-hosted.mjs
+          run_one hero-soldier-cards node scripts/validate-hero-soldier-cards-hosted.mjs
+          run_one hero-card-icons node scripts/validate-hero-card-icons-hosted.mjs
+          run_one hero-awakening-icons node scripts/validate-hero-awakening-icons-hosted.mjs
+
+          exit "$failed"
+
+      - name: Upload hosted QA diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-qa-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          path: hosted-qa-diagnostic
+          if-no-files-found: error
+          retention-days: 1
