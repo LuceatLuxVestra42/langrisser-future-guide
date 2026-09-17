@@ -37,9 +37,20 @@ async function readDecodedHeroFullartState(page, skinId) {
     const selector = `img[src*="/images/skin-fullart/${expectedSkinId}.webp"]`;
     const images = [...document.querySelectorAll(selector)];
     if (images.length !== 1) return null;
-    const node = images[0];
-    if (!(node instanceof HTMLImageElement)) return null;
-    await node.decode();
+    const decodedNode = images[0];
+    if (!(decodedNode instanceof HTMLImageElement)) return null;
+    await decodedNode.decode();
+
+    const currentImages = [...document.querySelectorAll(selector)];
+    if (currentImages.length !== 1) return null;
+    const node = currentImages[0];
+    if (!(node instanceof HTMLImageElement) || !node.isConnected) return null;
+    if (node !== decodedNode) {
+      await node.decode();
+      const stableImages = [...document.querySelectorAll(selector)];
+      if (stableImages.length !== 1 || stableImages[0] !== node || !node.isConnected) return null;
+    }
+
     return {
       complete: node.complete,
       naturalWidth: node.naturalWidth,
