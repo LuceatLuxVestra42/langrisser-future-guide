@@ -8,6 +8,7 @@ type ManifestAssetRecord = {
 const admittedRecords: ManifestAssetRecord[] = [
   ...manifest.records,
   ...manifest.awakeningRecords,
+  ...manifest.spTalentRecords,
 ];
 
 const bySourcePath = new Map<string, ManifestAssetRecord>(
