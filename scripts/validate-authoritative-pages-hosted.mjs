@@ -32,16 +32,35 @@ async function fetchWithRetry(path, attempts = 5) {
   throw new Error(`${path} did not become healthy: ${last instanceof Response ? last.status : String(last)}`);
 }
 
-async function clickUntilText(page, control, expectedText, label, attempts = 5) {
+async function readDecodedHeroFullartState(page, skinId) {
+  return page.evaluate(async ({ expectedSkinId }) => {
+    const selector = `img[src*="/images/skin-fullart/${expectedSkinId}.webp"]`;
+    const images = [...document.querySelectorAll(selector)];
+    if (images.length !== 1) return null;
+    const node = images[0];
+    if (!(node instanceof HTMLImageElement)) return null;
+    await node.decode();
+    return {
+      complete: node.complete,
+      naturalWidth: node.naturalWidth,
+      naturalHeight: node.naturalHeight,
+      objectFit: getComputedStyle(node).objectFit,
+    };
+  }, { expectedSkinId: skinId });
+}
+
+async function clickUntilVisualState(page, control, expectedText, skinId, label, attempts = 5) {
   const expected = page.getByText(expectedText, { exact: true });
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       await control.click();
       await expected.waitFor({ state: "visible", timeout: 1000 });
-      return;
+      const imageState = await readDecodedHeroFullartState(page, skinId);
+      check(imageState, `${label} reached text state without Skin ${skinId} image state`);
+      return imageState;
     } catch (error) {
       if (attempt === attempts) {
-        throw new Error(`${label} did not reach expected state after ${attempts} attempts: ${expectedText}`, { cause: error });
+        throw new Error(`${label} did not reach expected visual state after ${attempts} attempts: ${expectedText} / Skin ${skinId}`, { cause: error });
       }
       await page.waitForTimeout(250);
     }
@@ -112,17 +131,16 @@ try {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
     check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
+    let imageState = null;
     if (index === 0) {
-      await clickUntilText(page, hero6Next, expectedLabel, "Hero 6 desktop first artwork interaction");
+      imageState = await clickUntilVisualState(page, hero6Next, expectedLabel, skinId, "Hero 6 desktop first artwork interaction");
     } else {
       await hero6Next.click();
       await page.waitForTimeout(100);
       await page.getByText(expectedLabel, { exact: true }).waitFor();
+      imageState = await readDecodedHeroFullartState(page, skinId);
     }
-    const image = page.locator(`img[src*="/images/skin-fullart/${skinId}.webp"]`);
-    check(await image.count() === 1, `Hero 6 fullart Skin ${skinId} image missing or duplicated`);
-    await image.evaluate((node) => node.decode());
-    const imageState = await image.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
+    check(imageState, `Hero 6 fullart Skin ${skinId} image missing, duplicated, or undecodable`);
     check(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, `Hero 6 fullart Skin ${skinId} image did not load`);
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
     check(await page.locator(`img[src*="/images/skins/${skinId}.png"]`).count() === 0, `Hero 6 reintroduced legacy static Skin ${skinId}`);
@@ -192,11 +210,8 @@ try {
     const firstSkinId = hero6FullartIds[0];
     const firstSkinLabel = hero6SkinPresentationLabels.get(firstSkinId);
     check(firstSkinLabel, `Hero 6 Skin ${firstSkinId} presentation label is not registered`);
-    await clickUntilText(mobilePage, mobileNext, firstSkinLabel, "Hero 6 mobile first artwork interaction");
-    const mobileFullart = mobilePage.locator(`img[src*="/images/skin-fullart/${firstSkinId}.webp"]`);
-    check(await mobileFullart.count() === 1, "Hero 6 mobile first fullart Skin missing or duplicated");
-    await mobileFullart.evaluate((node) => node.decode());
-    const mobileFullartState = await mobileFullart.evaluate((node) => ({ complete: node.complete, naturalWidth: node.naturalWidth, naturalHeight: node.naturalHeight, objectFit: getComputedStyle(node).objectFit }));
+    const mobileFullartState = await clickUntilVisualState(mobilePage, mobileNext, firstSkinLabel, firstSkinId, "Hero 6 mobile first artwork interaction");
+    check(mobileFullartState, "Hero 6 mobile first fullart Skin missing, duplicated, or undecodable");
     check(mobileFullartState.complete && mobileFullartState.naturalWidth > 0 && mobileFullartState.naturalHeight > 0, "Hero 6 mobile first fullart Skin did not load");
     check(mobileFullartState.objectFit === "contain", `Hero 6 mobile fullart object-fit=${mobileFullartState.objectFit}`);
     const mobileHeading = mobilePage.getByRole("heading", { name: "전용장비", exact: true });
