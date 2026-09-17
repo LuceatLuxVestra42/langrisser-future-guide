@@ -1,0 +1,102 @@
+name: Hosted Validator Isolation
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/hosted-validator-isolation.yml'
+
+permissions:
+  contents: read
+
+env:
+  HOSTED_BASE_URL: https://luceatluxvestra42.github.io/langrisser-future-guide/
+
+jobs:
+  isolate-hosted-validators:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.base.sha }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout diagnostic head
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-download-url: https://github.com/oven-sh/bun/releases/download/bun-v1.4.1/bun-linux-x64.zip
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Confirm hosted source is PR base
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=/tmp/authoritative-pages-source.json
+          probe="${HOSTED_BASE_URL}authoritative-pages-source.json?isolation=${GITHUB_RUN_ID}-$(date +%s)"
+          curl --silent --show-error --fail --location --max-time 20 "$probe" -o "$manifest"
+          live_sha="$(node -e "const fs=require('fs');const value=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(value.sourceSha||''))" "$manifest")"
+          printf 'HOSTED_ISOLATION_SOURCE expected=%s live=%s\n' "$EXPECTED_SOURCE_SHA" "$live_sha"
+          test "$live_sha" = "$EXPECTED_SOURCE_SHA"
+
+      - name: Install Chromium QA runtime
+        run: |
+          bun add --no-save playwright@1.55.0
+          bunx playwright install --with-deps chromium
+
+      - name: route-hosted-qa-strict
+        id: route
+        continue-on-error: true
+        run: node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SOURCE_SHA"
+
+      - name: authoritative-pages
+        id: authoritative
+        continue-on-error: true
+        run: node scripts/validate-authoritative-pages-hosted.mjs
+
+      - name: hero-central-discipline
+        id: central
+        continue-on-error: true
+        run: node scripts/validate-hero-central-discipline-hosted.mjs
+
+      - name: hero-soldier-cards
+        id: soldier_cards
+        continue-on-error: true
+        run: node scripts/validate-hero-soldier-cards-hosted.mjs
+
+      - name: hero-card-icons
+        id: card_icons
+        continue-on-error: true
+        run: node scripts/validate-hero-card-icons-hosted.mjs
+
+      - name: hero-awakening-icons
+        id: awakening
+        continue-on-error: true
+        run: node scripts/validate-hero-awakening-icons-hosted.mjs
+
+      - name: Assert all hosted validators passed
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'route=%s authoritative=%s central=%s soldier_cards=%s card_icons=%s awakening=%s\n' \
+            '${{ steps.route.outcome }}' \
+            '${{ steps.authoritative.outcome }}' \
+            '${{ steps.central.outcome }}' \
+            '${{ steps.soldier_cards.outcome }}' \
+            '${{ steps.card_icons.outcome }}' \
+            '${{ steps.awakening.outcome }}'
+          test '${{ steps.route.outcome }}' = success
+          test '${{ steps.authoritative.outcome }}' = success
+          test '${{ steps.central.outcome }}' = success
+          test '${{ steps.soldier_cards.outcome }}' = success
+          test '${{ steps.card_icons.outcome }}' = success
+          test '${{ steps.awakening.outcome }}' = success
