@@ -46,6 +46,7 @@ type HeroJobMovementRowView = {
   moveType: number;
   moveTypeNameKr: string;
   movePoint: number;
+  attackRange: number | null;
 };
 
 function HeroSpTalentSection({
@@ -154,13 +155,20 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
     setMovementRows(null);
     setLoadError(null);
 
-    void import("@/lib/hero-job-movement.static")
-      .then(({ getStaticHeroJobMovement }) => {
+    void Promise.all([
+      import("@/lib/hero-job-movement.static"),
+      import("@/lib/hero-final-job-attack-range.static"),
+    ])
+      .then(([{ getStaticHeroJobMovement }, { getStaticHeroFinalJobAttackRange }]) => {
         const rows = getStaticHeroJobMovement(heroId);
         if (!rows) {
           throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
         }
-        if (!cancelled) setMovementRows(rows);
+        const projectedRows = rows.map((row) => ({
+          ...row,
+          attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
+        }));
+        if (!cancelled) setMovementRows(projectedRows);
       })
       .catch((error) => {
         if (!cancelled) setLoadError(String(error instanceof Error ? error.message : error));
@@ -199,6 +207,7 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
               data-job-id={row.jobId}
               data-move-type={row.moveType}
               data-move-point={row.movePoint}
+              data-basic-attack-range={row.attackRange ?? ""}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -207,9 +216,16 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                     {row.nameCn ?? `Job ${row.jobId}`}
                   </h3>
                 </div>
-                <span className="shrink-0 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
-                  Job {row.jobId}
-                </span>
+                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                  {row.attackRange != null ? (
+                    <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground">
+                      공격 사거리 {row.attackRange}
+                    </span>
+                  ) : null}
+                  <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                    Job {row.jobId}
+                  </span>
+                </div>
               </div>
 
               <dl className="mt-4 grid grid-cols-2 gap-2">
