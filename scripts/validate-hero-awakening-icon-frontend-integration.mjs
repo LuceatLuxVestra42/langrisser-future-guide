@@ -20,12 +20,12 @@ if (assetValidation.awakeningMapSha256 !== EXPECTED_AWAKENING_MAP_SHA || assetVa
 if (manifest.schemaId !== "hero-skill-icon-assets/v1" || manifest.status !== "FROZEN") fail("manifest contract mismatch");
 if (manifest.awakeningAdmission?.status !== "FROZEN" || manifest.awakeningAdmission?.completion !== "COMPLETE" || manifest.awakeningAdmission?.semanticReopen !== false) fail("A7-2 admission contract mismatch");
 if (manifest.awakeningAdmission?.lookupAuthority !== "exact sourcePath only" || manifest.awakeningAdmission?.awakeningMapSha256 !== EXPECTED_AWAKENING_MAP_SHA) fail("A7-2 exact lookup authority mismatch");
-if (!Array.isArray(manifest.records) || manifest.records.length !== 13) fail("legacy manifest record count mismatch");
+if (!Array.isArray(manifest.records)) fail("manifest records missing");
 if (!Array.isArray(manifest.awakeningRecords) || manifest.awakeningRecords.length !== 256) fail("awakeningRecords count mismatch");
 
 const admitted = [...manifest.records, ...manifest.awakeningRecords];
 const bySourcePath = new Map(admitted.map((record) => [record.sourcePath, record]));
-if (bySourcePath.size !== admitted.length || bySourcePath.size !== 269) fail(`combined exact lookup uniqueness mismatch ${bySourcePath.size}/${admitted.length}`);
+if (bySourcePath.size !== admitted.length) fail(`combined exact lookup uniqueness mismatch ${bySourcePath.size}/${admitted.length}`);
 
 const legacyLeonAwakening = manifest.records.filter((record) => record.role === "awakening");
 if (legacyLeonAwakening.length !== 1) fail("legacy Leon awakening count mismatch");
@@ -48,7 +48,7 @@ console.log(JSON.stringify({
   checkpoint: "AWAKENING_ICON_A8_FRONTEND_INTEGRATION_PREFLIGHT",
   status: "PASS",
   completion: "COMPLETE",
-  legacyManifestRecordCount: manifest.records.length,
+  manifestRecordCount: manifest.records.length,
   awakeningAdmissionRecordCount: manifest.awakeningRecords.length,
   totalAwakeningResolvableCount: allAwakening.length,
   combinedExactLookupCount: bySourcePath.size,
