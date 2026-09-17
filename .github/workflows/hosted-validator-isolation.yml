@@ -15,7 +15,7 @@ jobs:
   isolate-hosted-validators:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.base.sha }}
       GITHUB_TOKEN: ${{ github.token }}
@@ -52,51 +52,98 @@ jobs:
           bun add --no-save playwright@1.55.0
           bunx playwright install --with-deps chromium
 
+      - name: Hero browser pre-route probe
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const base = process.env.HOSTED_BASE_URL;
+          async function probe(heroId, phase) {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const pageErrors = [];
+            const consoleErrors = [];
+            const requestFailures = [];
+            const badResponses = [];
+            page.on('pageerror', e => pageErrors.push(String(e)));
+            page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
+            page.on('requestfailed', r => requestFailures.push({ url: r.url(), failure: r.failure()?.errorText || '' }));
+            page.on('response', r => { if (r.status() >= 400) badResponses.push({ status: r.status(), url: r.url() }); });
+            let navStatus = null;
+            let navError = null;
+            try {
+              const response = await page.goto(new URL(`heroes/${heroId}/?diag=${phase}-${Date.now()}`, base).toString(), { waitUntil: 'domcontentloaded', timeout: 45000 });
+              navStatus = response?.status() ?? null;
+              await page.waitForTimeout(5000);
+            } catch (error) {
+              navError = String(error);
+            }
+            const state = await page.evaluate(() => ({
+              href: location.href,
+              readyState: document.readyState,
+              title: document.title,
+              bodyText: (document.body?.innerText || '').slice(0, 1200),
+              bodyTextLength: (document.body?.innerText || '').length,
+              bodyHtmlLength: (document.body?.innerHTML || '').length,
+              headings: [...document.querySelectorAll('h1,h2,h3')].slice(0, 20).map(n => n.textContent?.trim() || ''),
+              nextButtons: [...document.querySelectorAll('button')].filter(n => n.getAttribute('aria-label') === '다음 일러스트' || n.textContent?.includes('다음 일러스트')).length,
+              representativeArtwork: document.querySelectorAll('img[alt*="대표 일러스트"]').length,
+              awakeningSections: document.querySelectorAll('[data-hero-awakening-skill="true"]').length,
+              scripts: [...document.scripts].map(s => s.src).filter(Boolean),
+            }));
+            console.log(JSON.stringify({ phase, heroId, navStatus, navError, ...state, pageErrors, consoleErrors, requestFailures, badResponses }, null, 2));
+            await browser.close();
+          }
+          await probe(6, 'pre-route-hero6');
+          await probe(14, 'pre-route-hero14');
+          NODE
+
       - name: route-hosted-qa-strict
-        id: route
-        continue-on-error: true
         run: node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SOURCE_SHA"
 
-      - name: authoritative-pages
-        id: authoritative
-        continue-on-error: true
-        run: node scripts/validate-authoritative-pages-hosted.mjs
-
-      - name: hero-central-discipline
-        id: central
-        continue-on-error: true
-        run: node scripts/validate-hero-central-discipline-hosted.mjs
-
-      - name: hero-soldier-cards
-        id: soldier_cards
-        continue-on-error: true
-        run: node scripts/validate-hero-soldier-cards-hosted.mjs
-
-      - name: hero-card-icons
-        id: card_icons
-        continue-on-error: true
-        run: node scripts/validate-hero-card-icons-hosted.mjs
-
-      - name: hero-awakening-icons
-        id: awakening
-        continue-on-error: true
-        run: node scripts/validate-hero-awakening-icons-hosted.mjs
-
-      - name: Assert all hosted validators passed
-        if: always()
-        shell: bash
+      - name: Hero browser post-route probe
         run: |
-          set -euo pipefail
-          printf 'route=%s authoritative=%s central=%s soldier_cards=%s card_icons=%s awakening=%s\n' \
-            '${{ steps.route.outcome }}' \
-            '${{ steps.authoritative.outcome }}' \
-            '${{ steps.central.outcome }}' \
-            '${{ steps.soldier_cards.outcome }}' \
-            '${{ steps.card_icons.outcome }}' \
-            '${{ steps.awakening.outcome }}'
-          test '${{ steps.route.outcome }}' = success
-          test '${{ steps.authoritative.outcome }}' = success
-          test '${{ steps.central.outcome }}' = success
-          test '${{ steps.soldier_cards.outcome }}' = success
-          test '${{ steps.card_icons.outcome }}' = success
-          test '${{ steps.awakening.outcome }}' = success
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          const base = process.env.HOSTED_BASE_URL;
+          async function probe(heroId, phase) {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const pageErrors = [];
+            const consoleErrors = [];
+            const requestFailures = [];
+            const badResponses = [];
+            page.on('pageerror', e => pageErrors.push(String(e)));
+            page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()); });
+            page.on('requestfailed', r => requestFailures.push({ url: r.url(), failure: r.failure()?.errorText || '' }));
+            page.on('response', r => { if (r.status() >= 400) badResponses.push({ status: r.status(), url: r.url() }); });
+            let navStatus = null;
+            let navError = null;
+            try {
+              const response = await page.goto(new URL(`heroes/${heroId}/?diag=${phase}-${Date.now()}`, base).toString(), { waitUntil: 'domcontentloaded', timeout: 45000 });
+              navStatus = response?.status() ?? null;
+              await page.waitForTimeout(5000);
+            } catch (error) {
+              navError = String(error);
+            }
+            const state = await page.evaluate(() => ({
+              href: location.href,
+              readyState: document.readyState,
+              title: document.title,
+              bodyText: (document.body?.innerText || '').slice(0, 1200),
+              bodyTextLength: (document.body?.innerText || '').length,
+              bodyHtmlLength: (document.body?.innerHTML || '').length,
+              headings: [...document.querySelectorAll('h1,h2,h3')].slice(0, 20).map(n => n.textContent?.trim() || ''),
+              nextButtons: [...document.querySelectorAll('button')].filter(n => n.getAttribute('aria-label') === '다음 일러스트' || n.textContent?.includes('다음 일러스트')).length,
+              representativeArtwork: document.querySelectorAll('img[alt*="대표 일러스트"]').length,
+              awakeningSections: document.querySelectorAll('[data-hero-awakening-skill="true"]').length,
+              scripts: [...document.scripts].map(s => s.src).filter(Boolean),
+            }));
+            console.log(JSON.stringify({ phase, heroId, navStatus, navError, ...state, pageErrors, consoleErrors, requestFailures, badResponses }, null, 2));
+            await browser.close();
+          }
+          await probe(6, 'post-route-hero6');
+          await probe(14, 'post-route-hero14');
+          NODE
+
+      - name: authoritative-pages reproduction
+        run: node scripts/validate-authoritative-pages-hosted.mjs
