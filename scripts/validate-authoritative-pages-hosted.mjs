@@ -49,15 +49,28 @@ async function readDecodedHeroFullartState(page, skinId) {
   }, { expectedSkinId: skinId });
 }
 
+async function readExpectedHeroFullartState(page, expected, skinId) {
+  if (await expected.count() !== 1 || !await expected.isVisible()) return null;
+  try {
+    return await readDecodedHeroFullartState(page, skinId);
+  } catch {
+    return null;
+  }
+}
+
 async function clickUntilVisualState(page, control, expectedText, skinId, label, attempts = 5) {
   const expected = page.getByText(expectedText, { exact: true });
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
+      const currentState = await readExpectedHeroFullartState(page, expected, skinId);
+      if (currentState) return currentState;
       await control.click();
-      await expected.waitFor({ state: "visible", timeout: 1000 });
-      const imageState = await readDecodedHeroFullartState(page, skinId);
-      check(imageState, `${label} reached text state without Skin ${skinId} image state`);
-      return imageState;
+      for (let probe = 0; probe < 10; probe += 1) {
+        const imageState = await readExpectedHeroFullartState(page, expected, skinId);
+        if (imageState) return imageState;
+        await page.waitForTimeout(100);
+      }
+      throw new Error(`${label} click completed without expected visual state`);
     } catch (error) {
       if (attempt === attempts) {
         throw new Error(`${label} did not reach expected visual state after ${attempts} attempts: ${expectedText} / Skin ${skinId}`, { cause: error });
