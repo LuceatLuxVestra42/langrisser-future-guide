@@ -1,12 +1,6 @@
 name: Hero Awakening Icon A9 Hosted Browser Gates
 
 on:
-  push:
-    branches:
-      - work/awakening-skill-icon-a9-hosted-browser-20260910
-  pull_request:
-    branches:
-      - work/awakening-skill-icon-a8-frontend-integration-20260910
   workflow_dispatch:
 
 permissions:
@@ -28,9 +22,9 @@ jobs:
           git status --porcelain=v1 --untracked-files=all > "$RUNNER_TEMP/a9-before.txt"
       - name: Probe current deployed GitHub Pages surface
         run: node tools/route-hosted-qa/cli/check.mjs --probe-current
-      - name: Classify candidate freshness without mutating deployment
+      - name: Classify current dispatch freshness without mutating deployment
         env:
-          EXPECTED_SOURCE_SHA: 547f42ad8f3d5827432f6ba798c16b7f21b22727
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
         shell: bash
         run: |
           set -euo pipefail
