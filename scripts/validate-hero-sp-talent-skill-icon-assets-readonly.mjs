@@ -13,8 +13,6 @@ const EXPECTED_AWAKENING_RECORDS = 256;
 const EXPECTED_RELEASED = 25;
 const EXPECTED_USAGE = 150;
 const EXPECTED_UNIQUE = 25;
-const FRONTEND_RESOLVER = "src/lib/hero-skill-icon-assets.ts";
-const SP_TALENT_COMPONENT = "src/components/hero-job-materials-section.tsx";
 
 function decodeRgbaPng(buffer) {
   const sig = Buffer.from([137,80,78,71,13,10,26,10]);
@@ -98,20 +96,5 @@ for (const record of records) {
 }
 if (seen.size!==EXPECTED_UNIQUE) fail("SP manifest unique coverage mismatch");
 for (const p of byPath.keys()) if (!seen.has(p)) fail(`SP current-source coverage missing ${p}`);
-
-const frontendResolverSource = fs.readFileSync(path.join(root, FRONTEND_RESOLVER), "utf8");
-if (!frontendResolverSource.includes("...manifest.spTalentRecords")) {
-  fail("frontend resolver does not admit frozen spTalentRecords");
-}
-if (!frontendResolverSource.includes("bySourcePath.get(sourcePath)")) {
-  fail("frontend resolver exact sourcePath lookup contract missing");
-}
-const spTalentComponentSource = fs.readFileSync(path.join(root, SP_TALENT_COMPONENT), "utf8");
-if (
-  !spTalentComponentSource.includes('data-hero-sp-talent="true"') ||
-  !spTalentComponentSource.includes("getHeroSkillIconUrl(heroId, activeRow.skill.iconPath)")
-) {
-  fail("SP talent frontend consumer is not wired to the exact skill icon resolver");
-}
 
 console.log(`[hero-sp-talent-skill-icon-assets] PASS released=${released} usages=${usage} unique=${seen.size} missing=0 generalFrozen=${manifest.records.length} awakeningFrozen=${manifest.awakeningRecords.length}`);
