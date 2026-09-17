@@ -131,15 +131,7 @@ try {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
     check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
-    let imageState = null;
-    if (index === 0) {
-      imageState = await clickUntilVisualState(page, hero6Next, expectedLabel, skinId, "Hero 6 desktop first artwork interaction");
-    } else {
-      await hero6Next.click();
-      await page.waitForTimeout(100);
-      await page.getByText(expectedLabel, { exact: true }).waitFor();
-      imageState = await readDecodedHeroFullartState(page, skinId);
-    }
+    const imageState = await clickUntilVisualState(page, hero6Next, expectedLabel, skinId, `Hero 6 desktop artwork interaction ${index + 1}`);
     check(imageState, `Hero 6 fullart Skin ${skinId} image missing, duplicated, or undecodable`);
     check(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, `Hero 6 fullart Skin ${skinId} image did not load`);
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
