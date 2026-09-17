@@ -67,6 +67,37 @@ async function clickUntilVisualState(page, control, expectedText, skinId, label,
   }
 }
 
+async function hasRepresentativeArtworkState(page, visualCount) {
+  const expectedLabel = page.getByText("대표 일러스트", { exact: true });
+  const expectedCounter = page.getByText(`1 / ${visualCount}`, { exact: true });
+  const artwork = page.locator('img[alt="레온 대표 일러스트"]');
+  return await expectedLabel.count() === 1
+    && await expectedLabel.isVisible()
+    && await expectedCounter.count() === 1
+    && await expectedCounter.isVisible()
+    && await artwork.count() === 1
+    && (await artwork.getAttribute("src"))?.includes("/images/heroes/cards/6.png") === true;
+}
+
+async function clickUntilRepresentativeArtworkState(page, control, visualCount, label, attempts = 5) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      if (await hasRepresentativeArtworkState(page, visualCount)) return;
+      await control.click();
+      for (let probe = 0; probe < 10; probe += 1) {
+        if (await hasRepresentativeArtworkState(page, visualCount)) return;
+        await page.waitForTimeout(100);
+      }
+      throw new Error(`${label} click completed without representative artwork state`);
+    } catch (error) {
+      if (attempt === attempts) {
+        throw new Error(`${label} did not reach representative artwork state after ${attempts} attempts`, { cause: error });
+      }
+      await page.waitForTimeout(250);
+    }
+  }
+}
+
 let manifest = null;
 for (let attempt = 1; attempt <= 120; attempt += 1) {
   try {
@@ -137,8 +168,7 @@ try {
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
     check(await page.locator(`img[src*="/images/skins/${skinId}.png"]`).count() === 0, `Hero 6 reintroduced legacy static Skin ${skinId}`);
   }
-  await hero6Next.click();
-  await page.waitForTimeout(100);
+  await clickUntilRepresentativeArtworkState(page, hero6Next, hero6VisualCount, "Hero 6 desktop artwork wrap");
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
   await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
   check((await page.locator('img[alt="레온 대표 일러스트"]').getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 carousel did not wrap back to representative artwork");
