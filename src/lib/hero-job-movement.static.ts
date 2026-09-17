@@ -81,7 +81,7 @@ if (definitionsById.size !== 5 || [1, 2, 3, 4, 5].some((id) => !definitionsById.
 }
 
 const byHeroId = new Map<number, HeroJobMovementRow[]>();
-let resolvedJobCount = 0;
+const resolvedJobIds = new Set<number>();
 for (const hero of heroJobLinks.records) {
   if (!Number.isSafeInteger(hero.heroId) || hero.heroId <= 0 || byHeroId.has(hero.heroId)) {
     throw new Error(`Hero Job movement Hero identity violation at heroId=${String(hero.heroId)}.`);
@@ -111,7 +111,7 @@ for (const hero of heroJobLinks.records) {
       throw new Error(`Hero Job ${jobId} has invalid BF_MovePoint ${String(movementEntry.movePoint)}.`);
     }
 
-    resolvedJobCount += 1;
+    resolvedJobIds.add(jobId);
     return {
       jobConnectionId: connection.jobConnectionId,
       role: connection.role,
@@ -129,8 +129,8 @@ for (const hero of heroJobLinks.records) {
   byHeroId.set(hero.heroId, rows);
 }
 
-if (resolvedJobCount !== 804 || Object.keys(movement.heroJobsById).length !== 804) {
-  throw new Error(`Hero Job movement frozen coverage mismatch: ${resolvedJobCount}/${Object.keys(movement.heroJobsById).length}.`);
+if (resolvedJobIds.size !== 804 || Object.keys(movement.heroJobsById).length !== 804) {
+  throw new Error(`Hero Job movement frozen coverage mismatch: ${resolvedJobIds.size}/${Object.keys(movement.heroJobsById).length}.`);
 }
 
 export function getStaticHeroJobMovement(heroId: number) {
