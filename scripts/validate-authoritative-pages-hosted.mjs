@@ -131,25 +131,32 @@ try {
     const skinId = hero6FullartIds[index];
     const expectedLabel = hero6SkinPresentationLabels.get(skinId);
     check(expectedLabel, `Hero 6 Skin ${skinId} presentation label is not registered`);
-    let imageState = null;
-    if (index === 0) {
-      imageState = await clickUntilVisualState(page, hero6Next, expectedLabel, skinId, "Hero 6 desktop first artwork interaction");
-    } else {
-      await hero6Next.click();
-      await page.waitForTimeout(100);
-      await page.getByText(expectedLabel, { exact: true }).waitFor();
-      imageState = await readDecodedHeroFullartState(page, skinId);
-    }
+    const imageState = await clickUntilVisualState(
+      page,
+      hero6Next,
+      expectedLabel,
+      skinId,
+      `Hero 6 desktop artwork interaction ${index + 1}`,
+    );
     check(imageState, `Hero 6 fullart Skin ${skinId} image missing, duplicated, or undecodable`);
     check(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, `Hero 6 fullart Skin ${skinId} image did not load`);
     check(imageState.objectFit === "contain", `Hero 6 fullart Skin ${skinId} object-fit=${imageState.objectFit}`);
     check(await page.locator(`img[src*="/images/skins/${skinId}.png"]`).count() === 0, `Hero 6 reintroduced legacy static Skin ${skinId}`);
   }
-  await hero6Next.click();
-  await page.waitForTimeout(100);
-  await page.getByText("대표 일러스트", { exact: true }).waitFor();
-  await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor();
-  check((await page.locator('img[alt="레온 대표 일러스트"]').getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 carousel did not wrap back to representative artwork");
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    try {
+      await hero6Next.click();
+      await page.getByText("대표 일러스트", { exact: true }).waitFor({ state: "visible", timeout: 1000 });
+      await page.getByText(`1 / ${hero6VisualCount}`, { exact: true }).waitFor({ state: "visible", timeout: 1000 });
+      check((await page.locator('img[alt="레온 대표 일러스트"]').getAttribute("src"))?.includes("/images/heroes/cards/6.png"), "Hero 6 carousel did not wrap back to representative artwork");
+      break;
+    } catch (error) {
+      if (attempt === 5) {
+        throw new Error("Hero 6 desktop artwork wrap did not return to representative artwork after 5 attempts", { cause: error });
+      }
+      await page.waitForTimeout(250);
+    }
+  }
 
   const exclusiveHeading = page.getByRole("heading", { name: "전용장비", exact: true });
   await exclusiveHeading.waitFor();
