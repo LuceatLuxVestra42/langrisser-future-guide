@@ -1,13 +1,9 @@
 name: Hero Awakening Icon Asset Validator
 
 on:
-  push:
-    branches:
-      - work/awakening-skill-icon-a7-3-asset-validator-20260910
   pull_request:
     branches:
       - main
-      - work/awakening-skill-icon-a7-2-manifest-admission-20260910
     paths:
       - '.github/workflows/hero-awakening-icon-asset-validator.yml'
       - 'scripts/validate-hero-awakening-icon-assets-readonly.mjs'
