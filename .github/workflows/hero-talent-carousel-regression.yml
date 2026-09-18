@@ -138,7 +138,7 @@ jobs:
             check((await state.getAttribute('data-hero-talent-min-star')) === String(target.initialStar), `${label} Hero ${target.heroId} min star mismatch`);
             check((await state.getAttribute('data-hero-talent-max-star')) === '6', `${label} Hero ${target.heroId} max star is not 6`);
 
-            const selectorButtons = carousel.locator('[aria-label="재능 성급 선택"] button');
+            const selectorButtons = carousel.locator('[aria-label="고유기 성급 선택"] button');
             const selectorTexts = (await selectorButtons.allTextContents()).map((text) => text.trim());
             const expectedSelectors = Array.from({ length: 7 - target.initialStar }, (_, index) => `${target.initialStar + index}성`);
             check(JSON.stringify(selectorTexts) === JSON.stringify(expectedSelectors), `${label} Hero ${target.heroId} selector mismatch: ${JSON.stringify(selectorTexts)} / ${JSON.stringify(expectedSelectors)}`);
@@ -146,8 +146,8 @@ jobs:
               check(await carousel.getByRole('button', { name: `${hiddenStar}성`, exact: true }).count() === 0, `${label} Hero ${target.heroId} exposed hidden ${hiddenStar}성 selector`);
             }
 
-            const lower = carousel.getByRole('button', { name: '낮은 성급 재능 보기', exact: true });
-            const higher = carousel.getByRole('button', { name: '높은 성급 재능 보기', exact: true });
+            const lower = carousel.getByRole('button', { name: '낮은 성급 고유기 보기', exact: true });
+            const higher = carousel.getByRole('button', { name: '높은 성급 고유기 보기', exact: true });
             check(await lower.count() === 1 && await higher.count() === 1, `${label} Hero ${target.heroId} talent arrows missing or duplicated`);
 
             const assertStar = async (star) => {
