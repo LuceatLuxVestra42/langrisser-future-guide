@@ -47,17 +47,19 @@ export function SoldierDetailDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="soldier-detail-title"
-        className="relative w-full max-w-6xl"
+        className="w-full max-w-6xl"
       >
-        <button
-          type="button"
-          aria-label="상세 창 닫기"
-          onClick={onClose}
-          className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <X className="h-5 w-5" aria-hidden="true" />
-        </button>
-        <div className="max-h-[calc(100dvh-1rem)] overflow-y-auto sm:max-h-[90vh]">
+        <div className="mb-2 flex justify-end px-1">
+          <button
+            type="button"
+            aria-label="상세 창 닫기"
+            onClick={onClose}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-h-[calc(90vh-3rem)]">
           <SoldierDetailModal
             key={record.soldierId}
             record={record}
