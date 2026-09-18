@@ -132,9 +132,6 @@ function HeroSpJobMovementSection({
     >
       <div>
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">SP 전직 이동 정보</h2>
-        <p className="mt-1 text-xs font-semibold text-muted-foreground">
-          검증된 SP 전직 이동력 · 이동타입 · 공격 사거리
-        </p>
       </div>
 
       {row ? (
