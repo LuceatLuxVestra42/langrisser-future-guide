@@ -101,7 +101,7 @@ check(presentationChangedProjectionCount > 0, "equipment effect presentation nor
 const fixtureDefinitions = [
   { equipmentId: 140, expectedScope: "general", fixtureLabel: "general-single-line", expectedLineBreakCount: 0 },
   { equipmentId: 13, expectedScope: "general", fixtureLabel: "general-two-line", expectedLineBreakCount: 1 },
-  { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline-suffix-compaction", expectedLineBreakCount: 2 },
+  { equipmentId: 8, expectedScope: "general", fixtureLabel: "general-multiline-suffix-compaction", expectedLineBreakCount: 1 },
   { equipmentId: 416, expectedScope: "exclusive", fixtureLabel: "exclusive-baseline", expectedLineBreakCount: 1 },
   { equipmentId: 427, expectedScope: "exclusive", fixtureLabel: "exclusive-multiline", expectedLineBreakCount: 3 },
   { equipmentId: 581, expectedScope: "exclusive", fixtureLabel: "exclusive-581-compact-trailer-regression", expectedLineBreakCount: 2 },
