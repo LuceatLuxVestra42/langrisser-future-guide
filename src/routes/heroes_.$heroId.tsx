@@ -201,7 +201,11 @@ function HeroDetailPage() {
     throw new Error("Hero card icon frozen index is not production-ready.");
   }
   const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
-  useEffect(() => setSelectedSoldierId(null), [hero.heroId]);
+  const [showAllSoldiers, setShowAllSoldiers] = useState(false);
+  useEffect(() => {
+    setSelectedSoldierId(null);
+    setShowAllSoldiers(false);
+  }, [hero.heroId]);
   const selectedSoldierRecord = selectedSoldierId == null
     ? null
     : (soldierDetailById.get(selectedSoldierId) ?? null);
@@ -523,17 +527,46 @@ function HeroDetailPage() {
         <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
         </div>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
+        <section
+          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+          data-hero-soldier-cards="true"
+          data-hero-soldier-cards-expanded={showAllSoldiers ? "true" : "false"}
+        >
           <SectionTitle title="사용 가능 용병" />
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-            {soldierCards.map((record) => (
-              <HeroSoldierCard
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
+            {soldierCards.map((record, index) => (
+              <div
                 key={record.soldierId}
-                record={record}
-                onOpen={setSelectedSoldierId}
-              />
+                data-hero-soldier-card-slot="true"
+                className={
+                  showAllSoldiers
+                    ? ""
+                    : index >= 8
+                      ? "hidden"
+                      : index >= 6
+                        ? "hidden sm:block"
+                        : ""
+                }
+              >
+                <HeroSoldierCard
+                  record={record}
+                  onOpen={setSelectedSoldierId}
+                />
+              </div>
             ))}
           </div>
+          {soldierCards.length > 8 ? (
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                aria-expanded={showAllSoldiers}
+                onClick={() => setShowAllSoldiers((current) => !current)}
+                className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-bold text-foreground shadow-sm transition hover:bg-muted"
+              >
+                {showAllSoldiers ? "용병 접기" : "전체 용병 보기"}
+              </button>
+            </div>
+          ) : null}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
