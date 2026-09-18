@@ -159,6 +159,12 @@ type Stage6SpRewardSkill = {
   cost?: number | null;
 };
 
+type Stage6SpMaterial = {
+  GoodsType?: number | null;
+  Id?: number | null;
+  Count?: number | null;
+};
+
 type Stage6SpMission = {
   id?: number | null;
   stage?: string | null;
@@ -179,6 +185,10 @@ type Stage6SpMission = {
 
 type Stage6Sp = {
   status?: string | null;
+  activationMaterials?: {
+    first?: Record<string, Stage6SpMaterial> | Stage6SpMaterial[] | null;
+    newFirst?: Record<string, Stage6SpMaterial> | Stage6SpMaterial[] | null;
+  } | null;
   job?: {
     jobConnectionId?: number | null;
     jobId?: number | null;
@@ -502,6 +512,18 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectSpRewardSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const projectSpMaterialList = (
+    materials: Record<string, Stage6SpMaterial> | Stage6SpMaterial[] | null | undefined,
+  ) => {
+    const rows = Array.isArray(materials)
+      ? materials
+      : (materials && typeof materials === "object" ? Object.values(materials) : []);
+    return rows.map((item) => ({
+      goodsType: Number.isInteger(item.GoodsType) ? Number(item.GoodsType) : null,
+      sourceId: Number.isInteger(item.Id) ? Number(item.Id) : null,
+      count: Number.isInteger(item.Count) ? Number(item.Count) : null,
+    }));
+  };
   const projectSpMission = (mission: Stage6SpMission) => ({
     missionId: Number.isInteger(mission.id) ? Number(mission.id) : null,
     phase: mission.stage ?? null,
@@ -637,6 +659,10 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         status: shard.sp?.talent?.status ?? null,
         selectionRule: shard.sp?.talent?.selectionRule ?? null,
         starProgression: spTalentProgression,
+      },
+      activationMaterials: {
+        first: projectSpMaterialList(shard.sp?.activationMaterials?.first),
+        newFirst: projectSpMaterialList(shard.sp?.activationMaterials?.newFirst),
       },
       missions: {
         firstStage: spFirstStageMissions,
