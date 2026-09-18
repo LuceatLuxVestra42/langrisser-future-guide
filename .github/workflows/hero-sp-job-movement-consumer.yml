@@ -8,8 +8,8 @@ on:
       - 'data/contracts/hero-sp-job-movement-consumer.v1.json'
       - 'data/generated/hero-sp-job-movement.v1.json'
       - 'data/validation/hero-sp-job-movement.v1.json'
-      - 'scripts/build_hero_sp_job_movement_consumer.cjs'
-      - 'scripts/validate_hero_sp_job_movement_consumer.cjs'
+      - 'scripts/build_hero_sp_job_mobility_consumer.cjs'
+      - 'scripts/validate_hero_sp_job_mobility_consumer.cjs'
       - 'src/lib/hero-sp-job-movement.static.ts'
       - 'src/components/hero-job-materials-section.tsx'
       - '.github/workflows/hero-sp-job-movement-consumer.yml'
@@ -20,8 +20,8 @@ on:
       - 'data/contracts/hero-sp-job-movement-consumer.v1.json'
       - 'data/generated/hero-sp-job-movement.v1.json'
       - 'data/validation/hero-sp-job-movement.v1.json'
-      - 'scripts/build_hero_sp_job_movement_consumer.cjs'
-      - 'scripts/validate_hero_sp_job_movement_consumer.cjs'
+      - 'scripts/build_hero_sp_job_mobility_consumer.cjs'
+      - 'scripts/validate_hero_sp_job_mobility_consumer.cjs'
       - 'src/lib/hero-sp-job-movement.static.ts'
       - 'src/components/hero-job-materials-section.tsx'
       - '.github/workflows/hero-sp-job-movement-consumer.yml'
@@ -42,10 +42,10 @@ jobs:
       - name: Rebuild SP movement consumer
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/build_hero_sp_job_movement_consumer.cjs
+        run: node scripts/build_hero_sp_job_mobility_consumer.cjs
       - name: Validate SP movement consumer
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/validate_hero_sp_job_movement_consumer.cjs
+        run: node scripts/validate_hero_sp_job_mobility_consumer.cjs
       - name: Verify frozen outputs
         run: git diff --exit-code -- data/generated/hero-sp-job-movement.v1.json data/validation/hero-sp-job-movement.v1.json
