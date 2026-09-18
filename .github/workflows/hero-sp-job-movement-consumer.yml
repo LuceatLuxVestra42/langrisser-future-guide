@@ -1,0 +1,51 @@
+name: Hero SP Job Movement Consumer
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-sp-job-movement-consumer.v1.json'
+      - 'data/generated/hero-sp-job-movement.v1.json'
+      - 'data/validation/hero-sp-job-movement.v1.json'
+      - 'scripts/build_hero_sp_job_movement_consumer.cjs'
+      - 'scripts/validate_hero_sp_job_movement_consumer.cjs'
+      - 'src/lib/hero-sp-job-movement.static.ts'
+      - 'src/components/hero-job-materials-section.tsx'
+      - '.github/workflows/hero-sp-job-movement-consumer.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/contracts/hero-sp-job-movement-consumer.v1.json'
+      - 'data/generated/hero-sp-job-movement.v1.json'
+      - 'data/validation/hero-sp-job-movement.v1.json'
+      - 'scripts/build_hero_sp_job_movement_consumer.cjs'
+      - 'scripts/validate_hero_sp_job_movement_consumer.cjs'
+      - 'src/lib/hero-sp-job-movement.static.ts'
+      - 'src/components/hero-job-materials-section.tsx'
+      - '.github/workflows/hero-sp-job-movement-consumer.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rebuild SP movement consumer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build_hero_sp_job_movement_consumer.cjs
+      - name: Validate SP movement consumer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/validate_hero_sp_job_movement_consumer.cjs
+      - name: Verify frozen outputs
+        run: git diff --exit-code -- data/generated/hero-sp-job-movement.v1.json data/validation/hero-sp-job-movement.v1.json
