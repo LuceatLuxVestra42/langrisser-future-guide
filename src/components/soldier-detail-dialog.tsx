@@ -51,40 +51,33 @@ export function SoldierDetailDialog({
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <>
-      <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6">
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="soldier-detail-title"
-          className="pointer-events-auto relative z-10 w-full max-w-6xl"
-        >
-          <div className="max-h-[calc(100dvh-1rem)] overflow-y-auto sm:max-h-[90vh]">
-            <SoldierDetailModal
-              key={record.soldierId}
-              record={record}
-              heroCardIcons={presentedHeroCardIcons}
-            />
-          </div>
+    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="soldier-detail-title"
+        className="pointer-events-auto flex max-h-[calc(100dvh-1rem)] w-full max-w-6xl flex-col sm:max-h-[90vh]"
+      >
+        <div className="flex shrink-0 justify-end pb-2">
+          <button
+            type="button"
+            aria-label="상세 창 닫기"
+            aria-controls="soldier-detail-title"
+            onClick={onClose}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="min-h-0 overflow-y-auto">
+          <SoldierDetailModal
+            key={record.soldierId}
+            record={record}
+            heroCardIcons={presentedHeroCardIcons}
+          />
         </div>
       </div>
-      <button
-        type="button"
-        aria-label="상세 창 닫기"
-        aria-controls="soldier-detail-title"
-        onClick={onClose}
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        style={{
-          position: "fixed",
-          top: "12px",
-          right: "12px",
-          zIndex: 2147483647,
-          pointerEvents: "auto",
-        }}
-      >
-        <X className="h-5 w-5" aria-hidden="true" />
-      </button>
-    </>,
+    </div>,
     document.body,
   );
 }
