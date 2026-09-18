@@ -49,7 +49,6 @@ for (const [path, label] of [
   ["heroes/6/", "Hero 6"],
   ["soldiers/101/", "Soldier 101"],
   ["images/soldiers-webp/101.webp", "Soldier 101 portrait"],
-  ["images/heroes/sp/6.webp", "Hero 6 SP artwork"],
 ]) {
   const response = await fetch(url(`${path}?qa=${Date.now()}`), { cache: "no-store" });
   check(response.ok, `${label} Hosted HTTP failed: ${response.status}`);
@@ -102,7 +101,9 @@ async function verifyHeroFormSwitch(page, label) {
   check(await switcher.getAttribute("data-active-hero-form") === "sp", `Hero 6 ${label} SP switch state mismatch`);
   const spArtwork = page.locator('img[data-hero-active-artwork="true"][data-hero-artwork-form="sp"]');
   check(await spArtwork.count() === 1, `Hero 6 ${label} SP artwork missing`);
-  check((await spArtwork.getAttribute("src"))?.includes("/images/heroes/sp/6.webp"), `Hero 6 ${label} SP artwork path mismatch`);
+  const spArtworkSrc = await spArtwork.getAttribute("src");
+  check(spArtworkSrc?.startsWith("data:image/webp;base64,") === true, `Hero 6 ${label} SP artwork is not the embedded WebP source`);
+  check((spArtworkSrc?.length ?? 0) > 50000, `Hero 6 ${label} SP artwork payload is unexpectedly short`);
 
   const spMovement = page.locator('[data-hero-sp-job-movement="true"]');
   check(await spMovement.count() === 1, `Hero 6 ${label} SP movement section missing`);
@@ -130,7 +131,8 @@ async function verifyHeroFormSwitch(page, label) {
   const spHeartFetterJobIds = await page.locator('[data-hero-heart-fetter="true"] [data-heart-fetter-job-id]').evaluateAll((nodes) =>
     nodes.map((node) => Number(node.getAttribute("data-heart-fetter-job-id"))),
   );
-  check(spHeartFetterJobIds.length > 0 && spHeartFetterJobIds.every((jobId) => jobId === 377), `Hero 6 ${label} SP HeartFetter isolation mismatch: ${JSON.stringify(spHeartFetterJobIds)}`);
+  check(spHeartFetterJobIds.every((jobId) => jobId === 377), `Hero 6 ${label} SP HeartFetter isolation mismatch: ${JSON.stringify(spHeartFetterJobIds)}`);
+  check(await page.locator('[data-hero-heart-fetter="true"]').getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} HeartFetter section did not switch to SP form`);
 
   await page.getByRole("button", { name: "기본 전직", exact: true }).click();
   await page.waitForFunction(() => document.querySelector("main")?.getAttribute("data-hero-form-mode") === "normal", null, { timeout: 45000 });
@@ -249,7 +251,7 @@ try {
       defaultMode: "normal",
       spJobId: 377,
       normalSpIsolation: "PASS",
-      spArtwork: "/images/heroes/sp/6.webp",
+      spArtwork: "embedded-webp-data-uri",
       spActivationMaterialBlock: "ABSENT",
       desktop: "PASS",
       mobile: "PASS",
