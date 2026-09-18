@@ -19,7 +19,7 @@ const EXPECTED_GENERAL_UNIQUE = 1006;
 const EXPECTED_AWAKENING_RECORDS = 256;
 const EXPECTED_SP_TALENT_RECORDS = 25;
 const FRONTEND_RESOLVER = "src/lib/hero-skill-icon-assets.ts";
-const SP_TALENT_COMPONENT = "src/components/hero-job-materials-section.tsx";
+const HERO_DETAIL_ROUTE = "src/routes/heroes_.$heroId.tsx";
 
 const expected = new Map([
   ["UI/Icon/Skill_ABS/Gift_Knight.png", { skillIds: [3067, 3072, 3077, 3082], part: 27, bundle: "5ca1962b06355b48fe0ca6531e002a13a63a1d35e42f558471aace39d4298adf", raw: "2dd27910f983fc8da35a1b21fbd492babbba105b724913f4bf378365a64e3d77", rgba: "a153365f9ad2a903456543b07beddb9ae976bcd045b5ef29c54d67f5bdb59b6d", width: 175, height: 158 }],
@@ -214,9 +214,10 @@ for (const record of generalRecords) {
 const frontendResolverSource = fs.readFileSync(path.join(repoRoot, FRONTEND_RESOLVER), "utf8");
 if (!frontendResolverSource.includes("...manifest.spTalentRecords")) fail("frontend resolver does not admit frozen SP talent icon records");
 if (!frontendResolverSource.includes("bySourcePath.get(sourcePath)")) fail("frontend resolver exact sourcePath lookup contract missing");
-const spTalentComponentSource = fs.readFileSync(path.join(repoRoot, SP_TALENT_COMPONENT), "utf8");
-if (!spTalentComponentSource.includes('data-hero-sp-talent="true"')) fail("SP talent detail section wiring missing");
-if (!spTalentComponentSource.includes("getHeroSkillIconUrl(heroId, activeRow.skill.iconPath)")) fail("SP talent detail icon resolver wiring missing");
+const heroDetailRouteSource = fs.readFileSync(path.join(repoRoot, HERO_DETAIL_ROUTE), "utf8");
+if (!heroDetailRouteSource.includes('data-hero-talent-carousel="true"')) fail("Hero talent carousel wiring missing");
+if (!heroDetailRouteSource.includes("detail.sp.talent.starProgression")) fail("SP talent progression is not consumed by the Hero detail route");
+if (!heroDetailRouteSource.includes("<HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />")) fail("SP talent detail icon resolver wiring missing");
 
 const allManifestRecords = [...manifest.records, ...manifest.awakeningRecords, ...manifest.spTalentRecords, ...manifest.spRewardRecords];
 const sourcePaths = allManifestRecords.map((record) => record.sourcePath);
