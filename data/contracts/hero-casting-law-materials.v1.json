@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "contract": "hero-casting-law-materials",
+  "owner": "hero-canonical",
+  "status": "ACTIVE",
+  "purpose": "Freeze the Hero Casting Law (영웅 율정/铸纹) template-to-level material progression from the pinned UnityDataTool parsed ConfigData snapshot. This catalog preserves source-defined template and level IDs and resolves only explicit GoodsType=6 item references; it does not infer Hero assignments.",
+  "authoritativeSourceContract": "data/contracts/configdata-source-pack-contract.v1.json",
+  "requiredSources": [
+    "ConfigDataCastingLawTemplateInfo",
+    "ConfigDataCastingLawLevelUpInfo",
+    "ConfigDataItemInfo"
+  ],
+  "relationContract": {
+    "templateLevel": "ConfigDataCastingLawTemplateInfo.CastingLawLevelUpInfoList[] -> ConfigDataCastingLawLevelUpInfo.ID by explicit numeric equality in source order",
+    "levelMaterial": "ConfigDataCastingLawLevelUpInfo.LevelupMaterialsCost[] preserved in source order",
+    "item": "LevelupMaterialsCost[].GoodsType == 6: Id -> ConfigDataItemInfo.ID by explicit numeric equality"
+  },
+  "frozenSnapshotExpectations": {
+    "templateCount": 50,
+    "levelsPerTemplate": 10,
+    "totalTemplateLevelCount": 500,
+    "postLevel5CommonMaterialItemIds": [
+      3308,
+      3309,
+      3310
+    ],
+    "postLevel5CommonMaterialMeaning": "All level 6-10 material references in the pinned snapshot resolve only to these three Item IDs. Counts remain template/level-specific and are not normalized."
+  },
+  "normalizationRules": [
+    "Preserve Template ID, Name, EquipmentType when present, Icon, and CastingLawLevelUpInfoList source order.",
+    "Require exactly ten level-info IDs per template in the pinned snapshot and map list position 1..10 to display level 1..10 without ID arithmetic.",
+    "Resolve every level-info ID only by explicit equality to ConfigDataCastingLawLevelUpInfo.ID.",
+    "Preserve LevelUpGoldCost, property fields, PreCastingLawLevelID, and LevelupMaterialsCost source values.",
+    "Resolve material items only when GoodsType is exactly 6 and only by explicit numeric equality to ConfigDataItemInfo.ID.",
+    "Do not derive Hero-to-template assignments from equipment icons, Hero names, display order, screenshot order, filename similarity, or ID arithmetic.",
+    "Do not treat the existing centralDiscipline release state as a proxy for Casting Law template availability.",
+    "Fail closed on duplicate IDs, missing level rows, malformed Goods records, missing item rows, broken predecessor chains, or generated/source mismatch."
+  ],
+  "semanticBoundary": {
+    "heroAssignmentIncluded": false,
+    "currentHeroStage6Reopened": false,
+    "centralDisciplineSkillSemanticsReopened": false,
+    "screenshotUsedAsCanonicalRelation": false
+  },
+  "itemSnapshotFields": [
+    "ID",
+    "Name",
+    "Desc",
+    "Rank",
+    "Icon",
+    "GetPathDesc"
+  ],
+  "validationPolicy": {
+    "PASS": [
+      "50 source templates resolve to 500 ordered level records with zero missing or duplicate IDs.",
+      "Every template level preserves the source predecessor chain and exact material list.",
+      "Every material is GoodsType 6 with a positive ID/count and resolves exactly once to ConfigDataItemInfo.ID.",
+      "All level 6-10 material IDs are exactly the frozen common set 3308, 3309, 3310 across the catalog.",
+      "Generated item snapshots match ConfigDataItemInfo exactly for the selected fields."
+    ],
+    "FAIL": [
+      "Any source identity, ordering, predecessor, material, item, count, or parity mismatch occurs."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-casting-law-materials.v1.json",
+    "summary": "data/validation/hero-casting-law-materials-summary.v1.json"
+  },
+  "producer": "scripts/build_hero_casting_law_materials.cjs",
+  "validator": "scripts/validate_hero_casting_law_materials.cjs",
+  "completionRule": "Run the producer against the current pinned ConfigData source-pack, then run the independent validator. Completion requires generated PASS, summary PASS, validator PASS, the frozen 50/500 coverage, post-level-5 common-item parity, and no unexpected repository mutation."
+}
