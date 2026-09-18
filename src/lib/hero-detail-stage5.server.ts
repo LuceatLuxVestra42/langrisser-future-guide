@@ -177,6 +177,8 @@ type Stage6SpMission = {
     equipmentId?: number | null;
     requiredLevel?: number | null;
     requiredHeroIds?: number[] | null;
+    activityType?: number | null;
+    routeType?: number | null;
     stageId?: number | null;
     stageIds?: number[] | null;
     clearCount?: number | null;
@@ -544,6 +546,8 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       requiredHeroIds: Array.isArray(mission.condition?.requiredHeroIds)
         ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
         : [],
+      activityType: Number.isInteger(mission.condition?.activityType) ? Number(mission.condition?.activityType) : null,
+      routeType: Number.isInteger(mission.condition?.routeType) ? Number(mission.condition?.routeType) : null,
       stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
       stageIds: Array.isArray(mission.condition?.stageIds)
         ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
