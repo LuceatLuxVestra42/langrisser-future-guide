@@ -32,6 +32,10 @@ function getMovementTypeIconUrl(moveType: number) {
   return `${import.meta.env.BASE_URL}images/shared/movement/${fileName}`;
 }
 
+function getAttackRangeIconUrl() {
+  return `${import.meta.env.BASE_URL}images/shared/stats/Icon_Range.png`;
+}
+
 type HeroJobMovementRowView = {
   jobConnectionId: number;
   jobId: number;
@@ -143,8 +147,22 @@ function HeroSpJobMovementSection({
               </h3>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground">
-                공격 사거리 {row.attackRange}
+              <span
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground"
+                title={`공격 사거리 ${row.attackRange}`}
+                aria-label={`공격 사거리 ${row.attackRange}`}
+              >
+                <img
+                  src={getAttackRangeIconUrl()}
+                  alt=""
+                  aria-hidden="true"
+                  width={20}
+                  height={20}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-5 w-5 object-contain"
+                />
+                <span className="tabular-nums">{row.attackRange}</span>
               </span>
             </div>
           </div>
@@ -249,8 +267,22 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                 </div>
                 <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
                   {row.attackRange != null ? (
-                    <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground">
-                      공격 사거리 {row.attackRange}
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground"
+                      title={`공격 사거리 ${row.attackRange}`}
+                      aria-label={`공격 사거리 ${row.attackRange}`}
+                    >
+                      <img
+                        src={getAttackRangeIconUrl()}
+                        alt=""
+                        aria-hidden="true"
+                        width={20}
+                        height={20}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-5 w-5 object-contain"
+                      />
+                      <span className="tabular-nums">{row.attackRange}</span>
                     </span>
                   ) : null}
                 </div>
