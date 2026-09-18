@@ -127,6 +127,8 @@ export function SiteSectionNav() {
             alt="용서의 시계"
             width={36}
             height={36}
+            loading="eager"
+            decoding="async"
             className="h-9 w-auto object-contain"
           />
           <span className="whitespace-nowrap text-base font-bold tracking-tight text-foreground sm:text-lg">
