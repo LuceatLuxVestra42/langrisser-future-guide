@@ -180,7 +180,17 @@ jobs:
               await page.keyboard.press('Enter');
               await page.getByText('스킨 상점 · 스킨권 구매', { exact: true }).waitFor({ timeout: 10000 });
 
-              const soldier101 = page.locator('[data-hero-soldier-cards="true"] a[href*="/soldiers/101"]').first();
+              const soldierSection = page.locator('[data-hero-soldier-cards="true"]');
+              const expandSoldiers = soldierSection.getByRole('button', { name: '전체 용병 보기', exact: true });
+              check(await expandSoldiers.count() === 1, 'Hero 6 Soldier preview expand control missing or duplicated');
+              await expandSoldiers.click();
+              await page.waitForFunction(
+                () => document.querySelector('[data-hero-soldier-cards="true"]')?.getAttribute('data-hero-soldier-cards-expanded') === 'true',
+                null,
+                { timeout: 10000 },
+              );
+
+              const soldier101 = soldierSection.locator('a[href*="/soldiers/101"]').first();
               check(await soldier101.count() === 1, 'Hero 6 → Soldier 101 progressive fallback link missing');
               const heroUrl = page.url();
               await soldier101.click();
