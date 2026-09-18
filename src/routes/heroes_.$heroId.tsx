@@ -22,6 +22,7 @@ import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
+import { getHeroSpArtworkPath } from "@/lib/hero-sp-artwork-assets";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
@@ -119,6 +120,8 @@ type HeroVisual = {
   sourceOrder: number | null;
 };
 
+type HeroFormMode = "normal" | "sp";
+
 const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
   LLR: "/images/heroes/rarity/LLR.png",
   SSR: "/images/heroes/rarity/SSR.png",
@@ -175,8 +178,13 @@ function stripConfigMarkup(value: string | null) {
 
 function HeroDetailPage() {
   const { hero, detail, soldierCommand, heartFetter, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const hasSpForm = detail.sp.released;
+  const [formMode, setFormMode] = useState<HeroFormMode>("normal");
+  useEffect(() => setFormMode("normal"), [hero.heroId]);
+  const isSpForm = hasSpForm && formMode === "sp";
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
-  const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[hero.rarity.baseLabel] ?? null;
+  const displayRarityLabel = isSpForm ? "SP" : hero.rarity.baseLabel;
+  const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[displayRarityLabel] ?? null;
   const soldierDetailById = useMemo(
     () => new Map(getSoldierPrototypePageData().records.map((record) => [record.soldierId, record])),
     [],
@@ -201,9 +209,17 @@ function HeroDetailPage() {
   }
   const closeSoldierDetail = useCallback(() => setSelectedSoldierId(null), []);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
+  const spArtworkPath = isSpForm ? getHeroSpArtworkPath(hero.heroId) : null;
+  const primaryImageUrl = spArtworkPath ? resolvePublicAssetUrl(spArtworkPath) : imageUrl;
   const visuals: HeroVisual[] = [];
-  if (imageUrl) {
-    visuals.push({ kind: "hero", src: imageUrl, label: "대표 일러스트", skinId: null, sourceOrder: null });
+  if (primaryImageUrl) {
+    visuals.push({
+      kind: "hero",
+      src: primaryImageUrl,
+      label: spArtworkPath ? "SP 일러스트" : "대표 일러스트",
+      skinId: null,
+      sourceOrder: null,
+    });
   }
   for (const skin of getSkinFullartVisuals(hero.heroId)) {
     visuals.push({
@@ -216,41 +232,46 @@ function HeroDetailPage() {
   }
 
   const [visualIndex, setVisualIndex] = useState(0);
-  useEffect(() => setVisualIndex(0), [hero.heroId]);
+  useEffect(() => setVisualIndex(0), [hero.heroId, formMode]);
   const activeVisual = visuals[visualIndex] ?? null;
   const moveVisual = (delta: number) => {
     if (visuals.length <= 1) return;
     setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
   };
 
-  const visibleTalentProgression = detail.talent.starProgression
-    .filter((row) => detail.talent.initialStar == null || row.star >= detail.talent.initialStar)
-    .sort((a, b) => a.star - b.star);
+  const visibleTalentProgression = (
+    isSpForm
+      ? [...detail.sp.talent.starProgression]
+      : detail.talent.starProgression.filter(
+          (row) => detail.talent.initialStar == null || row.star >= detail.talent.initialStar,
+        )
+  ).sort((a, b) => a.star - b.star);
   const sixStarTalentIndex = visibleTalentProgression.findIndex((row) => row.star === 6);
   const defaultTalentIndex = sixStarTalentIndex >= 0 ? sixStarTalentIndex : Math.max(visibleTalentProgression.length - 1, 0);
   const [talentIndex, setTalentIndex] = useState(defaultTalentIndex);
-  useEffect(() => setTalentIndex(defaultTalentIndex), [hero.heroId, defaultTalentIndex]);
+  useEffect(() => setTalentIndex(defaultTalentIndex), [hero.heroId, isSpForm, defaultTalentIndex]);
   const activeTalentRow = visibleTalentProgression[talentIndex] ?? null;
   const moveTalent = (delta: number) => {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
-  const finalJobRows = [
-    ...detail.jobs.branches
-      .filter((branch) => branch.capstone?.rank === 4)
-      .map((branch) => ({ key: `normal-${branch.branchIndex}`, capstone: branch.capstone })),
-    ...(detail.sp.released && detail.sp.finalJob
-      ? [{ key: "sp", capstone: detail.sp.finalJob }]
-      : []),
-  ];
+  const normalFinalJobRows = detail.jobs.branches
+    .filter((branch) => branch.capstone?.rank === 4)
+    .map((branch) => ({ key: `normal-${branch.branchIndex}`, capstone: branch.capstone }));
+  const spFinalJobRows = detail.sp.released && detail.sp.finalJob
+    ? [{ key: "sp", capstone: detail.sp.finalJob }]
+    : [];
+  const finalJobRows = isSpForm ? spFinalJobRows : normalFinalJobRows;
   const finalJobNameById = new Map<number, string>();
   for (const { capstone } of finalJobRows) {
     if (capstone?.jobId != null) finalJobNameById.set(capstone.jobId, capstone.nameCn ?? `Job ${capstone.jobId}`);
   }
-  const heartFetterRows = [...new Set(heartFetter.effects.map((effect) => effect.jobId))].map((jobId) => ({
+  const heartFetterRows = [...finalJobNameById.entries()].map(([jobId, jobName]) => ({
     jobId,
-    jobName: finalJobNameById.get(jobId) ?? `Job ${jobId}`,
-    effects: heartFetter.effects.filter((effect) => effect.jobId === jobId).sort((a, b) => a.level - b.level || a.skillId - b.skillId),
+    jobName,
+    effects: heartFetter.effects
+      .filter((effect) => effect.jobId === jobId)
+      .sort((a, b) => a.level - b.level || a.skillId - b.skillId),
   }));
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
   const equipableSkillById = new Map<number, SkillView>();
@@ -264,6 +285,7 @@ function HeroDetailPage() {
     <main
       data-name-kr-status={hero.localization.nameKrStatus}
       data-name-source-authority={hero.localization.sourceAuthority}
+      data-hero-form-mode={isSpForm ? "sp" : "normal"}
       className="min-h-screen bg-background"
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
@@ -297,7 +319,7 @@ function HeroDetailPage() {
 
               {activeVisual ? (
                 <div className="absolute bottom-4 right-4 z-20 rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-right text-[11px] font-semibold text-foreground shadow-sm backdrop-blur sm:bottom-5 sm:right-5">
-                  <div>{activeVisual.kind === "hero" ? "대표 일러스트" : getHeroSkinAcquisitionDisplayLabel(hero.heroId, activeVisual.skinId, activeVisual.sourceOrder)}</div>
+                  <div>{activeVisual.kind === "hero" ? activeVisual.label : getHeroSkinAcquisitionDisplayLabel(hero.heroId, activeVisual.skinId, activeVisual.sourceOrder)}</div>
                   <div className="mt-0.5 text-muted-foreground">{visualIndex + 1} / {visuals.length}</div>
                 </div>
               ) : null}
@@ -307,12 +329,12 @@ function HeroDetailPage() {
               {rarityIconPath ? (
                 <img
                   src={resolvePublicAssetUrl(rarityIconPath)}
-                  alt={`${hero.rarity.baseLabel} 등급`}
-                  title={hero.rarity.baseLabel}
+                  alt={`${displayRarityLabel} 등급`}
+                  title={displayRarityLabel}
                   className="mb-2 h-8 w-auto self-start object-contain sm:h-9"
                 />
               ) : (
-                <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{hero.rarity.baseLabel}</p>
+                <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{displayRarityLabel}</p>
               )}
               <h1 className="text-4xl font-bold tracking-tight text-foreground [word-break:keep-all] [overflow-wrap:break-word] sm:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
@@ -334,12 +356,40 @@ function HeroDetailPage() {
                     />
                   ))}
                 </div>
+
+                {hasSpForm ? (
+                  <div className="mt-7" data-hero-form-switch="true" data-active-hero-form={isSpForm ? "sp" : "normal"}>
+                    <p className="mb-2 text-xs font-bold text-muted-foreground">전직 형태</p>
+                    <div className="inline-flex rounded-xl border border-border bg-muted/30 p-1" role="group" aria-label="전직 형태 선택">
+                      <button
+                        type="button"
+                        aria-pressed={!isSpForm}
+                        onClick={() => setFormMode("normal")}
+                        className={`rounded-lg px-4 py-2 text-sm font-extrabold transition ${!isSpForm ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        기본 전직
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={isSpForm}
+                        onClick={() => setFormMode("sp")}
+                        className={`rounded-lg px-4 py-2 text-sm font-extrabold transition ${isSpForm ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                      >
+                        SP 전직
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-talent-carousel="true">
+        <section
+          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+          data-hero-talent-carousel="true"
+          data-hero-form-mode={isSpForm ? "sp" : "normal"}
+        >
           <SectionTitle title="재능" />
           {activeTalentRow ? (
             <div
@@ -423,7 +473,7 @@ function HeroDetailPage() {
             )}
           </div>
 
-          {detail.sp.released ? (
+          {isSpForm ? (
             <div
               className="mt-7 border-t border-border pt-5"
               data-hero-sp-reward-skills="true"
@@ -443,10 +493,14 @@ function HeroDetailPage() {
           ) : null}
         </section>
 
-        <HeroJobMaterialsSection heroId={hero.heroId} />
+        <HeroJobMaterialsSection heroId={hero.heroId} mode={isSpForm ? "sp" : "normal"} />
         <HeroAwakeningMaterialsSection heroId={hero.heroId} />
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section
+          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+          data-hero-final-job-stats-section="true"
+          data-hero-form-mode={isSpForm ? "sp" : "normal"}
+        >
           <SectionTitle title="최종 직업 스탯" />
           {finalJobRows.length > 0 ? (
             <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
@@ -467,7 +521,7 @@ function HeroDetailPage() {
                     if (!capstone) return null;
                     return (
                       <Fragment key={key}>
-                        <tr className="border-b border-border/60">
+                        <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
                           <th scope="row" className="px-4 pb-2 pt-3 text-left">
                             <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
                           </th>
@@ -503,7 +557,8 @@ function HeroDetailPage() {
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
           data-hero-heart-fetter="true"
-          data-heart-fetter-effect-count={heartFetter.effects.length}
+          data-hero-form-mode={isSpForm ? "sp" : "normal"}
+          data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
         >
           <SectionTitle title="유대 Lv4 / Lv7 효과" />
           <p className="mt-2 text-xs font-semibold text-muted-foreground">한국어 설명 준비 중 · 검증된 중국 서버 presentation consumer 원문</p>
@@ -537,7 +592,7 @@ function HeroDetailPage() {
           )}
         </section>
 
-        {detail.sp.released ? (
+        {isSpForm ? (
           <HeroSpMissionSection
             activationMaterials={detail.sp.activationMaterials}
             missions={detail.sp.missions}
