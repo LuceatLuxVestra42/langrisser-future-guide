@@ -5,10 +5,15 @@ type ManifestAssetRecord = {
   publicPath: string;
 };
 
+const spRewardRecords = (
+  manifest as typeof manifest & { spRewardRecords?: ManifestAssetRecord[] }
+).spRewardRecords ?? [];
+
 const admittedRecords: ManifestAssetRecord[] = [
   ...manifest.records,
   ...manifest.awakeningRecords,
   ...manifest.spTalentRecords,
+  ...spRewardRecords,
 ];
 
 const bySourcePath = new Map<string, ManifestAssetRecord>(
