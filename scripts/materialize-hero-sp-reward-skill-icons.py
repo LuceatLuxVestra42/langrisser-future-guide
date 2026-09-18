@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, hashlib, importlib.util, json, pathlib
+import argparse, hashlib, importlib.util, json, pathlib, time
 
 SHARDS = pathlib.Path("data/generated/hero-detail/by-id")
 MANIFEST = pathlib.Path("data/generated/hero-skill-icon-assets.v1.json")
@@ -112,20 +112,36 @@ def scan_shard(index, count, output):
     errors = []
     bundle_count = 0
     for package in selected:
-        try:
-            entries = verifier.zip_directory(package["url"], package["contentLength"])
-        except Exception as exc:
-            errors.append({"packagePart":package["part"],"reason":f"PACKAGE_CATALOG_FAIL:{type(exc).__name__}:{exc}"})
+        entries = None
+        catalog_exc = None
+        for attempt in range(3):
+            try:
+                entries = verifier.zip_directory(package["url"], package["contentLength"])
+                break
+            except Exception as exc:
+                catalog_exc = exc
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+        if entries is None:
+            errors.append({"packagePart":package["part"],"reason":f"PACKAGE_CATALOG_FAIL:{type(catalog_exc).__name__}:{catalog_exc}"})
             continue
         for entry in entries:
             if not verifier.norm(entry["name"]).endswith(".b"):
                 continue
             bundle_count += 1
-            try:
-                raw = verifier.fetch_zip_entry(package["url"], entry)
-                env = UnityPy.load(raw)
-            except Exception as exc:
-                errors.append({"packagePart":package["part"],"bundleEntry":entry["name"],"reason":f"BUNDLE_DECODE_FAIL:{type(exc).__name__}:{exc}"})
+            raw = env = None
+            bundle_exc = None
+            for attempt in range(3):
+                try:
+                    raw = verifier.fetch_zip_entry(package["url"], entry)
+                    env = UnityPy.load(raw)
+                    break
+                except Exception as exc:
+                    bundle_exc = exc
+                    if attempt < 2:
+                        time.sleep(2 ** attempt)
+            if env is None:
+                errors.append({"packagePart":package["part"],"bundleEntry":entry["name"],"reason":f"BUNDLE_DECODE_FAIL:{type(bundle_exc).__name__}:{bundle_exc}"})
                 continue
             bundle_sha = None
             for container_path,value in env.container.items():
