@@ -91,6 +91,10 @@ async function verifyHeroFormSwitch(page, label) {
   check(await page.locator('[data-hero-sp-job-movement="true"]').count() === 0, `Hero 6 ${label} SP movement leaked into normal form`);
   check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 0, `Hero 6 ${label} SP reward skills leaked into normal form`);
   check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 6 ${label} SP missions leaked into normal form`);
+  const normalCommand = page.locator('[data-hero-soldier-command="true"]');
+  check(await normalCommand.getAttribute("data-hero-form-mode") === "normal", `Hero 6 ${label} Soldier command did not default to normal form`);
+  check(await normalCommand.locator('[data-command-mode="NORMAL"]').count() === 1, `Hero 6 ${label} normal Soldier command table missing`);
+  check(await normalCommand.locator('[data-command-mode="SP"]').count() === 0, `Hero 6 ${label} SP Soldier command leaked into normal form`);
   const normalFinalJobIds = await page.locator('[data-hero-final-job-stats-section="true"] [data-final-job-id]').evaluateAll((nodes) =>
     nodes.map((node) => Number(node.getAttribute("data-final-job-id"))),
   );
@@ -119,6 +123,10 @@ async function verifyHeroFormSwitch(page, label) {
   check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 1, `Hero 6 ${label} SP reward skills missing`);
   check(await page.locator('[data-hero-sp-missions="true"]').count() === 1, `Hero 6 ${label} SP missions missing`);
   check(await page.locator('[data-sp-activation-materials="true"]').count() === 0, `Hero 6 ${label} obsolete SP activation-material block is visible`);
+  const spCommand = page.locator('[data-hero-soldier-command="true"]');
+  check(await spCommand.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} Soldier command did not switch to SP form`);
+  check(await spCommand.locator('[data-command-mode="SP"]').count() === 1, `Hero 6 ${label} SP Soldier command table missing`);
+  check(await spCommand.locator('[data-command-mode="NORMAL"]').count() === 0, `Hero 6 ${label} normal Soldier command leaked into SP form`);
 
   const talent = page.locator('[data-hero-talent-carousel="true"]');
   check(await talent.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} talent did not switch to SP form`);
@@ -138,6 +146,7 @@ async function verifyHeroFormSwitch(page, label) {
   await page.getByRole("button", { name: "기본 전직", exact: true }).click();
   await page.waitForFunction(() => document.querySelector("main")?.getAttribute("data-hero-form-mode") === "normal", null, { timeout: 45000 });
   check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 6 ${label} normal form did not restore job materials`);
+  check(await page.locator('[data-hero-soldier-command="true"]').getAttribute("data-hero-form-mode") === "normal", `Hero 6 ${label} Soldier command did not restore normal form`);
   check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 6 ${label} SP missions survived normal-form restore`);
 }
 
@@ -200,6 +209,10 @@ async function verifyNonSpHeroFormAbsence(page, label) {
   check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP reward skills`);
   check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP missions`);
   check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 100 ${label} normal job materials missing`);
+  const command = page.locator('[data-hero-soldier-command="true"]');
+  check(await command.getAttribute("data-hero-form-mode") === "normal", `Hero 100 ${label} Soldier command did not remain normal`);
+  check(await command.locator('[data-command-mode="NORMAL"]').count() === 1, `Hero 100 ${label} normal Soldier command missing`);
+  check(await command.locator('[data-command-mode="SP"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP Soldier command`);
 }
 
 async function verifyInlineSoldierDialog(page, cards, cardIndex, label) {

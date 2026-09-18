@@ -67,9 +67,24 @@ function CommandVariantTable({ title, variant, mode }: { title: string; variant:
   );
 }
 
-export function HeroSoldierCommandSection({ soldierCommand }: { soldierCommand: HeroSoldierCommandView }) {
+export function HeroSoldierCommandSection({
+  soldierCommand,
+  mode,
+}: {
+  soldierCommand: HeroSoldierCommandView;
+  mode: "normal" | "sp";
+}) {
+  const variant = mode === "sp" ? soldierCommand.sp : soldierCommand.normal;
+  if (!variant) {
+    throw new Error(`Hero ${soldierCommand.heroId} requested SP Soldier command without a frozen SP variant.`);
+  }
+
   return (
-    <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-command="true">
+    <section
+      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+      data-hero-soldier-command="true"
+      data-hero-form-mode={mode}
+    >
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">병사 지휘 보정</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -77,11 +92,12 @@ export function HeroSoldierCommandSection({ soldierCommand }: { soldierCommand: 
         </p>
       </div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-2">
-        <CommandVariantTable title="일반 클래스" mode="NORMAL" variant={soldierCommand.normal} />
-        {soldierCommand.spEligible && soldierCommand.sp ? (
-          <CommandVariantTable title="SP 클래스" mode="SP" variant={soldierCommand.sp} />
-        ) : null}
+      <div className="mt-5">
+        <CommandVariantTable
+          title={mode === "sp" ? "SP 클래스" : "일반 클래스"}
+          mode={mode === "sp" ? "SP" : "NORMAL"}
+          variant={variant}
+        />
       </div>
     </section>
   );
