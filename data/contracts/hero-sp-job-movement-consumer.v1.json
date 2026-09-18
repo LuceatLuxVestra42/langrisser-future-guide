@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "stage": "hero-sp-job-movement-consumer",
+  "status": "PRODUCER_READY",
+  "owner": "hero-canonical",
+  "expectedBaseHead": "0c542641f421bd0d4022bf444db9903635d56a3b",
+  "purpose": "Project released SP final-job movement type and movement point for Hero detail presentation without reopening SP identity/relation semantics.",
+  "populationAuthority": {
+    "consumer": "data/generated/hero-final-job-attack-range.v1.json",
+    "rule": "Reuse only references where kind=SP from the already-frozen final-job consumer.",
+    "requiredStatus": "FROZEN",
+    "requiredReleasedSpReferenceCount": 25
+  },
+  "semanticAuthority": "Exact ConfigDataJobInfo.ID lookup for the inherited SP JobID, copying MoveType and BF_MovePoint only.",
+  "movementDefinitions": "data/contracts/hero-soldier-movement-type-presentation.v1.json",
+  "sourcePack": "data/contracts/configdata-source-pack-contract.v1.json",
+  "outputs": {
+    "consumer": "data/generated/hero-sp-job-movement.v1.json",
+    "validation": "data/validation/hero-sp-job-movement.v1.json"
+  },
+  "boundaries": {
+    "nameJoin": false,
+    "idArithmetic": false,
+    "filenameSimilarity": false,
+    "screenOrderMapping": false,
+    "relationRecomputation": false,
+    "rawConfigDataFrontendRead": false,
+    "historicalFallback": false,
+    "normalJobPopulationChanged": false,
+    "attackRangeMeaningChanged": false
+  }
+}
