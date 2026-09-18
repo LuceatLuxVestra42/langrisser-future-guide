@@ -1,0 +1,74 @@
+name: Hero Casting Law Materials
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'feat/hero-casting-law-materials-*'
+    paths:
+      - '.github/workflows/hero-casting-law-materials.yml'
+      - 'data/contracts/hero-casting-law-materials.v1.json'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+      - 'scripts/build_hero_casting_law_materials.cjs'
+      - 'scripts/validate_hero_casting_law_materials.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  build-validate-freeze:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact branch source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Confirm clean source checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain=v1)"
+          git diff --check
+
+      - name: Build frozen Casting Law material catalog
+        run: node scripts/build_hero_casting_law_materials.cjs
+
+      - name: Independently validate source parity
+        run: node scripts/validate_hero_casting_law_materials.cjs
+
+      - name: Reject unexpected mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed='^(data/generated/hero-casting-law-materials\.v1\.json|data/validation/hero-casting-law-materials-summary\.v1\.json)$'
+          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
+          if [[ -n "$unexpected" ]]; then
+            printf 'Unexpected mutation after producer/validator:\n%s\n' "$unexpected" >&2
+            exit 1
+          fi
+          git diff --check
+
+      - name: Freeze validated outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-casting-law-materials.v1.json data/validation/hero-casting-law-materials-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Casting Law material outputs already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Freeze Hero Casting Law material catalog'
+          git push origin HEAD:"${GITHUB_REF_NAME}"
