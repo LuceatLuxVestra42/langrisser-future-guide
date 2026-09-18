@@ -37,30 +37,29 @@ export function SoldierDetailDialog({
   }, [onClose]);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6">
       <div
         aria-hidden="true"
-        className="pointer-events-auto absolute inset-0 bg-black/60"
+        className="absolute inset-0 z-0 bg-black/60"
         onMouseDown={onClose}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="soldier-detail-title"
-        className="pointer-events-auto relative z-10 w-full max-w-6xl"
+        className="relative z-10 w-full max-w-6xl"
       >
-        <div className="pointer-events-none mb-2 flex justify-end px-1">
+        <div className="relative z-20 mb-2 flex justify-end px-1">
           <button
             type="button"
             aria-label="상세 창 닫기"
             onClick={onClose}
-            className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            style={{ pointerEvents: "auto" }}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-h-[calc(90vh-3rem)]">
+        <div className="relative z-10 max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-h-[calc(90vh-3rem)]">
           <SoldierDetailModal
             key={record.soldierId}
             record={record}
