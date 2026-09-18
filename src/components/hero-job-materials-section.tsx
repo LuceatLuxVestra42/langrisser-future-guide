@@ -163,6 +163,8 @@ function HeroSpJobMovementSection({
                   title={row.moveTypeNameKr}
                   width={32}
                   height={32}
+                  loading="lazy"
+                  decoding="async"
                   className="h-8 w-8 object-contain"
                 />
               </dd>
@@ -268,6 +270,8 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                       title={row.moveTypeNameKr}
                       width={32}
                       height={32}
+                      loading="lazy"
+                      decoding="async"
                       className="h-8 w-8 object-contain"
                     />
                   </dd>
