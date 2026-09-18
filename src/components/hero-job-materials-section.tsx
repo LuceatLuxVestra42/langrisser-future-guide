@@ -5,11 +5,6 @@ import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 
-function stripConfigMarkup(value: string | null) {
-  if (!value) return "-";
-  return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
-}
-
 function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
   const iconUrl = getHeroJobMaterialIconUrl(sourcePath);
   if (!iconUrl) return null;
