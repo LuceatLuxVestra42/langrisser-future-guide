@@ -24,7 +24,15 @@ export function SoldierDetailDialog({
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
+    const mainElement = document.querySelector("main");
+    const previousMainPointerEvents = mainElement instanceof HTMLElement
+      ? mainElement.style.pointerEvents
+      : null;
+
     document.body.style.overflow = "hidden";
+    if (mainElement instanceof HTMLElement) {
+      mainElement.style.pointerEvents = "none";
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -34,6 +42,9 @@ export function SoldierDetailDialog({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      if (mainElement instanceof HTMLElement && previousMainPointerEvents != null) {
+        mainElement.style.pointerEvents = previousMainPointerEvents;
+      }
     };
   }, [onClose]);
 
@@ -62,8 +73,14 @@ export function SoldierDetailDialog({
         aria-label="상세 창 닫기"
         aria-controls="soldier-detail-title"
         onClick={onClose}
-        className="fixed right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-5 sm:top-5"
-        style={{ zIndex: 2147483647, pointerEvents: "auto" }}
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        style={{
+          position: "fixed",
+          top: "12px",
+          right: "12px",
+          zIndex: 2147483647,
+          pointerEvents: "auto",
+        }}
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>
