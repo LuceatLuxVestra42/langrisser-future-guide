@@ -211,6 +211,11 @@ export function resolveHeroNameLocalization(
   };
 }
 
+export function resolveHeroDisplayNameById(heroId: number) {
+  const hero = resolveFrozenHero(heroId);
+  return resolveHeroNameLocalization(heroId, hero.identity.nameKr, hero.identity.nameCn).displayName;
+}
+
 export function resolveHeroDisplayNameKr(
   heroId: number,
   fallbackNameKr: string | null,
