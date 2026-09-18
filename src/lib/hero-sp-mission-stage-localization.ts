@@ -1,4 +1,4 @@
-import localization from "../data/hero-sp-mission-stage-localization.json";
+import localization from "./hero-sp-mission-stage-localization.v1.json";
 
 type SpStageCondition = {
   kind: string | null;
