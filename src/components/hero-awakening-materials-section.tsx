@@ -1,9 +1,6 @@
 import { getHeroAwakeningMaterialIconUrl } from "@/lib/hero-awakening-material-icon-assets";
 import { getStaticHeroAwakeningMaterials } from "@/lib/hero-awakening-materials.static";
 
-function stripConfigMarkup(value: string) {
-  return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
-}
 
 export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
   const hero = getStaticHeroAwakeningMaterials(heroId);
