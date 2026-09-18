@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -49,6 +50,89 @@ function normalizedMovePoint(value) {
   return Number.isFinite(value) ? value : null;
 }
 
+function readUint32BE(buffer, offset) {
+  return buffer.readUInt32BE(offset);
+}
+
+function crc32(buffer) {
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function validateMovementIconPng(iconFileName) {
+  const relativePath = `public/images/shared/movement/${iconFileName}`;
+  const absolutePath = path.join(ROOT, relativePath);
+  if (!fs.existsSync(absolutePath)) {
+    fail('movement-icon-missing', relativePath);
+    return;
+  }
+
+  const buffer = fs.readFileSync(absolutePath);
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (buffer.length < 33 || !buffer.subarray(0, 8).equals(signature)) {
+    fail('movement-icon-invalid-png-signature', relativePath);
+    return;
+  }
+
+  let offset = 8;
+  let sawIhdr = false;
+  let sawIend = false;
+  const idatChunks = [];
+  while (offset + 12 <= buffer.length) {
+    const length = readUint32BE(buffer, offset);
+    const typeStart = offset + 4;
+    const dataStart = offset + 8;
+    const dataEnd = dataStart + length;
+    const crcOffset = dataEnd;
+    if (crcOffset + 4 > buffer.length) {
+      fail('movement-icon-truncated-png-chunk', { iconFileName, offset, length });
+      return;
+    }
+
+    const type = buffer.subarray(typeStart, dataStart).toString('ascii');
+    const storedCrc = readUint32BE(buffer, crcOffset);
+    const calculatedCrc = crc32(buffer.subarray(typeStart, dataEnd));
+    if (storedCrc !== calculatedCrc) {
+      fail('movement-icon-png-crc-mismatch', { iconFileName, type, storedCrc, calculatedCrc });
+    }
+
+    if (type === 'IHDR') {
+      sawIhdr = true;
+      const width = readUint32BE(buffer, dataStart);
+      const height = readUint32BE(buffer, dataStart + 4);
+      if (width <= 0 || height <= 0) fail('movement-icon-invalid-dimensions', { iconFileName, width, height });
+    } else if (type === 'IDAT') {
+      idatChunks.push(buffer.subarray(dataStart, dataEnd));
+    } else if (type === 'IEND') {
+      sawIend = true;
+      offset = crcOffset + 4;
+      break;
+    }
+
+    offset = crcOffset + 4;
+  }
+
+  if (!sawIhdr || !sawIend || idatChunks.length === 0) {
+    fail('movement-icon-png-structure', { iconFileName, sawIhdr, sawIend, idatChunkCount: idatChunks.length });
+    return;
+  }
+  if (offset !== buffer.length) {
+    fail('movement-icon-trailing-bytes', { iconFileName, parsedBytes: offset, fileBytes: buffer.length });
+  }
+
+  try {
+    zlib.inflateSync(Buffer.concat(idatChunks));
+  } catch (error) {
+    fail('movement-icon-idat-inflate-failed', { iconFileName, error: error instanceof Error ? error.message : String(error) });
+  }
+}
+
 if (contract?.status !== 'FROZEN') fail('contract-not-frozen', contract?.status ?? null);
 if (!Array.isArray(contract?.definitions)) fail('contract-definitions-not-array', null);
 if (!Array.isArray(heroJobs?.records)) fail('hero-job-links-records-not-array', null);
@@ -68,6 +152,9 @@ if (expectedDefinitions.length !== 5 || !sameJson([...definitionIds].sort((a, b)
   fail('movement-definition-set', definitionIds);
 }
 if (!sameJson(generated?.definitions, expectedDefinitions)) fail('generated-definition-parity', null);
+for (const definition of expectedDefinitions) {
+  validateMovementIconPng(definition.iconFileName);
+}
 
 const allowedMoveTypes = new Set(definitionIds);
 const jobIndex = indexByIntegerId(jobInfo, 'job-info');
