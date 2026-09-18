@@ -634,7 +634,7 @@ function HeroDetailPage() {
           <HeroSpMissionSection
             missions={detail.sp.missions}
             secondStageRewardSoldierNames={detail.sp.secondStageRewards.soldiers.map(
-              (soldier) => soldier.nameKr ?? soldier.nameCn,
+              (soldier) => soldier.displayName,
             )}
           />
         ) : null}
