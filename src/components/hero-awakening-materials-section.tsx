@@ -21,10 +21,7 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
       </div>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-sm font-extrabold text-foreground">각성기 습득</span>
-        </div>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+        <ul className="grid gap-2 sm:grid-cols-3">
           {hero.awakening.materials.map((material, index) => {
             const iconUrl = getHeroAwakeningMaterialIconUrl(material.item.icon);
             if (!iconUrl) {
