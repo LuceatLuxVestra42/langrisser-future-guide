@@ -153,6 +153,20 @@ jobs:
               const name = article.locator('[data-hero-talent-name="true"]');
               const starDisplay = article.locator(`[data-hero-talent-star-display="${star}"]`);
               const description = article.locator('[data-hero-talent-description="true"]');
+              const talentIcon = article.locator('[data-hero-skill-icon-variant="talent"]');
+              const talentIconImage = talentIcon.locator('img');
+              check(await talentIcon.count() === 1, `${label} Hero ${target.heroId} talent icon missing or duplicated`);
+              check(await talentIconImage.count() === 1, `${label} Hero ${target.heroId} talent icon image missing or duplicated`);
+              const talentIconPresentation = await talentIconImage.evaluate((element) => {
+                const rect = element.getBoundingClientRect();
+                return {
+                  clipPath: getComputedStyle(element).clipPath,
+                  width: rect.width,
+                  height: rect.height,
+                };
+              });
+              check(talentIconPresentation.clipPath.startsWith('polygon('), `${label} Hero ${target.heroId} talent icon is not hex-clipped: ${talentIconPresentation.clipPath}`);
+              check(talentIconPresentation.width > talentIconPresentation.height, `${label} Hero ${target.heroId} talent icon must preserve Gift asset aspect ratio: ${JSON.stringify(talentIconPresentation)}`);
               check(await name.count() === 1, `${label} Hero ${target.heroId} talent name missing or duplicated`);
               check(await starDisplay.count() === 1, `${label} Hero ${target.heroId} ${star}성 display missing or duplicated`);
               check((await starDisplay.innerText()).trim() === "★".repeat(star), `${label} Hero ${target.heroId} ${star}성 display mismatch`);
