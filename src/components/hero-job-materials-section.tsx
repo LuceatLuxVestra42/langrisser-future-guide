@@ -16,6 +16,22 @@ function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
   );
 }
 
+const MOVEMENT_ICON_FILE_BY_TYPE: Record<number, string> = {
+  1: "Move_Ride.png",
+  2: "Move_Walk.png",
+  3: "Move_Water.png",
+  4: "Move_Fly.png",
+  5: "Move_FieldArmy.png",
+};
+
+function getMovementTypeIconUrl(moveType: number) {
+  const fileName = MOVEMENT_ICON_FILE_BY_TYPE[moveType];
+  if (!fileName) {
+    throw new Error(`Unsupported frozen movement type ${moveType}.`);
+  }
+  return `${import.meta.env.BASE_URL}images/shared/movement/${fileName}`;
+}
+
 type HeroJobMovementRowView = {
   jobConnectionId: number;
   jobId: number;
@@ -143,7 +159,16 @@ function HeroSpJobMovementSection({
             </div>
             <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
               <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-              <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
+              <dd className="mt-1">
+                <img
+                  src={getMovementTypeIconUrl(row.moveType)}
+                  alt={row.moveTypeNameKr}
+                  title={row.moveTypeNameKr}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                />
+              </dd>
             </div>
           </dl>
         </article>
@@ -245,7 +270,16 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                 </div>
                 <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
                   <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-                  <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
+                  <dd className="mt-1">
+                <img
+                  src={getMovementTypeIconUrl(row.moveType)}
+                  alt={row.moveTypeNameKr}
+                  title={row.moveTypeNameKr}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                />
+              </dd>
                 </div>
               </dl>
             </article>
