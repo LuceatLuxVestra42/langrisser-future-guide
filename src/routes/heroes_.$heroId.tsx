@@ -456,7 +456,7 @@ function HeroDetailPage() {
                 </button>
                 <article key={`${activeTalentRow.star}-${activeTalentRow.skillId}`} className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
                   <div className="flex items-start gap-3">
-                    <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
+                    <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} variant="talent" />
                     <h3 className="min-w-0 flex-1 font-bold text-foreground" data-hero-talent-name="true">
                       {activeTalentRow.skill.nameCn ?? "스킬"}
                     </h3>
@@ -799,10 +799,38 @@ function HeroSoldierCard({
   );
 }
 
-function HeroSkillIcon({ heroId, skill }: { heroId: number; skill: SkillView }) {
+function HeroSkillIcon({
+  heroId,
+  skill,
+  variant = "default",
+}: {
+  heroId: number;
+  skill: SkillView;
+  variant?: "default" | "talent";
+}) {
   const iconUrl = getHeroSkillIconUrl(heroId, skill.iconPath);
   if (!iconUrl) return null;
-  return <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"><img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" /></div>;
+  const isTalent = variant === "talent";
+  return (
+    <div
+      data-hero-skill-icon-variant={variant}
+      className={isTalent
+        ? "flex h-16 w-16 shrink-0 items-center justify-center"
+        : "flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm"}
+    >
+      <img
+        src={iconUrl}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        className={isTalent ? "h-auto max-h-16 w-16 object-contain" : "h-full w-full object-contain"}
+        style={isTalent
+          ? { clipPath: "polygon(26% 6%, 74% 6%, 94% 50%, 74% 90%, 27% 90%, 6% 50%)" }
+          : undefined}
+      />
+    </div>
+  );
 }
 
 function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
