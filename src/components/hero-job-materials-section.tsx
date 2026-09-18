@@ -169,7 +169,12 @@ function HeroSpJobMovementSection({
 
     const jobConnectionId = finalJob.jobConnectionId;
     const jobId = finalJob.jobId;
-    if (!Number.isInteger(jobConnectionId) || !Number.isInteger(jobId)) {
+    if (
+      typeof jobConnectionId !== "number" ||
+      !Number.isInteger(jobConnectionId) ||
+      typeof jobId !== "number" ||
+      !Number.isInteger(jobId)
+    ) {
       setLoadError(`Hero ${heroId} released SP final job has no exact frozen identity.`);
       return () => {
         cancelled = true;
