@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const ROOT = path.resolve(import.meta.dirname, "..");
+const ROOT = path.resolve(import.meta.dirname, "../..");
 const readJson = (relativePath) =>
   JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), "utf8"));
 
