@@ -1,0 +1,104 @@
+name: Hero SP Reward Skill Icon Materialize
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/hero-skill-icon-sp-reward-materialize.yml'
+      - 'scripts/materialize-hero-skill-icon-sp-reward-assets.py'
+      - 'scripts/admit-hero-sp-reward-skill-icon-manifest.mjs'
+      - 'scripts/validate-hero-sp-reward-skill-icon-assets-readonly.mjs'
+      - 'scripts/validate-hero-skill-icon-assets-readonly.mjs'
+      - 'src/lib/hero-skill-icon-assets.ts'
+      - 'data/generated/hero-skill-icon-sp-reward-materialization.v1.json'
+      - 'data/generated/hero-skill-icon-assets.v1.json'
+      - 'public/images/heroes/skill-icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install official asset verifier dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - name: Exhaustively scan official installer shard
+        run: >
+          python scripts/materialize-hero-skill-icon-sp-reward-assets.py
+          --shard-index ${{ matrix.shard }}
+          --shard-count 8
+          --output /tmp/sp-reward-shard-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sp-reward-shard-${{ matrix.shard }}
+          path: /tmp/sp-reward-shard-${{ matrix.shard }}.json
+          if-no-files-found: error
+          retention-days: 1
+
+  materialize:
+    needs: scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install official asset verifier dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: sp-reward-shard-*
+          path: /tmp/sp-reward-scan
+          merge-multiple: true
+      - name: Merge exhaustive proof and materialize exact SP reward icons
+        run: >
+          python scripts/materialize-hero-skill-icon-sp-reward-assets.py
+          --merge-dir /tmp/sp-reward-scan
+          --write
+      - name: Admit materialized SP reward icons into frozen manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          if node -e 'const m=require("./data/generated/hero-skill-icon-assets.v1.json"); process.exit(Array.isArray(m.spRewardRecords)?0:1)'; then
+            echo 'SP reward manifest records already admitted.'
+          else
+            node scripts/admit-hero-sp-reward-skill-icon-manifest.mjs
+          fi
+      - name: Validate SP reward icon materialization and frontend admission
+        run: node scripts/validate-hero-skill-icon-assets-readonly.mjs
+      - name: Commit deterministic materialization outputs when needed
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-skill-icon-sp-reward-materialization.v1.json data/generated/hero-skill-icon-assets.v1.json public/images/heroes/skill-icons/*.png
+          if git diff --cached --quiet; then
+            echo 'No materialization diff.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Materialize SP reward skill icons'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
