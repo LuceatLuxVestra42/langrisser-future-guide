@@ -397,32 +397,38 @@ function HeroDetailPage() {
                   ))}
                 </div>
 
-                {hasSpForm ? (
-                  <div className="mt-7" data-hero-form-switch="true" data-active-hero-form={isSpForm ? "sp" : "normal"}>
-                    <p className="mb-2 text-xs font-bold text-muted-foreground">전직 형태</p>
-                    <div className="inline-flex rounded-xl border border-border bg-muted/30 p-1" role="group" aria-label="전직 형태 선택">
-                      <button
-                        type="button"
-                        aria-pressed={!isSpForm}
-                        onClick={() => setFormMode("normal")}
-                        className={`rounded-lg px-4 py-2 text-sm font-extrabold transition ${!isSpForm ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        기본 전직
-                      </button>
-                      <button
-                        type="button"
-                        aria-pressed={isSpForm}
-                        onClick={() => setFormMode("sp")}
-                        className={`rounded-lg px-4 py-2 text-sm font-extrabold transition ${isSpForm ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-                      >
-                        SP 전직
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
           </div>
+
+          {hasSpForm ? (
+            <div
+              className="border-t border-border bg-muted/15 p-3 sm:p-4"
+              data-hero-form-switch="true"
+              data-active-hero-form={isSpForm ? "sp" : "normal"}
+            >
+              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/35 p-1.5" role="group" aria-label="전직 형태 선택">
+                <button
+                  type="button"
+                  aria-label="기본 전직"
+                  aria-pressed={!isSpForm}
+                  onClick={() => setFormMode("normal")}
+                  className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${!isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                >
+                  기본전직 보기
+                </button>
+                <button
+                  type="button"
+                  aria-label="SP 전직"
+                  aria-pressed={isSpForm}
+                  onClick={() => setFormMode("sp")}
+                  className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                >
+                  SP전직 보기
+                </button>
+              </div>
+            </div>
+          ) : null}
         </section>
 
         <section
@@ -484,6 +490,50 @@ function HeroDetailPage() {
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 고유기 progression이 없어.</p>
           )}
+        </section>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="equipment-discipline">
+        <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
+        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="bond-command">
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+          <SectionTitle title="유대" />
+          {hasBondUnlockConditions ? (
+            <div className="mt-5 grid gap-2 lg:grid-cols-2">
+              {detail.bonds.rows.flatMap((bond) => {
+                const favorabilityLevel = bond.completionConditions.find((condition) => condition.favorability)?.favorability?.requiredLevel ?? null;
+                const fetterIconNumber = favorabilityLevel == null ? null : (FETTER_ICON_BY_FAVORABILITY_LEVEL[favorabilityLevel] ?? null);
+                const fetterIconUrl = fetterIconNumber == null ? null : resolvePublicAssetUrl(`/images/fetter/Fetter${fetterIconNumber}.png`);
+                return bond.completionConditions
+                  .filter((condition) => !condition.favorability)
+                  .map((condition, conditionIndex) => (
+                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
+                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-9 w-9 shrink-0 object-contain" /> : null}
+                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
+                    </div>
+                  ));
+              })}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
+          )}
+        </section>
+        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
+        </div>
+
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
+          <SectionTitle title="사용 가능 용병" />
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
+            {soldierCards.map((record) => (
+              <HeroSoldierCard
+                key={record.soldierId}
+                record={record}
+                onOpen={setSelectedSoldierId}
+              />
+            ))}
+          </div>
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -638,45 +688,8 @@ function HeroDetailPage() {
           />
         ) : null}
 
-        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle title="유대" />
-          {hasBondUnlockConditions ? (
-            <div className="mt-5 grid gap-2 lg:grid-cols-2">
-              {detail.bonds.rows.flatMap((bond) => {
-                const favorabilityLevel = bond.completionConditions.find((condition) => condition.favorability)?.favorability?.requiredLevel ?? null;
-                const fetterIconNumber = favorabilityLevel == null ? null : (FETTER_ICON_BY_FAVORABILITY_LEVEL[favorabilityLevel] ?? null);
-                const fetterIconUrl = fetterIconNumber == null ? null : resolvePublicAssetUrl(`/images/fetter/Fetter${fetterIconNumber}.png`);
-                return bond.completionConditions
-                  .filter((condition) => !condition.favorability)
-                  .map((condition, conditionIndex) => (
-                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
-                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-9 w-9 shrink-0 object-contain" /> : null}
-                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
-                    </div>
-                  ));
-              })}
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
-          )}
-        </section>
-        <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
-        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-soldier-cards="true">
-          <SectionTitle title="사용 가능 용병" />
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
-            {soldierCards.map((record) => (
-              <HeroSoldierCard
-                key={record.soldierId}
-                record={record}
-                onOpen={setSelectedSoldierId}
-              />
-            ))}
-          </div>
-        </section>
       </div>
 
       {selectedSoldierRecord ? (
