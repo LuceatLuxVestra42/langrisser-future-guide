@@ -455,14 +455,14 @@ function HeroDetailPage() {
                   <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
                 <article key={`${activeTalentRow.star}-${activeTalentRow.skillId}`} className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} variant="talent" />
                     <h3 className="min-w-0 flex-1 font-bold text-foreground" data-hero-talent-name="true">
                       {activeTalentRow.skill.nameCn ?? "스킬"}
                     </h3>
                   </div>
                   <div
-                    className="mt-4 tracking-[0.08em] text-amber-500"
+                    className="mt-2 tracking-[0.08em] text-amber-500"
                     data-hero-talent-star-display={activeTalentRow.star}
                     aria-label={`${activeTalentRow.star}성`}
                   >
