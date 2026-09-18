@@ -37,18 +37,13 @@ export function SoldierDetailDialog({
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6"
-      onMouseDown={(event) => {
-        if (event.currentTarget === event.target) onClose();
-      }}
-    >
+    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6">
       <button
         type="button"
         aria-label="상세 창 닫기"
         aria-controls="soldier-detail-title"
         onClick={onClose}
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{
           position: "fixed",
           top: "12px",
@@ -63,7 +58,7 @@ export function SoldierDetailDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="soldier-detail-title"
-        className="relative z-10 w-full max-w-6xl"
+        className="pointer-events-auto relative z-10 w-full max-w-6xl"
       >
         <div className="max-h-[calc(100dvh-1rem)] overflow-y-auto sm:max-h-[90vh]">
           <SoldierDetailModal
