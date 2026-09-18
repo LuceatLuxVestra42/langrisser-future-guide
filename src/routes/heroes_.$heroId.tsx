@@ -25,6 +25,7 @@ import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-
 import { getHeroSpArtworkSource } from "@/lib/hero-sp-artwork-assets";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
+import { resolveHeroSpMissionStageLabelKr } from "@/lib/hero-sp-mission-stage-localization";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
@@ -795,6 +796,8 @@ type SpMissionView = {
     equipmentId: number | null;
     requiredLevel: number | null;
     requiredHeroIds: number[];
+    activityType: number | null;
+    routeType: number | null;
     stageId: number | null;
     stageIds: number[];
     clearCount: number | null;
@@ -886,11 +889,23 @@ function SpMissionPhase({ title, missions }: { title: string; missions: SpMissio
 
 function formatSpMissionCondition(mission: SpMissionView) {
   const condition = mission.condition;
-  if (condition.kind === "EXCLUSIVE_EQUIPMENT_LEVEL") return "전용장비 ID " + (condition.equipmentId ?? "?") + " · Lv." + (condition.requiredLevel ?? "?") + " 달성";
-  if (condition.kind === "CLEAR_STORY_STAGE_WITH_HEROES") return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · Stage " + (condition.stageId ?? "?") + " · " + (condition.clearCount ?? 1) + "회 클리어";
-  if (condition.kind === "CLEAR_ACTIVITY_STAGE_WITH_HEROES" || condition.kind === "CLEAR_ACTIVITY_STAGE_SOLO_OR_SPECIFIED") return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · Stage " + condition.stageIds.join(", ") + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  if (condition.kind === "EXCLUSIVE_EQUIPMENT_LEVEL") {
+    return "전용장비 ID " + (condition.equipmentId ?? "?") + " · Lv." + (condition.requiredLevel ?? "?") + " 달성";
+  }
+
+  const stageLabelKr = resolveHeroSpMissionStageLabelKr(condition);
+  if (condition.kind === "CLEAR_STORY_STAGE_WITH_HEROES") {
+    return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  }
+  if (condition.kind === "CLEAR_ACTIVITY_STAGE_WITH_HEROES") {
+    return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · " + (stageLabelKr ?? ("Stage " + condition.stageIds.join(", "))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  }
+  if (condition.kind === "CLEAR_ACTIVITY_STAGE_SOLO_OR_SPECIFIED") {
+    return "Hero " + condition.requiredHeroIds.join(", ") + " 단독 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+  }
   return null;
 }
+
 function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {
   if (condition.favorability) {
     const targetName = condition.favorability.targetHeroNameKr ?? condition.favorability.targetHeroNameCn ?? condition.favorability.targetHeroNameEn ?? "영웅";
