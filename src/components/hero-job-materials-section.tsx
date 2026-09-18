@@ -1,11 +1,9 @@
 import { useLoaderData } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
-import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
   if (!value) return "-";
@@ -20,136 +18,6 @@ function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
     <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-background p-1 shadow-sm">
       <img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" />
     </div>
-  );
-}
-
-type SpTalentSkill = {
-  skillId: number;
-  nameCn: string | null;
-  desc: string | null;
-  iconPath: string | null;
-};
-
-type SpTalentView = {
-  status: string | null;
-  selectionRule: string | null;
-  starProgression: Array<{
-    star: number;
-    skillId: number;
-    skill: SpTalentSkill;
-  }>;
-};
-
-type HeroJobMovementRowView = {
-  jobConnectionId: number;
-  jobId: number;
-  nameCn: string | null;
-  moveType: number;
-  moveTypeNameKr: string;
-  movePoint: number;
-  attackRange: number | null;
-};
-
-type HeroSpFinalJobView = {
-  jobConnectionId: number | null;
-  jobId: number | null;
-  nameCn: string | null;
-};
-
-function HeroSpTalentSection({
-  heroId,
-  jobNameCn,
-  talent,
-}: {
-  heroId: number;
-  jobNameCn: string | null;
-  talent: SpTalentView;
-}) {
-  const progression = [...talent.starProgression].sort((a, b) => a.star - b.star);
-  const sixStarIndex = progression.findIndex((row) => row.star === 6);
-  const defaultIndex = sixStarIndex >= 0 ? sixStarIndex : Math.max(progression.length - 1, 0);
-  const [talentIndex, setTalentIndex] = useState(defaultIndex);
-  useEffect(() => setTalentIndex(defaultIndex), [heroId, defaultIndex]);
-
-  if (talent.status !== "VERIFIED" || progression.length === 0) return null;
-
-  const activeRow = progression[talentIndex] ?? progression.at(-1) ?? null;
-  if (!activeRow) return null;
-  const iconUrl = getHeroSkillIconUrl(heroId, activeRow.skill.iconPath);
-  const moveTalent = (delta: number) => {
-    setTalentIndex((current) => Math.min(Math.max(current + delta, 0), progression.length - 1));
-  };
-
-  return (
-    <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
-      data-hero-sp-talent="true"
-      data-sp-talent-count={progression.length}
-      data-sp-talent-selection-rule={talent.selectionRule ?? ""}
-    >
-      <div>
-        <h2 className="text-lg font-extrabold tracking-tight text-foreground">SP 전직 고유기</h2>
-        <p className="mt-1 text-xs font-semibold text-muted-foreground">
-          {jobNameCn ? `${jobNameCn} · ` : ""}검증된 중국 서버 SP 전직 고유기
-        </p>
-      </div>
-
-      <div className="mt-4" data-hero-sp-talent-active-star={activeRow.star}>
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch gap-2 sm:gap-3">
-          <button
-            type="button"
-            aria-label="낮은 성급 SP 고유기 보기"
-            onClick={() => moveTalent(-1)}
-            disabled={talentIndex === 0}
-            className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
-          >
-            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
-
-          <article className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-            <div className="flex items-start gap-3">
-              {iconUrl ? (
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-background p-1.5 shadow-sm">
-                  <img src={iconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-full w-full object-contain" />
-                </div>
-              ) : null}
-              <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-foreground">
-                  {activeRow.star}성 · {activeRow.skill.nameCn ?? `Skill ${activeRow.skillId}`}
-                </h3>
-                <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">
-                  {stripConfigMarkup(activeRow.skill.desc)}
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <button
-            type="button"
-            aria-label="높은 성급 SP 고유기 보기"
-            onClick={() => moveTalent(1)}
-            disabled={talentIndex === progression.length - 1}
-            className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
-          >
-            <ChevronRight className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:justify-center" aria-label="SP 고유기 성급 선택">
-          {progression.map((row, index) => (
-            <button
-              key={`${row.star}-${row.skillId}-sp-selector`}
-              type="button"
-              onClick={() => setTalentIndex(index)}
-              aria-pressed={index === talentIndex}
-              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${index === talentIndex ? "border-foreground bg-foreground text-background" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}
-            >
-              {row.star}성
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -381,7 +249,13 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
   );
 }
 
-export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
+export function HeroJobMaterialsSection({
+  heroId,
+  mode,
+}: {
+  heroId: number;
+  mode: "normal" | "sp";
+}) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
   if (!hero) {
@@ -415,20 +289,15 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
     0,
   );
 
+  if (mode === "sp") {
+    if (!detail.sp.released || !detail.sp.finalJob) {
+      throw new Error(`Hero ${heroId} requested SP form without a released frozen SP final job.`);
+    }
+    return <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />;
+  }
+
   return (
     <>
-      {detail.sp.released ? (
-        <HeroSpTalentSection
-          heroId={heroId}
-          jobNameCn={detail.sp.finalJob?.nameCn ?? null}
-          talent={detail.sp.talent}
-        />
-      ) : null}
-
-      {detail.sp.released && detail.sp.finalJob ? (
-        <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />
-      ) : null}
-
       <HeroJobMovementSection heroId={heroId} />
 
       <section
