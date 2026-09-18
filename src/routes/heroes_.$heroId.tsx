@@ -796,6 +796,7 @@ type SpMissionView = {
     equipmentId: number | null;
     requiredLevel: number | null;
     requiredHeroIds: number[];
+    requiredHeroNames: string[];
     activityType: number | null;
     routeType: number | null;
     stageId: number | null;
@@ -894,14 +895,15 @@ function formatSpMissionCondition(mission: SpMissionView) {
   }
 
   const stageLabelKr = resolveHeroSpMissionStageLabelKr(condition);
+  const requiredHeroNames = condition.requiredHeroNames.join(", ");
   if (condition.kind === "CLEAR_STORY_STAGE_WITH_HEROES") {
-    return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+    return requiredHeroNames + " 포함 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
   }
   if (condition.kind === "CLEAR_ACTIVITY_STAGE_WITH_HEROES") {
-    return "Hero " + condition.requiredHeroIds.join(", ") + " 포함 · " + (stageLabelKr ?? ("Stage " + condition.stageIds.join(", "))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+    return requiredHeroNames + " 포함 · " + (stageLabelKr ?? ("Stage " + condition.stageIds.join(", "))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
   }
   if (condition.kind === "CLEAR_ACTIVITY_STAGE_SOLO_OR_SPECIFIED") {
-    return "Hero " + condition.requiredHeroIds.join(", ") + " 단독 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
+    return requiredHeroNames + " 단독 · " + (stageLabelKr ?? ("Stage " + (condition.stageId ?? "?"))) + " · " + (condition.clearCount ?? 1) + "회 클리어";
   }
   return null;
 }
