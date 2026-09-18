@@ -2,16 +2,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
+import { resolveConfigDataFile } from './configdata-source-pack-maintenance-root.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(ROOT, relativePath), 'utf8'));
+const readJson = (filePath) => JSON.parse(fs.readFileSync(path.isAbsolute(filePath) ? filePath : path.join(ROOT, filePath), 'utf8'));
 
 const paths = {
   contract: 'data/contracts/hero-soldier-movement-type-presentation.v1.json',
   heroJobs: 'data/generated/hero-job-links.v1.json',
   soldierMaster: 'data/generated/soldier-master.v1.json',
-  jobInfo: 'data/configdata/ConfigDataJobInfo.json',
-  soldierInfo: 'data/configdata/ConfigDataSoldierInfo.json',
+  jobInfo: resolveConfigDataFile('ConfigDataJobInfo.json'),
+  soldierInfo: resolveConfigDataFile('ConfigDataSoldierInfo.json'),
   generated: 'data/generated/shared-movement-type-index.v1.json',
   validation: 'data/validation/shared-movement-type-index-final.v1.json',
 };
