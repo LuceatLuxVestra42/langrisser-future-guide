@@ -265,7 +265,7 @@ function HeroDetailPage() {
   const finalJobRows = isSpForm ? spFinalJobRows : normalFinalJobRows;
   const finalJobNameById = new Map<number, string>();
   for (const { capstone } of finalJobRows) {
-    if (capstone?.jobId != null) finalJobNameById.set(capstone.jobId, capstone.nameCn ?? `Job ${capstone.jobId}`);
+    if (capstone?.jobId != null) finalJobNameById.set(capstone.jobId, capstone.nameCn ?? "전직");
   }
   const heartFetterRows = [...finalJobNameById.entries()].map(([jobId, jobName]) => ({
     jobId,
@@ -419,7 +419,7 @@ function HeroDetailPage() {
                   <div className="flex items-start gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? `Skill ${activeTalentRow.skillId}`}</h3>
+                      <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? "스킬"}</h3>
                       <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
                     </div>
                   </div>
@@ -530,7 +530,7 @@ function HeroDetailPage() {
                       <Fragment key={key}>
                         <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
                           <th scope="row" className="px-4 pb-2 pt-3 text-left">
-                            <div className="font-bold text-foreground">{capstone.nameCn ?? `Job ${capstone.jobId ?? "?"}`}</div>
+                            <div className="font-bold text-foreground">{capstone.nameCn ?? "전직"}</div>
                           </th>
                           <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
                           <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
@@ -568,7 +568,6 @@ function HeroDetailPage() {
           data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
         >
           <SectionTitle title="유대 Lv4 / Lv7 효과" />
-          <p className="mt-2 text-xs font-semibold text-muted-foreground">한국어 설명 준비 중 · 검증된 중국 서버 presentation consumer 원문</p>
           {heartFetterRows.length > 0 ? (
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
               {heartFetterRows.map((row) => (
@@ -585,7 +584,6 @@ function HeroDetailPage() {
                       >
                         <div className="flex items-center gap-2">
                           <span className="rounded bg-muted px-2 py-1 text-[11px] font-black text-foreground">Lv.{effect.level}</span>
-                          <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">Skill {effect.skillId}</span>
                         </div>
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
                       </div>
@@ -761,7 +759,7 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
       <div className="flex items-start gap-3">
         <HeroSkillIcon heroId={heroId} skill={skill} />
         <div className="min-w-0 flex-1">
-          <h4 className="font-bold text-foreground">{skill.nameCn ?? `Skill ${skill.skillId}`}</h4>
+          <h4 className="font-bold text-foreground">{skill.nameCn ?? "스킬"}</h4>
           {hasMetadata ? (
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
               {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">유형 {skill.displayType}</span> : null}
