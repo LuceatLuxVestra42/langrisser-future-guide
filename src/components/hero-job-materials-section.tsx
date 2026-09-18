@@ -139,15 +139,12 @@ function HeroSpJobMovementSection({
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
               <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                {row.nameCn ?? `Job ${row.jobId}`}
+                {row.nameCn ?? "SP 전직"}
               </h3>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
               <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground">
                 공격 사거리 {row.attackRange}
-              </span>
-              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
-                Job {row.jobId}
               </span>
             </div>
           </div>
@@ -227,9 +224,6 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
     >
       <div>
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 이동 정보</h2>
-        <p className="mt-1 text-xs font-semibold text-muted-foreground">
-          검증된 전직별 이동력 · 이동타입
-        </p>
       </div>
 
       {movementRows ? (
@@ -248,7 +242,7 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
                   <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                    {row.nameCn ?? `Job ${row.jobId}`}
+                    {row.nameCn ?? "전직"}
                   </h3>
                 </div>
                 <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -257,9 +251,6 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                       공격 사거리 {row.attackRange}
                     </span>
                   ) : null}
-                  <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
-                    Job {row.jobId}
-                  </span>
                 </div>
               </div>
 
@@ -352,9 +343,6 @@ export function HeroJobMaterialsSection({
       >
         <div>
           <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 재료</h2>
-          <p className="mt-1 text-xs font-semibold text-muted-foreground">
-            검증된 중국 서버 ConfigData 기준 · 재료명은 중국 서버 원문
-          </p>
         </div>
 
         {connections.length > 0 ? (
