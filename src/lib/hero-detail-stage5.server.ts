@@ -1,4 +1,5 @@
 import { readHeroCvLocalization } from "./hero-cv-localization.server";
+import { resolveHeroDisplayNameById } from "./hero-display-name";
 import { readHeroSkinPresentation } from "./skin-detail.server";
 import { readHeroDetailRouteStage4Data } from "./hero-list.server";
 
@@ -526,35 +527,44 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       count: Number.isInteger(item.Count) ? Number(item.Count) : null,
     }));
   };
-  const projectSpMission = (mission: Stage6SpMission) => ({
-    missionId: Number.isInteger(mission.id) ? Number(mission.id) : null,
-    phase: mission.stage ?? null,
-    titleCn: mission.titleCn ?? null,
-    descCn: mission.descCn ?? null,
-    missionType: Number.isInteger(mission.missionType) ? Number(mission.missionType) : null,
-    condition: {
-      kind: mission.condition?.kind ?? null,
-      items: Array.isArray(mission.condition?.items)
-        ? mission.condition.items.map((item) => ({
-            goodsType: Number.isInteger(item.GoodsType) ? Number(item.GoodsType) : null,
-            sourceId: Number.isInteger(item.Id) ? Number(item.Id) : null,
-            count: Number.isInteger(item.Count) ? Number(item.Count) : null,
-          }))
-        : [],
-      equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition?.equipmentId) : null,
-      requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition?.requiredLevel) : null,
-      requiredHeroIds: Array.isArray(mission.condition?.requiredHeroIds)
-        ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
-        : [],
-      activityType: Number.isInteger(mission.condition?.activityType) ? Number(mission.condition?.activityType) : null,
-      routeType: Number.isInteger(mission.condition?.routeType) ? Number(mission.condition?.routeType) : null,
-      stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
-      stageIds: Array.isArray(mission.condition?.stageIds)
-        ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
-        : [],
-      clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition?.clearCount) : null,
-    },
-  });
+  const projectSpMission = (mission: Stage6SpMission) => {
+    const requiredHeroIds = Array.isArray(mission.condition?.requiredHeroIds)
+      ? mission.condition.requiredHeroIds.filter((value): value is number => Number.isInteger(value)).map(Number)
+      : [];
+    const requiredHeroNames = requiredHeroIds.map(resolveHeroDisplayNameById);
+    if (requiredHeroNames.length !== requiredHeroIds.length) {
+      throw new Error(`SP mission ${String(mission.id ?? "?")} required-Hero presentation parity mismatch.`);
+    }
+
+    return {
+      missionId: Number.isInteger(mission.id) ? Number(mission.id) : null,
+      phase: mission.stage ?? null,
+      titleCn: mission.titleCn ?? null,
+      descCn: mission.descCn ?? null,
+      missionType: Number.isInteger(mission.missionType) ? Number(mission.missionType) : null,
+      condition: {
+        kind: mission.condition?.kind ?? null,
+        items: Array.isArray(mission.condition?.items)
+          ? mission.condition.items.map((item) => ({
+              goodsType: Number.isInteger(item.GoodsType) ? Number(item.GoodsType) : null,
+              sourceId: Number.isInteger(item.Id) ? Number(item.Id) : null,
+              count: Number.isInteger(item.Count) ? Number(item.Count) : null,
+            }))
+          : [],
+        equipmentId: Number.isInteger(mission.condition?.equipmentId) ? Number(mission.condition?.equipmentId) : null,
+        requiredLevel: Number.isInteger(mission.condition?.requiredLevel) ? Number(mission.condition?.requiredLevel) : null,
+        requiredHeroIds,
+        requiredHeroNames,
+        activityType: Number.isInteger(mission.condition?.activityType) ? Number(mission.condition?.activityType) : null,
+        routeType: Number.isInteger(mission.condition?.routeType) ? Number(mission.condition?.routeType) : null,
+        stageId: Number.isInteger(mission.condition?.stageId) ? Number(mission.condition?.stageId) : null,
+        stageIds: Array.isArray(mission.condition?.stageIds)
+          ? mission.condition.stageIds.filter((value): value is number => Number.isInteger(value)).map(Number)
+          : [],
+        clearCount: Number.isInteger(mission.condition?.clearCount) ? Number(mission.condition?.clearCount) : null,
+      },
+    };
+  };
   const spFirstStageMissions = Array.isArray(shard.sp?.missions?.firstStage)
     ? shard.sp.missions.firstStage.map(projectSpMission)
     : [];
