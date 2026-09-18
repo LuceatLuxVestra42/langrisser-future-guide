@@ -36,28 +36,28 @@ function PercentValue({ value, emphasized = false }: { value: number; emphasized
 
 function CommandVariantTable({ title, variant, mode }: { title: string; variant: CommandVariant; mode: "NORMAL" | "SP" }) {
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-background" data-command-mode={mode}>
-      <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/35 px-4 py-3">
+    <article className="min-w-0 overflow-hidden rounded-xl border border-border bg-background" data-command-mode={mode}>
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/35 px-3 py-3">
         <h3 className="font-bold text-foreground">{title}</h3>
         <span className="text-[11px] font-bold text-muted-foreground">최종 지휘 보정</span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[520px] border-collapse text-sm">
+      <div className="min-w-0" data-command-table-fit="true">
+        <table className="w-full table-fixed border-collapse text-xs sm:text-sm">
           <thead>
             <tr className="border-b border-border text-xs text-muted-foreground">
-              <th scope="col" className="px-4 py-2.5 text-left font-bold">능력치</th>
-              <th scope="col" className="px-4 py-2.5 text-right font-bold">기본 지휘</th>
-              <th scope="col" className="px-4 py-2.5 text-right font-bold">중앙 유대</th>
-              <th scope="col" className="px-4 py-2.5 text-right font-bold">최종</th>
+              <th scope="col" className="w-1/4 px-2 py-2.5 text-left font-bold sm:px-3">능력치</th>
+              <th scope="col" className="w-1/4 px-2 py-2.5 text-right font-bold leading-tight sm:px-3">기본 지휘</th>
+              <th scope="col" className="w-1/4 px-2 py-2.5 text-right font-bold leading-tight sm:px-3">중앙 유대</th>
+              <th scope="col" className="w-1/4 px-2 py-2.5 text-right font-bold sm:px-3">최종</th>
             </tr>
           </thead>
           <tbody>
             {STAT_ROWS.map(({ key, label }) => (
               <tr key={key} className="border-b border-border last:border-b-0">
-                <th scope="row" className="px-4 py-3 text-left font-bold text-foreground">{label}</th>
-                <td className="px-4 py-3 text-right"><PercentValue value={variant.base[key]} /></td>
-                <td className="px-4 py-3 text-right"><PercentValue value={variant.hero3Contribution[key]} /></td>
-                <td className="px-4 py-3 text-right"><PercentValue value={variant.final[key]} emphasized /></td>
+                <th scope="row" className="px-2 py-3 text-left font-bold text-foreground sm:px-3">{label}</th>
+                <td className="px-2 py-3 text-right sm:px-3"><PercentValue value={variant.base[key]} /></td>
+                <td className="px-2 py-3 text-right sm:px-3"><PercentValue value={variant.hero3Contribution[key]} /></td>
+                <td className="px-2 py-3 text-right sm:px-3"><PercentValue value={variant.final[key]} emphasized /></td>
               </tr>
             ))}
           </tbody>
