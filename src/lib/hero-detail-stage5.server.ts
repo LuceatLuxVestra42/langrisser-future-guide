@@ -330,10 +330,15 @@ function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
 
 function projectSpRewardSoldier(soldier: Stage6SpRewardSoldier | null | undefined) {
   if (!soldier || !Number.isInteger(soldier.soldierId)) return null;
+  const displayName = soldier.nameKr ?? soldier.nameCn;
+  if (!displayName) {
+    throw new Error(`SP reward Soldier ${String(soldier.soldierId)} has no frozen display name.`);
+  }
   return {
     soldierId: Number(soldier.soldierId),
     nameCn: soldier.nameCn ?? null,
     nameKr: soldier.nameKr ?? null,
+    displayName,
     nameKrStatus: soldier.nameKrStatus ?? null,
     tier: Number.isInteger(soldier.tier) ? Number(soldier.tier) : null,
     armyType: soldier.armyType ?? null,
