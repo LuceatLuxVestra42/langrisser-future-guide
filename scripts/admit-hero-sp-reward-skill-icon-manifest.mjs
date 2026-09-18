@@ -13,7 +13,7 @@ if(!Array.isArray(manifest.spTalentRecords)||manifest.spTalentRecords.length!==2
 if(material.schemaId!=="hero-skill-icon-sp-reward-materialization/v1"||material.status!=="FROZEN"||material.completion!=="COMPLETE"||material.semanticReopen!==false) fail("materialization contract mismatch");
 if(material.lookupAuthority!=="exact sp.secondStageRewards.skills[].icon only") fail("lookup authority mismatch");
 if(material.scope?.excludedHeroIds?.length!==1||material.scope.excludedHeroIds[0]!==6||material.scope?.spTalentIconsIncluded!==false) fail("scope mismatch");
-if(material.summary?.targetUsageCount!==48||material.summary?.targetUniqueIconPathCount!==48||material.summary?.provedCount!==48||material.summary?.missingCount!==0||material.summary?.publicPathCollisionCount!==0) fail("materialization summary mismatch");
+if(material.summary?.targetUsageCount!==48||material.summary?.targetUniqueIconPathCount!==48||material.summary?.packageScanCount!==68||material.summary?.bundleScanCount!==3045||material.summary?.provedCount!==48||material.summary?.missingCount!==0||material.summary?.publicPathCollisionCount!==0) fail("materialization summary mismatch");
 const byPath=new Map();let released=0,total=0,excluded=0;
 for(const name of fs.readdirSync(shardDir).filter(n=>/^\d+\.json$/.test(n))){
  const hero=read("data/generated/hero-detail/by-id/"+name), sp=hero.sp??{};
@@ -34,7 +34,7 @@ for(const row of material.records??[]){
  const pub=String(row.publicPath??"").toLowerCase();if(!pub||seenPublic.has(pub)) fail("publicPath collision "+row.publicPath);seenPublic.add(pub);
  const expected={usageCount:src.usageCount,heroIds:[...src.heroIds].sort((a,b)=>a-b),skillIds:[...src.skillIds].sort((a,b)=>a-b)};
  for(const k of ["usageCount","heroIds","skillIds"]) if(JSON.stringify(row[k])!==JSON.stringify(expected[k])) fail("usage parity "+row.sourcePath+" "+k);
- if(row.role!=="sp-reward"||row.verificationOwner!=="OFFICIAL_INSTALLER_EXACT_RUNTIME_PATH_UNITY_SPRITE"||row.objectType!=="Sprite") fail("proof contract "+row.sourcePath);
+ if(row.role!=="sp-reward"||row.verificationOwner!=="OFFICIAL_INSTALLER_EXHAUSTIVE_ALL_BUNDLES_EXACT_RUNTIME_PATH_UNITY_SPRITE"||row.objectType!=="Sprite") fail("proof contract "+row.sourcePath);
  const file=path.join(root,String(row.publicPath).replace(/^\//,"public/"));if(!fs.existsSync(file)) fail("missing PNG "+row.publicPath);
  records.push({...row});
 }
