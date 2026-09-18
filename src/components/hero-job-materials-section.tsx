@@ -271,15 +271,15 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                 <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
                   <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
                   <dd className="mt-1">
-                <img
-                  src={getMovementTypeIconUrl(row.moveType)}
-                  alt={row.moveTypeNameKr}
-                  title={row.moveTypeNameKr}
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 object-contain"
-                />
-              </dd>
+                    <img
+                      src={getMovementTypeIconUrl(row.moveType)}
+                      alt={row.moveTypeNameKr}
+                      title={row.moveTypeNameKr}
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain"
+                    />
+                  </dd>
                 </div>
               </dl>
             </article>
