@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "stage": "hero-sp-job-movement-consumer",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "owner": "hero-canonical",
+  "expectedBaseHead": "0c542641f421bd0d4022bf444db9903635d56a3b",
+  "summary": {
+    "releasedSpHeroCount": 25,
+    "releasedSpJobCount": 25,
+    "missingSourceJobCount": 0,
+    "invalidMoveTypeCount": 0,
+    "invalidMovePointCount": 0,
+    "hardErrorCount": 0
+  },
+  "consumer": "data/generated/hero-sp-job-movement.v1.json",
+  "validator": "scripts/validate_hero_sp_job_mobility_consumer.cjs",
+  "nextOwner": "hero-frontend",
+  "decision": "Reuse frozen released-SP final-job identities and resolve movement fields by exact numeric JobID only."
+}

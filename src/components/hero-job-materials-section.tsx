@@ -49,6 +49,12 @@ type HeroJobMovementRowView = {
   attackRange: number | null;
 };
 
+type HeroSpFinalJobView = {
+  jobConnectionId: number | null;
+  jobId: number | null;
+  nameCn: string | null;
+};
+
 function HeroSpTalentSection({
   heroId,
   jobNameCn,
@@ -142,6 +148,130 @@ function HeroSpTalentSection({
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+function HeroSpJobMovementSection({
+  heroId,
+  finalJob,
+}: {
+  heroId: number;
+  finalJob: HeroSpFinalJobView;
+}) {
+  const [row, setRow] = useState<HeroJobMovementRowView | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setRow(null);
+    setLoadError(null);
+
+    const jobConnectionId = finalJob.jobConnectionId;
+    const jobId = finalJob.jobId;
+    if (
+      typeof jobConnectionId !== "number" ||
+      !Number.isInteger(jobConnectionId) ||
+      typeof jobId !== "number" ||
+      !Number.isInteger(jobId)
+    ) {
+      setLoadError(`Hero ${heroId} released SP final job has no exact frozen identity.`);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void Promise.all([
+      import("@/lib/hero-sp-job-movement.static"),
+      import("@/lib/hero-final-job-attack-range.static"),
+    ])
+      .then(([{ getStaticHeroSpJobMovement }, { getStaticHeroFinalJobAttackRange }]) => {
+        const movement = getStaticHeroSpJobMovement(heroId, jobConnectionId, jobId);
+        if (!movement) {
+          throw new Error(`Hero ${heroId} SP Job ${jobId} has no frozen movement record.`);
+        }
+        const attackRange = getStaticHeroFinalJobAttackRange(jobId);
+        if (attackRange == null) {
+          throw new Error(`Hero ${heroId} SP Job ${jobId} has no frozen attack-range record.`);
+        }
+        if (!cancelled) {
+          setRow({
+            jobConnectionId: movement.jobConnectionId,
+            jobId: movement.jobId,
+            nameCn: finalJob.nameCn ?? movement.nameCn,
+            moveType: movement.moveType,
+            moveTypeNameKr: movement.moveTypeNameKr,
+            movePoint: movement.movePoint,
+            attackRange,
+          });
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) setLoadError(String(error instanceof Error ? error.message : error));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [heroId, finalJob.jobConnectionId, finalJob.jobId, finalJob.nameCn]);
+
+  if (loadError) {
+    throw new Error(loadError);
+  }
+
+  return (
+    <section
+      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+      data-hero-sp-job-movement="true"
+      data-hero-sp-job-movement-status={row ? "ready" : "loading"}
+      data-job-connection-id={row?.jobConnectionId ?? ""}
+      data-job-id={row?.jobId ?? ""}
+      data-move-type={row?.moveType ?? ""}
+      data-move-point={row?.movePoint ?? ""}
+      data-basic-attack-range={row?.attackRange ?? ""}
+    >
+      <div>
+        <h2 className="text-lg font-extrabold tracking-tight text-foreground">SP 전직 이동 정보</h2>
+        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+          검증된 SP 전직 이동력 · 이동타입 · 공격 사거리
+        </p>
+      </div>
+
+      {row ? (
+        <article className="mt-5 rounded-xl border border-border bg-muted/20 p-4">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
+              <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
+                {row.nameCn ?? `Job ${row.jobId}`}
+              </h3>
+            </div>
+            <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground">
+                공격 사거리 {row.attackRange}
+              </span>
+              <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                Job {row.jobId}
+              </span>
+            </div>
+          </div>
+
+          <dl className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
+              <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
+              <dd className="mt-1 text-sm font-extrabold text-foreground">{row.moveTypeNameKr}</dd>
+            </div>
+          </dl>
+        </article>
+      ) : (
+        <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          SP 전직 이동 정보를 불러오는 중이야.
+        </p>
+      )}
     </section>
   );
 }
@@ -277,6 +407,10 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
           jobNameCn={detail.sp.finalJob?.nameCn ?? null}
           talent={detail.sp.talent}
         />
+      ) : null}
+
+      {detail.sp.released && detail.sp.finalJob ? (
+        <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />
       ) : null}
 
       <HeroJobMovementSection heroId={heroId} />
