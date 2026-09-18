@@ -87,9 +87,6 @@ export function HeroSoldierCommandSection({
     >
       <div>
         <h2 className="text-xl font-bold tracking-tight text-foreground">병사 지휘 보정</h2>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          영웅 기본 지휘 보정과 중앙 유대의 병사 보정을 분리해서 표시해. 최종 수치는 두 값을 합산한 결과야.
-        </p>
       </div>
 
       <div className="mt-5">
