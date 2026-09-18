@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "contract": "hero-casting-law-by-hero",
+  "owner": "hero-canonical",
+  "status": "ACTIVE",
+  "purpose": "Attach every canonical Hero's explicit CastingLawTemplates_ID list to the frozen Casting Law material catalog, classify exact cost signatures for presentation, and precompute per-Hero level 1-5 / 6-10 / 1-10 material and gold totals without inferring Hero-template relations.",
+  "upstream": [
+    "data/hero-name-master.v1.json",
+    "data/generated/hero-casting-law-materials.v1.json"
+  ],
+  "authoritativeSourceContract": "data/contracts/configdata-source-pack-contract.v1.json",
+  "requiredSources": [
+    "ConfigDataHeroInfo"
+  ],
+  "relationContract": {
+    "hero": "hero-name-master.records[].heroId -> ConfigDataHeroInfo.ID by explicit numeric equality",
+    "templates": "ConfigDataHeroInfo.CastingLawTemplates_ID[] preserved in source order; only positive integer IDs are admitted",
+    "template": "CastingLawTemplates_ID[] -> hero-casting-law-materials.templates[].templateId by explicit numeric equality"
+  },
+  "costProfiles": {
+    "A": "normal gold + normal material counts",
+    "B": "double gold + double material counts",
+    "C": "double gold + normal material counts"
+  },
+  "costProfileRule": "Classify only by the exact 10-level gold/count signature in the frozen material catalog. No template-ID range, name, icon, Hero identity, or equipment filename may determine the profile.",
+  "slotPresentationRule": "Use template EquipmentType metadata when explicit (1=armor, 2=head, 3=accessory). Templates without EquipmentType are preserved as weapon slots in source order. This label is presentation only and does not create a new semantic relation.",
+  "normalizationRules": [
+    "Require exactly one ConfigDataHeroInfo row for every canonical Hero ID.",
+    "Preserve CastingLawTemplates_ID source order and duplicate occurrences; do not deduplicate because separate slots may legitimately share a template.",
+    "Ignore only non-positive/non-integer placeholder values; never replace them by name, order, ID arithmetic, or historical output.",
+    "Resolve every admitted template ID exactly once in the frozen hero-casting-law-materials catalog.",
+    "Aggregate material counts by explicit Item ID and gold by exact frozen per-level costs.",
+    "Compute independent totals for level 1-5, level 6-10, and level 1-10.",
+    "Do not gate template availability on centralDiscipline.status or CastingLawSkill_ID.",
+    "Do not reopen Hero Stage 6 central-discipline skill semantics."
+  ],
+  "validationPolicy": {
+    "PASS": [
+      "Generated Hero population exactly matches the canonical Hero master.",
+      "Every canonical Hero resolves to exactly one ConfigDataHeroInfo row.",
+      "Every positive CastingLawTemplates_ID entry resolves to the frozen Casting Law catalog.",
+      "Every referenced template matches exactly one of cost profiles A/B/C by full 10-level signature.",
+      "Per-Hero material and gold totals reproduce direct summation from frozen template levels.",
+      "No name JOIN, ID arithmetic, or central-discipline release proxy is used."
+    ],
+    "FAIL": [
+      "Any Hero identity, source cardinality, template relation, cost-profile, material total, gold total, or frozen-source parity mismatch occurs."
+    ]
+  },
+  "output": {
+    "generated": "data/generated/hero-casting-law-by-hero.v1.json",
+    "summary": "data/validation/hero-casting-law-by-hero-summary.v1.json"
+  },
+  "producer": "scripts/build_hero_casting_law_by_hero.cjs",
+  "validator": "scripts/validate_hero_casting_law_by_hero.cjs",
+  "completionRule": "Run producer and independent validator against current canonical Hero master, pinned ConfigData source-pack, and frozen Casting Law catalog. Completion requires PASS/PASS, full canonical population, zero unresolved template refs, exact aggregate parity, and no unexpected repository mutation."
+}
