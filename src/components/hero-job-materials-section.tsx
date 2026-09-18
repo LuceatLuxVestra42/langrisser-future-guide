@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
+import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 
 function stripConfigMarkup(value: string | null) {
@@ -387,13 +388,28 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
     throw new Error(`Hero ${heroId} has no frozen job-material record.`);
   }
 
+  const jobMovementRows = getStaticHeroJobMovement(heroId);
+  if (!jobMovementRows) {
+    throw new Error(`Hero ${heroId} has no frozen job-name source.`);
+  }
+  const jobMovementByConnectionId = new Map(jobMovementRows.map((row) => [row.jobConnectionId, row]));
+
   const connections = hero.connections
-    .map((connection, connectionIndex) => ({
+    .map((connection) => ({
       ...connection,
-      connectionIndex,
+      jobNameCn: jobMovementByConnectionId.get(connection.jobConnectionId)?.nameCn ?? null,
       levels: connection.levels.filter((level) => level.materials.length > 0),
     }))
     .filter((connection) => connection.levels.length > 0);
+
+  for (const connection of connections) {
+    if (!connection.jobNameCn) {
+      throw new Error(
+        `Hero ${heroId} JobConnection ${connection.jobConnectionId} has no verified Chinese job name.`,
+      );
+    }
+  }
+
   const materialEntryCount = connections.reduce(
     (sum, connection) => sum + connection.levels.reduce((levelSum, level) => levelSum + level.materials.length, 0),
     0,
@@ -435,40 +451,32 @@ export function HeroJobMaterialsSection({ heroId }: { heroId: number }) {
                 className="rounded-xl border border-border bg-muted/20 p-4"
                 data-job-connection-id={connection.jobConnectionId}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="text-sm font-extrabold text-foreground">
-                    전직 경로 {connection.connectionIndex + 1}
-                    {connection.jobId != null ? ` · Job ${connection.jobId}` : ""}
-                  </h3>
-                  <span className="text-[11px] font-bold text-muted-foreground">Connection {connection.jobConnectionId}</span>
-                </div>
+                <h3 className="text-sm font-extrabold text-foreground">{connection.jobNameCn}</h3>
 
-                <div className="mt-3 space-y-3">
+                <div className="mt-3 divide-y divide-border/70">
                   {connection.levels.map((level) => (
-                    <div key={level.jobLevelId} className="rounded-lg border border-border/70 bg-background/70 p-3" data-job-level-id={level.jobLevelId}>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold text-muted-foreground">
-                        <span>JobLevel {level.jobLevelId}</span>
-                        {level.heroLevelRequired != null ? <span>영웅 Lv.{level.heroLevelRequired}</span> : null}
-                      </div>
-                      <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <div
+                      key={level.jobLevelId}
+                      className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:gap-4"
+                      data-job-level-id={level.jobLevelId}
+                    >
+                      {level.heroLevelRequired != null ? (
+                        <span className="shrink-0 text-xs font-bold text-muted-foreground">
+                          영웅 Lv.{level.heroLevelRequired}
+                        </span>
+                      ) : null}
+
+                      <ul className="flex flex-wrap items-center gap-3">
                         {level.materials.map((material, materialIndex) => (
                           <li
                             key={`${material.id}-${materialIndex}`}
-                            className="rounded-md border border-border/70 bg-card px-3 py-2"
+                            className="flex items-center gap-1.5"
                             data-job-material-id={material.id}
                           >
-                            <div className="flex items-start gap-3">
-                              <HeroJobMaterialIcon sourcePath={material.jobMaterial.icon} />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-baseline justify-between gap-3">
-                                  <span className="text-sm font-bold text-foreground">{material.jobMaterial.nameCn}</span>
-                                  <span className="shrink-0 text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
-                                </div>
-                                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                                  {stripConfigMarkup(material.jobMaterial.descriptionCn)}
-                                </p>
-                              </div>
-                            </div>
+                            <HeroJobMaterialIcon sourcePath={material.jobMaterial.icon} />
+                            <span className="text-sm font-extrabold tabular-nums text-foreground">
+                              ×{material.count}
+                            </span>
                           </li>
                         ))}
                       </ul>
