@@ -235,6 +235,7 @@ function HeroDetailPage() {
   const [visualIndex, setVisualIndex] = useState(0);
   useEffect(() => setVisualIndex(0), [hero.heroId, formMode]);
   const activeVisual = visuals[visualIndex] ?? null;
+  const activeVisualSrc = activeVisual?.src ?? null;
   const [failedVisualSrc, setFailedVisualSrc] = useState<string | null>(null);
   const [loadedVisualSrc, setLoadedVisualSrc] = useState<string | null>(null);
   const nextVisualSrc = visuals.length > 1
@@ -245,18 +246,18 @@ function HeroDetailPage() {
     : null;
 
   useEffect(() => {
-    if (!activeVisual || loadedVisualSrc !== activeVisual.src) return;
+    if (!activeVisualSrc || loadedVisualSrc !== activeVisualSrc) return;
 
     const candidates = new Set(
       [nextVisualSrc, inactiveSpArtworkSource]
-        .filter((src): src is string => Boolean(src && src !== activeVisual.src)),
+        .filter((src): src is string => Boolean(src && src !== activeVisualSrc)),
     );
     for (const src of candidates) {
       const image = new Image();
       image.decoding = "async";
       image.src = src;
     }
-  }, [activeVisual, inactiveSpArtworkSource, loadedVisualSrc, nextVisualSrc]);
+  }, [activeVisualSrc, inactiveSpArtworkSource, loadedVisualSrc, nextVisualSrc]);
 
   const moveVisual = (delta: number) => {
     if (visuals.length <= 1) return;
