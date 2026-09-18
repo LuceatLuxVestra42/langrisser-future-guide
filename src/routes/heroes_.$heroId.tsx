@@ -600,7 +600,7 @@ function HeroDetailPage() {
 
         {isSpForm ? <HeroSpMissionSection missions={detail.sp.missions} /> : null}
 
-        <HeroSoldierCommandSection soldierCommand={soldierCommand} />
+        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
