@@ -18,15 +18,11 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
     >
       <div>
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">각성기 재료</h2>
-        <p className="mt-1 text-xs font-semibold text-muted-foreground">
-          검증된 중국 서버 ConfigData 기준 · 재료명은 중국 서버 원문
-        </p>
       </div>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-sm font-extrabold text-foreground">각성기 습득</span>
-          <span className="text-[11px] font-bold text-muted-foreground">Skill {hero.awakening.skillId}</span>
         </div>
         <ul className="mt-3 grid gap-2 sm:grid-cols-3">
           {hero.awakening.materials.map((material, index) => {
