@@ -22,6 +22,10 @@ export type HeroAwakeningMaterialRecord = {
   nameCn: string | null;
   nameEn: string | null;
   sourceState: "LEVEL2_SKILL_DEFINED" | "LEVEL2_SKILL_NOT_DEFINED" | "AWAKEN_INFO_NOT_FOUND";
+  stage1: null | {
+    awaken1LevelId: number;
+    materials: HeroAwakeningMaterialEntry[];
+  };
   awakening: null | {
     skillId: number;
     awaken2LevelId: number | null;
@@ -48,6 +52,8 @@ if (artifact.recordCount !== 267 || artifact.records.length !== 267) {
 }
 
 const byHeroId = new Map<number, HeroAwakeningMaterialRecord>();
+let stage1DefinedCount = 0;
+let stage1MaterialEntryCount = 0;
 let definedCount = 0;
 let undefinedCount = 0;
 let materialEntryCount = 0;
@@ -55,22 +61,41 @@ for (const record of artifact.records) {
   if (!Number.isSafeInteger(record.heroId) || record.heroId <= 0 || byHeroId.has(record.heroId)) {
     throw new Error(`Hero awakening materials frozen identity violation at heroId=${String(record.heroId)}.`);
   }
+  if (
+    !record.stage1 ||
+    !Number.isSafeInteger(record.stage1.awaken1LevelId) ||
+    record.stage1.awaken1LevelId <= 0 ||
+    record.stage1.materials.length === 0
+  ) {
+    throw new Error(`Hero ${record.heroId} has an invalid frozen awakening stage-I payload.`);
+  }
+  stage1DefinedCount += 1;
+  stage1MaterialEntryCount += record.stage1.materials.length;
+
   if (record.sourceState === "LEVEL2_SKILL_DEFINED") {
     if (!record.awakening || !Number.isSafeInteger(record.awakening.skillId) || record.awakening.skillId <= 0 || record.awakening.materials.length === 0) {
-      throw new Error(`Hero ${record.heroId} has an invalid frozen awakening-material payload.`);
+      throw new Error(`Hero ${record.heroId} has an invalid frozen awakening stage-II payload.`);
     }
     definedCount += 1;
     materialEntryCount += record.awakening.materials.length;
   } else {
     if (record.awakening !== null) {
-      throw new Error(`Hero ${record.heroId} has an awakening payload despite sourceState=${record.sourceState}.`);
+      throw new Error(`Hero ${record.heroId} has a stage-II awakening payload despite sourceState=${record.sourceState}.`);
     }
     undefinedCount += 1;
   }
   byHeroId.set(record.heroId, record);
 }
-if (definedCount !== 257 || undefinedCount !== 10 || materialEntryCount !== 771) {
-  throw new Error(`Hero awakening materials frozen summary mismatch: defined=${definedCount}, undefined=${undefinedCount}, materials=${materialEntryCount}.`);
+if (
+  stage1DefinedCount !== 267 ||
+  stage1MaterialEntryCount !== 801 ||
+  definedCount !== 257 ||
+  undefinedCount !== 10 ||
+  materialEntryCount !== 771
+) {
+  throw new Error(
+    `Hero awakening materials frozen summary mismatch: stage1=${stage1DefinedCount}/${stage1MaterialEntryCount}, stage2=${definedCount}/${undefinedCount}/${materialEntryCount}.`,
+  );
 }
 
 export function getStaticHeroAwakeningMaterials(heroId: number) {

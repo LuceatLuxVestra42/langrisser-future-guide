@@ -31,6 +31,32 @@ function snapshot(row) {
     getPathDescriptionCn: row.GetPathDesc ?? null,
   };
 }
+function expectedMaterials({ heroId, field, sourceMaterials, itemById, errors, usedItemIds }) {
+  if (!Array.isArray(sourceMaterials) || sourceMaterials.length === 0) {
+    errors.push(`heroId ${heroId}: source ${field} missing or empty`);
+    return [];
+  }
+  const out = [];
+  for (let i = 0; i < sourceMaterials.length; i += 1) {
+    const goods = sourceMaterials[i];
+    if (!Number.isInteger(goods?.GoodsType) || goods.GoodsType !== 6) {
+      errors.push(`heroId ${heroId} ${field}[${i}]: unsupported GoodsType=${String(goods?.GoodsType)}`);
+      continue;
+    }
+    if (!Number.isInteger(goods?.Id) || goods.Id <= 0 || !Number.isInteger(goods?.Count) || goods.Count <= 0) {
+      errors.push(`heroId ${heroId} ${field}[${i}]: malformed Goods`);
+      continue;
+    }
+    const master = itemById.get(goods.Id);
+    if (!master) {
+      errors.push(`heroId ${heroId} ${field}[${i}]: missing Item ${goods.Id}`);
+      continue;
+    }
+    usedItemIds.add(goods.Id);
+    out.push({ goodsType: goods.GoodsType, id: goods.Id, count: goods.Count, item: snapshot(master) });
+  }
+  return out;
+}
 
 function main() {
   const errors = [];
@@ -45,8 +71,6 @@ function main() {
   if (upstream.status !== 'PASS') errors.push(`upstream status=${upstream.status}`);
   if (output.status !== 'PASS') errors.push(`output status=${output.status}`);
   if (summary.status !== 'PASS') errors.push(`summary status=${summary.status}`);
-  if (!Array.isArray(upstream.records)) errors.push('upstream records missing');
-  if (!Array.isArray(output.records)) errors.push('output records missing');
 
   const expectedHeroes = Array.isArray(upstream.records) ? upstream.records : [];
   const actualHeroes = Array.isArray(output.records) ? output.records : [];
@@ -59,85 +83,95 @@ function main() {
     else actualByHero.set(hero.heroId, hero);
   }
 
+  let stage1DefinedCount = 0;
+  let stage1MaterialEntryCount = 0;
+  const stage1ItemIds = new Set();
   let definedAwakeningCount = 0;
   let undefinedAwakeningCount = 0;
   let materialEntryCount = 0;
-  const usedItemIds = new Set();
+  const stage2ItemIds = new Set();
 
   for (const expectedHero of expectedHeroes) {
     const heroId = expectedHero?.heroId;
     const actual = actualByHero.get(heroId);
     if (!actual) { errors.push(`missing heroId=${heroId}`); continue; }
     const source = awakenById.get(heroId);
-    const skillId = source?.Level2SkillID;
-
-    const identityExpected = {
-      heroId,
-      nameKr: expectedHero?.nameKr ?? null,
-      nameCn: expectedHero?.nameCn ?? null,
-      nameEn: expectedHero?.nameEn ?? null,
-    };
-    for (const key of ['heroId', 'nameKr', 'nameCn', 'nameEn']) {
-      if (actual[key] !== identityExpected[key]) errors.push(`heroId ${heroId}: ${key} mismatch`);
+    if (!source) {
+      errors.push(`heroId ${heroId}: source AwakenInfo missing`);
+      continue;
     }
 
+    for (const key of ['heroId', 'nameKr', 'nameCn', 'nameEn']) {
+      const expected = key === 'heroId' ? heroId : (expectedHero?.[key] ?? null);
+      if (actual[key] !== expected) errors.push(`heroId ${heroId}: ${key} mismatch`);
+    }
+
+    const awaken1LevelId = source.Awaken1LevelID;
+    if (!Number.isInteger(awaken1LevelId) || awaken1LevelId <= 0) {
+      errors.push(`heroId ${heroId}: source Awaken1LevelID missing or invalid`);
+    } else {
+      const materials = expectedMaterials({
+        heroId,
+        field: 'Awaken1Material',
+        sourceMaterials: source.Awaken1Material,
+        itemById,
+        errors,
+        usedItemIds: stage1ItemIds,
+      });
+      stage1DefinedCount += 1;
+      stage1MaterialEntryCount += materials.length;
+      if (!same(actual.stage1, { awaken1LevelId, materials })) errors.push(`heroId ${heroId}: stage1 payload mismatch`);
+    }
+
+    const skillId = source.Level2SkillID;
     if (!Number.isInteger(skillId) || skillId <= 0) {
       undefinedAwakeningCount += 1;
-      const expectedState = source ? 'LEVEL2_SKILL_NOT_DEFINED' : 'AWAKEN_INFO_NOT_FOUND';
-      if (actual.sourceState !== expectedState) errors.push(`heroId ${heroId}: sourceState=${actual.sourceState}, expected=${expectedState}`);
-      if (actual.awakening !== null) errors.push(`heroId ${heroId}: awakening must be null`);
+      if (actual.sourceState !== 'LEVEL2_SKILL_NOT_DEFINED') errors.push(`heroId ${heroId}: sourceState mismatch`);
+      if (actual.awakening !== null) errors.push(`heroId ${heroId}: stage2 awakening must be null`);
       continue;
     }
 
     definedAwakeningCount += 1;
     if (actual.sourceState !== 'LEVEL2_SKILL_DEFINED') errors.push(`heroId ${heroId}: defined sourceState mismatch`);
-    const sourceMaterials = source.Awaken2Material;
-    if (!Array.isArray(sourceMaterials) || sourceMaterials.length === 0) {
-      errors.push(`heroId ${heroId} Level2SkillID ${skillId}: source Awaken2Material missing or empty`);
-      continue;
-    }
-    const expectedMaterials = [];
-    for (let i = 0; i < sourceMaterials.length; i += 1) {
-      materialEntryCount += 1;
-      const goods = sourceMaterials[i];
-      if (!Number.isInteger(goods?.GoodsType) || goods.GoodsType !== 6) {
-        errors.push(`heroId ${heroId} Awaken2Material[${i}]: unsupported GoodsType=${String(goods?.GoodsType)}`);
-        continue;
-      }
-      if (!Number.isInteger(goods?.Id) || goods.Id <= 0 || !Number.isInteger(goods?.Count) || goods.Count <= 0) {
-        errors.push(`heroId ${heroId} Awaken2Material[${i}]: malformed Goods`);
-        continue;
-      }
-      const master = itemById.get(goods.Id);
-      if (!master) {
-        errors.push(`heroId ${heroId} Awaken2Material[${i}]: missing Item ${goods.Id}`);
-        continue;
-      }
-      usedItemIds.add(goods.Id);
-      expectedMaterials.push({ goodsType: goods.GoodsType, id: goods.Id, count: goods.Count, item: snapshot(master) });
-    }
+    const materials = expectedMaterials({
+      heroId,
+      field: 'Awaken2Material',
+      sourceMaterials: source.Awaken2Material,
+      itemById,
+      errors,
+      usedItemIds: stage2ItemIds,
+    });
+    materialEntryCount += materials.length;
     const expectedAwakening = {
       skillId,
       awaken2LevelId: Number.isInteger(source.Awaken2LevelID) ? source.Awaken2LevelID : null,
       awaken2Unlock: typeof source.Awaken2Unlock === 'boolean' ? source.Awaken2Unlock : null,
-      materials: expectedMaterials,
+      materials,
     };
     if (!same(actual.awakening, expectedAwakening)) errors.push(`heroId ${heroId}: awakening payload mismatch`);
   }
 
   if (output.version !== 1 || output.domain !== 'hero-awakening-materials') errors.push('output contract identity mismatch');
   if (output.recordCount !== expectedHeroes.length) errors.push(`output.recordCount=${output.recordCount}, expected=${expectedHeroes.length}`);
-  if (summary.heroCount !== expectedHeroes.length) errors.push(`summary.heroCount=${summary.heroCount}, expected=${expectedHeroes.length}`);
-  if (summary.definedAwakeningCount !== definedAwakeningCount) errors.push(`summary.definedAwakeningCount=${summary.definedAwakeningCount}, expected=${definedAwakeningCount}`);
-  if (summary.undefinedAwakeningCount !== undefinedAwakeningCount) errors.push(`summary.undefinedAwakeningCount=${summary.undefinedAwakeningCount}, expected=${undefinedAwakeningCount}`);
-  if (summary.materialEntryCount !== materialEntryCount) errors.push(`summary.materialEntryCount=${summary.materialEntryCount}, expected=${materialEntryCount}`);
-  if (summary.distinctItemCount !== usedItemIds.size) errors.push(`summary.distinctItemCount=${summary.distinctItemCount}, expected=${usedItemIds.size}`);
+  const expectedSummary = {
+    heroCount: expectedHeroes.length,
+    stage1DefinedCount,
+    stage1MaterialEntryCount,
+    stage1DistinctItemCount: stage1ItemIds.size,
+    definedAwakeningCount,
+    undefinedAwakeningCount,
+    materialEntryCount,
+    distinctItemCount: stage2ItemIds.size,
+  };
+  for (const [key, value] of Object.entries(expectedSummary)) {
+    if (summary[key] !== value) errors.push(`summary.${key}=${summary[key]}, expected=${value}`);
+  }
   if (summary.sourceRecordCounts?.awakenInfo !== awakenRows.length) errors.push('summary source AwakenInfo count mismatch');
   if (summary.sourceRecordCounts?.itemInfo !== itemRows.length) errors.push('summary source ItemInfo count mismatch');
   if ((summary.hardErrors || []).length !== 0) errors.push(`summary hardErrors=${(summary.hardErrors || []).length}`);
 
   console.log(`HERO AWAKENING MATERIAL VALIDATION: ${errors.length ? 'FAIL' : 'PASS'}`);
-  console.log(`heroes=${expectedHeroes.length} defined=${definedAwakeningCount} undefined=${undefinedAwakeningCount} materials=${materialEntryCount} distinctItems=${usedItemIds.size} errors=${errors.length}`);
+  console.log(`heroes=${expectedHeroes.length} stage1=${stage1DefinedCount}/${stage1MaterialEntryCount}/${stage1ItemIds.size} stage2=${definedAwakeningCount}/${materialEntryCount}/${stage2ItemIds.size} undefined2=${undefinedAwakeningCount} errors=${errors.length}`);
   if (errors.length) {
     for (const error of errors.slice(0, 100)) console.error(`- ${error}`);
     process.exitCode = 1;
