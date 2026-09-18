@@ -24,6 +24,14 @@ const expectedHero6MovementRows = [
   { jobId: 306, moveType: 1, movePoint: 5 },
 ];
 
+const movementIconFileByType = {
+  1: "Move_Ride.png",
+  2: "Move_Walk.png",
+  3: "Move_Water.png",
+  4: "Move_Fly.png",
+  5: "Move_FieldArmy.png",
+};
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
@@ -78,8 +86,16 @@ async function verifyHeroJobMovement(page, label) {
     movePoint: Number(node.getAttribute("data-move-point")),
   })));
   check(JSON.stringify(actualRows) === JSON.stringify(expectedHero6MovementRows), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
-  const text = await section.innerText();
-  check(text.includes("기마 이동") && text.includes("보행 이동"), `Hero 6 ${label} Job movement Korean labels missing`);
+  const actualIconSources = await rows.evaluateAll((nodes) => nodes.map((node) => {
+    const moveType = Number(node.getAttribute("data-move-type"));
+    const image = node.querySelector('img[src*="/images/shared/movement/"]');
+    return { moveType, src: image?.getAttribute("src") ?? null };
+  }));
+  for (const icon of actualIconSources) {
+    const expectedFile = movementIconFileByType[icon.moveType];
+    check(expectedFile, `Hero 6 ${label} Job movement has unsupported MoveType ${icon.moveType}`);
+    check(icon.src?.endsWith(`/images/shared/movement/${expectedFile}`) === true, `Hero 6 ${label} Job movement icon mismatch for MoveType ${icon.moveType}: ${icon.src}`);
+  }
 }
 
 async function verifyHeroFormSwitch(page, label) {
@@ -118,6 +134,11 @@ async function verifyHeroFormSwitch(page, label) {
     { timeout: 45000 },
   );
   check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP movement JobID mismatch`);
+  const spMoveType = Number(await spMovement.getAttribute("data-move-type"));
+  const expectedSpIconFile = movementIconFileByType[spMoveType];
+  check(expectedSpIconFile, `Hero 6 ${label} SP movement has unsupported MoveType ${spMoveType}`);
+  const spMovementIconSrc = await spMovement.locator('img[src*="/images/shared/movement/"]').getAttribute("src");
+  check(spMovementIconSrc?.endsWith(`/images/shared/movement/${expectedSpIconFile}`) === true, `Hero 6 ${label} SP movement icon mismatch for MoveType ${spMoveType}: ${spMovementIconSrc}`);
   check(await page.locator('[data-hero-job-movement="true"]').count() === 0, `Hero 6 ${label} normal movement leaked into SP form`);
   check(await page.locator('[data-hero-job-materials="true"]').count() === 0, `Hero 6 ${label} normal job materials leaked into SP form`);
   check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 1, `Hero 6 ${label} SP reward skills missing`);
