@@ -126,7 +126,7 @@ function build() {
       hardErrorCount: 0,
     },
     consumer: OUTPUT,
-    validator: 'scripts/validate_hero_sp_job_movement_consumer.cjs',
+    validator: 'scripts/validate_hero_sp_job_mobility_consumer.cjs',
     nextOwner: 'hero-frontend',
     decision: 'Reuse frozen released-SP final-job identities and resolve movement fields by exact numeric JobID only.',
   });
