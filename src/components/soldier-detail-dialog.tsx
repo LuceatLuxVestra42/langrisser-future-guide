@@ -37,12 +37,12 @@ export function SoldierDetailDialog({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 z-0 bg-black/60"
-        onMouseDown={onClose}
-      />
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-6"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+    >
       <button
         type="button"
         aria-label="상세 창 닫기"
