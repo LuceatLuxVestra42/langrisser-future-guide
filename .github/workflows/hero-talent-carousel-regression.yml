@@ -172,14 +172,20 @@ jobs:
               check((await starDisplay.innerText()).trim() === "★".repeat(star), `${label} Hero ${target.heroId} ${star}성 display mismatch`);
               check(await description.count() === 1, `${label} Hero ${target.heroId} talent description missing or duplicated`);
 
-              const [nameBox, starBox, descriptionBox] = await Promise.all([
+              const [iconBox, nameBox, starBox, descriptionBox] = await Promise.all([
+                talentIcon.boundingBox(),
                 name.boundingBox(),
                 starDisplay.boundingBox(),
                 description.boundingBox(),
               ]);
-              check(nameBox && starBox && descriptionBox, `${label} Hero ${target.heroId} talent layout boxes unavailable`);
+              check(iconBox && nameBox && starBox && descriptionBox, `${label} Hero ${target.heroId} talent layout boxes unavailable`);
               check(Math.abs(starBox.x - descriptionBox.x) <= 1, `${label} Hero ${target.heroId} talent description must align with star row: star=${starBox.x}, description=${descriptionBox.x}`);
               check(nameBox.x >= starBox.x, `${label} Hero ${target.heroId} talent name must stay beside the icon while star/description use the full card width`);
+              const iconCenterY = iconBox.y + (iconBox.height / 2);
+              const nameCenterY = nameBox.y + (nameBox.height / 2);
+              check(Math.abs(iconCenterY - nameCenterY) <= 1, `${label} Hero ${target.heroId} talent name must be vertically centered on the icon: icon=${iconCenterY}, name=${nameCenterY}`);
+              const iconToStarGap = starBox.y - (iconBox.y + iconBox.height);
+              check(iconToStarGap >= 0 && iconToStarGap <= 8, `${label} Hero ${target.heroId} talent icon-to-star gap must stay compact: ${iconToStarGap}`);
             };
 
             await assertStar(6);
