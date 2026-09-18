@@ -272,6 +272,7 @@ function ArmyIcon({
       <img
         src={officialUrl}
         alt=""
+        decoding="async"
         className={`${className} object-contain`}
         aria-hidden="true"
         onError={() => setFailedUrl(officialUrl)}

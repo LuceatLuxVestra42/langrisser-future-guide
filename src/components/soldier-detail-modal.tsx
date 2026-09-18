@@ -373,6 +373,9 @@ function SoldierPreview({ record }: { record: SoldierPrototypePresentationRecord
               src={portraitUrl}
               alt=""
               aria-hidden="true"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-contain object-bottom px-2 pb-8 pt-2"
               onError={() => setPortraitFailed(true)}
             />
@@ -397,6 +400,8 @@ function SoldierPreview({ record }: { record: SoldierPrototypePresentationRecord
             <img
               src={officialUrl}
               alt=""
+              loading="eager"
+              decoding="async"
               className="h-full w-full object-contain"
               aria-hidden="true"
               onError={() => setImageFailed(true)}
@@ -453,6 +458,8 @@ function SoldierStatTable({ record }: { record: SoldierPrototypePresentationReco
             src={stat.icon}
             alt=""
             aria-hidden="true"
+            loading="eager"
+            decoding="async"
             className="h-5 w-5 shrink-0 object-contain sm:h-6 sm:w-6"
           />
           <span className="text-sm font-black leading-none tabular-nums text-foreground sm:text-base">
