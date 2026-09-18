@@ -21,6 +21,22 @@ function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
   );
 }
 
+type HeroJobMovementRowView = {
+  jobConnectionId: number;
+  jobId: number;
+  nameCn: string | null;
+  moveType: number;
+  moveTypeNameKr: string;
+  movePoint: number;
+  attackRange: number | null;
+};
+
+type HeroSpFinalJobView = {
+  jobConnectionId: number | null;
+  jobId: number | null;
+  nameCn: string | null;
+};
+
 function HeroSpJobMovementSection({
   heroId,
   finalJob,
