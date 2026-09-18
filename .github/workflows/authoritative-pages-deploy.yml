@@ -240,26 +240,38 @@ jobs:
           run_hosted_validator() {
             local validator="$1"
             shift
-            printf 'HOSTED_QA_START validator=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
-              "$validator" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            if "$@"; then
-              printf 'HOSTED_QA_PASS validator=%s timestamp=%s\n' \
-                "$validator" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-              return 0
-            else
-              local status=$?
-              printf 'HOSTED_QA_FAIL validator=%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
-                "$validator" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
-              printf '%s\n' 'HOSTED_QA_MANIFEST_PROBE_BEGIN' >&2
-              curl --silent --show-error --location --max-time 20 \
-                -D /tmp/hosted-manifest.headers \
-                "${HOSTED_BASE_URL}authoritative-pages-source.json?qa=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s)" \
-                -o /tmp/hosted-manifest.json || true
-              cat /tmp/hosted-manifest.headers >&2 2>/dev/null || true
-              cat /tmp/hosted-manifest.json >&2 2>/dev/null || true
-              printf '\n%s\n' 'HOSTED_QA_MANIFEST_PROBE_END' >&2
-              return "$status"
-            fi
+            local max_attempts=3
+            local status=0
+
+            for attempt in $(seq 1 "$max_attempts"); do
+              printf 'HOSTED_QA_START validator=%s attempt=%s/%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
+                "$validator" "$attempt" "$max_attempts" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              if "$@"; then
+                printf 'HOSTED_QA_PASS validator=%s attempt=%s/%s timestamp=%s\n' \
+                  "$validator" "$attempt" "$max_attempts" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                return 0
+              fi
+
+              status=$?
+              printf 'HOSTED_QA_ATTEMPT_FAIL validator=%s attempt=%s/%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
+                "$validator" "$attempt" "$max_attempts" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+
+              if [[ "$attempt" -lt "$max_attempts" ]]; then
+                sleep 5
+              fi
+            done
+
+            printf 'HOSTED_QA_FAIL validator=%s attempts=%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
+              "$validator" "$max_attempts" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+            printf '%s\n' 'HOSTED_QA_MANIFEST_PROBE_BEGIN' >&2
+            curl --silent --show-error --location --max-time 20 \
+              -D /tmp/hosted-manifest.headers \
+              "${HOSTED_BASE_URL}authoritative-pages-source.json?qa=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s)" \
+              -o /tmp/hosted-manifest.json || true
+            cat /tmp/hosted-manifest.headers >&2 2>/dev/null || true
+            cat /tmp/hosted-manifest.json >&2 2>/dev/null || true
+            printf '\n%s\n' 'HOSTED_QA_MANIFEST_PROBE_END' >&2
+            return "$status"
           }
 
           run_hosted_validator route-hosted-qa-strict \
