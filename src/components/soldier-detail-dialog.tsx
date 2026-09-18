@@ -48,7 +48,14 @@ export function SoldierDetailDialog({
         aria-label="상세 창 닫기"
         aria-controls="soldier-detail-title"
         onClick={onClose}
-        className="fixed right-3 top-3 z-[70] flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-5 sm:top-5"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        style={{
+          position: "fixed",
+          top: "12px",
+          right: "12px",
+          zIndex: 2147483647,
+          pointerEvents: "auto",
+        }}
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>
