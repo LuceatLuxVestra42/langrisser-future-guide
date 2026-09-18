@@ -201,11 +201,7 @@ function HeroDetailPage() {
     throw new Error("Hero card icon frozen index is not production-ready.");
   }
   const [selectedSoldierId, setSelectedSoldierId] = useState<number | null>(null);
-  const [showAllSoldiers, setShowAllSoldiers] = useState(false);
-  useEffect(() => {
-    setSelectedSoldierId(null);
-    setShowAllSoldiers(false);
-  }, [hero.heroId]);
+  useEffect(() => setSelectedSoldierId(null), [hero.heroId]);
   const selectedSoldierRecord = selectedSoldierId == null
     ? null
     : (soldierDetailById.get(selectedSoldierId) ?? null);
@@ -462,7 +458,14 @@ function HeroDetailPage() {
                   <div className="flex items-start gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-foreground">{activeTalentRow.star}성 · {activeTalentRow.skill.nameCn ?? "스킬"}</h3>
+                      <h3
+                        className="font-bold text-foreground"
+                        data-hero-talent-star-display={activeTalentRow.star}
+                        aria-label={`${activeTalentRow.star}성 · ${activeTalentRow.skill.nameCn ?? "스킬"}`}
+                      >
+                        <span className="tracking-[0.08em] text-amber-500" aria-hidden="true">{"★".repeat(activeTalentRow.star)}</span>
+                        <span> · {activeTalentRow.skill.nameCn ?? "스킬"}</span>
+                      </h3>
                       <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
                     </div>
                   </div>
@@ -483,10 +486,11 @@ function HeroDetailPage() {
                     key={`${row.star}-${row.skillId}-selector`}
                     type="button"
                     onClick={() => setTalentIndex(index)}
+                    aria-label={`${row.star}성`}
                     aria-pressed={index === talentIndex}
                     className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${index === talentIndex ? "border-foreground bg-foreground text-background" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}
                   >
-                    {row.star}성
+                    <span aria-hidden="true" className="tracking-[0.08em]">{"★".repeat(row.star)}</span>
                   </button>
                 ))}
               </div>
@@ -505,7 +509,7 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4" data-hero-bond-unlock-grid="true">
+            <div className="mt-5 grid grid-cols-1 gap-2" data-hero-bond-unlock-grid="true">
               {detail.bonds.rows.flatMap((bond) => {
                 const favorabilityLevel = bond.completionConditions.find((condition) => condition.favorability)?.favorability?.requiredLevel ?? null;
                 const fetterIconNumber = favorabilityLevel == null ? null : (FETTER_ICON_BY_FAVORABILITY_LEVEL[favorabilityLevel] ?? null);
@@ -513,9 +517,9 @@ function HeroDetailPage() {
                 return bond.completionConditions
                   .filter((condition) => !condition.favorability)
                   .map((condition, conditionIndex) => (
-                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex min-w-0 flex-col items-start gap-2 rounded-lg border border-border bg-muted/20 px-2.5 py-3">
+                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
                       {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-8 w-8 shrink-0 object-contain" /> : null}
-                      <p className="text-[11px] font-semibold leading-4 text-foreground sm:text-xs">{formatBondCondition(condition)}</p>
+                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
                     </div>
                   ));
               })}
@@ -530,23 +534,14 @@ function HeroDetailPage() {
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
           data-hero-soldier-cards="true"
-          data-hero-soldier-cards-expanded={showAllSoldiers ? "true" : "false"}
         >
           <SectionTitle title="사용 가능 용병" />
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
-            {soldierCards.map((record, index) => (
+          <div className="mt-4 grid grid-cols-6 gap-1.5 sm:grid-cols-8 sm:gap-2" data-hero-soldier-card-grid="true">
+            {soldierCards.map((record) => (
               <div
                 key={record.soldierId}
                 data-hero-soldier-card-slot="true"
-                className={
-                  `min-w-0 ${showAllSoldiers
-                    ? ""
-                    : index >= 8
-                      ? "hidden"
-                      : index >= 6
-                        ? "hidden sm:block"
-                        : ""}`
-                }
+                className="min-w-0"
               >
                 <HeroSoldierCard
                   record={record}
@@ -555,18 +550,6 @@ function HeroDetailPage() {
               </div>
             ))}
           </div>
-          {soldierCards.length > 8 ? (
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                aria-expanded={showAllSoldiers}
-                onClick={() => setShowAllSoldiers((current) => !current)}
-                className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-bold text-foreground shadow-sm transition hover:bg-muted"
-              >
-                {showAllSoldiers ? "용병 접기" : "전체 용병 보기"}
-              </button>
-            </div>
-          ) : null}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
