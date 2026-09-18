@@ -1,0 +1,87 @@
+name: Hero Casting Law By Hero
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/hero-casting-law-by-hero.yml'
+      - 'data/contracts/hero-casting-law-by-hero.v1.json'
+      - 'data/generated/hero-casting-law-materials.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'scripts/build_hero_casting_law_by_hero.cjs'
+      - 'scripts/validate_hero_casting_law_by_hero.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+  push:
+    branches:
+      - 'feat/hero-casting-law-by-hero-*'
+    paths:
+      - '.github/workflows/hero-casting-law-by-hero.yml'
+      - 'data/contracts/hero-casting-law-by-hero.v1.json'
+      - 'data/generated/hero-casting-law-materials.v1.json'
+      - 'data/hero-name-master.v1.json'
+      - 'scripts/build_hero_casting_law_by_hero.cjs'
+      - 'scripts/validate_hero_casting_law_by_hero.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  build-validate-freeze:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Confirm clean checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain=v1)"
+          git diff --check
+
+      - name: Build per-Hero Casting Law costs
+        run: node scripts/build_hero_casting_law_by_hero.cjs
+
+      - name: Independently validate Hero-template and cost parity
+        run: node scripts/validate_hero_casting_law_by_hero.cjs
+
+      - name: Reject unexpected mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed='^(data/generated/hero-casting-law-by-hero\.v1\.json|data/validation/hero-casting-law-by-hero-summary\.v1\.json)$'
+          unexpected="$(git status --porcelain=v1 | sed -E 's/^...//' | grep -Ev "$allowed" || true)"
+          if [[ -n "$unexpected" ]]; then
+            printf 'Unexpected mutation after producer/validator:\n%s\n' "$unexpected" >&2
+            exit 1
+          fi
+          git diff --check
+
+      - name: Freeze validated outputs
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-casting-law-by-hero.v1.json data/validation/hero-casting-law-by-hero-summary.v1.json
+          if git diff --cached --quiet; then
+            echo 'Per-Hero Casting Law outputs already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Freeze per-Hero Casting Law costs'
+          git push origin HEAD:"${GITHUB_REF_NAME}"
