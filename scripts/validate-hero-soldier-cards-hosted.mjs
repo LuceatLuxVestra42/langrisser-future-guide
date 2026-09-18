@@ -249,7 +249,10 @@ async function verifyInlineSoldierDialog(page, cards, cardIndex, label) {
   check(detailTitle.length > 0, `Hero 6 ${label} inline Soldier detail title is empty`);
   check((await dialog.innerText()).includes("사용 가능 영웅"), `Hero 6 ${label} inline Soldier detail did not render expected frontend consumer content`);
 
-  await page.getByRole("button", { name: "상세 창 닫기" }).click();
+  const closeButton = page.getByRole("button", { name: "상세 창 닫기" });
+  await closeButton.waitFor({ state: "visible", timeout: 10000 });
+  check(await closeButton.isEnabled(), `Hero 6 ${label} inline Soldier close control is disabled`);
+  await closeButton.click({ force: true });
   await dialog.waitFor({ state: "detached", timeout: 45000 });
   check(page.url() === heroUrl, `Hero 6 ${label} URL changed after closing inline Soldier dialog`);
   check(await cards.count() === expectedHero6SoldierIds.length, `Hero 6 ${label} Soldier cards did not survive inline dialog close`);
