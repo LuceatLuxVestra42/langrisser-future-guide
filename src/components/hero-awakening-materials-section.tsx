@@ -20,39 +20,35 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">각성기 재료</h2>
       </div>
 
-      <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
-        <ul className="grid gap-2 sm:grid-cols-3">
-          {hero.awakening.materials.map((material, index) => {
-            const iconUrl = getHeroAwakeningMaterialIconUrl(material.item.icon);
-            if (!iconUrl) {
-              throw new Error(
-                `Awakening material ${material.id} has no admitted icon for sourcePath=${String(material.item.icon)}.`,
-              );
-            }
-
-            return (
-              <li
-                key={`${material.id}-${index}`}
-                className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/70 px-3 py-3"
-                data-awakening-material-id={material.id}
-                data-awakening-material-icon={material.item.icon ?? ""}
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-background p-1 shadow-sm">
-                  <img
-                    src={iconUrl}
-                    alt={material.item.nameCn}
-                    title={material.item.nameCn}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <span className="text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
-              </li>
+      <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-3">
+        {hero.awakening.materials.map((material, index) => {
+          const iconUrl = getHeroAwakeningMaterialIconUrl(material.item.icon);
+          if (!iconUrl) {
+            throw new Error(
+              `Awakening material ${material.id} has no admitted icon for sourcePath=${String(material.item.icon)}.`,
             );
-          })}
-        </ul>
-      </div>
+          }
+
+          return (
+            <li
+              key={`${material.id}-${index}`}
+              className="inline-flex items-center gap-2"
+              data-awakening-material-id={material.id}
+              data-awakening-material-icon={material.item.icon ?? ""}
+            >
+              <img
+                src={iconUrl}
+                alt={material.item.nameCn}
+                title={material.item.nameCn}
+                loading="lazy"
+                decoding="async"
+                className="h-12 w-12 shrink-0 object-contain"
+              />
+              <span className="text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
