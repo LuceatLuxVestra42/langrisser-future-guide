@@ -138,15 +138,9 @@ jobs:
             check((await state.getAttribute('data-hero-talent-min-star')) === String(target.initialStar), `${label} Hero ${target.heroId} min star mismatch`);
             check((await state.getAttribute('data-hero-talent-max-star')) === '6', `${label} Hero ${target.heroId} max star is not 6`);
 
-            const selectorButtons = carousel.locator('[aria-label="고유기 성급 선택"] button');
-            const selectorTexts = (await selectorButtons.allTextContents()).map((text) => text.trim());
-            const expectedSelectors = Array.from(
-              { length: 7 - target.initialStar },
-              (_, index) => "★".repeat(target.initialStar + index),
-            );
-            check(JSON.stringify(selectorTexts) === JSON.stringify(expectedSelectors), `${label} Hero ${target.heroId} selector mismatch: ${JSON.stringify(selectorTexts)} / ${JSON.stringify(expectedSelectors)}`);
-            for (let hiddenStar = 1; hiddenStar < target.initialStar; hiddenStar += 1) {
-              check(await carousel.getByRole('button', { name: `${hiddenStar}성`, exact: true }).count() === 0, `${label} Hero ${target.heroId} exposed hidden ${hiddenStar}성 selector`);
+            check(await carousel.locator('[aria-label="고유기 성급 선택"]').count() === 0, `${label} Hero ${target.heroId} direct talent star selector must be removed`);
+            for (let star = target.initialStar; star <= 6; star += 1) {
+              check(await carousel.getByRole('button', { name: `${star}성`, exact: true }).count() === 0, `${label} Hero ${target.heroId} exposed direct ${star}성 selector`);
             }
 
             const lower = carousel.getByRole('button', { name: '낮은 성급 고유기 보기', exact: true });
@@ -155,10 +149,23 @@ jobs:
 
             const assertStar = async (star) => {
               await carousel.locator(`[data-hero-talent-active-star="${star}"]`).waitFor({ state: 'attached', timeout: 5000 });
-              const starButton = carousel.getByRole('button', { name: `${star}성`, exact: true });
-              check((await starButton.getAttribute('aria-pressed')) === 'true', `${label} Hero ${target.heroId} ${star}성 selector is not pressed`);
-              const heading = (await carousel.locator('article h3').innerText()).trim();
-              check(heading.startsWith(`${"★".repeat(star)} ·`), `${label} Hero ${target.heroId} ${star}성 card heading mismatch: ${heading}`);
+              const article = carousel.locator('article');
+              const name = article.locator('[data-hero-talent-name="true"]');
+              const starDisplay = article.locator(`[data-hero-talent-star-display="${star}"]`);
+              const description = article.locator('[data-hero-talent-description="true"]');
+              check(await name.count() === 1, `${label} Hero ${target.heroId} talent name missing or duplicated`);
+              check(await starDisplay.count() === 1, `${label} Hero ${target.heroId} ${star}성 display missing or duplicated`);
+              check((await starDisplay.innerText()).trim() === "★".repeat(star), `${label} Hero ${target.heroId} ${star}성 display mismatch`);
+              check(await description.count() === 1, `${label} Hero ${target.heroId} talent description missing or duplicated`);
+
+              const [nameBox, starBox, descriptionBox] = await Promise.all([
+                name.boundingBox(),
+                starDisplay.boundingBox(),
+                description.boundingBox(),
+              ]);
+              check(nameBox && starBox && descriptionBox, `${label} Hero ${target.heroId} talent layout boxes unavailable`);
+              check(Math.abs(starBox.x - descriptionBox.x) <= 1, `${label} Hero ${target.heroId} talent description must align with star row: star=${starBox.x}, description=${descriptionBox.x}`);
+              check(nameBox.x >= starBox.x, `${label} Hero ${target.heroId} talent name must stay beside the icon while star/description use the full card width`);
             };
 
             await assertStar(6);
@@ -182,14 +189,9 @@ jobs:
             }
             check(await higher.isDisabled(), `${label} Hero ${target.heroId} higher arrow must be disabled after returning to 6성`);
 
-            await carousel.getByRole('button', { name: `${target.initialStar}성`, exact: true }).click();
-            await assertStar(target.initialStar);
-            await carousel.getByRole('button', { name: '6성', exact: true }).click();
-            await assertStar(6);
-
             check(pageErrors.length === 0, `${label} Hero ${target.heroId} page errors: ${JSON.stringify(pageErrors)}`);
             check(consoleErrors.length === 0, `${label} Hero ${target.heroId} console errors: ${JSON.stringify(consoleErrors)}`);
-            return { heroId: target.heroId, initialStar: target.initialStar, downward, upward, selectors: selectorTexts };
+            return { heroId: target.heroId, initialStar: target.initialStar, downward, upward, directSelectors: false };
           }
 
           const browser = await chromium.launch({ headless: true });
