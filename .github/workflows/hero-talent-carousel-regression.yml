@@ -140,7 +140,10 @@ jobs:
 
             const selectorButtons = carousel.locator('[aria-label="고유기 성급 선택"] button');
             const selectorTexts = (await selectorButtons.allTextContents()).map((text) => text.trim());
-            const expectedSelectors = Array.from({ length: 7 - target.initialStar }, (_, index) => `${target.initialStar + index}성`);
+            const expectedSelectors = Array.from(
+              { length: 7 - target.initialStar },
+              (_, index) => "★".repeat(target.initialStar + index),
+            );
             check(JSON.stringify(selectorTexts) === JSON.stringify(expectedSelectors), `${label} Hero ${target.heroId} selector mismatch: ${JSON.stringify(selectorTexts)} / ${JSON.stringify(expectedSelectors)}`);
             for (let hiddenStar = 1; hiddenStar < target.initialStar; hiddenStar += 1) {
               check(await carousel.getByRole('button', { name: `${hiddenStar}성`, exact: true }).count() === 0, `${label} Hero ${target.heroId} exposed hidden ${hiddenStar}성 selector`);
@@ -155,7 +158,7 @@ jobs:
               const starButton = carousel.getByRole('button', { name: `${star}성`, exact: true });
               check((await starButton.getAttribute('aria-pressed')) === 'true', `${label} Hero ${target.heroId} ${star}성 selector is not pressed`);
               const heading = (await carousel.locator('article h3').innerText()).trim();
-              check(heading.startsWith(`${star}성 ·`), `${label} Hero ${target.heroId} ${star}성 card heading mismatch: ${heading}`);
+              check(heading.startsWith(`${"★".repeat(star)} ·`), `${label} Hero ${target.heroId} ${star}성 card heading mismatch: ${heading}`);
             };
 
             await assertStar(6);
