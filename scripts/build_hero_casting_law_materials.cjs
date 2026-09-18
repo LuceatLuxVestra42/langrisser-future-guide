@@ -151,7 +151,7 @@ function main() {
         nameCn: template.Name ?? null,
         equipmentType: Number.isInteger(template.EquipmentType) ? template.EquipmentType : null,
         icon: template.Icon ?? null,
-        levelInfoIds,
+        levelInfoIds: levelIds,
         levels,
       };
     });
