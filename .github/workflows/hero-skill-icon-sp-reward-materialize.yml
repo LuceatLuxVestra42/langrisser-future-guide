@@ -1,0 +1,47 @@
+name: Hero SP Reward Skill Icon Materialize
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/hero-skill-icon-sp-reward-materialize.yml'
+      - 'scripts/materialize-hero-skill-icon-sp-reward-assets.py'
+      - 'data/generated/hero-skill-icon-sp-reward-materialization.v1.json'
+      - 'public/images/heroes/skill-icons/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install official asset verifier dependencies
+        run: pip install UnityPy==1.25.3 Pillow
+      - name: Materialize exact SP reward skill icons
+        run: python scripts/materialize-hero-skill-icon-sp-reward-assets.py --write
+      - name: Commit deterministic materialization outputs when needed
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/generated/hero-skill-icon-sp-reward-materialization.v1.json public/images/heroes/skill-icons/*.png
+          if git diff --cached --quiet; then
+            echo 'No materialization diff.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Materialize SP reward skill icons'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
