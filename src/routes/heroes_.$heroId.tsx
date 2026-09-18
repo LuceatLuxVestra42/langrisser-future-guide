@@ -23,6 +23,7 @@ import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equi
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
+import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
@@ -536,7 +537,12 @@ function HeroDetailPage() {
           )}
         </section>
 
-        {detail.sp.released ? <HeroSpMissionSection missions={detail.sp.missions} /> : null}
+        {detail.sp.released ? (
+          <HeroSpMissionSection
+            activationMaterials={detail.sp.activationMaterials}
+            missions={detail.sp.missions}
+          />
+        ) : null}
 
         <HeroSoldierCommandSection soldierCommand={soldierCommand} />
 
@@ -715,6 +721,12 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
   );
 }
 
+type SpMaterialView = {
+  goodsType: number | null;
+  sourceId: number | null;
+  count: number | null;
+};
+
 type SpMissionView = {
   missionId: number | null;
   phase: string | null;
@@ -723,7 +735,7 @@ type SpMissionView = {
   missionType: number | null;
   condition: {
     kind: string | null;
-    items: Array<{ goodsType: number | null; sourceId: number | null; count: number | null }>;
+    items: SpMaterialView[];
     equipmentId: number | null;
     requiredLevel: number | null;
     requiredHeroIds: number[];
@@ -733,11 +745,64 @@ type SpMissionView = {
   };
 };
 
-function HeroSpMissionSection({ missions }: { missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] } }) {
-  if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
+function SpMaterialIcon({
+  material,
+  context,
+}: {
+  material: SpMaterialView;
+  context: string;
+}) {
+  const presentation = getHeroSpMaterialPresentation(material.goodsType, material.sourceId);
+  if (!presentation) {
+    throw new Error(
+      `${context} has no admitted SP material icon for GoodsType=${String(material.goodsType)} Id=${String(material.sourceId)}.`,
+    );
+  }
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-2 py-1 text-[11px] font-semibold text-foreground"
+      title={presentation.displayName}
+      data-sp-material-goods-type={material.goodsType ?? undefined}
+      data-sp-material-source-id={material.sourceId ?? undefined}
+    >
+      <img
+        src={presentation.iconUrl}
+        alt={presentation.displayName}
+        loading="lazy"
+        decoding="async"
+        className="h-8 w-8 shrink-0 object-contain"
+      />
+      <span className="tabular-nums">×{material.count ?? "?"}</span>
+    </span>
+  );
+}
+
+function HeroSpMissionSection({
+  activationMaterials,
+  missions,
+}: {
+  activationMaterials: { first: SpMaterialView[]; newFirst: SpMaterialView[] };
+  missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] };
+}) {
+  const hasActivationMaterials =
+    activationMaterials.first.length > 0 || activationMaterials.newFirst.length > 0;
+  if (!hasActivationMaterials && missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   return (
     <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-sp-missions="true" data-sp-first-stage-count={missions.firstStage.length} data-sp-second-stage-count={missions.secondStage.length}>
       <SectionTitle title="SP 전직 미션" />
+      {hasActivationMaterials ? (
+        <div className="mt-4 rounded-xl border border-border bg-muted/10 p-3 sm:p-4" data-sp-activation-materials="true">
+          <h3 className="text-sm font-bold text-foreground">SP 해금 아이템</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {activationMaterials.first.map((material, index) => (
+              <SpMaterialIcon key={`first-${material.goodsType}-${material.sourceId}-${index}`} material={material} context="SP activation first material" />
+            ))}
+            {activationMaterials.newFirst.map((material, index) => (
+              <SpMaterialIcon key={`new-first-${material.goodsType}-${material.sourceId}-${index}`} material={material} context="SP activation new-first material" />
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <SpMissionPhase title="1차 전직" missions={missions.firstStage} />
         <SpMissionPhase title="2차 전직" missions={missions.secondStage} />
@@ -764,9 +829,11 @@ function SpMissionPhase({ title, missions }: { title: string; missions: SpMissio
             {mission.condition.items.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-1.5" aria-label="필요 재료">
                 {mission.condition.items.map((item, itemIndex) => (
-                  <span key={String(mission.missionId ?? index) + "-material-" + itemIndex} className="rounded-md border border-border bg-muted/30 px-2 py-1 text-[11px] font-semibold text-foreground">
-                    {"ID " + (item.sourceId ?? "?") + " ×" + (item.count ?? "?")}
-                  </span>
+                  <SpMaterialIcon
+                    key={String(mission.missionId ?? index) + "-material-" + itemIndex}
+                    material={item}
+                    context={`SP mission ${String(mission.missionId ?? index)}`}
+                  />
                 ))}
               </div>
             ) : null}
