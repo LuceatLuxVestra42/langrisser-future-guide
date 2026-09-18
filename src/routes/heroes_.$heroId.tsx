@@ -458,9 +458,12 @@ function HeroDetailPage() {
                   <div className="flex items-start gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-foreground" data-hero-talent-star-display={activeTalentRow.star}>
+                      <h3
+                        className="font-bold text-foreground"
+                        data-hero-talent-star-display={activeTalentRow.star}
+                        aria-label={`${activeTalentRow.star}성 · ${activeTalentRow.skill.nameCn ?? "스킬"}`}
+                      >
                         <span className="tracking-[0.08em] text-amber-500" aria-hidden="true">{"★".repeat(activeTalentRow.star)}</span>
-                        <span className="sr-only">{activeTalentRow.star}성</span>
                         <span> · {activeTalentRow.skill.nameCn ?? "스킬"}</span>
                       </h3>
                       <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
