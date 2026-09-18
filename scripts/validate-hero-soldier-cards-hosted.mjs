@@ -47,6 +47,7 @@ check(manifest.semanticStageReopened === false, "deployment manifest reopened se
 
 for (const [path, label] of [
   ["heroes/6/", "Hero 6"],
+  ["heroes/100/", "Hero 100 non-SP"],
   ["soldiers/101/", "Soldier 101"],
   ["images/soldiers-webp/101.webp", "Soldier 101 portrait"],
 ]) {
@@ -81,11 +82,72 @@ async function verifyHeroJobMovement(page, label) {
   check(text.includes("기마 이동") && text.includes("보행 이동"), `Hero 6 ${label} Job movement Korean labels missing`);
 }
 
+async function verifyHeroFormSwitch(page, label) {
+  const main = page.locator('main[data-hero-form-mode]');
+  const switcher = page.locator('[data-hero-form-switch="true"]');
+  check(await switcher.count() === 1, `Hero 6 ${label} form switch missing or duplicated`);
+  check(await main.getAttribute("data-hero-form-mode") === "normal", `Hero 6 ${label} did not default to normal form`);
+  check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 6 ${label} normal job materials missing`);
+  check(await page.locator('[data-hero-sp-job-movement="true"]').count() === 0, `Hero 6 ${label} SP movement leaked into normal form`);
+  check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 0, `Hero 6 ${label} SP reward skills leaked into normal form`);
+  check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 6 ${label} SP missions leaked into normal form`);
+  const normalFinalJobIds = await page.locator('[data-hero-final-job-stats-section="true"] [data-final-job-id]').evaluateAll((nodes) =>
+    nodes.map((node) => Number(node.getAttribute("data-final-job-id"))),
+  );
+  check(normalFinalJobIds.length > 0 && !normalFinalJobIds.includes(377), `Hero 6 ${label} normal final jobs contain SP Job 377: ${JSON.stringify(normalFinalJobIds)}`);
+
+  await page.getByRole("button", { name: "SP 전직", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("main")?.getAttribute("data-hero-form-mode") === "sp", null, { timeout: 45000 });
+
+  check(await switcher.getAttribute("data-active-hero-form") === "sp", `Hero 6 ${label} SP switch state mismatch`);
+  const spArtwork = page.locator('img[data-hero-active-artwork="true"][data-hero-artwork-form="sp"]');
+  check(await spArtwork.count() === 1, `Hero 6 ${label} SP artwork missing`);
+  const spArtworkSrc = await spArtwork.getAttribute("src");
+  check(spArtworkSrc?.startsWith("data:image/webp;base64,") === true, `Hero 6 ${label} SP artwork is not the embedded WebP source`);
+  check((spArtworkSrc?.length ?? 0) > 50000, `Hero 6 ${label} SP artwork payload is unexpectedly short`);
+
+  const spMovement = page.locator('[data-hero-sp-job-movement="true"]');
+  check(await spMovement.count() === 1, `Hero 6 ${label} SP movement section missing`);
+  await page.waitForFunction(
+    () => document.querySelector('[data-hero-sp-job-movement="true"]')?.getAttribute("data-hero-sp-job-movement-status") === "ready",
+    null,
+    { timeout: 45000 },
+  );
+  check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP movement JobID mismatch`);
+  check(await page.locator('[data-hero-job-movement="true"]').count() === 0, `Hero 6 ${label} normal movement leaked into SP form`);
+  check(await page.locator('[data-hero-job-materials="true"]').count() === 0, `Hero 6 ${label} normal job materials leaked into SP form`);
+  check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 1, `Hero 6 ${label} SP reward skills missing`);
+  check(await page.locator('[data-hero-sp-missions="true"]').count() === 1, `Hero 6 ${label} SP missions missing`);
+  check(await page.locator('[data-sp-activation-materials="true"]').count() === 0, `Hero 6 ${label} obsolete SP activation-material block is visible`);
+
+  const talent = page.locator('[data-hero-talent-carousel="true"]');
+  check(await talent.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} talent did not switch to SP form`);
+  check(await talent.locator('[data-hero-talent-min-star]').getAttribute("data-hero-talent-min-star") === "1", `Hero 6 ${label} SP talent progression did not start at 1 star`);
+
+  const spFinalJobIds = await page.locator('[data-hero-final-job-stats-section="true"] [data-final-job-id]').evaluateAll((nodes) =>
+    nodes.map((node) => Number(node.getAttribute("data-final-job-id"))),
+  );
+  check(JSON.stringify(spFinalJobIds) === JSON.stringify([377]), `Hero 6 ${label} SP final-job isolation mismatch: ${JSON.stringify(spFinalJobIds)}`);
+
+  const spHeartFetterJobIds = await page.locator('[data-hero-heart-fetter="true"] [data-heart-fetter-job-id]').evaluateAll((nodes) =>
+    nodes.map((node) => Number(node.getAttribute("data-heart-fetter-job-id"))),
+  );
+  check(spHeartFetterJobIds.every((jobId) => jobId === 377), `Hero 6 ${label} SP HeartFetter isolation mismatch: ${JSON.stringify(spHeartFetterJobIds)}`);
+  check(await page.locator('[data-hero-heart-fetter="true"]').getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} HeartFetter section did not switch to SP form`);
+
+  await page.getByRole("button", { name: "기본 전직", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector("main")?.getAttribute("data-hero-form-mode") === "normal", null, { timeout: 45000 });
+  check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 6 ${label} normal form did not restore job materials`);
+  check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 6 ${label} SP missions survived normal-form restore`);
+}
+
 async function verifyHeroSoldierCards(page, label) {
   const navigation = await page.goto(url("heroes/6/"), { waitUntil: "networkidle", timeout: 45000 });
   check(navigation && navigation.status() < 400, `Hero 6 ${label} detail failed: ${navigation?.status()}`);
   await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
   await verifyHeroJobMovement(page, label);
+  await verifyHeroFormSwitch(page, label);
+  await verifyHeroJobMovement(page, `${label} restored-normal`);
 
   const section = page.locator('[data-hero-soldier-cards="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Soldier card section missing or duplicated`);
@@ -126,6 +188,20 @@ async function verifyHeroSoldierCards(page, label) {
   return { section, cards };
 }
 
+async function verifyNonSpHeroFormAbsence(page, label) {
+  const navigation = await page.goto(url("heroes/100/"), { waitUntil: "networkidle", timeout: 45000 });
+  check(navigation && navigation.status() < 400, `Hero 100 ${label} detail failed: ${navigation?.status()}`);
+  await page.getByRole("heading", { name: "로젠실", exact: true }).waitFor();
+
+  const main = page.locator('main[data-hero-form-mode]');
+  check(await main.getAttribute("data-hero-form-mode") === "normal", `Hero 100 ${label} did not remain in normal form`);
+  check(await page.locator('[data-hero-form-switch="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed an SP form switch`);
+  check(await page.locator('[data-hero-sp-job-movement="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP movement`);
+  check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP reward skills`);
+  check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP missions`);
+  check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 100 ${label} normal job materials missing`);
+}
+
 async function verifyInlineSoldierDialog(page, cards, cardIndex, label) {
   const card = cards.nth(cardIndex);
   check(await card.count() === 1, `Hero 6 ${label} target Soldier card missing`);
@@ -163,6 +239,7 @@ try {
   const soldier101Index = expectedHero6SoldierIds.indexOf(101);
   check(soldier101Index >= 0, "Hero 6 expected Soldier 101 index missing");
   await verifyInlineSoldierDialog(desktopPage, desktop.cards, soldier101Index, "desktop Soldier 101");
+  await verifyNonSpHeroFormAbsence(desktopPage, "desktop");
   check(desktopPageErrors.length === 0, `desktop page errors: ${JSON.stringify(desktopPageErrors)}`);
   check(desktopConsoleErrors.length === 0, `desktop console errors: ${JSON.stringify(desktopConsoleErrors)}`);
   await desktopPage.close();
@@ -178,14 +255,25 @@ try {
   await verifyInlineSoldierDialog(mobilePage, mobile.cards, soldier101Index, "mobile Soldier 101");
   const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check(overflow <= 1, `Hero 6 mobile horizontal overflow=${overflow}`);
+  await verifyNonSpHeroFormAbsence(mobilePage, "mobile");
   check(mobilePageErrors.length === 0, `mobile page errors: ${JSON.stringify(mobilePageErrors)}`);
   check(mobileConsoleErrors.length === 0, `mobile console errors: ${JSON.stringify(mobileConsoleErrors)}`);
   await mobileContext.close();
 
   console.log(JSON.stringify({
-    status: "PASS_HERO_SOLDIER_CARDS_AND_JOB_MOVEMENT_HOSTED_BROWSER_QA",
+    status: "PASS_HERO_FORM_SWITCH_SOLDIER_CARDS_AND_JOB_MOVEMENT_HOSTED_BROWSER_QA",
     sourceSha: expectedSourceSha,
     heroId: 6,
+    heroFormSwitch: {
+      defaultMode: "normal",
+      spJobId: 377,
+      normalSpIsolation: "PASS",
+      spArtwork: "embedded-webp-data-uri",
+      spActivationMaterialBlock: "ABSENT",
+      desktop: "PASS",
+      mobile: "PASS",
+      nonSpHero100SwitchAbsent: "PASS",
+    },
     jobMovement: {
       hydratedRowCount: expectedHero6MovementRows.length,
       identityMoveTypeMovePointParity: "PASS",
