@@ -457,18 +457,23 @@ function HeroDetailPage() {
                 <article key={`${activeTalentRow.star}-${activeTalentRow.skillId}`} className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
                   <div className="flex items-start gap-3">
                     <HeroSkillIcon heroId={hero.heroId} skill={activeTalentRow.skill} />
-                    <div className="min-w-0 flex-1">
-                      <h3
-                        className="font-bold text-foreground"
-                        data-hero-talent-star-display={activeTalentRow.star}
-                        aria-label={`${activeTalentRow.star}성 · ${activeTalentRow.skill.nameCn ?? "스킬"}`}
-                      >
-                        <span className="tracking-[0.08em] text-amber-500" aria-hidden="true">{"★".repeat(activeTalentRow.star)}</span>
-                        <span> · {activeTalentRow.skill.nameCn ?? "스킬"}</span>
-                      </h3>
-                      <p className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(activeTalentRow.skill.desc)}</p>
-                    </div>
+                    <h3 className="min-w-0 flex-1 font-bold text-foreground" data-hero-talent-name="true">
+                      {activeTalentRow.skill.nameCn ?? "스킬"}
+                    </h3>
                   </div>
+                  <div
+                    className="mt-4 tracking-[0.08em] text-amber-500"
+                    data-hero-talent-star-display={activeTalentRow.star}
+                    aria-label={`${activeTalentRow.star}성`}
+                  >
+                    <span aria-hidden="true">{"★".repeat(activeTalentRow.star)}</span>
+                  </div>
+                  <p
+                    className="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground"
+                    data-hero-talent-description="true"
+                  >
+                    {stripConfigMarkup(activeTalentRow.skill.desc)}
+                  </p>
                 </article>
                 <button
                   type="button"
@@ -479,20 +484,6 @@ function HeroDetailPage() {
                 >
                   <ChevronRight className="h-5 w-5" aria-hidden="true" />
                 </button>
-              </div>
-              <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:justify-center" aria-label="고유기 성급 선택">
-                {visibleTalentProgression.map((row, index) => (
-                  <button
-                    key={`${row.star}-${row.skillId}-selector`}
-                    type="button"
-                    onClick={() => setTalentIndex(index)}
-                    aria-label={`${row.star}성`}
-                    aria-pressed={index === talentIndex}
-                    className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${index === talentIndex ? "border-foreground bg-foreground text-background" : "border-border bg-background text-muted-foreground hover:text-foreground"}`}
-                  >
-                    <span aria-hidden="true" className="tracking-[0.08em]">{"★".repeat(row.star)}</span>
-                  </button>
-                ))}
               </div>
             </div>
           ) : (
