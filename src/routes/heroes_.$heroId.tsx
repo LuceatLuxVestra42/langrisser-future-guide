@@ -298,7 +298,13 @@ function HeroDetailPage() {
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual ? (
-                <img src={activeVisual.src} alt={`${displayName} ${activeVisual.label}`} className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6" />
+                <img
+                  src={activeVisual.src}
+                  alt={`${displayName} ${activeVisual.label}`}
+                  data-hero-active-artwork="true"
+                  data-hero-artwork-form={isSpForm && spArtworkPath && activeVisual.kind === "hero" ? "sp" : "normal"}
+                  className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6"
+                />
               ) : (
                 <div className="flex h-full min-h-[357px] flex-col items-center justify-center gap-3 text-muted-foreground">
                   <UserRound className="h-20 w-20" strokeWidth={1.05} aria-hidden="true" />
@@ -592,12 +598,7 @@ function HeroDetailPage() {
           )}
         </section>
 
-        {isSpForm ? (
-          <HeroSpMissionSection
-            activationMaterials={detail.sp.activationMaterials}
-            missions={detail.sp.missions}
-          />
-        ) : null}
+        {isSpForm ? <HeroSpMissionSection missions={detail.sp.missions} /> : null}
 
         <HeroSoldierCommandSection soldierCommand={soldierCommand} />
 
@@ -833,31 +834,14 @@ function SpMaterialIcon({
 }
 
 function HeroSpMissionSection({
-  activationMaterials,
   missions,
 }: {
-  activationMaterials: { first: SpMaterialView[]; newFirst: SpMaterialView[] };
   missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] };
 }) {
-  const hasActivationMaterials =
-    activationMaterials.first.length > 0 || activationMaterials.newFirst.length > 0;
-  if (!hasActivationMaterials && missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
+  if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   return (
     <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-sp-missions="true" data-sp-first-stage-count={missions.firstStage.length} data-sp-second-stage-count={missions.secondStage.length}>
       <SectionTitle title="SP 전직 미션" />
-      {hasActivationMaterials ? (
-        <div className="mt-4 rounded-xl border border-border bg-muted/10 p-3 sm:p-4" data-sp-activation-materials="true">
-          <h3 className="text-sm font-bold text-foreground">SP 해금 아이템</h3>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {activationMaterials.first.map((material, index) => (
-              <SpMaterialIcon key={`first-${material.goodsType}-${material.sourceId}-${index}`} material={material} context="SP activation first material" />
-            ))}
-            {activationMaterials.newFirst.map((material, index) => (
-              <SpMaterialIcon key={`new-first-${material.goodsType}-${material.sourceId}-${index}`} material={material} context="SP activation new-first material" />
-            ))}
-          </div>
-        </div>
-      ) : null}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <SpMissionPhase title="1차 전직" missions={missions.firstStage} />
         <SpMissionPhase title="2차 전직" missions={missions.secondStage} />
