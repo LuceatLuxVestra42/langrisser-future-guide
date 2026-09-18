@@ -1,6 +1,7 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { getOfficialArmyIconUrlById } from "@/lib/army-icon-assets";
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
@@ -36,6 +37,63 @@ function getAttackRangeIconUrl() {
   return `${import.meta.env.BASE_URL}images/shared/stats/Icon_Range.png`;
 }
 
+function HeroFinalJobArmyIcon({
+  armyId,
+  armyNameCn,
+}: {
+  armyId: number;
+  armyNameCn: string | null;
+}) {
+  const officialUrl = getOfficialArmyIconUrlById(armyId);
+  const label = armyNameCn ?? `Army ${armyId}`;
+
+  if (officialUrl) {
+    return (
+      <img
+        src={officialUrl}
+        alt=""
+        aria-hidden="true"
+        title={label}
+        width={32}
+        height={32}
+        loading="lazy"
+        decoding="async"
+        className="h-8 w-8 object-contain"
+        data-hero-final-job-army-icon="official"
+      />
+    );
+  }
+
+  if (armyId !== 27) {
+    throw new Error(`Hero final-job army ${armyId} has no validated icon consumer.`);
+  }
+
+  return (
+    <span
+      className="inline-flex h-8 w-8 items-center justify-center"
+      title={label}
+      aria-label={label}
+      data-hero-final-job-army-icon="fallback"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-8 w-8"
+        aria-hidden="true"
+      >
+        <path d="M4 16c2-5 5-8 9-9 2-.5 4-.3 7 1-2 1-3 2-4 4 2 0 3 .7 4 2-2 .2-3 .8-4 2-1.6 2-4 3-7 3H5" />
+        <path d="M8 17c-1 2-2 3-4 3 1-2 1-4 0-6" />
+        <path d="M12 8c0-2 1-4 3-5 0 2 .7 3 2 4" />
+        <path d="M15 12h.01" />
+      </svg>
+    </span>
+  );
+}
+
 type HeroJobMovementRowView = {
   jobConnectionId: number;
   jobId: number;
@@ -44,6 +102,8 @@ type HeroJobMovementRowView = {
   moveTypeNameKr: string;
   movePoint: number;
   attackRange: number | null;
+  armyId: number | null;
+  armyNameCn: string | null;
 };
 
 type HeroSpFinalJobView = {
@@ -84,8 +144,13 @@ function HeroSpJobMovementSection({
     void Promise.all([
       import("@/lib/hero-sp-job-movement.static"),
       import("@/lib/hero-final-job-attack-range.static"),
+      import("@/lib/hero-final-job-army.static"),
     ])
-      .then(([{ getStaticHeroSpJobMovement }, { getStaticHeroFinalJobAttackRange }]) => {
+      .then(([
+        { getStaticHeroSpJobMovement },
+        { getStaticHeroFinalJobAttackRange },
+        { getStaticHeroFinalJobArmy },
+      ]) => {
         const movement = getStaticHeroSpJobMovement(heroId, jobConnectionId, jobId);
         if (!movement) {
           throw new Error(`Hero ${heroId} SP Job ${jobId} has no frozen movement record.`);
@@ -93,6 +158,10 @@ function HeroSpJobMovementSection({
         const attackRange = getStaticHeroFinalJobAttackRange(jobId);
         if (attackRange == null) {
           throw new Error(`Hero ${heroId} SP Job ${jobId} has no frozen attack-range record.`);
+        }
+        const army = getStaticHeroFinalJobArmy(jobId);
+        if (!army) {
+          throw new Error(`Hero ${heroId} SP Job ${jobId} has no frozen army record.`);
         }
         if (!cancelled) {
           setRow({
@@ -103,6 +172,8 @@ function HeroSpJobMovementSection({
             moveTypeNameKr: movement.moveTypeNameKr,
             movePoint: movement.movePoint,
             attackRange,
+            armyId: army.armyId,
+            armyNameCn: army.armyNameCn,
           });
         }
       })
@@ -129,6 +200,7 @@ function HeroSpJobMovementSection({
       data-move-type={row?.moveType ?? ""}
       data-move-point={row?.movePoint ?? ""}
       data-basic-attack-range={row?.attackRange ?? ""}
+      data-army-id={row?.armyId ?? ""}
     >
       <div>
         <h2 className="text-lg font-extrabold tracking-tight text-foreground">SP 전직 이동 정보</h2>
@@ -164,7 +236,7 @@ function HeroSpJobMovementSection({
             </div>
           </div>
 
-          <dl className="mt-4 grid grid-cols-2 gap-2">
+          <dl className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
             <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
               <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
               <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
@@ -182,6 +254,12 @@ function HeroSpJobMovementSection({
                   decoding="async"
                   className="h-8 w-8 object-contain"
                 />
+              </dd>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
+              <dd className="mt-1">
+                <HeroFinalJobArmyIcon armyId={row.armyId!} armyNameCn={row.armyNameCn} />
               </dd>
             </div>
           </dl>
@@ -207,16 +285,26 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
     void Promise.all([
       import("@/lib/hero-job-movement.static"),
       import("@/lib/hero-final-job-attack-range.static"),
+      import("@/lib/hero-final-job-army.static"),
     ])
-      .then(([{ getStaticHeroJobMovement }, { getStaticHeroFinalJobAttackRange }]) => {
+      .then(([
+        { getStaticHeroJobMovement },
+        { getStaticHeroFinalJobAttackRange },
+        { getStaticHeroFinalJobArmy },
+      ]) => {
         const rows = getStaticHeroJobMovement(heroId);
         if (!rows) {
           throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
         }
-        const projectedRows = rows.map((row) => ({
-          ...row,
-          attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
-        }));
+        const projectedRows = rows.map((row) => {
+          const army = getStaticHeroFinalJobArmy(row.jobId);
+          return {
+            ...row,
+            attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
+            armyId: army?.armyId ?? null,
+            armyNameCn: army?.armyNameCn ?? null,
+          };
+        });
         if (!cancelled) setMovementRows(projectedRows);
       })
       .catch((error) => {
@@ -254,6 +342,7 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
               data-move-type={row.moveType}
               data-move-point={row.movePoint}
               data-basic-attack-range={row.attackRange ?? ""}
+              data-army-id={row.armyId ?? ""}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -285,7 +374,7 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                 </div>
               </div>
 
-              <dl className="mt-4 grid grid-cols-2 gap-2">
+              <dl className={`mt-4 grid grid-cols-2 gap-2 ${row.armyId != null ? "sm:grid-cols-3" : ""}`}>
                 <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
                   <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
                   <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
@@ -305,6 +394,14 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
                     />
                   </dd>
                 </div>
+                {row.armyId != null ? (
+                  <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                    <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
+                    <dd className="mt-1">
+                      <HeroFinalJobArmyIcon armyId={row.armyId} armyNameCn={row.armyNameCn} />
+                    </dd>
+                  </div>
+                ) : null}
               </dl>
             </article>
           ))}
