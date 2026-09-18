@@ -47,6 +47,7 @@ check(manifest.semanticStageReopened === false, "deployment manifest reopened se
 
 for (const [path, label] of [
   ["heroes/6/", "Hero 6"],
+  ["heroes/100/", "Hero 100 non-SP"],
   ["soldiers/101/", "Soldier 101"],
   ["images/soldiers-webp/101.webp", "Soldier 101 portrait"],
 ]) {
@@ -187,6 +188,20 @@ async function verifyHeroSoldierCards(page, label) {
   return { section, cards };
 }
 
+async function verifyNonSpHeroFormAbsence(page, label) {
+  const navigation = await page.goto(url("heroes/100/"), { waitUntil: "networkidle", timeout: 45000 });
+  check(navigation && navigation.status() < 400, `Hero 100 ${label} detail failed: ${navigation?.status()}`);
+  await page.getByRole("heading", { name: "로젠실", exact: true }).waitFor();
+
+  const main = page.locator('main[data-hero-form-mode]');
+  check(await main.getAttribute("data-hero-form-mode") === "normal", `Hero 100 ${label} did not remain in normal form`);
+  check(await page.locator('[data-hero-form-switch="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed an SP form switch`);
+  check(await page.locator('[data-hero-sp-job-movement="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP movement`);
+  check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP reward skills`);
+  check(await page.locator('[data-hero-sp-missions="true"]').count() === 0, `Hero 100 ${label} unexpectedly exposed SP missions`);
+  check(await page.locator('[data-hero-job-materials="true"]').count() === 1, `Hero 100 ${label} normal job materials missing`);
+}
+
 async function verifyInlineSoldierDialog(page, cards, cardIndex, label) {
   const card = cards.nth(cardIndex);
   check(await card.count() === 1, `Hero 6 ${label} target Soldier card missing`);
@@ -224,6 +239,7 @@ try {
   const soldier101Index = expectedHero6SoldierIds.indexOf(101);
   check(soldier101Index >= 0, "Hero 6 expected Soldier 101 index missing");
   await verifyInlineSoldierDialog(desktopPage, desktop.cards, soldier101Index, "desktop Soldier 101");
+  await verifyNonSpHeroFormAbsence(desktopPage, "desktop");
   check(desktopPageErrors.length === 0, `desktop page errors: ${JSON.stringify(desktopPageErrors)}`);
   check(desktopConsoleErrors.length === 0, `desktop console errors: ${JSON.stringify(desktopConsoleErrors)}`);
   await desktopPage.close();
@@ -239,6 +255,7 @@ try {
   await verifyInlineSoldierDialog(mobilePage, mobile.cards, soldier101Index, "mobile Soldier 101");
   const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   check(overflow <= 1, `Hero 6 mobile horizontal overflow=${overflow}`);
+  await verifyNonSpHeroFormAbsence(mobilePage, "mobile");
   check(mobilePageErrors.length === 0, `mobile page errors: ${JSON.stringify(mobilePageErrors)}`);
   check(mobileConsoleErrors.length === 0, `mobile console errors: ${JSON.stringify(mobileConsoleErrors)}`);
   await mobileContext.close();
@@ -255,6 +272,7 @@ try {
       spActivationMaterialBlock: "ABSENT",
       desktop: "PASS",
       mobile: "PASS",
+      nonSpHero100SwitchAbsent: "PASS",
     },
     jobMovement: {
       hydratedRowCount: expectedHero6MovementRows.length,
