@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -196,17 +197,27 @@ function EquipmentHeader({
   equipmentId: number;
 }) {
   const imageUrl = getOfficialEquipmentImageUrl(equipmentId);
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
 
   return (
     <header className="mt-5 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="flex flex-col gap-5 p-5 sm:p-7 md:flex-row md:items-center md:gap-7 lg:p-8">
         <div className="flex shrink-0 items-center justify-center self-center rounded-2xl border border-border bg-muted/25 p-2.5 md:self-auto">
-          <img
-            src={imageUrl}
-            alt={displayName + " 장비 이미지"}
-            decoding="async"
-            className="h-28 w-28 object-contain sm:h-32 sm:w-32"
-          />
+          {failedImageUrl !== imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={displayName + " 장비 이미지"}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              onError={() => setFailedImageUrl(imageUrl)}
+              className="h-28 w-28 object-contain sm:h-32 sm:w-32"
+            />
+          ) : (
+            <div className="flex h-28 w-28 items-center justify-center text-muted-foreground sm:h-32 sm:w-32" aria-label={displayName + " 장비 이미지 불러오기 실패"}>
+              <Shield className="h-10 w-10" strokeWidth={1.4} aria-hidden="true" />
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 flex-1 text-center md:text-left">
