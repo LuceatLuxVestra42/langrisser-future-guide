@@ -185,6 +185,32 @@ async function verifyHeroSoldierCards(page, label) {
 
   const cards = section.locator('a[href*="/soldiers/"]');
   check(await cards.count() === expectedHero6SoldierIds.length, `Hero 6 ${label} Soldier card count mismatch`);
+  check(await section.getAttribute("data-hero-soldier-cards-expanded") === "false", `Hero 6 ${label} Soldier preview did not default collapsed`);
+
+  const initialVisibleCardCount = await cards.evaluateAll((nodes) =>
+    nodes.filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0).length,
+  );
+  const expectedInitialVisibleCardCount = label.startsWith("mobile") ? 6 : 8;
+  check(
+    initialVisibleCardCount === expectedInitialVisibleCardCount,
+    `Hero 6 ${label} initial Soldier preview count mismatch: ${initialVisibleCardCount}/${expectedInitialVisibleCardCount}`,
+  );
+
+  const expandButton = section.getByRole("button", { name: "전체 용병 보기", exact: true });
+  check(await expandButton.count() === 1, `Hero 6 ${label} Soldier expand control missing or duplicated`);
+  await expandButton.click();
+  await page.waitForFunction(
+    () => document.querySelector('[data-hero-soldier-cards="true"]')?.getAttribute("data-hero-soldier-cards-expanded") === "true",
+    null,
+    { timeout: 10000 },
+  );
+  const expandedVisibleCardCount = await cards.evaluateAll((nodes) =>
+    nodes.filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0).length,
+  );
+  check(
+    expandedVisibleCardCount === expectedHero6SoldierIds.length,
+    `Hero 6 ${label} expanded Soldier card count mismatch: ${expandedVisibleCardCount}/${expectedHero6SoldierIds.length}`,
+  );
 
   const hrefs = await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")));
   const parsedIds = hrefs.map((href) => {
