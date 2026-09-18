@@ -296,12 +296,12 @@ function FusionPowerMark({ fusionPower }: { fusionPower: FusionPowerRecord }) {
           <img
             src={publicAsset(primaryMarkAsset.webAssetPath)}
             alt=""
-            className="hut-fusion-image hut-fusion-primary"
+            className="hut-fusion-image hut-fusion-primary" loading="lazy" decoding="async"
           />
           <img
             src={publicAsset(secondaryMarkAsset.webAssetPath)}
             alt=""
-            className="hut-fusion-image hut-fusion-secondary"
+            className="hut-fusion-image hut-fusion-secondary" loading="lazy" decoding="async"
           />
           <span aria-hidden="true" className="hut-fusion-divider" />
         </span>
@@ -311,7 +311,7 @@ function FusionPowerMark({ fusionPower }: { fusionPower: FusionPowerRecord }) {
           alt=""
           width={primaryMarkAsset.width}
           height={primaryMarkAsset.height}
-          className="hut-fusion-image"
+          className="hut-fusion-image" loading="lazy" decoding="async"
         />
       )}
     </span>
@@ -335,14 +335,14 @@ function HeroCard({
     >
       <div className="hut-hero-card">
         <div className="hut-portrait">
-          <img src={heroImage(hero.id)} alt="" />
+          <img src={heroImage(hero.id)} alt="" loading="lazy" decoding="async" />
           {fusionPower ? <FusionPowerMark fusionPower={fusionPower} /> : null}
           <strong>{hero.name}</strong>
         </div>
         <div className="hut-hero-meta">
           <div className="hut-factions">
             {hero.factions.map((id) => (
-              <img key={id} src={factionImage(id)} alt={FACTION_NAMES[id] ?? ""} title={FACTION_NAMES[id]} />
+              <img key={id} src={factionImage(id)} alt={FACTION_NAMES[id] ?? ""} title={FACTION_NAMES[id]} loading="lazy" decoding="async" />
             ))}
           </div>
           <div className="hut-bond"><b>4번</b><span>{hero.bond4}</span></div>
@@ -362,7 +362,7 @@ function MiniCard({ id, name }: { id: number; name: string }) {
       aria-label={`${name} 상세 보기`}
       className="hut-mini-card hut-mini-link"
     >
-      <img src={heroImage(id)} alt="" />
+      <img src={heroImage(id)} alt="" loading="lazy" decoding="async" />
       <span>{name}</span>
     </Link>
   );

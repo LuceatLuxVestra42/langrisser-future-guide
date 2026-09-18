@@ -554,6 +554,8 @@ function TrainingArmyIcon({ armyType }: { armyType: string }) {
     <img
       src={iconUrl}
       alt=""
+      loading="eager"
+      decoding="async"
       className="h-4 w-4 shrink-0 object-contain"
       aria-hidden="true"
     />
@@ -564,7 +566,7 @@ function TrainingPassiveIcon({ techId, className }: { techId: number; className:
   const iconUrl = getPassiveTrainingIconUrl(techId);
   if (!iconUrl) return null;
 
-  return <img src={iconUrl} alt="" className={`${className} shrink-0 object-contain`} aria-hidden="true" />;
+  return <img src={iconUrl} alt="" loading="eager" decoding="async" className={`${className} shrink-0 object-contain`} aria-hidden="true" />;
 }
 
 function EffectComparisonCard({
@@ -668,6 +670,8 @@ function TrainingCostSimulator({
           <img
             src={getSoldierCommonMaterialIconUrl("gold")}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="h-5 w-5 shrink-0 object-contain"
             aria-hidden="true"
           />
@@ -684,6 +688,8 @@ function TrainingCostSimulator({
                 <img
                   src={iconUrl}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className="h-5 w-5 shrink-0 object-contain"
                   aria-hidden="true"
                 />

@@ -140,6 +140,19 @@ function HeroSection() {
   }, []);
 
   const hero = heroImages[index] ?? heroImages[0]!;
+  const [failedHeroUrl, setFailedHeroUrl] = useState<string | null>(null);
+  const [loadedHeroUrl, setLoadedHeroUrl] = useState<string | null>(null);
+  const nextHeroUrl = heroImages.length > 1
+    ? (heroImages[(index + 1) % heroImages.length]?.url ?? null)
+    : null;
+
+  useEffect(() => {
+    if (!nextHeroUrl || loadedHeroUrl !== hero.url || nextHeroUrl === hero.url) return;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = nextHeroUrl;
+  }, [hero.url, loadedHeroUrl, nextHeroUrl]);
+
   const step = (delta: number) =>
     setIndex((i) => (i + delta + heroImages.length) % heroImages.length);
 
@@ -149,11 +162,19 @@ function HeroSection() {
       aria-label="히어로 이미지 미리보기"
     >
       <div className="absolute inset-0 -z-10">
-        <img
-          src={hero.url}
-          alt={hero.alt}
-          className="h-full w-full object-cover object-[center_28%]"
-        />
+        <div className="absolute inset-0 bg-muted" aria-hidden="true" />
+        {failedHeroUrl !== hero.url ? (
+          <img
+            src={hero.url}
+            alt={hero.alt}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            onLoad={() => setLoadedHeroUrl(hero.url)}
+            onError={() => setFailedHeroUrl(hero.url)}
+            className="h-full w-full object-cover object-[center_28%]"
+          />
+        ) : null}
         <div className="absolute inset-0 bg-hero-scrim" />
         <div className="absolute inset-0 bg-hero-fade" />
       </div>
@@ -247,6 +268,8 @@ function Index() {
             alt="용서의 시계"
             width={40}
             height={40}
+            loading="eager"
+            decoding="async"
             className="h-10 w-auto object-contain"
           />
           <span className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">미래시 시트</span>

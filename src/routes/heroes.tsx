@@ -393,19 +393,19 @@ function HeroGridPage() {
                           <img
                             src={getRarityIconUrl("N") ?? undefined}
                             alt="N"
-                            className="h-5 w-auto object-contain"
+                            className="h-5 w-auto object-contain" loading="eager" decoding="async"
                           />
                           <img
                             src={getRarityIconUrl("R") ?? undefined}
                             alt="R"
-                            className="h-5 w-auto object-contain"
+                            className="h-5 w-auto object-contain" loading="eager" decoding="async"
                           />
                         </span>
                       ) : getRarityIconUrl(option.label) ? (
                         <img
                           src={getRarityIconUrl(option.label) ?? undefined}
                           alt={option.label}
-                          className="h-6 w-auto object-contain"
+                          className="h-6 w-auto object-contain" loading="eager" decoding="async"
                         />
                       ) : (
                         <span>{option.label}</span>
@@ -427,7 +427,7 @@ function HeroGridPage() {
                   <img
                     src={resolvePublicAssetUrl(SP_ICON_PATH)}
                     alt="SP"
-                    className="h-6 w-auto object-contain"
+                    className="h-6 w-auto object-contain" loading="eager" decoding="async"
                   />
                   <span className="opacity-60">{data.filters.spCount}</span>
                 </button>
@@ -450,7 +450,7 @@ function HeroGridPage() {
                         src={resolvePublicAssetUrl(option.markPath)}
                         alt=""
                         aria-hidden="true"
-                        className="h-6 w-6 shrink-0 object-contain"
+                        className="h-6 w-6 shrink-0 object-contain" loading="eager" decoding="async"
                       />
                       <span>{option.label}</span>
                     </span>
