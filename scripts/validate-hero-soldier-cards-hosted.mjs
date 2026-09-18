@@ -179,6 +179,37 @@ async function verifyHeroSoldierCards(page, label) {
   await verifyHeroFormSwitch(page, label);
   await verifyHeroJobMovement(page, `${label} restored-normal`);
 
+  const bondGrid = page.locator('[data-hero-bond-unlock-grid="true"]');
+  check(await bondGrid.count() === 1, `Hero 6 ${label} Bond unlock grid missing or duplicated`);
+  const bondColumnCount = await bondGrid.evaluate((node) => {
+    const columns = getComputedStyle(node).gridTemplateColumns;
+    return columns.split(" ").filter(Boolean).length;
+  });
+  const expectedBondColumnCount = label.startsWith("mobile") ? 2 : 4;
+  check(
+    bondColumnCount === expectedBondColumnCount,
+    `Hero 6 ${label} Bond unlock column count mismatch: ${bondColumnCount}/${expectedBondColumnCount}`,
+  );
+
+  const commandTableFit = page.locator('[data-command-table-fit="true"]');
+  check(await commandTableFit.count() === 1, `Hero 6 ${label} Soldier command table fit container missing or duplicated`);
+  const commandHorizontalOverflow = await commandTableFit.evaluate((node) => node.scrollWidth - node.clientWidth);
+  check(commandHorizontalOverflow <= 1, `Hero 6 ${label} Soldier command horizontal overflow=${commandHorizontalOverflow}`);
+
+  if (!label.startsWith("mobile")) {
+    const exclusiveSection = page.locator('[data-hero-exclusive-equipment="true"]');
+    const exclusiveCopy = exclusiveSection.locator('[data-hero-exclusive-equipment-copy="true"]');
+    const exclusiveImage = exclusiveSection.locator("img").first();
+    check(await exclusiveSection.count() === 1 && await exclusiveCopy.count() === 1 && await exclusiveImage.count() === 1, `Hero 6 ${label} exclusive Equipment layout markers missing`);
+    const exclusiveRatio = await exclusiveSection.evaluate((section) => {
+      const image = section.querySelector("img");
+      const copy = section.querySelector('[data-hero-exclusive-equipment-copy="true"]');
+      if (!(image instanceof HTMLElement) || !(copy instanceof HTMLElement)) return null;
+      return { imageWidth: image.getBoundingClientRect().width, copyWidth: copy.getBoundingClientRect().width };
+    });
+    check(exclusiveRatio && exclusiveRatio.copyWidth > exclusiveRatio.imageWidth, `Hero 6 ${label} exclusive Equipment copy did not receive more width than the image`);
+  }
+
   const section = page.locator('[data-hero-soldier-cards="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Soldier card section missing or duplicated`);
   check((await section.innerText()).includes("사용 가능 용병"), `Hero 6 ${label} Soldier section title missing`);
@@ -194,6 +225,18 @@ async function verifyHeroSoldierCards(page, label) {
   check(
     initialVisibleCardCount === expectedInitialVisibleCardCount,
     `Hero 6 ${label} initial Soldier preview count mismatch: ${initialVisibleCardCount}/${expectedInitialVisibleCardCount}`,
+  );
+  const initialVisibleCardGeometry = await cards.evaluateAll((nodes) =>
+    nodes
+      .filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0)
+      .map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      }),
+  );
+  check(
+    initialVisibleCardGeometry.every(({ width, height }) => width > 0 && height > 0 && Math.abs(width - height) <= 2),
+    `Hero 6 ${label} Soldier preview contains a non-square or collapsed card: ${JSON.stringify(initialVisibleCardGeometry)}`,
   );
 
   const expandButton = section.getByRole("button", { name: "전체 용병 보기", exact: true });

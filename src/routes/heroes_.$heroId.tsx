@@ -505,7 +505,7 @@ function HeroDetailPage() {
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
-            <div className="mt-5 grid gap-2 lg:grid-cols-2">
+            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4" data-hero-bond-unlock-grid="true">
               {detail.bonds.rows.flatMap((bond) => {
                 const favorabilityLevel = bond.completionConditions.find((condition) => condition.favorability)?.favorability?.requiredLevel ?? null;
                 const fetterIconNumber = favorabilityLevel == null ? null : (FETTER_ICON_BY_FAVORABILITY_LEVEL[favorabilityLevel] ?? null);
@@ -513,9 +513,9 @@ function HeroDetailPage() {
                 return bond.completionConditions
                   .filter((condition) => !condition.favorability)
                   .map((condition, conditionIndex) => (
-                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
-                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-9 w-9 shrink-0 object-contain" /> : null}
-                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
+                    <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex min-w-0 flex-col items-start gap-2 rounded-lg border border-border bg-muted/20 px-2.5 py-3">
+                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-8 w-8 shrink-0 object-contain" /> : null}
+                      <p className="text-[11px] font-semibold leading-4 text-foreground sm:text-xs">{formatBondCondition(condition)}</p>
                     </div>
                   ));
               })}
@@ -539,13 +539,13 @@ function HeroDetailPage() {
                 key={record.soldierId}
                 data-hero-soldier-card-slot="true"
                 className={
-                  showAllSoldiers
+                  `min-w-0 ${showAllSoldiers
                     ? ""
                     : index >= 8
                       ? "hidden"
                       : index >= 6
                         ? "hidden sm:block"
-                        : ""
+                        : ""}`
                 }
               >
                 <HeroSoldierCard
@@ -787,7 +787,7 @@ function HeroSoldierCard({
         event.preventDefault();
         onOpen(record.soldierId);
       }}
-      className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group relative block aspect-square w-full overflow-hidden rounded-lg border border-border bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-muted via-background to-muted pb-8 text-muted-foreground transition group-hover:text-foreground">
         {portraitUrl && !portraitFailed ? (
