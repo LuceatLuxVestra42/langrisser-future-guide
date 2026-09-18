@@ -630,7 +630,14 @@ function HeroDetailPage() {
           )}
         </section>
 
-        {isSpForm ? <HeroSpMissionSection missions={detail.sp.missions} /> : null}
+        {isSpForm ? (
+          <HeroSpMissionSection
+            missions={detail.sp.missions}
+            secondStageRewardSoldierNames={detail.sp.secondStageRewards.soldiers.map(
+              (soldier) => soldier.displayName,
+            )}
+          />
+        ) : null}
 
         <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
 
@@ -870,36 +877,46 @@ function SpMaterialIcon({
 
 function HeroSpMissionSection({
   missions,
+  secondStageRewardSoldierNames,
 }: {
   missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] };
+  secondStageRewardSoldierNames: string[];
 }) {
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
+  if (missions.secondStage.length > 0 && secondStageRewardSoldierNames.length === 0) {
+    throw new Error("Released SP second-stage missions have no frozen reward Soldier display name.");
+  }
+
+  const secondStageCompletionText =
+    secondStageRewardSoldierNames.join(", ") + " 사용가능, 스탯보너스, SP 스킬 2개 획득";
+
   return (
     <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-sp-missions="true" data-sp-first-stage-count={missions.firstStage.length} data-sp-second-stage-count={missions.secondStage.length}>
       <SectionTitle title="SP 전직 미션" />
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <SpMissionPhase title="1차 전직" missions={missions.firstStage} />
-        <SpMissionPhase title="2차 전직" missions={missions.secondStage} />
+        <SpMissionPhase title="1차 전직" missions={missions.firstStage} completionText="SP전직 및 고유기 획득" />
+        <SpMissionPhase title="2차 전직" missions={missions.secondStage} completionText={secondStageCompletionText} />
       </div>
     </section>
   );
 }
 
-function SpMissionPhase({ title, missions }: { title: string; missions: SpMissionView[] }) {
+function SpMissionPhase({
+  title,
+  missions,
+  completionText,
+}: {
+  title: string;
+  missions: SpMissionView[];
+  completionText: string;
+}) {
   return (
     <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-foreground">{title}</h3>
-        <span className="text-xs font-semibold tabular-nums text-muted-foreground">{missions.length}개</span>
-      </div>
+      <h3 className="text-sm font-bold text-foreground">{title}</h3>
       <ol className="mt-3 space-y-2">
         {missions.map((mission, index) => (
           <li key={mission.missionId ?? index} className="rounded-lg border border-border bg-background px-3 py-3" data-sp-mission-id={mission.missionId ?? undefined}>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-black tabular-nums text-muted-foreground">{index + 1}</span>
-              <span className="text-sm font-bold text-foreground">{mission.titleCn ?? ("Mission " + (mission.missionId ?? "?"))}</span>
-            </div>
-            {mission.descCn ? <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{stripConfigMarkup(mission.descCn)}</p> : null}
+            <div className="text-sm font-bold text-foreground">{index + 1}단계</div>
             {mission.condition.items.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-1.5" aria-label="필요 재료">
                 {mission.condition.items.map((item, itemIndex) => (
@@ -912,6 +929,11 @@ function SpMissionPhase({ title, missions }: { title: string; missions: SpMissio
               </div>
             ) : null}
             {formatSpMissionCondition(mission) ? <p className="mt-2 text-xs font-semibold leading-5 text-foreground">{formatSpMissionCondition(mission)}</p> : null}
+            {index === missions.length - 1 ? (
+              <p className="mt-2 text-xs font-extrabold leading-5 text-foreground" data-sp-mission-completion-reward="true">
+                {completionText}
+              </p>
+            ) : null}
           </li>
         ))}
       </ol>
@@ -922,7 +944,7 @@ function SpMissionPhase({ title, missions }: { title: string; missions: SpMissio
 function formatSpMissionCondition(mission: SpMissionView) {
   const condition = mission.condition;
   if (condition.kind === "EXCLUSIVE_EQUIPMENT_LEVEL") {
-    return "전용장비 ID " + (condition.equipmentId ?? "?") + " · Lv." + (condition.requiredLevel ?? "?") + " 달성";
+    return "전용장비 · Lv." + (condition.requiredLevel ?? "?") + " 달성";
   }
 
   const stageLabelKr = resolveHeroSpMissionStageLabelKr(condition);
