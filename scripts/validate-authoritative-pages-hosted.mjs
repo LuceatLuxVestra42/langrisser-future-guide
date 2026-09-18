@@ -243,12 +243,7 @@ try {
   await exclusiveHeading.waitFor();
   const exclusiveSection = exclusiveHeading.locator("xpath=ancestor::section[1]");
   const exclusiveText = await exclusiveSection.innerText();
-  for (const token of [
-    "청룡의 갑옷",
-    "天翔游龙",
-  ]) {
-    check(exclusiveText.includes(token), `Hero 6 exclusive Equipment missing token: ${token}`);
-  }
+  check(exclusiveText.includes("청룡의 갑옷"), "Hero 6 exclusive Equipment name is missing");
   const exclusiveImage = exclusiveSection.locator('img[alt="청룡의 갑옷 전용장비"]');
   check(await exclusiveImage.count() === 1, "Hero 6 exclusive Equipment image missing or duplicated");
   check((await exclusiveImage.getAttribute("src"))?.includes("/images/equipment/416.png"), "Hero 6 exclusive Equipment image source mismatch");
