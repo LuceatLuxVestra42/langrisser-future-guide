@@ -44,7 +44,7 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
                 decoding="async"
                 className="h-12 w-12 shrink-0 object-contain"
               />
-              <span className="text-sm font-extrabold tabular-nums text-foreground">×{material.count}</span>
+              <span className="text-sm font-extrabold tabular-nums text-foreground">x {material.count}</span>
             </li>
           );
         })}
