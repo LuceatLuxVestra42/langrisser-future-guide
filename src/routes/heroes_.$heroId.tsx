@@ -235,6 +235,29 @@ function HeroDetailPage() {
   const [visualIndex, setVisualIndex] = useState(0);
   useEffect(() => setVisualIndex(0), [hero.heroId, formMode]);
   const activeVisual = visuals[visualIndex] ?? null;
+  const [failedVisualSrc, setFailedVisualSrc] = useState<string | null>(null);
+  const [loadedVisualSrc, setLoadedVisualSrc] = useState<string | null>(null);
+  const nextVisualSrc = visuals.length > 1
+    ? (visuals[(visualIndex + 1) % visuals.length]?.src ?? null)
+    : null;
+  const inactiveSpArtworkSource = hasSpForm && !isSpForm
+    ? getHeroSpArtworkSource(hero.heroId)
+    : null;
+
+  useEffect(() => {
+    if (!activeVisual || loadedVisualSrc !== activeVisual.src) return;
+
+    const candidates = new Set(
+      [nextVisualSrc, inactiveSpArtworkSource]
+        .filter((src): src is string => Boolean(src && src !== activeVisual.src)),
+    );
+    for (const src of candidates) {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = src;
+    }
+  }, [activeVisual, inactiveSpArtworkSource, loadedVisualSrc, nextVisualSrc]);
+
   const moveVisual = (delta: number) => {
     if (visuals.length <= 1) return;
     setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
@@ -298,12 +321,17 @@ function HeroDetailPage() {
           <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]">
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
-              {activeVisual ? (
+              {activeVisual && failedVisualSrc !== activeVisual.src ? (
                 <img
                   src={activeVisual.src}
                   alt={`${displayName} ${activeVisual.label}`}
                   data-hero-active-artwork="true"
                   data-hero-artwork-form={isSpForm && spArtworkSource && activeVisual.kind === "hero" ? "sp" : "normal"}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  onLoad={() => setLoadedVisualSrc(activeVisual.src)}
+                  onError={() => setFailedVisualSrc(activeVisual.src)}
                   className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6"
                 />
               ) : (
@@ -338,6 +366,8 @@ function HeroDetailPage() {
                   src={resolvePublicAssetUrl(rarityIconPath)}
                   alt={`${displayRarityLabel} 등급`}
                   title={displayRarityLabel}
+                  loading="eager"
+                  decoding="async"
                   className="mb-2 h-8 w-auto self-start object-contain sm:h-9"
                 />
               ) : (
@@ -359,6 +389,8 @@ function HeroDetailPage() {
                       src={resolvePublicAssetUrl(faction.webAssetPath)}
                       alt={faction.label}
                       title={faction.label}
+                      loading="eager"
+                      decoding="async"
                       className="h-10 w-10 object-contain"
                     />
                   ))}
@@ -613,7 +645,7 @@ function HeroDetailPage() {
                   .filter((condition) => !condition.favorability)
                   .map((condition, conditionIndex) => (
                     <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
-                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" className="h-9 w-9 shrink-0 object-contain" /> : null}
+                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-9 w-9 shrink-0 object-contain" /> : null}
                       <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
                     </div>
                   ));
@@ -729,7 +761,7 @@ function HeroSoldierCard({
       </div>
 
       <div className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded bg-background/80 px-1 shadow-sm backdrop-blur" title={armyLabel}>
-        {armyIconUrl ? <img src={armyIconUrl} alt="" aria-hidden="true" className="h-5 w-5 object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="text-[10px] font-bold text-foreground">{armyLabel.slice(0, 1)}</span>}
+        {armyIconUrl ? <img src={armyIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-5 w-5 object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="text-[10px] font-bold text-foreground">{armyLabel.slice(0, 1)}</span>}
         <span className="sr-only">{armyLabel}</span>
       </div>
 
