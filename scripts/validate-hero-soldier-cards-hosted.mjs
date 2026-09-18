@@ -181,14 +181,17 @@ async function verifyHeroSoldierCards(page, label) {
 
   const bondGrid = page.locator('[data-hero-bond-unlock-grid="true"]');
   check(await bondGrid.count() === 1, `Hero 6 ${label} Bond unlock grid missing or duplicated`);
-  const bondColumnCount = await bondGrid.evaluate((node) => {
-    const columns = getComputedStyle(node).gridTemplateColumns;
-    return columns.split(" ").filter(Boolean).length;
+  const bondLayout = await bondGrid.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
+      rows: style.gridTemplateRows.split(" ").filter(Boolean).length,
+      items: node.children.length,
+    };
   });
-  const expectedBondColumnCount = label.startsWith("mobile") ? 2 : 4;
   check(
-    bondColumnCount === expectedBondColumnCount,
-    `Hero 6 ${label} Bond unlock column count mismatch: ${bondColumnCount}/${expectedBondColumnCount}`,
+    bondLayout.columns === 1 && bondLayout.rows === 4 && bondLayout.items === 4,
+    `Hero 6 ${label} Bond unlock layout is not 4 rows: ${JSON.stringify(bondLayout)}`,
   );
 
   const commandTableFit = page.locator('[data-command-table-fit="true"]');
@@ -200,14 +203,31 @@ async function verifyHeroSoldierCards(page, label) {
     const exclusiveSection = page.locator('[data-hero-exclusive-equipment="true"]');
     const exclusiveCopy = exclusiveSection.locator('[data-hero-exclusive-equipment-copy="true"]');
     const exclusiveImage = exclusiveSection.locator("img").first();
-    check(await exclusiveSection.count() === 1 && await exclusiveCopy.count() === 1 && await exclusiveImage.count() === 1, `Hero 6 ${label} exclusive Equipment layout markers missing`);
-    const exclusiveRatio = await exclusiveSection.evaluate((section) => {
+    const exclusiveName = exclusiveSection.locator('[data-hero-exclusive-equipment-name="true"]');
+    check(
+      await exclusiveSection.count() === 1 &&
+      await exclusiveCopy.count() === 1 &&
+      await exclusiveImage.count() === 1 &&
+      await exclusiveName.count() === 1,
+      `Hero 6 ${label} exclusive Equipment layout markers missing`,
+    );
+    const exclusiveGeometry = await exclusiveSection.evaluate((section) => {
       const image = section.querySelector("img");
+      const name = section.querySelector('[data-hero-exclusive-equipment-name="true"]');
       const copy = section.querySelector('[data-hero-exclusive-equipment-copy="true"]');
-      if (!(image instanceof HTMLElement) || !(copy instanceof HTMLElement)) return null;
-      return { imageWidth: image.getBoundingClientRect().width, copyWidth: copy.getBoundingClientRect().width };
+      if (!(image instanceof HTMLElement) || !(name instanceof HTMLElement) || !(copy instanceof HTMLElement)) return null;
+      const imageRect = image.getBoundingClientRect();
+      const nameRect = name.getBoundingClientRect();
+      const copyRect = copy.getBoundingClientRect();
+      return {
+        imageWidth: imageRect.width,
+        imageBottom: imageRect.bottom,
+        nameTop: nameRect.top,
+        copyWidth: copyRect.width,
+      };
     });
-    check(exclusiveRatio && exclusiveRatio.copyWidth > exclusiveRatio.imageWidth, `Hero 6 ${label} exclusive Equipment copy did not receive more width than the image`);
+    check(exclusiveGeometry && exclusiveGeometry.copyWidth > exclusiveGeometry.imageWidth, `Hero 6 ${label} exclusive Equipment copy did not receive more width than the image`);
+    check(exclusiveGeometry && exclusiveGeometry.nameTop >= exclusiveGeometry.imageBottom, `Hero 6 ${label} exclusive Equipment name is not below the image`);
   }
 
   const section = page.locator('[data-hero-soldier-cards="true"]');
@@ -216,17 +236,26 @@ async function verifyHeroSoldierCards(page, label) {
 
   const cards = section.locator('a[href*="/soldiers/"]');
   check(await cards.count() === expectedHero6SoldierIds.length, `Hero 6 ${label} Soldier card count mismatch`);
-  check(await section.getAttribute("data-hero-soldier-cards-expanded") === "false", `Hero 6 ${label} Soldier preview did not default collapsed`);
 
-  const initialVisibleCardCount = await cards.evaluateAll((nodes) =>
+  const soldierGrid = section.locator('[data-hero-soldier-card-grid="true"]');
+  check(await soldierGrid.count() === 1, `Hero 6 ${label} Soldier grid missing or duplicated`);
+  const soldierColumnCount = await soldierGrid.evaluate((node) =>
+    getComputedStyle(node).gridTemplateColumns.split(" ").filter(Boolean).length,
+  );
+  const expectedSoldierColumnCount = label.startsWith("mobile") ? 6 : 8;
+  check(
+    soldierColumnCount === expectedSoldierColumnCount,
+    `Hero 6 ${label} Soldier columns mismatch: ${soldierColumnCount}/${expectedSoldierColumnCount}`,
+  );
+
+  const visibleCardCount = await cards.evaluateAll((nodes) =>
     nodes.filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0).length,
   );
-  const expectedInitialVisibleCardCount = label.startsWith("mobile") ? 6 : 8;
   check(
-    initialVisibleCardCount === expectedInitialVisibleCardCount,
-    `Hero 6 ${label} initial Soldier preview count mismatch: ${initialVisibleCardCount}/${expectedInitialVisibleCardCount}`,
+    visibleCardCount === expectedHero6SoldierIds.length,
+    `Hero 6 ${label} Soldier cards are not all visible: ${visibleCardCount}/${expectedHero6SoldierIds.length}`,
   );
-  const initialVisibleCardGeometry = await cards.evaluateAll((nodes) =>
+  const visibleCardGeometry = await cards.evaluateAll((nodes) =>
     nodes
       .filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0)
       .map((node) => {
@@ -235,24 +264,8 @@ async function verifyHeroSoldierCards(page, label) {
       }),
   );
   check(
-    initialVisibleCardGeometry.every(({ width, height }) => width > 0 && height > 0 && Math.abs(width - height) <= 2),
-    `Hero 6 ${label} Soldier preview contains a non-square or collapsed card: ${JSON.stringify(initialVisibleCardGeometry)}`,
-  );
-
-  const expandButton = section.getByRole("button", { name: "전체 용병 보기", exact: true });
-  check(await expandButton.count() === 1, `Hero 6 ${label} Soldier expand control missing or duplicated`);
-  await expandButton.click();
-  await page.waitForFunction(
-    () => document.querySelector('[data-hero-soldier-cards="true"]')?.getAttribute("data-hero-soldier-cards-expanded") === "true",
-    null,
-    { timeout: 10000 },
-  );
-  const expandedVisibleCardCount = await cards.evaluateAll((nodes) =>
-    nodes.filter((node) => node instanceof HTMLElement && node.getClientRects().length > 0).length,
-  );
-  check(
-    expandedVisibleCardCount === expectedHero6SoldierIds.length,
-    `Hero 6 ${label} expanded Soldier card count mismatch: ${expandedVisibleCardCount}/${expectedHero6SoldierIds.length}`,
+    visibleCardGeometry.every(({ width, height }) => width > 0 && height > 0 && Math.abs(width - height) <= 2),
+    `Hero 6 ${label} Soldier grid contains a non-square or collapsed card: ${JSON.stringify(visibleCardGeometry)}`,
   );
 
   const hrefs = await cards.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href")));
