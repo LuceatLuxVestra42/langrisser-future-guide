@@ -22,7 +22,7 @@ import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
-import { getHeroSpArtworkPath } from "@/lib/hero-sp-artwork-assets";
+import { getHeroSpArtworkSource } from "@/lib/hero-sp-artwork-assets";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
@@ -209,14 +209,14 @@ function HeroDetailPage() {
   }
   const closeSoldierDetail = useCallback(() => setSelectedSoldierId(null), []);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
-  const spArtworkPath = isSpForm ? getHeroSpArtworkPath(hero.heroId) : null;
-  const primaryImageUrl = spArtworkPath ? resolvePublicAssetUrl(spArtworkPath) : imageUrl;
+  const spArtworkSource = isSpForm ? getHeroSpArtworkSource(hero.heroId) : null;
+  const primaryImageUrl = spArtworkSource ?? imageUrl;
   const visuals: HeroVisual[] = [];
   if (primaryImageUrl) {
     visuals.push({
       kind: "hero",
       src: primaryImageUrl,
-      label: spArtworkPath ? "SP 일러스트" : "대표 일러스트",
+      label: spArtworkSource ? "SP 일러스트" : "대표 일러스트",
       skinId: null,
       sourceOrder: null,
     });
@@ -302,7 +302,7 @@ function HeroDetailPage() {
                   src={activeVisual.src}
                   alt={`${displayName} ${activeVisual.label}`}
                   data-hero-active-artwork="true"
-                  data-hero-artwork-form={isSpForm && spArtworkPath && activeVisual.kind === "hero" ? "sp" : "normal"}
+                  data-hero-artwork-form={isSpForm && spArtworkSource && activeVisual.kind === "hero" ? "sp" : "normal"}
                   className="absolute inset-0 h-full w-full object-contain object-bottom px-3 pt-4 sm:px-6 sm:pt-6"
                 />
               ) : (
