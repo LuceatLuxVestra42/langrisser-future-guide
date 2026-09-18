@@ -41,8 +41,7 @@ export function HeroExclusiveEquipmentSection({
           <div className="min-w-0">
             <h3 className="text-xl font-bold text-foreground">{detail.identity.nameKr ?? detail.identity.nameCn}</h3>
             <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4">
-              <h4 className="font-bold text-foreground">{detail.effect.effectName}</h4>
-              <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{detail.effect.effectText}</p>
+              <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">{detail.effect.effectText}</p>
             </div>
           </div>
         </div>
