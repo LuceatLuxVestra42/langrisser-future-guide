@@ -1,3 +1,4 @@
+import "./validate-hero-sp-reward-skill-icon-assets-readonly.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -217,12 +218,12 @@ const spTalentComponentSource = fs.readFileSync(path.join(repoRoot, SP_TALENT_CO
 if (!spTalentComponentSource.includes('data-hero-sp-talent="true"')) fail("SP talent detail section wiring missing");
 if (!spTalentComponentSource.includes("getHeroSkillIconUrl(heroId, activeRow.skill.iconPath)")) fail("SP talent detail icon resolver wiring missing");
 
-const allManifestRecords = [...manifest.records, ...manifest.awakeningRecords, ...manifest.spTalentRecords];
+const allManifestRecords = [...manifest.records, ...manifest.awakeningRecords, ...manifest.spTalentRecords, ...manifest.spRewardRecords];
 const sourcePaths = allManifestRecords.map((record) => record.sourcePath);
-if (new Set(sourcePaths).size !== sourcePaths.length) fail("manifest sourcePath duplicate across records/awakeningRecords/spTalentRecords");
+if (new Set(sourcePaths).size !== sourcePaths.length) fail("manifest sourcePath duplicate across records/awakeningRecords/spTalentRecords/spRewardRecords");
 const admitted = new Set(sourcePaths);
 const missingGeneral = [...stage6General.keys()].filter((sourcePath) => !admitted.has(sourcePath));
 if (missingGeneral.length !== 0) fail(`Stage6 general manifest coverage missing ${missingGeneral.length}`);
 if ([...stage6General.keys()].filter((sourcePath) => expected.has(sourcePath)).length !== 10) fail("legacy Stage6 general overlap drift");
 
-console.log(`[hero-skill-icon-assets] PASS legacy=${legacyRecords.length} general=${generalRecords.length} stage6=${stage6General.size}/${EXPECTED_GENERAL_UNIQUE} missing=0 awakening=${manifest.awakeningRecords.length} spTalent=${manifest.spTalentRecords.length} official=1.1.113`);
+console.log(`[hero-skill-icon-assets] PASS legacy=${legacyRecords.length} general=${generalRecords.length} stage6=${stage6General.size}/${EXPECTED_GENERAL_UNIQUE} missing=0 awakening=${manifest.awakeningRecords.length} spTalent=${manifest.spTalentRecords.length} spReward=${manifest.spRewardRecords.length} official=1.1.113`);
