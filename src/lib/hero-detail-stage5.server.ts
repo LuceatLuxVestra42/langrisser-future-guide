@@ -160,6 +160,16 @@ type Stage6SpRewardSkill = {
   cost?: number | null;
 };
 
+type Stage6SpRewardSoldier = {
+  soldierId?: number;
+  nameCn?: string | null;
+  nameKr?: string | null;
+  nameKrStatus?: string | null;
+  tier?: number | null;
+  armyType?: string | null;
+  validationStatus?: string | null;
+};
+
 type Stage6SpMaterial = {
   GoodsType?: number | null;
   Id?: number | null;
@@ -205,6 +215,7 @@ type Stage6Sp = {
   } | null;
   secondStageRewards?: {
     skills?: Stage6SpRewardSkill[] | null;
+    soldiers?: Stage6SpRewardSoldier[] | null;
   } | null;
 } | null | undefined;
 
@@ -314,6 +325,19 @@ function projectSpRewardSkill(skill: Stage6SpRewardSkill | null | undefined) {
     range: skill.range ?? null,
     areaOrTarget: skill.areaOrTarget ?? null,
     cost: Number.isInteger(skill.cost) ? Number(skill.cost) : null,
+  };
+}
+
+function projectSpRewardSoldier(soldier: Stage6SpRewardSoldier | null | undefined) {
+  if (!soldier || !Number.isInteger(soldier.soldierId)) return null;
+  return {
+    soldierId: Number(soldier.soldierId),
+    nameCn: soldier.nameCn ?? null,
+    nameKr: soldier.nameKr ?? null,
+    nameKrStatus: soldier.nameKrStatus ?? null,
+    tier: Number.isInteger(soldier.tier) ? Number(soldier.tier) : null,
+    armyType: soldier.armyType ?? null,
+    validationStatus: soldier.validationStatus ?? null,
   };
 }
 
@@ -515,6 +539,15 @@ function projectStage6Shard(shard: Stage6HeroShard) {
         .map(projectSpRewardSkill)
         .filter((skill): skill is NonNullable<typeof skill> => skill !== null)
     : [];
+  const sourceSpRewardSoldiers = Array.isArray(shard.sp?.secondStageRewards?.soldiers)
+    ? shard.sp.secondStageRewards.soldiers
+    : [];
+  const spRewardSoldiers = sourceSpRewardSoldiers
+    .map(projectSpRewardSoldier)
+    .filter((soldier): soldier is NonNullable<typeof soldier> => soldier !== null);
+  if (spRewardSoldiers.length !== sourceSpRewardSoldiers.length) {
+    throw new Error(`Hero ${shard.heroId} SP reward Soldier projection parity mismatch.`);
+  }
   const projectSpMaterialList = (
     materials: Record<string, Stage6SpMaterial> | Stage6SpMaterial[] | null | undefined,
   ) => {
@@ -684,6 +717,7 @@ function projectStage6Shard(shard: Stage6HeroShard) {
       },
       secondStageRewards: {
         skills: spRewardSkills,
+        soldiers: spRewardSoldiers,
       },
     },
     systems: {
