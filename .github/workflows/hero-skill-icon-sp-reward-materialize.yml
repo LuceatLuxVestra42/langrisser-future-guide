@@ -31,12 +31,23 @@ jobs:
         run: pip install UnityPy==1.25.3 Pillow
       - name: Materialize exact SP reward skill icons
         run: python scripts/materialize-hero-skill-icon-sp-reward-assets.py --write
+      - name: Admit materialized SP reward icons into frozen manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          if node -e 'const m=require("./data/generated/hero-skill-icon-assets.v1.json"); process.exit(Array.isArray(m.spRewardRecords)?0:1)'; then
+            echo 'SP reward manifest records already admitted.'
+          else
+            node scripts/admit-hero-sp-reward-skill-icon-manifest.mjs
+          fi
+      - name: Validate SP reward icon materialization and frontend admission
+        run: node scripts/validate-hero-skill-icon-assets-readonly.mjs
       - name: Commit deterministic materialization outputs when needed
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          git add data/generated/hero-skill-icon-sp-reward-materialization.v1.json public/images/heroes/skill-icons/*.png
+          git add data/generated/hero-skill-icon-sp-reward-materialization.v1.json data/generated/hero-skill-icon-assets.v1.json public/images/heroes/skill-icons/*.png
           if git diff --cached --quiet; then
             echo 'No materialization diff.'
             exit 0
