@@ -28,6 +28,8 @@ type CastingLawMaterial = {
   itemId: number;
   count: number;
   nameCn: string;
+  sourceIconPath: string | null;
+  iconUrl: string;
 };
 
 type CastingLawRangeTotals = {
@@ -58,7 +60,18 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
           key={material.itemId}
           className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
           data-casting-law-material-id={material.itemId}
+          data-casting-law-material-source-icon={material.sourceIconPath ?? ""}
         >
+          <img
+            src={material.iconUrl}
+            alt={material.nameCn}
+            title={material.nameCn}
+            width={32}
+            height={32}
+            loading="lazy"
+            decoding="async"
+            className="h-8 w-8 shrink-0 object-contain"
+          />
           <span className="max-w-[15rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
@@ -122,7 +135,18 @@ function LevelTable({
                       key={`${material.itemId}-${index}`}
                       className="inline-flex items-center gap-1 rounded bg-muted/40 px-2 py-1 text-[11px] font-semibold text-foreground"
                       data-casting-law-level-material-id={material.itemId}
+                      data-casting-law-level-material-source-icon={material.sourceIconPath ?? ""}
                     >
+                      <img
+                        src={material.iconUrl}
+                        alt={material.nameCn}
+                        title={material.nameCn}
+                        width={36}
+                        height={36}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-9 w-9 shrink-0 object-contain"
+                      />
                       <span>{material.nameCn}</span>
                       <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
                     </span>
