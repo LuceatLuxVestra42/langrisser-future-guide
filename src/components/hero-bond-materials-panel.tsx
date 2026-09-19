@@ -1,3 +1,5 @@
+import { Coins } from "lucide-react";
+
 type BondMaterial = {
   itemId: number;
   count: number;
@@ -62,7 +64,6 @@ function MaterialBadges({
             className="h-6 w-6 shrink-0 object-contain"
             data-hero-bond-material-icon={material.itemId}
           />
-          <span className="max-w-[14rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
       ))}
@@ -70,15 +71,22 @@ function MaterialBadges({
   );
 }
 
+function GoldCost({ value }: { value: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 font-extrabold tabular-nums text-foreground" data-hero-bond-gold-cost={value}>
+      <Coins className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <span>×{formatNumber(value)}</span>
+    </span>
+  );
+}
+
 function BondTrack({
   label,
-  sourceName,
   profile,
   iconUrl,
   resolveAssetUrl,
 }: {
   label: string;
-  sourceName: string | null;
   profile: BondCostProfile;
   iconUrl?: string | null;
   resolveAssetUrl: (path: string) => string;
@@ -104,13 +112,12 @@ function BondTrack({
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h4 className="text-sm font-extrabold text-foreground">{label}</h4>
-                {sourceName ? <p className="mt-0.5 text-[11px] text-muted-foreground">{sourceName}</p> : null}
               </div>
               <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
               <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">접기</span>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-              <span className="font-bold tabular-nums">Lv.2~10 골드 {formatNumber(profile.total.gold)}</span>
+              <GoldCost value={profile.total.gold} />
             </div>
             <div className="mt-2">
               <MaterialBadges materials={profile.total.materials} resolveAssetUrl={resolveAssetUrl} />
@@ -138,8 +145,10 @@ function BondTrack({
                   <td className="px-3 py-2.5">
                     <MaterialBadges materials={level.materials} resolveAssetUrl={resolveAssetUrl} />
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2.5 text-right font-bold tabular-nums text-foreground">
-                    {formatNumber(level.goldCost)}
+                  <td className="whitespace-nowrap px-3 py-2.5 text-right">
+                    <div className="flex justify-end">
+                      <GoldCost value={level.goldCost} />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -162,9 +171,6 @@ export function HeroBondMaterialsPanel({
     <div className="mt-5 border-t border-border pt-5" data-hero-bond-materials="true">
       <div>
         <h3 className="text-sm font-extrabold text-foreground">유대 강화 재료</h3>
-        <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          일반 유대 5종과 마음의 유대의 Lv.2~10 강화 비용
-        </p>
       </div>
 
       <div className="mt-3 space-y-2">
@@ -172,7 +178,6 @@ export function HeroBondMaterialsPanel({
           <BondTrack
             key={fetter.fetterId}
             label={`유대 ${fetter.displayOrder}`}
-            sourceName={fetter.nameCn}
             profile={fetter}
             iconUrl={resolveAssetUrl(`/images/fetter/Fetter${fetter.displayOrder}.png`)}
             resolveAssetUrl={resolveAssetUrl}
@@ -180,7 +185,6 @@ export function HeroBondMaterialsPanel({
         ))}
         <BondTrack
           label="마음의 유대"
-          sourceName={materials.heartFetter.nameCn}
           profile={materials.heartFetter}
           resolveAssetUrl={resolveAssetUrl}
         />
