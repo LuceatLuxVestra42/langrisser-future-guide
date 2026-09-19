@@ -314,12 +314,12 @@ function RootShell({ children }: { children: ReactNode }) {
             background: oklch(0.52 0 0) !important;
           }
 
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"] > div > div { background: #7ac943 !important; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"] > div > div { background: #5ecb32 !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="ATK"] > div > div { background: #e53935 !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="INT"] > div > div { background: #2f6bff !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEF"] > div > div { background: #d39a3a !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="MDEF"] > div > div { background: #7c63c7 !important; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEX"] > div > div { background: #d946ef !important; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEX"] > div > div { background: #e63b82 !important; }
 
           @media (max-width: 39.99rem) {
             [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] {
