@@ -9,15 +9,26 @@ type CastingLawMaterialIconRecord = {
   driveFileId: string;
   driveFileSize: number;
   driveFolderId: string;
-  deliveryUrl: string;
-  deliveryMode: "GOOGLE_DRIVE_PUBLIC_IMAGE";
+  sourceDeliveryUrl: string;
+  spritePath: string;
+  spriteSymbolId: string;
+  deliveryMode: "LOCAL_SVG_SPRITE";
 };
 
 type CastingLawMaterialIconManifest = {
   version: 1;
   schemaId: "hero-casting-law-material-icons/v1";
   status: "PASS";
-  completion: "MAPPED_EXTERNAL";
+  completion: "LOCAL_MIRRORED";
+  delivery: {
+    spritePath: string;
+    publicPath: string;
+    symbolRule: string;
+    sourcePixelFormat: string;
+    wrapperFormat: string;
+    sourceDimensions: string;
+    externallyHostedAtRuntime: boolean;
+  };
   contract: {
     requiredItemCount: number;
     exactSourceBasenameMatch: boolean;
@@ -32,6 +43,8 @@ type CastingLawMaterialIconManifest = {
     unresolved: number;
     uniqueItemIds: number;
     uniqueDriveFileIds: number;
+    localSpriteSymbols: number;
+    runtimeExternalDependencies: number;
   };
 };
 
@@ -41,7 +54,14 @@ if (
   manifest.version !== 1 ||
   manifest.schemaId !== "hero-casting-law-material-icons/v1" ||
   manifest.status !== "PASS" ||
-  manifest.completion !== "MAPPED_EXTERNAL" ||
+  manifest.completion !== "LOCAL_MIRRORED" ||
+  manifest.delivery.spritePath !== "public/images/heroes/casting-law-material-icons.svg" ||
+  manifest.delivery.publicPath !== "images/heroes/casting-law-material-icons.svg" ||
+  manifest.delivery.symbolRule !== "casting-law-item-{itemId}" ||
+  manifest.delivery.sourcePixelFormat !== "PNG" ||
+  manifest.delivery.wrapperFormat !== "SVG symbol sprite" ||
+  manifest.delivery.sourceDimensions !== "172x172 RGBA" ||
+  manifest.delivery.externallyHostedAtRuntime !== false ||
   manifest.contract.requiredItemCount !== 45 ||
   manifest.contract.exactSourceBasenameMatch !== true ||
   manifest.contract.uniqueItemId !== true ||
@@ -52,6 +72,8 @@ if (
   manifest.summary.unresolved !== 0 ||
   manifest.summary.uniqueItemIds !== 45 ||
   manifest.summary.uniqueDriveFileIds !== 45 ||
+  manifest.summary.localSpriteSymbols !== 45 ||
+  manifest.summary.runtimeExternalDependencies !== 0 ||
   manifest.records.length !== 45
 ) {
   throw new Error("Hero Casting Law material icon manifest is not production-ready.");
@@ -59,9 +81,11 @@ if (
 
 const byItemId = new Map<number, CastingLawMaterialIconRecord>();
 const driveFileIds = new Set<string>();
+const symbolIds = new Set<string>();
 
 for (const record of manifest.records) {
   const sourceFileName = record.sourceIconPath.split("/").pop() ?? "";
+  const expectedSymbolId = `casting-law-item-${record.itemId}`;
   if (
     !Number.isSafeInteger(record.itemId) ||
     record.itemId <= 0 ||
@@ -73,13 +97,17 @@ for (const record of manifest.records) {
     driveFileIds.has(record.driveFileId) ||
     !Number.isSafeInteger(record.driveFileSize) ||
     record.driveFileSize <= 0 ||
-    record.deliveryMode !== "GOOGLE_DRIVE_PUBLIC_IMAGE" ||
-    record.deliveryUrl !== `https://drive.google.com/uc?export=view&id=${record.driveFileId}`
+    record.sourceDeliveryUrl !== `https://drive.google.com/uc?export=view&id=${record.driveFileId}` ||
+    record.spritePath !== manifest.delivery.spritePath ||
+    record.spriteSymbolId !== expectedSymbolId ||
+    symbolIds.has(record.spriteSymbolId) ||
+    record.deliveryMode !== "LOCAL_SVG_SPRITE"
   ) {
     throw new Error(`Hero Casting Law material icon manifest record is invalid for itemId=${record.itemId}.`);
   }
   byItemId.set(record.itemId, record);
   driveFileIds.add(record.driveFileId);
+  symbolIds.add(record.spriteSymbolId);
 }
 
 export function getHeroCastingLawMaterialIconAsset(
@@ -92,11 +120,15 @@ export function getHeroCastingLawMaterialIconAsset(
   return record;
 }
 
-export function getHeroCastingLawMaterialIconUrl(
+export function getHeroCastingLawMaterialIconSymbolId(
   itemId: number,
   sourceIconPath: string | null | undefined,
 ) {
-  return getHeroCastingLawMaterialIconAsset(itemId, sourceIconPath)?.deliveryUrl ?? null;
+  return getHeroCastingLawMaterialIconAsset(itemId, sourceIconPath)?.spriteSymbolId ?? null;
+}
+
+export function getHeroCastingLawMaterialIconPublicPath() {
+  return manifest.delivery.publicPath;
 }
 
 export function getHeroCastingLawMaterialIconAssetCount() {
