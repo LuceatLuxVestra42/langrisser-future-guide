@@ -12,12 +12,14 @@ import {
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
 import { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";
+import { HeroBondMaterialsPanel } from "@/components/hero-bond-materials-panel";
 import { HeroCastingLawSection } from "@/components/hero-casting-law-section";
 import { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";
 import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { getHeroBondMaterialsPresentation } from "@/lib/hero-bond-materials.functions";
 import { getHeroCastingLawPresentation } from "@/lib/hero-casting-law.functions";
 import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
@@ -39,6 +41,8 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (!Number.isSafeInteger(heroId) || heroId <= 0) throw notFound();
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
+    const bondMaterials = await getHeroBondMaterialsPresentation({ data: { heroId } });
+    if (!bondMaterials) throw new Error(`Hero ${heroId} has no frozen bond-material presentation.`);
     const castingLaw = await getHeroCastingLawPresentation({ data: { heroId } });
     if (!castingLaw) throw new Error(`Hero ${heroId} has no frozen Casting Law presentation.`);
     const finalJobStatBars = await getHeroFinalJobStatBarPresentationData();
@@ -97,7 +101,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (soldierCards.length !== data.detail.soldiers.count) {
       throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
     }
-    return { ...data, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards };
+    return { ...data, bondMaterials, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -182,7 +186,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, soldierCommand, heartFetter, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const { hero, detail, soldierCommand, heartFetter, bondMaterials, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const hasSpForm = detail.sp.released;
   const [formMode, setFormMode] = useState<HeroFormMode>("normal");
   useEffect(() => setFormMode("normal"), [hero.heroId]);
@@ -522,6 +526,7 @@ function HeroDetailPage() {
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
           )}
+          <HeroBondMaterialsPanel materials={bondMaterials} resolveAssetUrl={resolvePublicAssetUrl} />
         </section>
         <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
         </div>
