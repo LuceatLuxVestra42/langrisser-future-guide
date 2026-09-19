@@ -31,6 +31,9 @@ const HERO_SOLDIER_ARMY_ORDER = new Map<string, number>(
 );
 
 const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
+  [93, new Set([
+    11746,
+  ])],
   [14, new Set([
     10401,
   ])],
