@@ -278,7 +278,7 @@ function HeroJobMovementSection({
   allowedJobConnectionIds,
 }: {
   heroId: number;
-  allowedJobConnectionIds?: readonly number[];
+  allowedJobConnectionIds?: readonly number[] | undefined;
 }) {
   const [movementRows, setMovementRows] = useState<HeroJobMovementRowView[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -437,7 +437,7 @@ export function HeroJobMaterialsSection({
 }: {
   heroId: number;
   mode: "normal" | "sp";
-  allowedJobConnectionIds?: readonly number[];
+  allowedJobConnectionIds?: readonly number[] | undefined;
 }) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
