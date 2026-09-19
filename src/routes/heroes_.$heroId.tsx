@@ -2,10 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
-  Brain,
   ChevronLeft,
   ChevronRight,
-  Crosshair,
   ImageOff,
   Swords,
   UserRound,
@@ -1177,11 +1175,13 @@ function SectionTitle({ title }: { title: string }) { return <h2 className="font
 
 type HeroFinalJobStatKey = "HP" | "ATK" | "INT" | "DEF" | "MDEF" | "DEX";
 
-const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Partial<Record<HeroFinalJobStatKey, string>> = {
+const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Record<HeroFinalJobStatKey, string> = {
   HP: "Icon_HP.png",
   ATK: "Icon_Attack.png",
+  INT: "Icon_Intelligence.png",
   DEF: "Icon_Defense.png",
   MDEF: "Icon_MagicDefense.png",
+  DEX: "Icon_Skill.png",
 };
 
 const HERO_FINAL_JOB_STAT_LABEL_BY_KEY: Record<HeroFinalJobStatKey, string> = {
@@ -1200,27 +1200,18 @@ function HeroStatLabel({
   stat: HeroFinalJobStatKey;
   className: string;
 }) {
-  const fileName = HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat];
-  const iconUrl = fileName
-    ? `${import.meta.env.BASE_URL}images/shared/stats/${fileName}`
-    : null;
+  const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
 
   return (
     <span className={className} data-hero-final-job-stat-label={stat}>
-      {iconUrl ? (
-        <img
-          src={iconUrl}
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          className="h-4 w-4 shrink-0 object-contain"
-        />
-      ) : stat === "INT" ? (
-        <Brain className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
-      ) : (
-        <Crosshair className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
-      )}
+      <img
+        src={iconUrl}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+        className="h-4 w-4 shrink-0 object-contain"
+      />
       <span>{HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}</span>
     </span>
   );
