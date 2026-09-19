@@ -1,5 +1,6 @@
 export type HeroCastingLawPresentation = {
   heroId: number;
+  iconSpritePublicPath: string;
   slots: Array<{
     sourceIndex: number;
     templateId: number;
@@ -29,7 +30,7 @@ type CastingLawMaterial = {
   count: number;
   nameCn: string;
   sourceIconPath: string | null;
-  iconUrl: string;
+  iconSymbolId: string;
 };
 
 type CastingLawRangeTotals = {
@@ -52,7 +53,42 @@ function slotLabel(slotType: string) {
   return slotType;
 }
 
-function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
+function getIconHref(spritePublicPath: string, symbolId: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+  return `${normalizedBase}${spritePublicPath}#${symbolId}`;
+}
+
+function CastingLawMaterialIcon({
+  material,
+  spritePublicPath,
+  sizeClass,
+}: {
+  material: CastingLawMaterial;
+  spritePublicPath: string;
+  sizeClass: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 172 172"
+      role="img"
+      aria-label={material.nameCn}
+      className={`shrink-0 ${sizeClass}`}
+      data-casting-law-material-symbol={material.iconSymbolId}
+    >
+      <title>{material.nameCn}</title>
+      <use href={getIconHref(spritePublicPath, material.iconSymbolId)} />
+    </svg>
+  );
+}
+
+function MaterialBadges({
+  materials,
+  spritePublicPath,
+}: {
+  materials: CastingLawMaterial[];
+  spritePublicPath: string;
+}) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {materials.map((material) => (
@@ -62,16 +98,7 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
           data-casting-law-material-id={material.itemId}
           data-casting-law-material-source-icon={material.sourceIconPath ?? ""}
         >
-          <img
-            src={material.iconUrl}
-            alt={material.nameCn}
-            title={material.nameCn}
-            width={32}
-            height={32}
-            loading="lazy"
-            decoding="async"
-            className="h-8 w-8 shrink-0 object-contain"
-          />
+          <CastingLawMaterialIcon material={material} spritePublicPath={spritePublicPath} sizeClass="h-8 w-8" />
           <span className="max-w-[15rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
@@ -83,9 +110,11 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
 function RangeSummary({
   title,
   totals,
+  spritePublicPath,
 }: {
   title: string;
   totals: CastingLawRangeTotals;
+  spritePublicPath: string;
 }) {
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-3">
@@ -96,7 +125,7 @@ function RangeSummary({
         </span>
       </div>
       <div className="mt-2">
-        <MaterialBadges materials={totals.materials} />
+        <MaterialBadges materials={totals.materials} spritePublicPath={spritePublicPath} />
       </div>
     </div>
   );
@@ -106,10 +135,12 @@ function LevelTable({
   levels,
   from,
   to,
+  spritePublicPath,
 }: {
   levels: HeroCastingLawPresentation["slots"][number]["levels"];
   from: number;
   to: number;
+  spritePublicPath: string;
 }) {
   const rows = levels.filter((level) => level.level >= from && level.level <= to);
   return (
@@ -137,15 +168,10 @@ function LevelTable({
                       data-casting-law-level-material-id={material.itemId}
                       data-casting-law-level-material-source-icon={material.sourceIconPath ?? ""}
                     >
-                      <img
-                        src={material.iconUrl}
-                        alt={material.nameCn}
-                        title={material.nameCn}
-                        width={36}
-                        height={36}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-9 w-9 shrink-0 object-contain"
+                      <CastingLawMaterialIcon
+                        material={material}
+                        spritePublicPath={spritePublicPath}
+                        sizeClass="h-9 w-9"
                       />
                       <span>{material.nameCn}</span>
                       <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
@@ -164,7 +190,13 @@ function LevelTable({
   );
 }
 
-function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] }) {
+function SlotCard({
+  slot,
+  spritePublicPath,
+}: {
+  slot: HeroCastingLawPresentation["slots"][number];
+  spritePublicPath: string;
+}) {
   return (
     <details
       className="group rounded-xl border border-border bg-muted/10"
@@ -190,8 +222,8 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
         </div>
 
         <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          <RangeSummary title="Lv.1~5 합계" totals={slot.level1to5} />
-          <RangeSummary title="Lv.6~10 합계" totals={slot.level6to10} />
+          <RangeSummary title="Lv.1~5 합계" totals={slot.level1to5} spritePublicPath={spritePublicPath} />
+          <RangeSummary title="Lv.6~10 합계" totals={slot.level6to10} spritePublicPath={spritePublicPath} />
         </div>
       </summary>
 
@@ -199,11 +231,11 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
         <div className="grid gap-4 xl:grid-cols-2">
           <div>
             <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.1~5 단계별</h4>
-            <LevelTable levels={slot.levels} from={1} to={5} />
+            <LevelTable levels={slot.levels} from={1} to={5} spritePublicPath={spritePublicPath} />
           </div>
           <div>
             <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.6~10 단계별</h4>
-            <LevelTable levels={slot.levels} from={6} to={10} />
+            <LevelTable levels={slot.levels} from={6} to={10} spritePublicPath={spritePublicPath} />
           </div>
         </div>
       </div>
@@ -235,14 +267,26 @@ export function HeroCastingLawSection({
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
         <h3 className="text-sm font-extrabold text-foreground">전체 슬롯 합계</h3>
         <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          <RangeSummary title="Lv.1~5" totals={castingLaw.totals.level1to5} />
-          <RangeSummary title="Lv.6~10" totals={castingLaw.totals.level6to10} />
+          <RangeSummary
+            title="Lv.1~5"
+            totals={castingLaw.totals.level1to5}
+            spritePublicPath={castingLaw.iconSpritePublicPath}
+          />
+          <RangeSummary
+            title="Lv.6~10"
+            totals={castingLaw.totals.level6to10}
+            spritePublicPath={castingLaw.iconSpritePublicPath}
+          />
         </div>
       </div>
 
       <div className="mt-4 space-y-3">
         {castingLaw.slots.map((slot) => (
-          <SlotCard key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`} slot={slot} />
+          <SlotCard
+            key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`}
+            slot={slot}
+            spritePublicPath={castingLaw.iconSpritePublicPath}
+          />
         ))}
       </div>
     </section>
