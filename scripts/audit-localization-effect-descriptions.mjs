@@ -20,7 +20,7 @@ const generalDetail = readJson("data/generated/equipment_stage3_4_general_detail
 const exclusiveConsumer = readJson("data/generated/equipment_stage3_5_exclusive_consumer.json");
 
 const expectedScopeCounts = {
-  general: { sourceRows: 174, matched: 128, review: 46, parts: [64, 64] },
+  general: { sourceRows: 206, matched: 206, review: 0, parts: [103, 103] },
   exclusive: { sourceRows: 143, matched: 133, review: 10, parts: [67, 66] },
 };
 
@@ -95,10 +95,10 @@ for (const scope of ["general", "exclusive"]) {
   totalMatched += scopedMatched;
 }
 
-if (totalMatched !== 261 || allIds.size !== 261) {
-  throw new Error(`total matched Equipment KR effect count must be 261, got ${allIds.size}.`);
+if (totalMatched !== 339 || allIds.size !== 339) {
+  throw new Error(`total matched Equipment KR effect count must be 339, got ${allIds.size}.`);
 }
 
 console.log(
-  `[localization-effect-description] PASS matched=${totalMatched} general=128 exclusive=133 review=56 nameMutation=0 semanticReopen=0`,
+  `[localization-effect-description] PASS matched=${totalMatched} general=206 exclusive=133 review=10 nameMutation=0 semanticReopen=0`,
 );
