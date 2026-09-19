@@ -1,0 +1,44 @@
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+
+const CATALOG_PATH = "data/generated/hero-bond-level-materials.v1.json";
+const MANIFEST_PATH = "data/generated/hero-bond-material-icon-assets.v1.json";
+const SUMMARY_PATH = "data/validation/hero-bond-material-icon-assets-summary.v1.json";
+const EXPECTED_COUNT = 43;
+const EXPECTED_FOLDER_ID = "1fVm9JVJlOiswiTezoRWFJQmUZWof8db8";
+const readJson = (p) => JSON.parse(fs.readFileSync(p, "utf8"));
+const fail = (m) => { throw new Error(m); };
+const gitBlobSha = (bytes) => crypto.createHash("sha1").update(Buffer.from(`blob ${bytes.length}\\0`)).update(bytes).digest("hex");
+const catalog = readJson(CATALOG_PATH);
+const manifest = readJson(MANIFEST_PATH);
+const summary = readJson(SUMMARY_PATH);
+if (catalog?.schemaVersion !== 1 || catalog?.stage !== "hero-bond-level-materials-v1" || catalog?.counts?.materialItems !== EXPECTED_COUNT) fail("Hero bond material catalog contract mismatch");
+if (manifest?.version !== 1 || manifest?.schemaId !== "hero-bond-material-icon-assets/v1" || manifest?.status !== "FROZEN" || manifest?.completion !== "COMPLETE" || manifest?.semanticReopen !== false) fail("Hero bond icon manifest contract mismatch");
+if (manifest?.sourceSnapshot?.provider !== "google-drive" || manifest?.sourceSnapshot?.folderId !== EXPECTED_FOLDER_ID || manifest?.sourceSnapshot?.copyMode !== "byte-identical") fail("Hero bond icon source snapshot drift");
+if (manifest?.authority?.runtimeDerivation !== false || manifest?.authority?.externalHotlink !== false) fail("Hero bond icon presentation boundary mismatch");
+const canonical = new Map((catalog.itemCatalog ?? []).map((item) => [item.itemId, item]));
+if (canonical.size !== EXPECTED_COUNT) fail(`canonical item count=${canonical.size}`);
+const ids=new Set(), sourcePaths=new Set(), repoPaths=new Set();
+for (const row of manifest.records ?? []) {
+ if (!Number.isSafeInteger(row?.itemId) || ids.has(row.itemId)) fail(`invalid/duplicate itemId=${row?.itemId}`);
+ const item=canonical.get(row.itemId);
+ if (!item || item.itemType !== 6 || item.icon !== row.sourcePath || item.nameCn !== row.nameCn) fail(`canonical relation mismatch itemId=${row.itemId}`);
+ const fileName=path.posix.basename(row.sourcePath);
+ if (row.sourceAsset?.provider !== "google-drive" || row.sourceAsset?.folderId !== EXPECTED_FOLDER_ID || row.sourceAsset?.fileName !== fileName || typeof row.sourceAsset?.fileId !== "string" || !row.sourceAsset.fileId || !Number.isSafeInteger(row.sourceAsset?.bytes) || row.sourceAsset.bytes <= 0) fail(`source provenance mismatch itemId=${row.itemId}`);
+ const expectedRepoPath=`public/images/heroes/bond-materials/${fileName}`;
+ const expectedPublicPath=`/images/heroes/bond-materials/${fileName}`;
+ if (row.repositoryAsset?.repoPath !== expectedRepoPath || row.repositoryAsset?.publicPath !== expectedPublicPath || row.repositoryAsset?.bytes !== row.sourceAsset.bytes || !/^[0-9a-f]{40}$/.test(row.repositoryAsset?.gitBlobSha ?? "")) fail(`repository asset metadata mismatch itemId=${row.itemId}`);
+ if (!fs.existsSync(expectedRepoPath)) fail(`missing repository asset itemId=${row.itemId}`);
+ const bytes=fs.readFileSync(expectedRepoPath);
+ if (bytes.length !== row.repositoryAsset.bytes || bytes.length < 8 || bytes.subarray(0,8).toString("hex") !== "89504e470d0a1a0a") fail(`PNG byte mismatch itemId=${row.itemId}`);
+ if (gitBlobSha(bytes) !== row.repositoryAsset.gitBlobSha) fail(`Git blob SHA mismatch itemId=${row.itemId}`);
+ if (sourcePaths.has(row.sourcePath) || repoPaths.has(expectedRepoPath)) fail(`duplicate asset relation itemId=${row.itemId}`);
+ ids.add(row.itemId); sourcePaths.add(row.sourcePath); repoPaths.add(expectedRepoPath);
+}
+if (ids.size !== EXPECTED_COUNT) fail(`manifest record count=${ids.size}`);
+for (const itemId of canonical.keys()) if (!ids.has(itemId)) fail(`canonical itemId ${itemId} missing asset`);
+if (manifest?.summary?.targetCount !== EXPECTED_COUNT || manifest?.summary?.resolvedCount !== EXPECTED_COUNT || manifest?.summary?.unresolvedCount !== 0 || manifest?.summary?.localAssetCount !== EXPECTED_COUNT) fail("manifest summary mismatch");
+const expectedSummary={"version":1,"domain":"hero-bond-material-icon-assets","status":"PASS","completion":"COMPLETE","targetCount":43,"resolvedCount":43,"unresolvedCount":0,"duplicateItemIdCount":0,"duplicateSourcePathCount":0,"missingRepositoryAssetCount":0,"sourceProvider":"google-drive","sourceFolderId":"1fVm9JVJlOiswiTezoRWFJQmUZWof8db8","semanticReopen":false,"hardErrors":[]};
+if (JSON.stringify(summary) !== JSON.stringify(expectedSummary)) fail("frozen validation summary drift");
+console.log(JSON.stringify({checkpoint:"HERO_BOND_MATERIAL_ICON_ASSETS",status:"PASS",assetCount:ids.size,sourceFolderId:EXPECTED_FOLDER_ID,semanticReopen:false,externalHotlink:false},null,2));
