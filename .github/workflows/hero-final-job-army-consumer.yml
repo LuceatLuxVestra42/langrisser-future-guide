@@ -1,0 +1,105 @@
+name: Hero Final Job Army Consumer
+
+on:
+  push:
+    branches:
+      - 'feat/hero-final-job-army-type-*'
+    paths:
+      - 'data/contracts/hero-final-job-army-consumer.v1.json'
+      - 'scripts/build_hero_final_job_army_consumer.cjs'
+      - 'scripts/validate_hero_final_job_army_consumer.cjs'
+      - '.github/workflows/hero-final-job-army-consumer.yml'
+  pull_request:
+    paths:
+      - 'data/contracts/hero-final-job-army-consumer.v1.json'
+      - 'data/generated/hero-final-job-army.v1.json'
+      - 'data/validation/hero-final-job-army.v1.json'
+      - 'scripts/build_hero_final_job_army_consumer.cjs'
+      - 'scripts/validate_hero_final_job_army_consumer.cjs'
+      - '.github/workflows/hero-final-job-army-consumer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hero-final-job-army-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  produce-validate-writeback:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Produce frozen JobID army consumer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build_hero_final_job_army_consumer.cjs
+
+      - name: Validate consumer independently
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/validate_hero_final_job_army_consumer.cjs
+
+      - name: Verify producer mutation scope
+        run: |
+          set -euo pipefail
+          changed="$(git status --porcelain | awk '{print $2}')"
+          test -n "$changed" || { echo 'consumer already current'; exit 0; }
+          while IFS= read -r path; do
+            case "$path" in
+              data/generated/hero-final-job-army.v1.json|data/validation/hero-final-job-army.v1.json) ;;
+              *) echo "unexpected final-job army producer mutation: $path" >&2; exit 1 ;;
+            esac
+          done <<< "$changed"
+
+      - name: Commit frozen consumer and evidence
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/generated/hero-final-job-army.v1.json data/validation/hero-final-job-army.v1.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(hero): publish final-job army consumer"
+          git push origin HEAD:${{ github.ref_name }}
+
+  validate-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild final-job army consumer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build_hero_final_job_army_consumer.cjs
+
+      - name: Validate final-job army consumer
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/validate_hero_final_job_army_consumer.cjs
+
+      - name: Verify frozen outputs are current
+        run: git diff --exit-code -- data/generated/hero-final-job-army.v1.json data/validation/hero-final-job-army.v1.json
