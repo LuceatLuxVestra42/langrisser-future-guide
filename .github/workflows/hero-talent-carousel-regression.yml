@@ -198,6 +198,14 @@ jobs:
               check(lowerBox && articleBox, `${label} Ashi talent navigation boxes unavailable`);
               check(Math.abs(lowerBox.y - articleBox.y) <= 1, `${label} Ashi lower navigation must stay top-aligned with the talent card: button=${lowerBox.y}, article=${articleBox.y}`);
               check(Math.abs(lowerBox.height - articleBox.height) <= 1, `${label} Ashi lower navigation height must match the talent card: button=${lowerBox.height}, article=${articleBox.height}`);
+              const [lowerIconBox, lowerLabelBox] = await Promise.all([
+                lower.locator('svg').boundingBox(),
+                lower.locator('span').boundingBox(),
+              ]);
+              check(lowerIconBox && lowerLabelBox, `${label} Ashi lower navigation icon/label boxes unavailable`);
+              const lowerContentCenter = (lowerIconBox.y + lowerLabelBox.y + lowerLabelBox.height) / 2;
+              const lowerButtonCenter = lowerBox.y + (lowerBox.height / 2);
+              check(Math.abs(lowerContentCenter - lowerButtonCenter) <= 2, `${label} Ashi lower navigation icon/label must be vertically centered: content=${lowerContentCenter}, button=${lowerButtonCenter}`);
             }
 
             const downward = [6];
