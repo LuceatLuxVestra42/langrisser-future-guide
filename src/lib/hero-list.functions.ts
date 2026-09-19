@@ -557,6 +557,31 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     11733,
     10210,
   ])],
+  [38, new Set([
+    11738,
+  ])],
+  [54, new Set([
+    11742,
+    11744,
+    10715,
+    11743,
+  ])],
+  [69, new Set([
+    11761,
+    11758,
+    11756,
+  ])],
+  [70, new Set([
+    11753,
+    11713,
+    11825,
+    11752,
+    11754,
+  ])],
+  [74, new Set([
+    11759,
+    11760,
+  ])],
 ]);
 
 function getHeroSoldierTierOrder(record: { isSp: boolean; tier: number }) {
