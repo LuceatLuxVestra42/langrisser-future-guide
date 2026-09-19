@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "contract": "hero-casting-law-material-icons",
+  "owner": "asset",
+  "status": "ACTIVE",
+  "purpose": "Freeze an explicit 45-item Casting Law material icon presentation map from canonical ConfigData itemId/icon sourcePath to the legacy Korean sheet's matching CastFigure asset snapshot, pinned by repository commit/blob SHA. This mapping is presentation-only and does not alter semantic material identity.",
+  "upstream": [
+    "data/generated/hero-casting-law-materials.v1.json"
+  ],
+  "authority": {
+    "semanticItemIdentity": "data/generated/hero-casting-law-materials.v1.json item.itemId",
+    "canonicalIconLocator": "data/generated/hero-casting-law-materials.v1.json item.icon",
+    "presentationAssetSnapshot": "redpanda7301/langrisser@2993e19ff392212f76b7ce006a6314ec0f10de4d img/item/CastFigure",
+    "relation": "45 explicit frozen records keyed by canonical itemId and exact ConfigData sourcePath; each external asset is pinned by Git blob SHA and immutable commit URL"
+  },
+  "expected": {
+    "distinctItemCount": 45,
+    "missingCount": 0,
+    "duplicateItemIdCount": 0,
+    "duplicateSourcePathCount": 0,
+    "duplicateAssetUrlCount": 0
+  },
+  "forbidden": [
+    "name JOIN",
+    "runtime filename derivation",
+    "ID arithmetic",
+    "screen-order matching",
+    "semantic relation changes"
+  ],
+  "outputs": {
+    "manifest": "data/generated/hero-casting-law-material-icon-assets.v1.json",
+    "validation": "data/validation/hero-casting-law-material-icon-assets-summary.v1.json"
+  },
+  "producer": "one-time explicit inventory freeze from current canonical catalog plus pinned legacy CastFigure inventory",
+  "completionRule": "45 explicit itemId/sourcePath asset records, zero unresolved canonical items, frozen external commit/blob provenance, validator PASS, frontend image rendering, Build/Hosted/Browser gates as applicable.",
+  "execution": {
+    "mode": "remote-only",
+    "featureBranch": "feat/hero-casting-law-material-icons-20260919",
+    "expectedBaseHead": "9d31a7243f04409d4ddb098982a40199a1cdf3bf"
+  },
+  "validator": "scripts/validate-hero-casting-law-material-icon-assets.mjs"
+}

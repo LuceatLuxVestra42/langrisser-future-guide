@@ -1,0 +1,49 @@
+name: Hero Casting Law Material Icons
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/hero-casting-law-material-icons.yml'
+      - 'data/contracts/hero-casting-law-material-icons.v1.json'
+      - 'data/generated/hero-casting-law-material-icon-assets.v1.json'
+      - 'data/validation/hero-casting-law-material-icon-assets-summary.v1.json'
+      - 'scripts/validate-hero-casting-law-material-icon-assets.mjs'
+      - 'scripts/probe-hero-casting-law-material-icon-assets.mjs'
+      - 'src/lib/hero-casting-law.server.ts'
+      - 'src/components/hero-casting-law-section.tsx'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate frozen icon map
+        run: node scripts/validate-hero-casting-law-material-icon-assets.mjs
+
+      - name: Probe pinned icon bytes
+        run: node scripts/probe-hero-casting-law-material-icon-assets.mjs
+
+      - name: Install dependencies without changing lockfile
+        run: npm install --no-package-lock
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Require clean repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          git diff --check
