@@ -41,14 +41,22 @@ function main() {
   assert.equal(manifest.presentationAuthority, true);
   assert.equal(manifest.productionConsumerAllowed, true);
   assert.equal(manifest.source.sha256, sha256(inputPath));
-  assert.deepStrictEqual(manifest.counts.mappingModes, {
+  assert.deepStrictEqual(manifest.counts.sourceMappingModes, {
     VALIDATED_DEFAULT: 1142,
     EXPLICIT_OVERRIDE: 6,
     EXCLUSION_SET_MEMBER: 8,
     SOURCE_CONFLICT_RESOLUTION: 2,
   });
+  assert.deepStrictEqual(manifest.counts.mappingModes, {
+    VALIDATED_DEFAULT: 1050,
+    EXPLICIT_OVERRIDE: 6,
+    EXCLUSION_SET_MEMBER: 8,
+    SOURCE_CONFLICT_RESOLUTION: 2,
+  });
   assert.equal(manifest.counts.heroPopulation, 267);
-  assert.equal(manifest.counts.effectRows, 1158);
+  assert.equal(manifest.counts.sourceEffectRows, 1158);
+  assert.equal(manifest.counts.effectRows, 1066);
+  assert.equal(manifest.counts.deduplicatedRows, 92);
   assert.equal(manifest.counts.uniqueSkills, 1066);
   assert.equal(manifest.heroShards.length, 3);
   assert.equal(manifest.skillTextShards.length, 3);
@@ -88,28 +96,45 @@ function main() {
   }
 
   const expectedHeroes = new Map();
+  const expectedHeroKeys = new Map();
   const expectedSkills = new Map();
-  const modeCounts = { VALIDATED_DEFAULT: 0, EXPLICIT_OVERRIDE: 0, EXCLUSION_SET_MEMBER: 0, SOURCE_CONFLICT_RESOLUTION: 0 };
+  const sourceModeCounts = { VALIDATED_DEFAULT: 0, EXPLICIT_OVERRIDE: 0, EXCLUSION_SET_MEMBER: 0, SOURCE_CONFLICT_RESOLUTION: 0 };
+  const presentationModeCounts = { VALIDATED_DEFAULT: 0, EXPLICIT_OVERRIDE: 0, EXCLUSION_SET_MEMBER: 0, SOURCE_CONFLICT_RESOLUTION: 0 };
+  let deduplicatedRows = 0;
   for (const effect of input.effects || []) {
     const heroId = Number(effect.heroId);
     const row = [Number(effect.heartFetterLevel), Number(effect.presentationJob.jobId), Number(effect.skill.skillId), effect.mappingMode];
-    if (!expectedHeroes.has(heroId)) expectedHeroes.set(heroId, []);
-    expectedHeroes.get(heroId).push(row);
+    if (!expectedHeroes.has(heroId)) {
+      expectedHeroes.set(heroId, []);
+      expectedHeroKeys.set(heroId, new Set());
+    }
+    const rowKey = JSON.stringify(row);
+    if (!expectedHeroKeys.get(heroId).has(rowKey)) {
+      expectedHeroKeys.get(heroId).add(rowKey);
+      expectedHeroes.get(heroId).push(row);
+      presentationModeCounts[effect.mappingMode]++;
+    } else {
+      deduplicatedRows++;
+    }
     const skillId = Number(effect.skill.skillId);
     const text = effect.skill.descriptionCn;
     if (expectedSkills.has(skillId)) assert.equal(expectedSkills.get(skillId), text, `Skill ${skillId}: inconsistent source text`);
     expectedSkills.set(skillId, text);
-    assert(Object.prototype.hasOwnProperty.call(modeCounts, effect.mappingMode), `unexpected mapping mode ${effect.mappingMode}`);
-    modeCounts[effect.mappingMode]++;
+    assert(Object.prototype.hasOwnProperty.call(sourceModeCounts, effect.mappingMode), `unexpected mapping mode ${effect.mappingMode}`);
+    sourceModeCounts[effect.mappingMode]++;
   }
   for (const rows of expectedHeroes.values()) rows.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || String(a[3]).localeCompare(String(b[3])));
 
   assert.equal(actualHeroes.size, expectedHeroes.size);
   assert.equal(actualSkills.size, expectedSkills.size);
-  assert.equal([...actualHeroes.values()].reduce((n, rows) => n + rows.length, 0), 1158);
-  assert.deepStrictEqual(modeCounts, manifest.counts.mappingModes);
+  assert.equal([...actualHeroes.values()].reduce((n, rows) => n + rows.length, 0), 1066);
+  assert.equal(deduplicatedRows, 92);
+  assert.deepStrictEqual(sourceModeCounts, manifest.counts.sourceMappingModes);
+  assert.deepStrictEqual(presentationModeCounts, manifest.counts.mappingModes);
   for (const [heroId, expectedRows] of expectedHeroes) {
-    assert.deepStrictEqual(actualHeroes.get(heroId), expectedRows, `Hero ${heroId}: consumer rows differ`);
+    const actualRows = actualHeroes.get(heroId);
+    assert.equal(new Set(actualRows.map((row) => JSON.stringify(row))).size, actualRows.length, `Hero ${heroId}: duplicate presentation tuple`);
+    assert.deepStrictEqual(actualRows, expectedRows, `Hero ${heroId}: consumer rows differ`);
     const heroJobs = collectHeroJobIds(heroId);
     for (const [, jobId] of expectedRows) assert(heroJobs.has(jobId), `Hero ${heroId}: presentation Job ${jobId} missing from frozen Hero shard`);
   }
@@ -120,9 +145,12 @@ function main() {
     semanticAuthority: false,
     presentationAuthority: true,
     heroPopulation: actualHeroes.size,
-    effectRows: 1158,
+    sourceEffectRows: 1158,
+    effectRows: 1066,
+    deduplicatedRows: 92,
     uniqueSkills: actualSkills.size,
-    mappingModes: modeCounts,
+    sourceMappingModes: sourceModeCounts,
+    mappingModes: presentationModeCounts,
   }, null, 2));
 }
 
