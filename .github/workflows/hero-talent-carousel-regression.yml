@@ -118,7 +118,8 @@ jobs:
           check(byInitialStar.has(2), 'No frozen Hero detail representative with initialStar=2');
           check(byInitialStar.has(1), 'No frozen Hero detail representative with initialStar=1');
 
-          const targets = [hero6, byInitialStar.get(2), byInitialStar.get(1)];
+          const ashi = { heroId: 99279, initialStar: 3, nameCn: '雅希' };
+          const targets = [hero6, byInitialStar.get(2), byInitialStar.get(1), ashi];
 
           async function verifyTalentCarousel(page, target, label) {
             const pageErrors = [];
@@ -191,6 +192,13 @@ jobs:
             await assertStar(6);
             check(await higher.isDisabled(), `${label} Hero ${target.heroId} higher arrow must be disabled at 6성`);
             check(!(await lower.isDisabled()), `${label} Hero ${target.heroId} lower arrow unexpectedly disabled at 6성`);
+            check((await lower.innerText()).includes('5성'), `${label} Hero ${target.heroId} lower arrow must expose 5성 target label at 6성: ${JSON.stringify(await lower.innerText())}`);
+            if (target.heroId === 99279) {
+              const [lowerBox, articleBox] = await Promise.all([lower.boundingBox(), carousel.locator('article').boundingBox()]);
+              check(lowerBox && articleBox, `${label} Ashi talent navigation boxes unavailable`);
+              check(Math.abs(lowerBox.y - articleBox.y) <= 1, `${label} Ashi lower navigation must stay top-aligned with the talent card: button=${lowerBox.y}, article=${articleBox.y}`);
+              check(lowerBox.height <= 120, `${label} Ashi lower navigation must not stretch with the long talent description: height=${lowerBox.height}`);
+            }
 
             const downward = [6];
             for (let star = 5; star >= target.initialStar; star -= 1) {
