@@ -356,7 +356,8 @@ function HeroDetailPage() {
   for (const row of detail.skills.jobLevelAcquisitions) {
     if (
       selectedMatthewJobConnectionIdSet &&
-      !selectedMatthewJobConnectionIdSet.has(row.jobConnectionId)
+      (row.jobConnectionId == null ||
+        !selectedMatthewJobConnectionIdSet.has(row.jobConnectionId))
     ) {
       continue;
     }
