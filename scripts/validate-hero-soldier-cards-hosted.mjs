@@ -32,6 +32,11 @@ const movementIconFileByType = {
   5: "Move_FieldArmy.png",
 };
 
+const expectedHero6FinalJobArmyById = {
+  307: { armyId: 3, iconFile: "Icon_Occupation_Cavalry.png" },
+  306: { armyId: 3, iconFile: "Icon_Occupation_Cavalry.png" },
+};
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const url = (path) => new URL(path.replace(/^\//, ""), baseUrl).toString();
@@ -96,6 +101,21 @@ async function verifyHeroJobMovement(page, label) {
     check(expectedFile, `Hero 6 ${label} Job movement has unsupported MoveType ${icon.moveType}`);
     check(icon.src?.endsWith(`/images/shared/movement/${expectedFile}`) === true, `Hero 6 ${label} Job movement icon mismatch for MoveType ${icon.moveType}: ${icon.src}`);
   }
+
+  for (const row of expectedHero6MovementRows) {
+    const card = section.locator(`[data-job-id="${row.jobId}"]`);
+    const expectedArmy = expectedHero6FinalJobArmyById[row.jobId];
+    if (!expectedArmy) {
+      check(await card.getAttribute("data-army-id") === "", `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly has an army projection`);
+      check(await card.locator('[data-hero-final-job-army-icon]').count() === 0, `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly renders an army icon`);
+      continue;
+    }
+    check(await card.getAttribute("data-army-id") === String(expectedArmy.armyId), `Hero 6 ${label} final Job ${row.jobId} Army_ID mismatch`);
+    const armyIcon = card.locator('[data-hero-final-job-army-icon="official"]');
+    check(await armyIcon.count() === 1, `Hero 6 ${label} final Job ${row.jobId} official army icon missing`);
+    const src = await armyIcon.getAttribute("src");
+    check(src?.endsWith(`/images/army/${expectedArmy.iconFile}`) === true, `Hero 6 ${label} final Job ${row.jobId} army icon mismatch: ${src}`);
+  }
 }
 
 async function verifyHeroFormSwitch(page, label) {
@@ -134,6 +154,11 @@ async function verifyHeroFormSwitch(page, label) {
     { timeout: 45000 },
   );
   check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP movement JobID mismatch`);
+  check(await spMovement.getAttribute("data-army-id") === "3", `Hero 6 ${label} SP movement Army_ID mismatch`);
+  const spArmyIcon = spMovement.locator('[data-hero-final-job-army-icon="official"]');
+  check(await spArmyIcon.count() === 1, `Hero 6 ${label} SP army icon missing`);
+  const spArmyIconSrc = await spArmyIcon.getAttribute("src");
+  check(spArmyIconSrc?.endsWith("/images/army/Icon_Occupation_Cavalry.png") === true, `Hero 6 ${label} SP army icon mismatch: ${spArmyIconSrc}`);
   const spMoveType = Number(await spMovement.getAttribute("data-move-type"));
   const expectedSpIconFile = movementIconFileByType[spMoveType];
   check(expectedSpIconFile, `Hero 6 ${label} SP movement has unsupported MoveType ${spMoveType}`);
