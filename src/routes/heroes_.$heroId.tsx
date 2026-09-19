@@ -386,7 +386,7 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-[minmax(0,3fr)_minmax(250px,1fr)]">
+          <div className="grid grid-cols-[minmax(0,4fr)_minmax(230px,1fr)]">
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual && failedVisualSrc !== activeVisual.src ? (
@@ -428,7 +428,7 @@ function HeroDetailPage() {
               ) : null}
             </div>
 
-            <div className="flex min-w-0 flex-col justify-center p-4 sm:p-5 lg:p-8">
+            <div className="flex min-w-0 flex-col justify-center p-4 sm:p-5 lg:p-6">
               {rarityIconPath ? (
                 <img
                   src={resolvePublicAssetUrl(rarityIconPath)}
