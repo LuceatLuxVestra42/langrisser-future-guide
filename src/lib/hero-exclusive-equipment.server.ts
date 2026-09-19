@@ -118,6 +118,8 @@ export function readHeroExclusiveEquipmentPresentation(heroId: number) {
     throw new Error(`Equipment ${equipmentId} is not admitted as exclusive-equipment metadata.`);
   }
 
+  const localizedEffect = localizeEquipmentEffectDescription(equipmentId, detail.effect);
+
   return {
     status: "RELEASED" as const,
     released: true,
@@ -137,8 +139,8 @@ export function readHeroExclusiveEquipmentPresentation(heroId: number) {
       stats: detail.stats,
       effect: {
         maxEffectSkillId: detail.effect.maxEffectSkillId,
-        effectName: detail.effect.effectName,
-        effectText: detail.effect.effectText,
+        effectName: localizedEffect.effectName,
+        effectText: localizedEffect.effectText,
       },
       acquisition: detail.acquisition,
     },
