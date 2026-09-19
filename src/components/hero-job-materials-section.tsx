@@ -273,7 +273,13 @@ function HeroSpJobMovementSection({
   );
 }
 
-function HeroJobMovementSection({ heroId }: { heroId: number }) {
+function HeroJobMovementSection({
+  heroId,
+  allowedJobConnectionIds,
+}: {
+  heroId: number;
+  allowedJobConnectionIds?: readonly number[];
+}) {
   const [movementRows, setMovementRows] = useState<HeroJobMovementRowView[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -296,15 +302,24 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
         if (!rows) {
           throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
         }
-        const projectedRows = rows.map((row) => {
-          const army = getStaticHeroFinalJobArmy(row.jobId);
-          return {
-            ...row,
-            attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
-            armyId: army?.armyId ?? null,
-            armyNameCn: army?.armyNameCn ?? null,
-          };
-        });
+        const allowedJobConnectionIdSet = allowedJobConnectionIds
+          ? new Set(allowedJobConnectionIds)
+          : null;
+        const projectedRows = rows
+          .filter((row) =>
+            allowedJobConnectionIdSet
+              ? allowedJobConnectionIdSet.has(row.jobConnectionId)
+              : true,
+          )
+          .map((row) => {
+            const army = getStaticHeroFinalJobArmy(row.jobId);
+            return {
+              ...row,
+              attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
+              armyId: army?.armyId ?? null,
+              armyNameCn: army?.armyNameCn ?? null,
+            };
+          });
         if (!cancelled) setMovementRows(projectedRows);
       })
       .catch((error) => {
@@ -314,7 +329,7 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
     return () => {
       cancelled = true;
     };
-  }, [heroId]);
+  }, [heroId, allowedJobConnectionIds]);
 
   if (loadError) {
     throw new Error(loadError);
@@ -418,9 +433,11 @@ function HeroJobMovementSection({ heroId }: { heroId: number }) {
 export function HeroJobMaterialsSection({
   heroId,
   mode,
+  allowedJobConnectionIds,
 }: {
   heroId: number;
   mode: "normal" | "sp";
+  allowedJobConnectionIds?: readonly number[];
 }) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
@@ -434,7 +451,15 @@ export function HeroJobMaterialsSection({
   }
   const jobMovementByConnectionId = new Map(jobMovementRows.map((row) => [row.jobConnectionId, row]));
 
+  const allowedJobConnectionIdSet = allowedJobConnectionIds
+    ? new Set(allowedJobConnectionIds)
+    : null;
   const connections = hero.connections
+    .filter((connection) =>
+      allowedJobConnectionIdSet
+        ? allowedJobConnectionIdSet.has(connection.jobConnectionId)
+        : true,
+    )
     .map((connection) => ({
       ...connection,
       jobNameCn: jobMovementByConnectionId.get(connection.jobConnectionId)?.nameCn ?? null,
@@ -464,7 +489,10 @@ export function HeroJobMaterialsSection({
 
   return (
     <>
-      <HeroJobMovementSection heroId={heroId} />
+      <HeroJobMovementSection
+        heroId={heroId}
+        allowedJobConnectionIds={allowedJobConnectionIds}
+      />
 
       <section
         className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
