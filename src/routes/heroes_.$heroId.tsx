@@ -580,7 +580,7 @@ function HeroDetailPage() {
                   onClick={() => moveTalent(-1)}
                   disabled={!previousTalentRow}
                   data-hero-talent-nav-direction="lower"
-                  className="group flex min-h-24 w-14 self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
+                  className="group flex min-h-24 w-[34px] self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
                 >
                   <ChevronLeft className="h-6 w-6 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
                   {previousTalentRow ? (
@@ -614,7 +614,7 @@ function HeroDetailPage() {
                   onClick={() => moveTalent(1)}
                   disabled={!nextTalentRow}
                   data-hero-talent-nav-direction="higher"
-                  className="group flex min-h-24 w-14 self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
+                  className="group flex min-h-24 w-[34px] self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
                 >
                   <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   {nextTalentRow ? (
