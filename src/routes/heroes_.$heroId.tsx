@@ -215,13 +215,15 @@ function HeroDetailPage() {
   const isMatthew = hero.heroId === MATTHEW_HERO_ID;
   const selectedMatthewVariant = MATTHEW_VARIANTS.find(
     (variant) => variant.id === matthewVariant,
-  ) ?? MATTHEW_VARIANTS[0];
-  const selectedMatthewVariantFinalJobId = selectedMatthewVariant.finalJobId;
+  );
+  const selectedMatthewVariantFinalJobId = selectedMatthewVariant?.finalJobId ?? 307;
+  const selectedMatthewVariantJobConnectionIds =
+    selectedMatthewVariant?.jobConnectionIds ?? [12, 17];
   const selectedMatthewJobConnectionIds = isMatthew && !isSpForm
     ? [
         ...MATTHEW_COMMON_JOB_CONNECTION_IDS,
         ...MATTHEW_FIXED_JOB_CONNECTION_IDS,
-        ...selectedMatthewVariant.jobConnectionIds,
+        ...selectedMatthewVariantJobConnectionIds,
       ]
     : undefined;
   const selectedMatthewJobConnectionIdSet = selectedMatthewJobConnectionIds
