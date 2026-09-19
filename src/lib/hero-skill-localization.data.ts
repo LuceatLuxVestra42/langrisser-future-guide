@@ -293,6 +293,14 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       source: { type: "legacy-korean-sheet", heroIds: [53], note: "Legacy Korean sheet hero/data/란포드.js; cross-checked against current generated Skill 11739 ID/CN/effect." },
     },
     {
+      skillId: 11746,
+      sourceNameCn: "虹吸",
+      nameKr: "사이펀",
+      descKr: "단일 적군에게 1.5배의 마법 피해를 준다. 전투 후 피해량의 30%만큼 생명을 회복한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [93], note: "Legacy Korean sheet hero/data/미지의기사.js; cross-checked against current generated Skill 11746 ID/CN/effect, cooldown/range/target." },
+    },
+    {
       skillId: 10705,
       sourceNameCn: "冰冻",
       nameKr: "빙결",
