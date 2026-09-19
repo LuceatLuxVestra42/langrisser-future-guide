@@ -2,7 +2,6 @@ type BondMaterial = {
   itemId: number;
   count: number;
   nameCn: string;
-  iconUrl: string;
 };
 
 type BondCostProfile = {
@@ -45,17 +44,6 @@ function MaterialBadges({ materials }: { materials: BondMaterial[] }) {
           className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
           data-hero-bond-material-id={material.itemId}
         >
-          <img
-            src={material.iconUrl}
-            alt=""
-            aria-hidden="true"
-            width={24}
-            height={24}
-            loading="lazy"
-            decoding="async"
-            className="h-6 w-6 shrink-0 object-contain"
-            data-hero-bond-material-icon={material.itemId}
-          />
           <span className="max-w-[14rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
