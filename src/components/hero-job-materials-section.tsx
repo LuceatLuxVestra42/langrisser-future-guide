@@ -64,34 +64,7 @@ function HeroFinalJobArmyIcon({
     );
   }
 
-  if (armyId !== 27) {
-    throw new Error(`Hero final-job army ${armyId} has no validated icon consumer.`);
-  }
-
-  return (
-    <span
-      className="inline-flex h-8 w-8 items-center justify-center"
-      title={label}
-      aria-label={label}
-      data-hero-final-job-army-icon="fallback"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-8 w-8"
-        aria-hidden="true"
-      >
-        <path d="M4 16c2-5 5-8 9-9 2-.5 4-.3 7 1-2 1-3 2-4 4 2 0 3 .7 4 2-2 .2-3 .8-4 2-1.6 2-4 3-7 3H5" />
-        <path d="M8 17c-1 2-2 3-4 3 1-2 1-4 0-6" />
-        <path d="M12 8c0-2 1-4 3-5 0 2 .7 3 2 4" />
-        <path d="M15 12h.01" />
-      </svg>
-    </span>
-  );
+  throw new Error(`Hero final-job army ${armyId} has no validated icon consumer.`);
 }
 
 type HeroJobMovementRowView = {
