@@ -259,10 +259,9 @@ export function HeroCastingLawSection({
       </div>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
-        <h3 className="text-sm font-extrabold text-foreground">전체 슬롯 합계</h3>
-        <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          <RangeSummary title="Lv.1~5" totals={castingLaw.totals.level1to5} />
-          <RangeSummary title="Lv.6~10" totals={castingLaw.totals.level6to10} />
+        <h3 className="text-sm font-extrabold text-foreground">합계 비용</h3>
+        <div className="mt-3">
+          <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
         </div>
       </div>
 
