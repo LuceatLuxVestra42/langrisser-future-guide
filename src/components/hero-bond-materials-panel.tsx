@@ -1,4 +1,4 @@
-import { Coins } from "lucide-react";
+import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 
 type BondMaterial = {
   itemId: number;
@@ -74,7 +74,16 @@ function MaterialBadges({
 function GoldCost({ value }: { value: number }) {
   return (
     <span className="inline-flex items-center gap-1 font-extrabold tabular-nums text-foreground" data-hero-bond-gold-cost={value}>
-      <Coins className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <img
+        src={getSoldierCommonMaterialIconUrl("gold")}
+        alt=""
+        aria-hidden="true"
+        width={24}
+        height={24}
+        loading="lazy"
+        decoding="async"
+        className="h-6 w-6 shrink-0 object-contain"
+      />
       <span>×{formatNumber(value)}</span>
     </span>
   );
