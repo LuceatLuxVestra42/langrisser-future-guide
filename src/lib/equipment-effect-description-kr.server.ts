@@ -43,7 +43,7 @@ const projections = [
 ] as unknown as EffectDescriptionProjection[];
 
 const expectedScopeCounts = {
-  general: { sourceRows: 174, matched: 128, review: 46 },
+  general: { sourceRows: 206, matched: 206, review: 0 },
   exclusive: { sourceRows: 143, matched: 133, review: 10 },
 } as const;
 
@@ -105,8 +105,8 @@ for (const scope of ["general", "exclusive"] as const) {
   }
 }
 
-if (effectDescriptionByEquipmentId.size !== 261) {
-  throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 261.`);
+if (effectDescriptionByEquipmentId.size !== 339) {
+  throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 339.`);
 }
 
 export function localizeEquipmentEffectDescription(
