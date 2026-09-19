@@ -41,9 +41,11 @@ function formatNumber(value: number) {
 function MaterialBadges({
   materials,
   resolveAssetUrl,
+  goldCost,
 }: {
   materials: BondMaterial[];
   resolveAssetUrl: (path: string) => string;
+  goldCost?: number;
 }) {
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -67,6 +69,7 @@ function MaterialBadges({
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
       ))}
+      {goldCost === undefined ? null : <GoldCost value={goldCost} />}
     </div>
   );
 }
@@ -128,9 +131,12 @@ function BondTrack({
               <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
               <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">접기</span>
             </div>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <MaterialBadges materials={profile.total.materials} resolveAssetUrl={resolveAssetUrl} />
-              <GoldCost value={profile.total.gold} />
+            <div className="mt-2">
+              <MaterialBadges
+                materials={profile.total.materials}
+                resolveAssetUrl={resolveAssetUrl}
+                goldCost={profile.total.gold}
+              />
             </div>
           </div>
         </div>
