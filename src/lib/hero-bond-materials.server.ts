@@ -1,4 +1,5 @@
 import artifactRaw from "../../data/generated/hero-bond-level-materials.v1.json";
+import iconAssetsRaw from "../../data/generated/hero-bond-material-icon-assets.v1.json";
 import summaryRaw from "../../data/validation/hero-bond-level-materials-summary.v1.json";
 
 type FrozenMaterial = {
@@ -102,8 +103,44 @@ type Summary = {
   };
 };
 
+type IconAssetManifest = {
+  version: 1;
+  schemaId: "hero-bond-material-icon-assets/v1";
+  status: "FROZEN";
+  completion: "COMPLETE";
+  semanticReopen: false;
+  records: Array<{
+    itemId: number;
+    nameCn: string | null;
+    sourcePath: string;
+    repositoryAsset: {
+      publicPath: string;
+    };
+  }>;
+};
+
 const artifact = artifactRaw as unknown as Artifact;
+const iconAssets = iconAssetsRaw as unknown as IconAssetManifest;
 const summary = summaryRaw as unknown as Summary;
+
+if (
+  iconAssets.version !== 1 ||
+  iconAssets.schemaId !== "hero-bond-material-icon-assets/v1" ||
+  iconAssets.status !== "FROZEN" ||
+  iconAssets.completion !== "COMPLETE" ||
+  iconAssets.semanticReopen !== false ||
+  iconAssets.records.length !== 43
+) {
+  throw new Error("Hero bond material icon asset manifest is not production-ready.");
+}
+
+const iconAssetByItemId = new Map<number, IconAssetManifest["records"][number]>();
+for (const row of iconAssets.records) {
+  if (!Number.isSafeInteger(row.itemId) || row.itemId <= 0 || iconAssetByItemId.has(row.itemId)) {
+    throw new Error(`Hero bond material icon asset identity violation at itemId=${String(row.itemId)}.`);
+  }
+  iconAssetByItemId.set(row.itemId, row);
+}
 
 if (
   artifact.schemaVersion !== 1 ||
@@ -206,10 +243,20 @@ function projectMaterial(material: FrozenMaterial) {
   if (!item) {
     throw new Error(`Hero bond material Item ${material.itemId} is missing from the frozen catalog.`);
   }
+  const iconAsset = iconAssetByItemId.get(material.itemId);
+  if (
+    !iconAsset ||
+    iconAsset.sourcePath !== item.icon ||
+    iconAsset.nameCn !== item.nameCn ||
+    !iconAsset.repositoryAsset.publicPath.startsWith("/images/heroes/bond-materials/")
+  ) {
+    throw new Error(`Hero bond material Item ${material.itemId} icon asset parity mismatch.`);
+  }
   return {
     itemId: material.itemId,
     count: material.count,
     nameCn: item.nameCn ?? `Item ${material.itemId}`,
+    iconPath: iconAsset.repositoryAsset.publicPath,
   };
 }
 
