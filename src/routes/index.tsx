@@ -157,12 +157,12 @@ function HeroSection() {
       className="relative isolate mx-auto w-[calc(100%-2rem)] max-w-[68rem] overflow-hidden sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)]"
       aria-label="히어로 이미지 미리보기"
     >
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-muted" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-muted">
         {failedHeroUrl !== hero.url ? (
           <img
             src={hero.url}
             alt={hero.alt}
+            data-home-hero-image="true"
             loading="eager"
             fetchPriority="high"
             decoding="async"
