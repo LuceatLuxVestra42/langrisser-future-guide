@@ -70,7 +70,6 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
             className="h-7 w-7 shrink-0 object-contain"
             data-casting-law-material-icon={material.itemId}
           />
-          <span className="max-w-[15rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
       ))}
@@ -144,7 +143,6 @@ function LevelTable({
                         className="h-6 w-6 shrink-0 object-contain"
                         data-casting-law-level-material-icon={material.itemId}
                       />
-                      <span>{material.nameCn}</span>
                       <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
                     </span>
                   ))}
@@ -172,15 +170,7 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
       <summary className="cursor-pointer list-none p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-extrabold text-foreground">{slotLabel(slot.slotType)}</h3>
-              <span className="rounded bg-muted px-2 py-1 text-[10px] font-black text-muted-foreground">
-                비용형 {slot.costProfile}
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {slot.templateNameCn ?? `Template ${slot.templateId}`}
-            </p>
+            <h3 className="font-extrabold text-foreground">{slotLabel(slot.slotType)}</h3>
           </div>
           <span className="text-xs font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
           <span className="hidden text-xs font-bold text-muted-foreground group-open:inline">접기</span>
@@ -219,15 +209,7 @@ export function HeroCastingLawSection({
       data-hero-casting-law="true"
       data-casting-law-slot-count={castingLaw.slots.length}
     >
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className="text-lg font-extrabold tracking-tight text-foreground">율정</h2>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            부위별 Lv.1~10 강화 재료와 요구 골드
-          </p>
-        </div>
-        <span className="text-xs font-semibold text-muted-foreground">총 {castingLaw.slots.length}개 슬롯</span>
-      </div>
+      <h2 className="text-lg font-extrabold tracking-tight text-foreground">율정</h2>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
         <h3 className="text-sm font-extrabold text-foreground">전체 슬롯 합계</h3>
