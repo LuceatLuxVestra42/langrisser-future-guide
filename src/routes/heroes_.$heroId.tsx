@@ -752,12 +752,12 @@ function HeroDetailPage() {
                 <thead className="bg-muted/50">
                   <tr className="border-b border-border">
                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                    <HeroStatHeader label="생명" stat="HP" />
-                    <HeroStatHeader label="공격" stat="ATK" />
-                    <HeroStatHeader label="지력" stat="INT" />
-                    <HeroStatHeader label="방어" stat="DEF" />
-                    <HeroStatHeader label="마방" stat="MDEF" />
-                    <HeroStatHeader label="기술" stat="DEX" />
+                    <HeroStatHeader stat="HP" />
+                    <HeroStatHeader stat="ATK" />
+                    <HeroStatHeader stat="INT" />
+                    <HeroStatHeader stat="DEF" />
+                    <HeroStatHeader stat="MDEF" />
+                    <HeroStatHeader stat="DEX" />
                   </tr>
                 </thead>
                 <tbody>
@@ -1184,31 +1184,52 @@ const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Partial<Record<HeroFinalJobStatKey, strin
   MDEF: "Icon_MagicDefense.png",
 };
 
-function HeroStatHeader({ label, stat }: { label: string; stat: HeroFinalJobStatKey }) {
+const HERO_FINAL_JOB_STAT_LABEL_BY_KEY: Record<HeroFinalJobStatKey, string> = {
+  HP: "생명",
+  ATK: "공격",
+  INT: "지력",
+  DEF: "방어",
+  MDEF: "마방",
+  DEX: "기술",
+};
+
+function HeroStatLabel({
+  stat,
+  className,
+}: {
+  stat: HeroFinalJobStatKey;
+  className: string;
+}) {
   const fileName = HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat];
   const iconUrl = fileName
     ? `${import.meta.env.BASE_URL}images/shared/stats/${fileName}`
     : null;
 
   return (
+    <span className={className} data-hero-final-job-stat-label={stat}>
+      {iconUrl ? (
+        <img
+          src={iconUrl}
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          decoding="async"
+          className="h-4 w-4 shrink-0 object-contain"
+        />
+      ) : stat === "INT" ? (
+        <Brain className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
+      ) : (
+        <Crosshair className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
+      )}
+      <span>{HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}</span>
+    </span>
+  );
+}
+
+function HeroStatHeader({ stat }: { stat: HeroFinalJobStatKey }) {
+  return (
     <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground" data-hero-final-job-stat-header={stat}>
-      <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
-        {iconUrl ? (
-          <img
-            src={iconUrl}
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            decoding="async"
-            className="h-4 w-4 shrink-0 object-contain"
-          />
-        ) : stat === "INT" ? (
-          <Brain className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
-        ) : (
-          <Crosshair className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
-        )}
-        <span>{label}</span>
-      </span>
+      <HeroStatLabel stat={stat} className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap" />
     </th>
   );
 }
@@ -1218,20 +1239,22 @@ function getJobStatBarPercent(value: number, domain: JobStatBarDomain) {
   const normalized = (value - domain.min) / (domain.max - domain.min);
   return Math.min(100, Math.max(25, 25 + (75 * normalized)));
 }
-function JobStatCell({ stat, value, domain }: { stat: string; value: number | null; domain: JobStatBarDomain }) {
-  if (value == null) return <td className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground">-</td>;
-  const barPercent = getJobStatBarPercent(value, domain);
+function JobStatCell({ stat, value, domain }: { stat: HeroFinalJobStatKey; value: number | null; domain: JobStatBarDomain }) {
+  const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
   return (
     <td
       className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground"
       data-hero-final-job-stat={stat}
       data-stat-domain-min={domain.min}
       data-stat-domain-max={domain.max}
-      data-stat-bar-percent={barPercent.toFixed(3)}
+      data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
     >
+      <HeroStatLabel stat={stat} className="inline-flex items-center gap-1.5 whitespace-nowrap" />
       <div className="relative min-w-[4.5rem] overflow-hidden rounded-md bg-muted/30 px-2 py-1.5">
-        <div className="absolute inset-y-0 left-0 bg-foreground/10" style={{ width: `${barPercent}%` }} aria-hidden="true" />
-        <span className="relative z-10">{value}</span>
+        {value == null ? null : (
+          <div className="absolute inset-y-0 left-0 bg-foreground/10" style={{ width: `${barPercent}%` }} aria-hidden="true" />
+        )}
+        <span className="relative z-10">{value ?? "-"}</span>
       </div>
     </td>
   );
