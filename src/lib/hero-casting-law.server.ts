@@ -1,5 +1,6 @@
 import byHeroRaw from "../../data/generated/hero-casting-law-by-hero.v1.json";
 import catalogRaw from "../../data/generated/hero-casting-law-materials.v1.json";
+import iconAssetsRaw from "../../data/generated/hero-casting-law-material-icon-assets.v1.json";
 
 type CostProfile = "A" | "B" | "C";
 
@@ -56,6 +57,7 @@ type CatalogMaterial = {
   item: {
     itemId: number;
     nameCn: string;
+    icon: string | null;
   };
 };
 
@@ -84,8 +86,42 @@ type CatalogArtifact = {
   templates: CatalogTemplate[];
 };
 
+type CastingLawIconAssetRecord = {
+  itemId: number;
+  nameCn: string;
+  rank: number | null;
+  sourcePath: string;
+  asset: {
+    repository: "redpanda7301/langrisser";
+    commit: string;
+    path: string;
+    fileName: string;
+    gitBlobSha: string;
+    bytes: number;
+    url: string;
+  };
+};
+
+type CastingLawIconAssetArtifact = {
+  version: 1;
+  schemaId: "hero-casting-law-material-icon-assets/v1";
+  status: "FROZEN";
+  completion: "COMPLETE";
+  semanticReopen: false;
+  summary: {
+    targetCount: number;
+    resolvedCount: number;
+    unresolvedCount: number;
+    uniqueItemIdCount: number;
+    uniqueSourcePathCount: number;
+    uniqueAssetUrlCount: number;
+  };
+  records: CastingLawIconAssetRecord[];
+};
+
 const byHero = byHeroRaw as unknown as ByHeroArtifact;
 const catalog = catalogRaw as unknown as CatalogArtifact;
+const iconAssets = iconAssetsRaw as unknown as CastingLawIconAssetArtifact;
 
 if (
   byHero.version !== 1 ||
@@ -109,6 +145,19 @@ if (
   catalog.templates.length !== 50
 ) {
   throw new Error("Casting Law material catalog is not production-ready.");
+}
+if (
+  iconAssets.version !== 1 ||
+  iconAssets.schemaId !== "hero-casting-law-material-icon-assets/v1" ||
+  iconAssets.status !== "FROZEN" ||
+  iconAssets.completion !== "COMPLETE" ||
+  iconAssets.semanticReopen !== false ||
+  iconAssets.summary.targetCount !== 45 ||
+  iconAssets.summary.resolvedCount !== 45 ||
+  iconAssets.summary.unresolvedCount !== 0 ||
+  iconAssets.records.length !== 45
+) {
+  throw new Error("Casting Law material icon asset map is not production-ready.");
 }
 
 const heroById = new Map<number, FrozenHero>();
@@ -135,10 +184,37 @@ for (const template of catalog.templates) {
   templateById.set(template.templateId, template);
 }
 
-function materialNameById(template: CatalogTemplate, itemId: number) {
+const iconAssetByItemId = new Map<number, CastingLawIconAssetRecord>();
+for (const record of iconAssets.records) {
+  if (!Number.isSafeInteger(record.itemId) || record.itemId <= 0 || iconAssetByItemId.has(record.itemId)) {
+    throw new Error(`Casting Law icon asset identity violation at itemId=${String(record.itemId)}.`);
+  }
+  if (!record.sourcePath || !record.asset?.url || !record.asset?.gitBlobSha) {
+    throw new Error(`Casting Law icon asset provenance missing at itemId=${record.itemId}.`);
+  }
+  iconAssetByItemId.set(record.itemId, record);
+}
+
+for (const template of catalog.templates) {
   for (const level of template.levels) {
     for (const material of level.materials) {
-      if (material.id === itemId) return material.item.nameCn;
+      const asset = iconAssetByItemId.get(material.item.itemId);
+      if (!asset || asset.sourcePath !== material.item.icon || asset.nameCn !== material.item.nameCn) {
+        throw new Error(`Casting Law icon asset/catalog parity mismatch at itemId=${material.item.itemId}.`);
+      }
+    }
+  }
+}
+
+function materialPresentationById(template: CatalogTemplate, itemId: number) {
+  for (const level of template.levels) {
+    for (const material of level.materials) {
+      if (material.id !== itemId) continue;
+      const asset = iconAssetByItemId.get(itemId);
+      if (!asset || asset.sourcePath !== material.item.icon) {
+        throw new Error(`Casting Law template ${template.templateId} cannot resolve icon asset for Item ${itemId}.`);
+      }
+      return { nameCn: material.item.nameCn, iconUrl: asset.asset.url };
     }
   }
   throw new Error(`Casting Law template ${template.templateId} cannot resolve material Item ${itemId}.`);
@@ -147,11 +223,15 @@ function materialNameById(template: CatalogTemplate, itemId: number) {
 function projectRange(template: CatalogTemplate, range: RangeTotals) {
   return {
     gold: range.gold,
-    materials: range.materials.map((material) => ({
-      itemId: material.itemId,
-      count: material.count,
-      nameCn: materialNameById(template, material.itemId),
-    })),
+    materials: range.materials.map((material) => {
+      const presentation = materialPresentationById(template, material.itemId);
+      return {
+        itemId: material.itemId,
+        count: material.count,
+        nameCn: presentation.nameCn,
+        iconUrl: presentation.iconUrl,
+      };
+    }),
   };
 }
 
@@ -179,35 +259,47 @@ export function readHeroCastingLawPresentation(heroId: number) {
         level: level.level,
         levelInfoId: level.levelInfoId,
         goldCost: level.goldCost,
-        materials: level.materials.map((material) => ({
-          itemId: material.id,
-          count: material.count,
-          nameCn: material.item.nameCn,
-        })),
+        materials: level.materials.map((material) => {
+          const asset = iconAssetByItemId.get(material.id);
+          if (!asset || asset.sourcePath !== material.item.icon) {
+            throw new Error(`Casting Law level material icon parity mismatch at Item ${material.id}.`);
+          }
+          return {
+            itemId: material.id,
+            count: material.count,
+            nameCn: material.item.nameCn,
+            iconUrl: asset.asset.url,
+          };
+        }),
       })),
     };
   });
 
-  const aggregateNames = new Map<number, string>();
+  const aggregatePresentation = new Map<number, { nameCn: string; iconUrl: string }>();
   for (const slot of slots) {
     for (const level of slot.levels) {
       for (const material of level.materials) {
-        const existing = aggregateNames.get(material.itemId);
-        if (existing && existing !== material.nameCn) {
-          throw new Error(`Hero ${heroId} Casting Law material ${material.itemId} has conflicting names.`);
+        const existing = aggregatePresentation.get(material.itemId);
+        if (existing && (existing.nameCn !== material.nameCn || existing.iconUrl !== material.iconUrl)) {
+          throw new Error(`Hero ${heroId} Casting Law material ${material.itemId} has conflicting presentation data.`);
         }
-        aggregateNames.set(material.itemId, material.nameCn);
+        aggregatePresentation.set(material.itemId, { nameCn: material.nameCn, iconUrl: material.iconUrl });
       }
     }
   }
   const projectAggregate = (range: RangeTotals) => ({
     gold: range.gold,
     materials: range.materials.map((material) => {
-      const nameCn = aggregateNames.get(material.itemId);
-      if (!nameCn) {
+      const presentation = aggregatePresentation.get(material.itemId);
+      if (!presentation) {
         throw new Error(`Hero ${heroId} cannot resolve aggregate Casting Law material ${material.itemId}.`);
       }
-      return { itemId: material.itemId, count: material.count, nameCn };
+      return {
+        itemId: material.itemId,
+        count: material.count,
+        nameCn: presentation.nameCn,
+        iconUrl: presentation.iconUrl,
+      };
     }),
   });
 
