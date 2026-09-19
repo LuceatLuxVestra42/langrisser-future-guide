@@ -77,6 +77,22 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       source: { type: "legacy-korean-sheet", heroIds: [6], note: "Migrated from the Leon-only Stage 5 presentation overlay." },
     },
     {
+      skillId: 10208,
+      sourceNameCn: "斩阳",
+      nameKr: "태양 베기",
+      descKr: "단일 적 부대를 공격해 1.5배의 피해를 준다. 전투 후 가한 피해량의 30%만큼 생명을 회복한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [10], note: "Legacy Korean sheet Hero page for 레딘; cross-checked against current generated Skill 10208 ID/CN/effect." },
+    },
+    {
+      skillId: 10809,
+      sourceNameCn: "审判",
+      nameKr: "심판",
+      descKr: "단일 적 부대를 공격해 1.2배의 피해를 준다. 전투 진입 전 자신 부대의 방어, 마방 +30%, 2턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [10], note: "Legacy Korean sheet Hero page for 레딘; cross-checked against current generated Skill 10809 ID/CN/effect." },
+    },
+    {
       skillId: 10705,
       sourceNameCn: "冰冻",
       nameKr: "빙결",
