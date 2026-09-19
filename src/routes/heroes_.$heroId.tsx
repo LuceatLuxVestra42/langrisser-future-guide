@@ -134,15 +134,18 @@ type MatthewVariant = "cavalry" | "flying" | "archer" | "assassin";
 
 const MATTHEW_HERO_ID = 1;
 const MATTHEW_FIXED_FINAL_JOB_ID = 206;
+const MATTHEW_COMMON_JOB_CONNECTION_IDS = [10, 11] as const;
+const MATTHEW_FIXED_JOB_CONNECTION_IDS = [13, 18] as const;
 const MATTHEW_VARIANTS: ReadonlyArray<{
   id: MatthewVariant;
   label: string;
   finalJobId: number;
+  jobConnectionIds: readonly number[];
 }> = [
-  { id: "cavalry", label: "기병매튜", finalJobId: 307 },
-  { id: "flying", label: "비병매튜", finalJobId: 405 },
-  { id: "archer", label: "궁병매튜", finalJobId: 604 },
-  { id: "assassin", label: "암살매튜", finalJobId: 1104 },
+  { id: "cavalry", label: "기병매튜", finalJobId: 307, jobConnectionIds: [12, 17] },
+  { id: "flying", label: "비병매튜", finalJobId: 405, jobConnectionIds: [14, 19] },
+  { id: "archer", label: "궁병매튜", finalJobId: 604, jobConnectionIds: [16, 21] },
+  { id: "assassin", label: "암살매튜", finalJobId: 1104, jobConnectionIds: [15, 20] },
 ];
 
 const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
@@ -210,9 +213,20 @@ function HeroDetailPage() {
   }, [hero.heroId]);
   const isSpForm = hasSpForm && formMode === "sp";
   const isMatthew = hero.heroId === MATTHEW_HERO_ID;
-  const selectedMatthewVariantFinalJobId = MATTHEW_VARIANTS.find(
+  const selectedMatthewVariant = MATTHEW_VARIANTS.find(
     (variant) => variant.id === matthewVariant,
-  )?.finalJobId ?? 307;
+  ) ?? MATTHEW_VARIANTS[0];
+  const selectedMatthewVariantFinalJobId = selectedMatthewVariant.finalJobId;
+  const selectedMatthewJobConnectionIds = isMatthew && !isSpForm
+    ? [
+        ...MATTHEW_COMMON_JOB_CONNECTION_IDS,
+        ...MATTHEW_FIXED_JOB_CONNECTION_IDS,
+        ...selectedMatthewVariant.jobConnectionIds,
+      ]
+    : undefined;
+  const selectedMatthewJobConnectionIdSet = selectedMatthewJobConnectionIds
+    ? new Set(selectedMatthewJobConnectionIds)
+    : null;
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const displayRarityLabel = isSpForm ? "SP" : hero.rarity.baseLabel;
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[displayRarityLabel] ?? null;
@@ -338,6 +352,12 @@ function HeroDetailPage() {
   const equipableSkillById = new Map<number, SkillView>();
   for (const skill of detail.skills.heroDirectSkills) equipableSkillById.set(skill.skillId, skill);
   for (const row of detail.skills.jobLevelAcquisitions) {
+    if (
+      selectedMatthewJobConnectionIdSet &&
+      !selectedMatthewJobConnectionIdSet.has(row.jobConnectionId)
+    ) {
+      continue;
+    }
     if (!equipableSkillById.has(row.skillId)) equipableSkillById.set(row.skillId, row.skill);
   }
   const equipableSkills = [...equipableSkillById.values()];
@@ -668,7 +688,11 @@ function HeroDetailPage() {
           ) : null}
         </section>
 
-        <HeroJobMaterialsSection heroId={hero.heroId} mode={isSpForm ? "sp" : "normal"} />
+        <HeroJobMaterialsSection
+          heroId={hero.heroId}
+          mode={isSpForm ? "sp" : "normal"}
+          allowedJobConnectionIds={selectedMatthewJobConnectionIds}
+        />
         <HeroAwakeningMaterialsSection heroId={hero.heroId} />
         <HeroCastingLawSection castingLaw={castingLaw} />
 
