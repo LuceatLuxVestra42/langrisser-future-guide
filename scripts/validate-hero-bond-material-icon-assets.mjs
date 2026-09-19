@@ -9,7 +9,7 @@ const EXPECTED_COUNT = 43;
 const EXPECTED_FOLDER_ID = "1fVm9JVJlOiswiTezoRWFJQmUZWof8db8";
 const readJson = (p) => JSON.parse(fs.readFileSync(p, "utf8"));
 const fail = (m) => { throw new Error(m); };
-const gitBlobSha = (bytes) => crypto.createHash("sha1").update(Buffer.from(`blob ${bytes.length}\\0`)).update(bytes).digest("hex");
+const gitBlobSha = (bytes) => crypto.createHash("sha1").update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest("hex");
 const catalog = readJson(CATALOG_PATH);
 const manifest = readJson(MANIFEST_PATH);
 const summary = readJson(SUMMARY_PATH);
