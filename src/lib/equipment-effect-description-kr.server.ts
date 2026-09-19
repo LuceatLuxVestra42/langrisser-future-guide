@@ -44,7 +44,7 @@ const projections = [
 
 const expectedScopeCounts = {
   general: { sourceRows: 206, matched: 206, review: 0 },
-  exclusive: { sourceRows: 143, matched: 133, review: 10 },
+  exclusive: { sourceRows: 167, matched: 167, review: 0 },
 } as const;
 
 const effectDescriptionByEquipmentId = new Map<number, string>();
@@ -105,7 +105,7 @@ for (const scope of ["general", "exclusive"] as const) {
   }
 }
 
-if (effectDescriptionByEquipmentId.size !== 339) {
+if (effectDescriptionByEquipmentId.size !== 373) {
   throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 339.`);
 }
 
