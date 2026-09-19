@@ -105,6 +105,61 @@ type Summary = {
 const artifact = artifactRaw as unknown as Artifact;
 const summary = summaryRaw as unknown as Summary;
 
+type BondMaterialIconPresentation = {
+  sourcePath: string;
+  iconUrl: string;
+};
+
+const BOND_MATERIAL_ICON_BY_ITEM_ID = new Map<number, BondMaterialIconPresentation>([
+  [3200, { sourcePath: "UI/Icon/Item_ABS/FetterMaterial01.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/FetterMaterial01.png" }],
+  [3201, { sourcePath: "UI/Icon/Item_ABS/FetterMaterial02.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/FetterMaterial02.png" }],
+  [3202, { sourcePath: "UI/Icon/Item_ABS/FetterMaterial03.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/FetterMaterial03.png" }],
+  [3203, { sourcePath: "UI/Icon/Item_ABS/FetterMaterial04.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/FetterMaterial04.png" }],
+  [3204, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed1.png" }],
+  [3205, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed2.png" }],
+  [3206, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed3.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed3.png" }],
+  [3207, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed4.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed4.png" }],
+  [3208, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed5.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed5.png" }],
+  [3209, { sourcePath: "UI/Icon/Item_ABS/Heart_Seed6.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Seed6.png" }],
+  [3210, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem1.png" }],
+  [3211, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem2.png" }],
+  [3212, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem3.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem3.png" }],
+  [3213, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem4.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem4.png" }],
+  [3214, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem5.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem5.png" }],
+  [3215, { sourcePath: "UI/Icon/Item_ABS/Heart_Gem6.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Gem6.png" }],
+  [3216, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower1.png" }],
+  [3217, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower2.png" }],
+  [3218, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower3.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower3.png" }],
+  [3219, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower4.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower4.png" }],
+  [3220, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower5.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower5.png" }],
+  [3221, { sourcePath: "UI/Icon/Item_ABS/Heart_Flower6.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Flower6.png" }],
+  [3222, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather1.png" }],
+  [3223, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather2.png" }],
+  [3224, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather3.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather3.png" }],
+  [3225, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather4.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather4.png" }],
+  [3226, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather5.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather5.png" }],
+  [3227, { sourcePath: "UI/Icon/Item_ABS/Heart_Feather6.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Feather6.png" }],
+  [3228, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf1.png" }],
+  [3229, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf2.png" }],
+  [3230, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf3.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf3.png" }],
+  [3231, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf4.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf4.png" }],
+  [3232, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf5.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf5.png" }],
+  [3233, { sourcePath: "UI/Icon/Item_ABS/Heart_Elf6.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Elf6.png" }],
+  [3234, { sourcePath: "UI/Icon/Item_ABS/Heart_Fire1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Fire1.png" }],
+  [3235, { sourcePath: "UI/Icon/Item_ABS/Heart_Water1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Water1.png" }],
+  [3236, { sourcePath: "UI/Icon/Item_ABS/Heart_Wind1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Wind1.png" }],
+  [3237, { sourcePath: "UI/Icon/Item_ABS/Heart_Earth1.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Earth1.png" }],
+  [3238, { sourcePath: "UI/Icon/Item_ABS/Heart_Fire2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Fire2.png" }],
+  [3239, { sourcePath: "UI/Icon/Item_ABS/Heart_Water2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Water2.png" }],
+  [3240, { sourcePath: "UI/Icon/Item_ABS/Heart_Wind2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Wind2.png" }],
+  [3241, { sourcePath: "UI/Icon/Item_ABS/Heart_Earth2.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Earth2.png" }],
+  [3246, { sourcePath: "UI/Icon/Item_ABS/Heart_Core.png", iconUrl: "https://langrisser.fandom.com/wiki/Special:Redirect/file/Heart_Core.png" }],
+]);
+
+if (BOND_MATERIAL_ICON_BY_ITEM_ID.size !== 43) {
+  throw new Error("Hero bond material icon presentation coverage drift.");
+}
+
 if (
   artifact.schemaVersion !== 1 ||
   artifact.stage !== "hero-bond-level-materials-v1" ||
@@ -206,10 +261,15 @@ function projectMaterial(material: FrozenMaterial) {
   if (!item) {
     throw new Error(`Hero bond material Item ${material.itemId} is missing from the frozen catalog.`);
   }
+  const iconPresentation = BOND_MATERIAL_ICON_BY_ITEM_ID.get(material.itemId);
+  if (!iconPresentation || iconPresentation.sourcePath !== item.icon) {
+    throw new Error(`Hero bond material Item ${material.itemId} icon presentation parity mismatch.`);
+  }
   return {
     itemId: material.itemId,
     count: material.count,
     nameCn: item.nameCn ?? `Item ${material.itemId}`,
+    iconUrl: iconPresentation.iconUrl,
   };
 }
 
