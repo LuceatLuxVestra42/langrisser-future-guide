@@ -1,0 +1,45 @@
+name: Hero Casting Law Material Icons
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/hero-casting-law-material-icons.yml'
+      - 'data/manifests/hero-casting-law-material-icons.v1.json'
+      - 'data/generated/hero-casting-law-materials.v1.json'
+      - 'public/images/heroes/casting-law-material-icons.svg'
+      - 'public/images/heroes/casting-law-material-icons.svg'
+      - 'scripts/validate_hero_casting_law_material_icons.cjs'
+      - 'src/lib/hero-casting-law-material-icon-assets.ts'
+      - 'src/lib/hero-casting-law.server.ts'
+      - 'src/components/hero-casting-law-section.tsx'
+  push:
+    branches:
+      - 'feat/hero-casting-law-icons-*'
+    paths:
+      - '.github/workflows/hero-casting-law-material-icons.yml'
+      - 'data/manifests/hero-casting-law-material-icons.v1.json'
+      - 'data/generated/hero-casting-law-materials.v1.json'
+      - 'scripts/validate_hero_casting_law_material_icons.cjs'
+      - 'src/lib/hero-casting-law-material-icon-assets.ts'
+      - 'src/lib/hero-casting-law.server.ts'
+      - 'src/components/hero-casting-law-section.tsx'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Validate exact item-to-icon mapping
+        run: node scripts/validate_hero_casting_law_material_icons.cjs
+
+      - name: Reject whitespace errors
+        run: git diff --check

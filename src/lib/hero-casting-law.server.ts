@@ -1,5 +1,9 @@
 import byHeroRaw from "../../data/generated/hero-casting-law-by-hero.v1.json";
 import catalogRaw from "../../data/generated/hero-casting-law-materials.v1.json";
+import {
+  getHeroCastingLawMaterialIconPublicPath,
+  getHeroCastingLawMaterialIconSymbolId,
+} from "./hero-casting-law-material-icon-assets";
 
 type CostProfile = "A" | "B" | "C";
 
@@ -56,6 +60,7 @@ type CatalogMaterial = {
   item: {
     itemId: number;
     nameCn: string;
+    icon: string | null;
   };
 };
 
@@ -135,10 +140,21 @@ for (const template of catalog.templates) {
   templateById.set(template.templateId, template);
 }
 
-function materialNameById(template: CatalogTemplate, itemId: number) {
+function materialPresentationById(template: CatalogTemplate, itemId: number) {
   for (const level of template.levels) {
     for (const material of level.materials) {
-      if (material.id === itemId) return material.item.nameCn;
+      if (material.id !== itemId) continue;
+      const iconSymbolId = getHeroCastingLawMaterialIconSymbolId(material.id, material.item.icon);
+      if (!iconSymbolId) {
+        throw new Error(
+          `Casting Law material ${material.id} has no verified icon mapping for sourcePath=${String(material.item.icon)}.`,
+        );
+      }
+      return {
+        nameCn: material.item.nameCn,
+        sourceIconPath: material.item.icon,
+        iconSymbolId,
+      };
     }
   }
   throw new Error(`Casting Law template ${template.templateId} cannot resolve material Item ${itemId}.`);
@@ -150,7 +166,7 @@ function projectRange(template: CatalogTemplate, range: RangeTotals) {
     materials: range.materials.map((material) => ({
       itemId: material.itemId,
       count: material.count,
-      nameCn: materialNameById(template, material.itemId),
+      ...materialPresentationById(template, material.itemId),
     })),
   };
 }
@@ -179,40 +195,56 @@ export function readHeroCastingLawPresentation(heroId: number) {
         level: level.level,
         levelInfoId: level.levelInfoId,
         goldCost: level.goldCost,
-        materials: level.materials.map((material) => ({
-          itemId: material.id,
-          count: material.count,
-          nameCn: material.item.nameCn,
-        })),
+        materials: level.materials.map((material) => {
+          const iconSymbolId = getHeroCastingLawMaterialIconSymbolId(material.id, material.item.icon);
+          if (!iconSymbolId) {
+            throw new Error(
+              `Casting Law material ${material.id} has no verified icon mapping for sourcePath=${String(material.item.icon)}.`,
+            );
+          }
+          return {
+            itemId: material.id,
+            count: material.count,
+            nameCn: material.item.nameCn,
+            sourceIconPath: material.item.icon,
+            iconSymbolId,
+          };
+        }),
       })),
     };
   });
 
-  const aggregateNames = new Map<number, string>();
+  const aggregatePresentation = new Map<number, { nameCn: string; sourceIconPath: string | null; iconSymbolId: string }>();
   for (const slot of slots) {
     for (const level of slot.levels) {
       for (const material of level.materials) {
-        const existing = aggregateNames.get(material.itemId);
-        if (existing && existing !== material.nameCn) {
-          throw new Error(`Hero ${heroId} Casting Law material ${material.itemId} has conflicting names.`);
+        const existing = aggregatePresentation.get(material.itemId);
+        const next = {
+          nameCn: material.nameCn,
+          sourceIconPath: material.sourceIconPath,
+          iconSymbolId: material.iconSymbolId,
+        };
+        if (existing && JSON.stringify(existing) !== JSON.stringify(next)) {
+          throw new Error(`Hero ${heroId} Casting Law material ${material.itemId} has conflicting presentation metadata.`);
         }
-        aggregateNames.set(material.itemId, material.nameCn);
+        aggregatePresentation.set(material.itemId, next);
       }
     }
   }
   const projectAggregate = (range: RangeTotals) => ({
     gold: range.gold,
     materials: range.materials.map((material) => {
-      const nameCn = aggregateNames.get(material.itemId);
-      if (!nameCn) {
+      const presentation = aggregatePresentation.get(material.itemId);
+      if (!presentation) {
         throw new Error(`Hero ${heroId} cannot resolve aggregate Casting Law material ${material.itemId}.`);
       }
-      return { itemId: material.itemId, count: material.count, nameCn };
+      return { itemId: material.itemId, count: material.count, ...presentation };
     }),
   });
 
   return {
     heroId,
+    iconSpritePublicPath: getHeroCastingLawMaterialIconPublicPath(),
     slots,
     totals: {
       level1to5: projectAggregate(hero.totals.level1to5),
