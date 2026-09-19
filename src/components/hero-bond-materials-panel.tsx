@@ -2,6 +2,7 @@ type BondMaterial = {
   itemId: number;
   count: number;
   nameCn: string;
+  iconPath: string;
 };
 
 type BondCostProfile = {
@@ -35,7 +36,13 @@ function formatNumber(value: number) {
   return value.toLocaleString("ko-KR");
 }
 
-function MaterialBadges({ materials }: { materials: BondMaterial[] }) {
+function MaterialBadges({
+  materials,
+  resolveAssetUrl,
+}: {
+  materials: BondMaterial[];
+  resolveAssetUrl: (path: string) => string;
+}) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {materials.map((material) => (
@@ -44,6 +51,17 @@ function MaterialBadges({ materials }: { materials: BondMaterial[] }) {
           className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
           data-hero-bond-material-id={material.itemId}
         >
+          <img
+            src={resolveAssetUrl(material.iconPath)}
+            alt=""
+            aria-hidden="true"
+            width={24}
+            height={24}
+            loading="lazy"
+            decoding="async"
+            className="h-6 w-6 shrink-0 object-contain"
+            data-hero-bond-material-icon={material.itemId}
+          />
           <span className="max-w-[14rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
@@ -57,11 +75,13 @@ function BondTrack({
   sourceName,
   profile,
   iconUrl,
+  resolveAssetUrl,
 }: {
   label: string;
   sourceName: string | null;
   profile: BondCostProfile;
   iconUrl?: string | null;
+  resolveAssetUrl: (path: string) => string;
 }) {
   return (
     <details
@@ -93,7 +113,7 @@ function BondTrack({
               <span className="font-bold tabular-nums">Lv.2~10 골드 {formatNumber(profile.total.gold)}</span>
             </div>
             <div className="mt-2">
-              <MaterialBadges materials={profile.total.materials} />
+              <MaterialBadges materials={profile.total.materials} resolveAssetUrl={resolveAssetUrl} />
             </div>
           </div>
         </div>
@@ -116,7 +136,7 @@ function BondTrack({
                     Lv.{level.targetLevel}
                   </th>
                   <td className="px-3 py-2.5">
-                    <MaterialBadges materials={level.materials} />
+                    <MaterialBadges materials={level.materials} resolveAssetUrl={resolveAssetUrl} />
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-right font-bold tabular-nums text-foreground">
                     {formatNumber(level.goldCost)}
@@ -155,12 +175,14 @@ export function HeroBondMaterialsPanel({
             sourceName={fetter.nameCn}
             profile={fetter}
             iconUrl={resolveAssetUrl(`/images/fetter/Fetter${fetter.displayOrder}.png`)}
+            resolveAssetUrl={resolveAssetUrl}
           />
         ))}
         <BondTrack
           label="마음의 유대"
           sourceName={materials.heartFetter.nameCn}
           profile={materials.heartFetter}
+          resolveAssetUrl={resolveAssetUrl}
         />
       </div>
     </div>
