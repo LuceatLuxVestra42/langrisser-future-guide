@@ -3,44 +3,40 @@
   "contract": "hero-casting-law-material-icons",
   "owner": "asset",
   "status": "ACTIVE",
-  "purpose": "Materialize the 45 distinct Hero Casting Law material icons from the official installer by exact ConfigDataItemInfo.Icon sourcePath and expose a frozen itemId/sourcePath/publicPath asset manifest for the Hero detail frontend.",
+  "purpose": "Freeze an explicit 45-item Casting Law material icon presentation map from canonical ConfigData itemId/icon sourcePath to the legacy Korean sheet's matching CastFigure asset snapshot, pinned by repository commit/blob SHA. This mapping is presentation-only and does not alter semantic material identity.",
   "upstream": [
-    "data/generated/hero-casting-law-materials.v1.json",
-    "data/generated/hero-awakening-icon-official-package-inventory.v1.json"
+    "data/generated/hero-casting-law-materials.v1.json"
   ],
   "authority": {
     "semanticItemIdentity": "data/generated/hero-casting-law-materials.v1.json item.itemId",
-    "iconLocator": "data/generated/hero-casting-law-materials.v1.json item.icon",
-    "binarySource": "official installer package inventory",
-    "relation": "itemId -> exact ConfigData item.icon sourcePath -> exact normalized Unity runtime container path"
+    "canonicalIconLocator": "data/generated/hero-casting-law-materials.v1.json item.icon",
+    "presentationAssetSnapshot": "redpanda7301/langrisser@2993e19ff392212f76b7ce006a6314ec0f10de4d img/item/CastFigure",
+    "relation": "45 explicit frozen records keyed by canonical itemId and exact ConfigData sourcePath; each external asset is pinned by Git blob SHA and immutable commit URL"
   },
   "expected": {
     "distinctItemCount": 45,
-    "sourceFolder": "UI/Icon/Item04_ABS",
-    "bundleBasename": "ui_icon_item04_abs.b",
     "missingCount": 0,
+    "duplicateItemIdCount": 0,
     "duplicateSourcePathCount": 0,
-    "publicPathCollisionCount": 0
+    "duplicateAssetUrlCount": 0
   },
   "forbidden": [
     "name JOIN",
-    "filename similarity",
-    "basename-only runtime matching",
+    "runtime filename derivation",
     "ID arithmetic",
-    "external wiki image substitution",
-    "screen-order matching"
+    "screen-order matching",
+    "semantic relation changes"
   ],
   "outputs": {
     "manifest": "data/generated/hero-casting-law-material-icon-assets.v1.json",
-    "validation": "data/validation/hero-casting-law-material-icon-assets-summary.v1.json",
-    "publicRoot": "public/images/heroes/casting-law-material-icons"
+    "validation": "data/validation/hero-casting-law-material-icon-assets-summary.v1.json"
   },
-  "producer": "scripts/materialize-hero-casting-law-material-icons.py",
-  "completionRule": "45/45 exact sourcePath Sprite matches, 45 unique public PNG files, manifest FROZEN/COMPLETE, validator PASS, zero unexpected mutation.",
+  "producer": "one-time explicit inventory freeze from current canonical catalog plus pinned legacy CastFigure inventory",
+  "completionRule": "45 explicit itemId/sourcePath asset records, zero unresolved canonical items, frozen external commit/blob provenance, validator PASS, frontend image rendering, Build/Hosted/Browser gates as applicable.",
   "execution": {
     "mode": "remote-only",
     "featureBranch": "feat/hero-casting-law-material-icons-20260919",
-    "expectedBaseHead": "9d31a7243f04409d4ddb098982a40199a1cdf3bf",
-    "materializationTrigger": "feature-branch push"
-  }
+    "expectedBaseHead": "9d31a7243f04409d4ddb098982a40199a1cdf3bf"
+  },
+  "validator": "scripts/validate-hero-casting-law-material-icon-assets.mjs"
 }
