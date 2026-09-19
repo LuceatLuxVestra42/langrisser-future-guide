@@ -386,7 +386,7 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-[minmax(0,3fr)_minmax(280px,1fr)]">
+          <div className="grid grid-cols-[minmax(0,3fr)_minmax(250px,1fr)]">
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual && failedVisualSrc !== activeVisual.src ? (
@@ -428,7 +428,7 @@ function HeroDetailPage() {
               ) : null}
             </div>
 
-            <div className="flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:p-10">
+            <div className="flex min-w-0 flex-col justify-center p-4 sm:p-5 lg:p-8">
               {rarityIconPath ? (
                 <img
                   src={resolvePublicAssetUrl(rarityIconPath)}
@@ -441,7 +441,7 @@ function HeroDetailPage() {
               ) : (
                 <p className="mb-2 text-sm font-black tracking-[0.16em] text-muted-foreground">{displayRarityLabel}</p>
               )}
-              <h1 className="text-4xl font-bold tracking-tight text-foreground [word-break:keep-all] [overflow-wrap:break-word] sm:text-5xl">{displayName}</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground [word-break:keep-all] [overflow-wrap:break-word] sm:text-4xl lg:text-5xl">{displayName}</h1>
               <div className="mt-3 space-y-0.5 text-sm text-muted-foreground">
                 <p>{hero.identity.nameCn}</p>
                 {hero.identity.nameEn ? <p>{hero.identity.nameEn}</p> : null}
