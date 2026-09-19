@@ -531,7 +531,7 @@ function HeroDetailPage() {
           data-hero-soldier-cards="true"
         >
           <SectionTitle title="사용 가능 용병" />
-          <div className="mt-4 grid grid-cols-6 gap-1.5 md:grid-cols-8 md:gap-2" data-hero-soldier-card-grid="true">
+          <div className="mt-4 grid grid-cols-6 gap-1.5 lg:grid-cols-8 lg:gap-2" data-hero-soldier-card-grid="true">
             {soldierCards.map((record) => (
               <div
                 key={record.soldierId}
