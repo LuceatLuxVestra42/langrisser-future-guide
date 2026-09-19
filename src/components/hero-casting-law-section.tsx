@@ -52,6 +52,19 @@ function slotLabel(slotType: string) {
   return slotType;
 }
 
+function summaryToneClass(slotType: string) {
+  if (slotType.startsWith("WEAPON_")) {
+    return "border-red-500/60 bg-red-500/25";
+  }
+  if (slotType === "ARMOR") {
+    return "border-green-500/60 bg-green-500/25";
+  }
+  if (slotType === "HEAD") {
+    return "border-blue-500/60 bg-blue-500/25";
+  }
+  return "border-border bg-background";
+}
+
 function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -214,26 +227,33 @@ export function HeroCastingLawSection({
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-summary="true">
         <h3 className="text-sm font-extrabold text-foreground">요구 문양재료</h3>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-start gap-3">
           {castingLaw.slots
             .filter((slot) => slot.summaryIcon !== null)
             .map((slot) => (
-              <span
+              <div
                 key={`summary-${slot.sourceIndex}-${slot.templateId}`}
-                className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-background"
-                title={slot.summaryIcon?.labelKr}
+                className="flex w-16 flex-col items-center gap-1.5"
                 data-casting-law-summary-template-id={slot.templateId}
               >
-                <img
-                  src={slot.summaryIcon?.iconUrl}
-                  alt={slot.summaryIcon?.labelKr ?? ""}
-                  width={40}
-                  height={40}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-10 w-10 object-contain"
-                />
-              </span>
+                <span
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-lg border ${summaryToneClass(slot.slotType)}`}
+                  title={slot.summaryIcon?.labelKr}
+                >
+                  <img
+                    src={slot.summaryIcon?.iconUrl}
+                    alt={slot.summaryIcon?.labelKr ?? ""}
+                    width={40}
+                    height={40}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-10 w-10 object-contain"
+                  />
+                </span>
+                <span className="w-full text-center text-[11px] font-bold leading-tight text-foreground">
+                  {slot.summaryIcon?.labelKr}
+                </span>
+              </div>
             ))}
         </div>
       </div>
