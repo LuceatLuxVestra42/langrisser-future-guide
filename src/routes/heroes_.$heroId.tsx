@@ -574,7 +574,7 @@ function HeroDetailPage() {
               <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch gap-2 sm:gap-3">
                 <button
                   type="button"
-                  aria-label={previousTalentRow ? `${previousTalentRow.star}성 고유기 보기` : "낮은 성급 고유기 없음"}
+                  aria-label="낮은 성급 고유기 보기"
                   onClick={() => moveTalent(-1)}
                   disabled={!previousTalentRow}
                   className="group flex w-14 flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
@@ -607,7 +607,7 @@ function HeroDetailPage() {
                 </article>
                 <button
                   type="button"
-                  aria-label={nextTalentRow ? `${nextTalentRow.star}성 고유기 보기` : "높은 성급 고유기 없음"}
+                  aria-label="높은 성급 고유기 보기"
                   onClick={() => moveTalent(1)}
                   disabled={!nextTalentRow}
                   className="group flex w-14 flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
