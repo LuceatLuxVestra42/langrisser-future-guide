@@ -106,7 +106,7 @@ for (const scope of ["general", "exclusive"] as const) {
 }
 
 if (effectDescriptionByEquipmentId.size !== 373) {
-  throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 339.`);
+  throw new Error(`Equipment KR effect total matched count mismatch: ${effectDescriptionByEquipmentId.size} !== 373.`);
 }
 
 export function localizeEquipmentEffectDescription(
