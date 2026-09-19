@@ -1,6 +1,9 @@
 import byHeroRaw from "../../data/generated/hero-casting-law-by-hero.v1.json";
 import catalogRaw from "../../data/generated/hero-casting-law-materials.v1.json";
-import { getHeroCastingLawMaterialIconUrl } from "./hero-casting-law-material-icon-assets";
+import {
+  getHeroCastingLawMaterialIconPublicPath,
+  getHeroCastingLawMaterialIconSymbolId,
+} from "./hero-casting-law-material-icon-assets";
 
 type CostProfile = "A" | "B" | "C";
 
@@ -141,8 +144,8 @@ function materialPresentationById(template: CatalogTemplate, itemId: number) {
   for (const level of template.levels) {
     for (const material of level.materials) {
       if (material.id !== itemId) continue;
-      const iconUrl = getHeroCastingLawMaterialIconUrl(material.id, material.item.icon);
-      if (!iconUrl) {
+      const iconSymbolId = getHeroCastingLawMaterialIconSymbolId(material.id, material.item.icon);
+      if (!iconSymbolId) {
         throw new Error(
           `Casting Law material ${material.id} has no verified icon mapping for sourcePath=${String(material.item.icon)}.`,
         );
@@ -150,7 +153,7 @@ function materialPresentationById(template: CatalogTemplate, itemId: number) {
       return {
         nameCn: material.item.nameCn,
         sourceIconPath: material.item.icon,
-        iconUrl,
+        iconSymbolId,
       };
     }
   }
@@ -193,8 +196,8 @@ export function readHeroCastingLawPresentation(heroId: number) {
         levelInfoId: level.levelInfoId,
         goldCost: level.goldCost,
         materials: level.materials.map((material) => {
-          const iconUrl = getHeroCastingLawMaterialIconUrl(material.id, material.item.icon);
-          if (!iconUrl) {
+          const iconSymbolId = getHeroCastingLawMaterialIconSymbolId(material.id, material.item.icon);
+          if (!iconSymbolId) {
             throw new Error(
               `Casting Law material ${material.id} has no verified icon mapping for sourcePath=${String(material.item.icon)}.`,
             );
@@ -204,14 +207,14 @@ export function readHeroCastingLawPresentation(heroId: number) {
             count: material.count,
             nameCn: material.item.nameCn,
             sourceIconPath: material.item.icon,
-            iconUrl,
+            iconSymbolId,
           };
         }),
       })),
     };
   });
 
-  const aggregatePresentation = new Map<number, { nameCn: string; sourceIconPath: string | null; iconUrl: string }>();
+  const aggregatePresentation = new Map<number, { nameCn: string; sourceIconPath: string | null; iconSymbolId: string }>();
   for (const slot of slots) {
     for (const level of slot.levels) {
       for (const material of level.materials) {
@@ -219,7 +222,7 @@ export function readHeroCastingLawPresentation(heroId: number) {
         const next = {
           nameCn: material.nameCn,
           sourceIconPath: material.sourceIconPath,
-          iconUrl: material.iconUrl,
+          iconSymbolId: material.iconSymbolId,
         };
         if (existing && JSON.stringify(existing) !== JSON.stringify(next)) {
           throw new Error(`Hero ${heroId} Casting Law material ${material.itemId} has conflicting presentation metadata.`);
@@ -241,6 +244,7 @@ export function readHeroCastingLawPresentation(heroId: number) {
 
   return {
     heroId,
+    iconSpritePublicPath: getHeroCastingLawMaterialIconPublicPath(),
     slots,
     totals: {
       level1to5: projectAggregate(hero.totals.level1to5),
