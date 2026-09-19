@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "stage": "hero-bond-level-materials-v1",
+  "status": "IMPLEMENTED_PENDING_FREEZE",
+  "owner": "hero-canonical",
+  "purpose": "Freeze per-Hero level-up gold and material costs for the five regular Hero Fetter tracks and the Hero HeartFetter track without reopening already-validated bond effect semantics.",
+  "baseline": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "ref": "main",
+    "expectedHead": "8b53b18e1768d118914a5ffb9d15431a57469c42"
+  },
+  "authoritativeInputs": {
+    "heroPopulation": "data/hero-name-master.v1.json",
+    "frozenHeroDetail": "data/generated/hero-detail/by-id/*.json",
+    "heartFetterEvidence": "data/generated/hero-heart-fetter-raw-condition.v1.json",
+    "sourcePackContract": "data/contracts/configdata-source-pack-contract.v1.json",
+    "sourcePackResolver": "scripts/configdata-source-pack-maintenance-root.cjs",
+    "logicalConfigData": [
+      "data/configdata/ConfigDataHeroHeartFetterInfo.json",
+      "data/configdata/ConfigDataItemInfo.json"
+    ]
+  },
+  "relation": {
+    "regular": "canonical heroId -> frozen Hero shard -> bonds[]; preserve explicit order/fetterId/cost fields only",
+    "heart": "canonical heroId -> frozen HeartFetter raw evidence heroHeartFetterId + heroHeartFetterSourceIndex -> ConfigDataHeroHeartFetterInfo[sourceIndex], requiring exact ID equality",
+    "item": "cost ItemType=6 + ItemId -> ConfigDataItemInfo.ID only when all matching source records agree on Name/Desc/Icon"
+  },
+  "costPolicy": {
+    "maxLevel": 10,
+    "targetLevels": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "gold": "LevelUpGold[targetLevel-2]",
+    "materials": "explicit LevelUpMaterials rows grouped by Level; preserve ItemType, ItemId, Count",
+    "skillLocator": "regular gotSkillIds[targetLevel-1] or HeartFetter HeroHeartFetterSkills[targetLevel-1]; locator only, no effect reinterpretation",
+    "totals": "sum explicit level costs only"
+  },
+  "expectedCoverage": {
+    "heroCount": 267,
+    "regularFetterRefs": 1335,
+    "regularFettersPerHero": 5,
+    "heartFetterRefs": 267
+  },
+  "forbidden": [
+    "name JOIN",
+    "ID arithmetic",
+    "filename similarity mapping",
+    "raw HeroInfo re-selection",
+    "new Fetter/HeartFetter effect semantics",
+    "runtime raw ConfigData fallback"
+  ],
+  "output": {
+    "artifact": "data/generated/hero-bond-level-materials.v1.json",
+    "summary": "data/validation/hero-bond-level-materials-summary.v1.json"
+  },
+  "producer": "scripts/build_hero_bond_level_materials.cjs",
+  "validator": "scripts/validate_hero_bond_level_materials.cjs",
+  "workflow": ".github/workflows/hero-bond-level-materials.yml",
+  "completion": "All 267 canonical Heroes have five frozen regular Fetter cost tracks plus one HeartFetter cost track, every level 2-10 cost is source-exact, every referenced material resolves without conflicting Item metadata, totals reproduce exactly, and validation leaves no unexpected tracked mutation."
+}
