@@ -12,6 +12,7 @@ import {
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
 import { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";
+import { HeroCastingLawSection } from "@/components/hero-casting-law-section";
 import { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";
 import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
@@ -591,6 +592,7 @@ function HeroDetailPage() {
 
         <HeroJobMaterialsSection heroId={hero.heroId} mode={isSpForm ? "sp" : "normal"} />
         <HeroAwakeningMaterialsSection heroId={hero.heroId} />
+        <HeroCastingLawSection heroId={hero.heroId} />
 
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
