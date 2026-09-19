@@ -2,8 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  Brain,
   ChevronLeft,
   ChevronRight,
+  Crosshair,
   ImageOff,
   Swords,
   UserRound,
@@ -748,12 +750,12 @@ function HeroDetailPage() {
                 <thead className="bg-muted/50">
                   <tr className="border-b border-border">
                     <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">생명</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">공격</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">지력</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">방어</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">마방</th>
-                    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground">기술</th>
+                    <HeroStatHeader label="생명" stat="HP" />
+                    <HeroStatHeader label="공격" stat="ATK" />
+                    <HeroStatHeader label="지력" stat="INT" />
+                    <HeroStatHeader label="방어" stat="DEF" />
+                    <HeroStatHeader label="마방" stat="MDEF" />
+                    <HeroStatHeader label="기술" stat="DEX" />
                   </tr>
                 </thead>
                 <tbody>
@@ -1170,6 +1172,45 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
 }
 
 function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
+
+type HeroFinalJobStatKey = "HP" | "ATK" | "INT" | "DEF" | "MDEF" | "DEX";
+
+const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Partial<Record<HeroFinalJobStatKey, string>> = {
+  HP: "Icon_HP.png",
+  ATK: "Icon_Attack.png",
+  DEF: "Icon_Defense.png",
+  MDEF: "Icon_MagicDefense.png",
+};
+
+function HeroStatHeader({ label, stat }: { label: string; stat: HeroFinalJobStatKey }) {
+  const fileName = HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat];
+  const iconUrl = fileName
+    ? `${import.meta.env.BASE_URL}images/shared/stats/${fileName}`
+    : null;
+
+  return (
+    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground" data-hero-final-job-stat-header={stat}>
+      <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+        {iconUrl ? (
+          <img
+            src={iconUrl}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            className="h-4 w-4 shrink-0 object-contain"
+          />
+        ) : stat === "INT" ? (
+          <Brain className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
+        ) : (
+          <Crosshair className="h-4 w-4 shrink-0" aria-hidden="true" strokeWidth={2.2} />
+        )}
+        <span>{label}</span>
+      </span>
+    </th>
+  );
+}
+
 type JobStatBarDomain = { min: number; max: number };
 function getJobStatBarPercent(value: number, domain: JobStatBarDomain) {
   const normalized = (value - domain.min) / (domain.max - domain.min);
