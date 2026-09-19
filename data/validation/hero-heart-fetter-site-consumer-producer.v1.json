@@ -3,8 +3,8 @@
   "stage": "hero-heart-fetter-site-consumer-producer-v1",
   "status": "PUBLISHED_VALIDATED",
   "owner": "hero-canonical",
-  "baseHead": "6b79dfce074decae43e4f86a8eb4fe0e40d2d3e5",
-  "publicationHead": "e71347f17f25c49059b8b707ff68a45134210b14",
+  "baseHead": "b0c064bcbc1101f6feff763519103c62a81a8463",
+  "publicationHead": "082b0736397d305cc43fd782f0c9f5db9101dde4",
   "contract": "data/contracts/hero-heart-fetter-site-consumer.v1.json",
   "builder": "scripts/build-hero-heart-fetter-site-consumer-v1.cjs",
   "validator": "scripts/validate-hero-heart-fetter-site-consumer-v1.cjs",
@@ -12,9 +12,17 @@
   "publication": {
     "manifest": "data/generated/hero-heart-fetter-site-consumer/manifest.v1.json",
     "heroPopulation": 267,
-    "effectRows": 1158,
+    "effectRows": 1066,
     "uniqueSkills": 1066,
     "mappingModes": {
+      "VALIDATED_DEFAULT": 1050,
+      "EXPLICIT_OVERRIDE": 6,
+      "EXCLUSION_SET_MEMBER": 8,
+      "SOURCE_CONFLICT_RESOLUTION": 2
+    },
+    "sourceEffectRows": 1158,
+    "deduplicatedRows": 92,
+    "sourceMappingModes": {
       "VALIDATED_DEFAULT": 1142,
       "EXPLICIT_OVERRIDE": 6,
       "EXCLUSION_SET_MEMBER": 8,
@@ -24,9 +32,9 @@
   "completionBoundary": {
     "producerMachineryImplemented": true,
     "trackedConsumerPublished": true,
-    "frontendConsumptionAdmitted": false
+    "frontendConsumptionAdmitted": true
   },
-  "nextRequiredAction": "Integrate the frozen HeartFetter site consumer in the hero frontend without reading research/raw sources or recomputing presentation relations.",
+  "nextRequiredAction": "Run owning Hero/HeartFetter validation, production build, then merge and verify the deployed Hero detail presentation.",
   "semanticBoundary": {
     "conditionType7RuntimeMeaningResolved": false,
     "newCanonicalHeroJobRelation": false,
