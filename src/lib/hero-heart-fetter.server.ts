@@ -15,8 +15,11 @@ type Manifest = {
   productionConsumerAllowed: boolean;
   counts: {
     heroPopulation: number;
+    sourceEffectRows: number;
     effectRows: number;
+    deduplicatedRows: number;
     uniqueSkills: number;
+    sourceMappingModes: Record<MappingMode, number>;
     mappingModes: Record<MappingMode, number>;
   };
 };
@@ -78,9 +81,15 @@ if (
   manifest.presentationAuthority !== true ||
   manifest.productionConsumerAllowed !== true ||
   manifest.counts.heroPopulation !== 267 ||
-  manifest.counts.effectRows !== 1158 ||
+  manifest.counts.sourceEffectRows !== 1158 ||
+  manifest.counts.effectRows !== 1066 ||
+  manifest.counts.deduplicatedRows !== 92 ||
   manifest.counts.uniqueSkills !== 1066 ||
-  manifest.counts.mappingModes.VALIDATED_DEFAULT !== 1142 ||
+  manifest.counts.sourceMappingModes.VALIDATED_DEFAULT !== 1142 ||
+  manifest.counts.sourceMappingModes.EXPLICIT_OVERRIDE !== 6 ||
+  manifest.counts.sourceMappingModes.EXCLUSION_SET_MEMBER !== 8 ||
+  manifest.counts.sourceMappingModes.SOURCE_CONFLICT_RESOLUTION !== 2 ||
+  manifest.counts.mappingModes.VALIDATED_DEFAULT !== 1050 ||
   manifest.counts.mappingModes.EXPLICIT_OVERRIDE !== 6 ||
   manifest.counts.mappingModes.EXCLUSION_SET_MEMBER !== 8 ||
   manifest.counts.mappingModes.SOURCE_CONFLICT_RESOLUTION !== 2
@@ -129,6 +138,7 @@ for (const shard of Object.values(heroShardModules)) {
     if (!Array.isArray(tuples)) {
       throw new Error(`Hero ${heroId} is missing from its HeartFetter hero-map shard.`);
     }
+    const tupleKeys = new Set<string>();
     const effects = tuples.map(([level, jobId, skillId, mappingMode]) => {
       if ((level !== 4 && level !== 7) || !Number.isSafeInteger(jobId) || jobId <= 0 || !Number.isSafeInteger(skillId) || skillId <= 0) {
         throw new Error(`Hero ${heroId} has an invalid HeartFetter tuple.`);
@@ -136,6 +146,11 @@ for (const shard of Object.values(heroShardModules)) {
       if (!(mappingMode in mappingModeCounts)) {
         throw new Error(`Hero ${heroId} has unsupported HeartFetter mapping mode ${mappingMode}.`);
       }
+      const tupleKey = JSON.stringify([level, jobId, skillId, mappingMode]);
+      if (tupleKeys.has(tupleKey)) {
+        throw new Error(`Hero ${heroId} has a duplicate HeartFetter presentation tuple.`);
+      }
+      tupleKeys.add(tupleKey);
       const text = skillTextById.get(skillId);
       if (!text) {
         throw new Error(`Hero ${heroId} HeartFetter Skill ${skillId} has no frozen text payload.`);
