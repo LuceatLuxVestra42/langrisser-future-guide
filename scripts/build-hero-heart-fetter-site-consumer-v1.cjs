@@ -35,10 +35,14 @@ function main() {
     throw new Error('presentation research population/count boundary changed');
   }
 
-  const expectedModes = { VALIDATED_DEFAULT: 1142, EXPLICIT_OVERRIDE: 6, EXCLUSION_SET_MEMBER: 8, SOURCE_CONFLICT_RESOLUTION: 2 };
-  const modeCounts = Object.fromEntries(Object.keys(expectedModes).map((k) => [k, 0]));
+  const expectedSourceModes = { VALIDATED_DEFAULT: 1142, EXPLICIT_OVERRIDE: 6, EXCLUSION_SET_MEMBER: 8, SOURCE_CONFLICT_RESOLUTION: 2 };
+  const expectedPresentationModes = { VALIDATED_DEFAULT: 1050, EXPLICIT_OVERRIDE: 6, EXCLUSION_SET_MEMBER: 8, SOURCE_CONFLICT_RESOLUTION: 2 };
+  const sourceModeCounts = Object.fromEntries(Object.keys(expectedSourceModes).map((k) => [k, 0]));
+  const presentationModeCounts = Object.fromEntries(Object.keys(expectedPresentationModes).map((k) => [k, 0]));
   const heroRows = new Map();
+  const heroRowKeys = new Map();
   const skillTexts = new Map();
+  let deduplicatedRows = 0;
 
   for (const effect of input.effects || []) {
     const heroId = Number(effect.heroId);
@@ -48,19 +52,33 @@ function main() {
     const mode = effect.mappingMode;
     const text = effect?.skill?.descriptionCn;
     if (!Number.isInteger(heroId) || ![4, 7].includes(level) || !Number.isInteger(jobId) || !Number.isInteger(skillId)) throw new Error('invalid effect identity');
-    if (!(mode in modeCounts)) throw new Error(`unexpected mapping mode ${mode}`);
+    if (!(mode in sourceModeCounts)) throw new Error(`unexpected mapping mode ${mode}`);
     if (typeof text !== 'string') throw new Error(`Skill ${skillId}: missing descriptionCn`);
-    modeCounts[mode]++;
-    if (!heroRows.has(heroId)) heroRows.set(heroId, []);
-    heroRows.get(heroId).push([level, jobId, skillId, mode]);
+    sourceModeCounts[mode]++;
+    if (!heroRows.has(heroId)) {
+      heroRows.set(heroId, []);
+      heroRowKeys.set(heroId, new Set());
+    }
+    const row = [level, jobId, skillId, mode];
+    const rowKey = JSON.stringify(row);
+    if (!heroRowKeys.get(heroId).has(rowKey)) {
+      heroRowKeys.get(heroId).add(rowKey);
+      heroRows.get(heroId).push(row);
+      presentationModeCounts[mode]++;
+    } else {
+      deduplicatedRows++;
+    }
     if (skillTexts.has(skillId) && skillTexts.get(skillId) !== text) throw new Error(`Skill ${skillId}: inconsistent descriptionCn`);
     skillTexts.set(skillId, text);
   }
-  for (const [mode, count] of Object.entries(expectedModes)) if (modeCounts[mode] !== count) throw new Error(`${mode}: expected ${count}, got ${modeCounts[mode]}`);
+  for (const [mode, count] of Object.entries(expectedSourceModes)) if (sourceModeCounts[mode] !== count) throw new Error(`${mode}: expected source count ${count}, got ${sourceModeCounts[mode]}`);
+  for (const [mode, count] of Object.entries(expectedPresentationModes)) if (presentationModeCounts[mode] !== count) throw new Error(`${mode}: expected presentation count ${count}, got ${presentationModeCounts[mode]}`);
+  if (deduplicatedRows !== 92) throw new Error(`expected 92 duplicate presentation rows, got ${deduplicatedRows}`);
 
   const heroIds = [...heroRows.keys()].sort((a, b) => a - b);
   const skillIds = [...skillTexts.keys()].sort((a, b) => a - b);
-  if (heroIds.length !== 267 || skillIds.length !== 1066) throw new Error(`unexpected unique counts heroes=${heroIds.length} skills=${skillIds.length}`);
+  const presentationEffectRows = [...heroRows.values()].reduce((sum, rows) => sum + rows.length, 0);
+  if (heroIds.length !== 267 || skillIds.length !== 1066 || presentationEffectRows !== 1066) throw new Error(`unexpected unique counts heroes=${heroIds.length} skills=${skillIds.length} presentationRows=${presentationEffectRows}`);
   for (const rows of heroRows.values()) rows.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || String(a[3]).localeCompare(String(b[3])));
 
   fs.rmSync(outputDir, { recursive: true, force: true });
@@ -94,9 +112,12 @@ function main() {
     },
     counts: {
       heroPopulation: heroIds.length,
-      effectRows: (input.effects || []).length,
+      sourceEffectRows: (input.effects || []).length,
+      effectRows: presentationEffectRows,
+      deduplicatedRows,
       uniqueSkills: skillIds.length,
-      mappingModes: modeCounts,
+      sourceMappingModes: sourceModeCounts,
+      mappingModes: presentationModeCounts,
     },
     heroShards,
     skillTextShards,
