@@ -72,6 +72,48 @@ async function readExpectedHeroFullartState(page, expected, skinId, probes = 20)
   return null;
 }
 
+async function readHomeHeroState(page) {
+  return page.evaluate(async () => {
+    const section = document.querySelector('section[aria-label="히어로 이미지 미리보기"]');
+    const image = section?.querySelector('[data-home-hero-image="true"]');
+    if (!(section instanceof HTMLElement) || !(image instanceof HTMLImageElement)) return null;
+
+    await image.decode();
+    const rect = image.getBoundingClientRect();
+    const sampleX = rect.left + rect.width * 0.18;
+    const sampleY = rect.top + rect.height * 0.72;
+    const stack = document.elementsFromPoint(sampleX, sampleY);
+    const imageStackIndex = stack.indexOf(image);
+    const mutedStackIndex = stack.findIndex((node) => node.classList?.contains("bg-muted"));
+    const style = getComputedStyle(image);
+
+    return {
+      src: image.currentSrc || image.src,
+      complete: image.complete,
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight,
+      width: rect.width,
+      height: rect.height,
+      display: style.display,
+      visibility: style.visibility,
+      opacity: style.opacity,
+      objectFit: style.objectFit,
+      imageStackIndex,
+      mutedStackIndex,
+    };
+  });
+}
+
+function checkHomeHeroState(state, label) {
+  check(state, `${label} Hero image missing`);
+  check(state.complete && state.naturalWidth > 0 && state.naturalHeight > 0, `${label} Hero image did not load`);
+  check(state.width > 0 && state.height > 0, `${label} Hero image has no rendered area`);
+  check(state.display !== "none" && state.visibility !== "hidden" && Number(state.opacity) > 0, `${label} Hero image is not visible`);
+  check(state.objectFit === "cover", `${label} Hero object-fit=${state.objectFit}`);
+  check(state.imageStackIndex >= 0, `${label} Hero image is absent from sampled paint stack`);
+  check(state.mutedStackIndex === -1 || state.mutedStackIndex > state.imageStackIndex, `${label} bg-muted layer paints above Hero image`);
+}
+
 async function clickHostedArtworkControl(control) {
   await control.evaluate((node) => {
     if (!(node instanceof HTMLButtonElement)) throw new Error("hosted artwork control is not a button");
@@ -213,7 +255,29 @@ page.on("pageerror", (error) => pageErrors.push(String(error)));
 page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
 
 try {
-  let response = await page.goto(browserUrl("heroes/6/"), { waitUntil: "load", timeout: 45000 });
+  let response = await page.goto(browserUrl(""), { waitUntil: "load", timeout: 45000 });
+  check(response && response.status() < 400, `Home Hero entry failed: ${response?.status()}`);
+  const homeHero = page.locator('[data-home-hero-image="true"]');
+  await homeHero.waitFor({ state: "visible", timeout: 20000 });
+  const initialHomeHeroState = await readHomeHeroState(page);
+  checkHomeHeroState(initialHomeHeroState, "desktop");
+  const initialHomeHeroSrc = initialHomeHeroState.src;
+  const nextHomeHero = page.getByRole("button", { name: "다음 히어로 이미지" });
+  check(await nextHomeHero.count() === 1, "Home Hero next control missing or duplicated");
+  await nextHomeHero.click();
+  await page.waitForFunction(
+    ({ selector, previousSrc }) => {
+      const image = document.querySelector(selector);
+      return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && (image.currentSrc || image.src) !== previousSrc;
+    },
+    { selector: '[data-home-hero-image="true"]', previousSrc: initialHomeHeroSrc },
+    { timeout: 20000 },
+  );
+  const nextHomeHeroState = await readHomeHeroState(page);
+  checkHomeHeroState(nextHomeHeroState, "desktop switched");
+  check(nextHomeHeroState.src !== initialHomeHeroSrc, "Home Hero next control did not change the image");
+
+  response = await page.goto(browserUrl("heroes/6/"), { waitUntil: "load", timeout: 45000 });
   check(response && response.status() < 400, `Hero 6 detail failed: ${response?.status()}`);
   await page.getByRole("heading", { name: "레온", exact: true }).waitFor();
   await page.getByText("대표 일러스트", { exact: true }).waitFor();
@@ -280,6 +344,12 @@ try {
   mobilePage.on("pageerror", (error) => mobilePageErrors.push(String(error)));
   mobilePage.on("console", (message) => { if (message.type() === "error") mobileConsoleErrors.push(message.text()); });
   try {
+    response = await mobilePage.goto(browserUrl(""), { waitUntil: "load", timeout: 45000 });
+    check(response && response.status() < 400, `Home Hero mobile entry failed: ${response?.status()}`);
+    await mobilePage.locator('[data-home-hero-image="true"]').waitFor({ state: "visible", timeout: 20000 });
+    const mobileHomeHeroState = await readHomeHeroState(mobilePage);
+    checkHomeHeroState(mobileHomeHeroState, "mobile");
+
     response = await mobilePage.goto(browserUrl("heroes/6/"), { waitUntil: "load", timeout: 45000 });
     check(response && response.status() < 400, `Hero 6 mobile detail failed: ${response?.status()}`);
     await mobilePage.getByText("대표 일러스트", { exact: true }).waitFor();
@@ -311,6 +381,12 @@ try {
     status: "PASS_AUTHORITATIVE_GITHUB_PAGES_HOSTED",
     sourceSha: expectedSourceSha,
     skinSource: "CURRENT_REPOSITORY_FROZEN_CONSUMER",
+    homeHero: {
+      desktop: "PASS",
+      mobile: "PASS",
+      switching: "PASS",
+      mutedFallbackBehindImage: "PASS",
+    },
     heroArtwork: {
       resolvedCount: 267,
       heroId: 6,
