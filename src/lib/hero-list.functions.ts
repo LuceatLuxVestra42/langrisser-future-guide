@@ -31,6 +31,87 @@ const HERO_SOLDIER_ARMY_ORDER = new Map<string, number>(
 );
 
 const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
+  [25, new Set([
+    10415,
+  ])],
+  [62, new Set([
+    12095,
+    12052,
+  ])],
+  [77, new Set([
+    12095,
+  ])],
+  [91, new Set([
+    12062,
+  ])],
+  [97, new Set([
+    12052,
+  ])],
+  [93, new Set([
+    11746,
+  ])],
+  [14, new Set([
+    10401,
+  ])],
+  [15, new Set([
+    10707,
+  ])],
+  [31, new Set([
+    10811,
+  ])],
+  [53, new Set([
+    11739,
+  ])],
+  [1, new Set([
+    10601,
+    11701,
+  ])],
+  [34, new Set([
+    10201,
+    11711,
+    10604,
+  ])],
+  [42, new Set([
+    10604,
+    10501,
+    10326,
+  ])],
+  [48, new Set([
+    10113,
+    10101,
+    10206,
+  ])],
+  [60, new Set([
+    11778,
+    11779,
+  ])],
+  [78, new Set([
+    11711,
+    11704,
+  ])],
+  [88, new Set([
+    11778,
+    10321,
+  ])],
+  [95, new Set([
+    11704,
+    11711,
+    12018,
+  ])],
+  [112, new Set([
+    11779,
+    10415,
+    12095,
+  ])],
+  [122, new Set([
+    10326,
+    10311,
+    12062,
+  ])],
+  [5, new Set([
+    10842,
+    10808,
+  ])],
   [6, new Set([
     10301,
     5020,
@@ -42,6 +123,20 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     11807,
     10302,
   ])],
+  [12, new Set([
+    10208,
+    10223,
+    10218,
+    10103,
+  ])],
+  [26, new Set([
+    10601,
+    10415,
+  ])],
+  [40, new Set([
+    10223,
+    10208,
+  ])],
   [8, new Set([
     10705,
     10703,
@@ -52,6 +147,10 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10109,
     10717,
     10716,
+  ])],
+  [10, new Set([
+    10208,
+    10809,
   ])],
   [9, new Set([
     10701,
