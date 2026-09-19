@@ -7,6 +7,7 @@ export type HeroCastingLawPresentation = {
     costProfile: "A" | "B" | "C";
     templateNameCn: string | null;
     equipmentType: number | null;
+    summaryIcon: { labelKr: string; iconUrl: string } | null;
     level1to5: CastingLawRangeTotals;
     level6to10: CastingLawRangeTotals;
     level1to10: CastingLawRangeTotals;
@@ -210,6 +211,32 @@ export function HeroCastingLawSection({
       data-casting-law-slot-count={castingLaw.slots.length}
     >
       <h2 className="text-lg font-extrabold tracking-tight text-foreground">율정</h2>
+
+      <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-summary="true">
+        <h3 className="text-sm font-extrabold text-foreground">요구 문양재료</h3>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {castingLaw.slots
+            .filter((slot) => slot.summaryIcon !== null)
+            .map((slot) => (
+              <span
+                key={`summary-${slot.sourceIndex}-${slot.templateId}`}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-border bg-background"
+                title={slot.summaryIcon?.labelKr}
+                data-casting-law-summary-template-id={slot.templateId}
+              >
+                <img
+                  src={slot.summaryIcon?.iconUrl}
+                  alt={slot.summaryIcon?.labelKr ?? ""}
+                  width={40}
+                  height={40}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-10 w-10 object-contain"
+                />
+              </span>
+            ))}
+        </div>
+      </div>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
         <h3 className="text-sm font-extrabold text-foreground">전체 슬롯 합계</h3>

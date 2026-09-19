@@ -1,6 +1,7 @@
 import byHeroRaw from "../../data/generated/hero-casting-law-by-hero.v1.json";
 import catalogRaw from "../../data/generated/hero-casting-law-materials.v1.json";
 import iconAssetsRaw from "../../data/generated/hero-casting-law-material-icon-assets.v1.json";
+import summaryIconsRaw from "../../data/generated/hero-casting-law-summary-icon-assets.v1.json";
 
 type CostProfile = "A" | "B" | "C";
 
@@ -72,6 +73,7 @@ type CatalogTemplate = {
   templateId: number;
   nameCn: string | null;
   equipmentType: number | null;
+  icon: string | null;
   levels: CatalogLevel[];
 };
 
@@ -119,9 +121,32 @@ type CastingLawIconAssetArtifact = {
   records: CastingLawIconAssetRecord[];
 };
 
+type CastingLawSummaryIconRecord = {
+  templateIconPath: string;
+  labelKr: string;
+  asset: {
+    url: string;
+    gitBlobSha: string;
+  };
+};
+
+type CastingLawSummaryIconArtifact = {
+  version: 1;
+  schemaId: "hero-casting-law-summary-icon-assets/v1";
+  status: "FROZEN";
+  completion: "COMPLETE";
+  semanticReopen: false;
+  summary: {
+    recordCount: number;
+    accessoryIncluded: false;
+  };
+  records: CastingLawSummaryIconRecord[];
+};
+
 const byHero = byHeroRaw as unknown as ByHeroArtifact;
 const catalog = catalogRaw as unknown as CatalogArtifact;
 const iconAssets = iconAssetsRaw as unknown as CastingLawIconAssetArtifact;
+const summaryIcons = summaryIconsRaw as unknown as CastingLawSummaryIconArtifact;
 
 if (
   byHero.version !== 1 ||
@@ -145,6 +170,18 @@ if (
   catalog.templates.length !== 50
 ) {
   throw new Error("Casting Law material catalog is not production-ready.");
+}
+if (
+  summaryIcons.version !== 1 ||
+  summaryIcons.schemaId !== "hero-casting-law-summary-icon-assets/v1" ||
+  summaryIcons.status !== "FROZEN" ||
+  summaryIcons.completion !== "COMPLETE" ||
+  summaryIcons.semanticReopen !== false ||
+  summaryIcons.summary.recordCount !== 13 ||
+  summaryIcons.summary.accessoryIncluded !== false ||
+  summaryIcons.records.length !== 13
+) {
+  throw new Error("Casting Law summary icon asset map is not production-ready.");
 }
 if (
   iconAssets.version !== 1 ||
@@ -182,6 +219,14 @@ for (const template of catalog.templates) {
     throw new Error(`Casting Law template identity/coverage violation at templateId=${String(template.templateId)}.`);
   }
   templateById.set(template.templateId, template);
+}
+
+const summaryIconByTemplatePath = new Map<string, CastingLawSummaryIconRecord>();
+for (const record of summaryIcons.records) {
+  if (!record.templateIconPath || !record.asset?.url || !record.asset?.gitBlobSha || summaryIconByTemplatePath.has(record.templateIconPath)) {
+    throw new Error(`Casting Law summary icon asset violation at ${String(record.templateIconPath)}.`);
+  }
+  summaryIconByTemplatePath.set(record.templateIconPath, record);
 }
 
 const iconAssetByItemId = new Map<number, CastingLawIconAssetRecord>();
@@ -252,6 +297,22 @@ export function readHeroCastingLawPresentation(heroId: number) {
       costProfile: slot.costProfile,
       templateNameCn: slot.templateNameCn,
       equipmentType: slot.equipmentType,
+      summaryIcon:
+        slot.slotType === "ACCESSORY"
+          ? null
+          : (() => {
+              if (!template.icon) {
+                throw new Error(`Casting Law template ${template.templateId} has no canonical icon path.`);
+              }
+              const summaryIcon = summaryIconByTemplatePath.get(template.icon);
+              if (!summaryIcon) {
+                throw new Error(`Casting Law template ${template.templateId} has no summary icon for ${template.icon}.`);
+              }
+              return {
+                labelKr: summaryIcon.labelKr,
+                iconUrl: summaryIcon.asset.url,
+              };
+            })(),
       level1to5: projectRange(template, slot.level1to5),
       level6to10: projectRange(template, slot.level6to10),
       level1to10: projectRange(template, slot.level1to10),
