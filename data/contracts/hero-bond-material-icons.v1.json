@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "contract": "hero-bond-material-icons",
+  "status": "ACTIVE",
+  "purpose": "Freeze the 43 Hero bond level-up material icons as byte-identical repository assets from the legacy Korean sheet Drive item asset source, bound to the existing frozen itemId and exact ConfigData icon sourcePath. Presentation only; no bond semantics change.",
+  "upstream": [
+    "data/generated/hero-bond-level-materials.v1.json"
+  ],
+  "authority": {
+    "semanticItemIdentity": "frozen Hero bond itemCatalog itemId",
+    "canonicalIconLocator": "frozen Hero bond itemCatalog icon",
+    "presentationAssetSource": "Google Drive folder 1fVm9JVJlOiswiTezoRWFJQmUZWof8db8 (아이템/아이템 1)",
+    "relation": "43 explicit records; exact canonical sourcePath basename equals source filename; source fileId/bytes and repository Git blob SHA frozen"
+  },
+  "expected": {
+    "distinctItemCount": 43,
+    "missingCount": 0,
+    "duplicateItemIdCount": 0,
+    "duplicateSourcePathCount": 0,
+    "localAssetCount": 43
+  },
+  "forbidden": [
+    "name JOIN",
+    "runtime filename derivation",
+    "ID arithmetic",
+    "screen-order matching",
+    "external image hotlink",
+    "semantic relation changes"
+  ],
+  "outputs": {
+    "manifest": "data/generated/hero-bond-material-icon-assets.v1.json",
+    "validation": "data/validation/hero-bond-material-icon-assets-summary.v1.json",
+    "publicDirectory": "public/images/heroes/bond-materials"
+  },
+  "execution": {
+    "mode": "remote-only",
+    "featureBranch": "feat/hero-bond-material-local-assets-20260919-v2",
+    "expectedBaseHead": "d16a4d6bdc4d9c38c7c917acb9c2774207110d0e"
+  },
+  "validator": "scripts/validate-hero-bond-material-icon-assets.mjs"
+}
