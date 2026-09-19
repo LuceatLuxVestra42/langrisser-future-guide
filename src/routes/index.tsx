@@ -133,11 +133,7 @@ function CategoryCard({ category }: { category: Category }) {
 }
 
 function HeroSection() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    setIndex(getHeroIndexForDate());
-  }, []);
+  const [index, setIndex] = useState(() => getHeroIndexForDate());
 
   const hero = heroImages[index] ?? heroImages[0]!;
   const [failedHeroUrl, setFailedHeroUrl] = useState<string | null>(null);
