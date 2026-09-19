@@ -325,6 +325,10 @@ function HeroDetailPage() {
   const [talentIndex, setTalentIndex] = useState(defaultTalentIndex);
   useEffect(() => setTalentIndex(defaultTalentIndex), [hero.heroId, isSpForm, defaultTalentIndex]);
   const activeTalentRow = visibleTalentProgression[talentIndex] ?? null;
+  const previousTalentRow = talentIndex > 0 ? (visibleTalentProgression[talentIndex - 1] ?? null) : null;
+  const nextTalentRow = talentIndex < visibleTalentProgression.length - 1
+    ? (visibleTalentProgression[talentIndex + 1] ?? null)
+    : null;
   const moveTalent = (delta: number) => {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
@@ -572,10 +576,13 @@ function HeroDetailPage() {
                   type="button"
                   aria-label="낮은 성급 고유기 보기"
                   onClick={() => moveTalent(-1)}
-                  disabled={talentIndex === 0}
-                  className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
+                  disabled={!previousTalentRow}
+                  className="group flex w-14 flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
                 >
-                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  <ChevronLeft className="h-6 w-6 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
+                  {previousTalentRow ? (
+                    <span className="text-xs font-extrabold leading-none">{previousTalentRow.star}성</span>
+                  ) : null}
                 </button>
                 <article key={`${activeTalentRow.star}-${activeTalentRow.skillId}`} className="min-w-0 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
                   <div className="flex items-center gap-3">
@@ -602,10 +609,13 @@ function HeroDetailPage() {
                   type="button"
                   aria-label="높은 성급 고유기 보기"
                   onClick={() => moveTalent(1)}
-                  disabled={talentIndex === visibleTalentProgression.length - 1}
-                  className="flex w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 sm:w-12"
+                  disabled={!nextTalentRow}
+                  className="group flex w-14 flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-1 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-16"
                 >
-                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  {nextTalentRow ? (
+                    <span className="text-xs font-extrabold leading-none">{nextTalentRow.star}성</span>
+                  ) : null}
                 </button>
               </div>
             </div>
