@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "contract": "hero-casting-law-material-icons",
+  "owner": "asset",
+  "status": "ACTIVE",
+  "purpose": "Materialize the 45 distinct Hero Casting Law material icons from the official installer by exact ConfigDataItemInfo.Icon sourcePath and expose a frozen itemId/sourcePath/publicPath asset manifest for the Hero detail frontend.",
+  "upstream": [
+    "data/generated/hero-casting-law-materials.v1.json",
+    "data/generated/hero-awakening-icon-official-package-inventory.v1.json"
+  ],
+  "authority": {
+    "semanticItemIdentity": "data/generated/hero-casting-law-materials.v1.json item.itemId",
+    "iconLocator": "data/generated/hero-casting-law-materials.v1.json item.icon",
+    "binarySource": "official installer package inventory",
+    "relation": "itemId -> exact ConfigData item.icon sourcePath -> exact normalized Unity runtime container path"
+  },
+  "expected": {
+    "distinctItemCount": 45,
+    "sourceFolder": "UI/Icon/Item04_ABS",
+    "bundleBasename": "ui_icon_item04_abs.b",
+    "missingCount": 0,
+    "duplicateSourcePathCount": 0,
+    "publicPathCollisionCount": 0
+  },
+  "forbidden": [
+    "name JOIN",
+    "filename similarity",
+    "basename-only runtime matching",
+    "ID arithmetic",
+    "external wiki image substitution",
+    "screen-order matching"
+  ],
+  "outputs": {
+    "manifest": "data/generated/hero-casting-law-material-icon-assets.v1.json",
+    "validation": "data/validation/hero-casting-law-material-icon-assets-summary.v1.json",
+    "publicRoot": "public/images/heroes/casting-law-material-icons"
+  },
+  "producer": "scripts/materialize-hero-casting-law-material-icons.py",
+  "completionRule": "45/45 exact sourcePath Sprite matches, 45 unique public PNG files, manifest FROZEN/COMPLETE, validator PASS, zero unexpected mutation."
+}
