@@ -386,7 +386,7 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]">
+          <div className="grid grid-cols-[minmax(0,3fr)_minmax(280px,1fr)]">
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual && failedVisualSrc !== activeVisual.src ? (
