@@ -667,7 +667,7 @@ function HeroDetailPage() {
             ) : detail.skills.awakening.status === "NONE" ? (
               <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
             ) : (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 데이터 확인 필요</p>
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
             )}
           </div>
 
