@@ -1,0 +1,34 @@
+name: Diagnose Hero Bond Level Materials
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/diagnose-hero-bond-level-materials.yml'
+      - 'scripts/diagnose_hero_bond_level_materials.cjs'
+      - 'scripts/lib/configdata-direct.cjs'
+      - 'scripts/configdata-source-pack-maintenance-root.cjs'
+      - 'scripts/hydrate-configdata-source-pack-v1.mjs'
+      - 'data/contracts/configdata-source-pack-contract.v1.json'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Diagnose candidate ConfigData tables
+        run: node scripts/diagnose_hero_bond_level_materials.cjs
+      - name: Verify repository unchanged
+        if: always()
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git status --porcelain)"
