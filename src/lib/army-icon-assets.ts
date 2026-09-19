@@ -21,6 +21,9 @@ const armyIconManifest = armyIconManifestJson as ArmyIconManifest;
 const armyIconByType = new Map(
   armyIconManifest.records.map((record) => [record.armyType, record]),
 );
+const armyIconById = new Map(
+  armyIconManifest.records.map((record) => [record.armyId, record]),
+);
 
 export function getOfficialArmyIconUrl(armyType: string): string | null {
   if (!armyIconManifest.assetsReady) return null;
@@ -33,6 +36,15 @@ export function getOfficialArmyIconUrl(armyType: string): string | null {
 
 export function getOfficialArmyIconLocator(armyType: string): string | null {
   return armyIconByType.get(armyType)?.iconNoBackLocator ?? null;
+}
+
+export function getOfficialArmyIconUrlById(armyId: number): string | null {
+  if (!armyIconManifest.assetsReady) return null;
+
+  const record = armyIconById.get(armyId);
+  if (!record) return null;
+
+  return `${import.meta.env.BASE_URL}${armyIconManifest.publicRoot}/${record.fileName}`;
 }
 
 export function areOfficialArmyIconsReady(): boolean {
