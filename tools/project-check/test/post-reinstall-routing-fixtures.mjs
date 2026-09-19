@@ -80,6 +80,12 @@ assertRoute(
 );
 
 assertRoute(
+  'src/lib/army-icon-assets.ts',
+  ['shared-frontend'],
+  ['production-build'],
+);
+
+assertRoute(
   'public/images/soldiers-webp/9999.webp',
   ['soldier-assets', 'soldier-frontend'],
   ['soldier-assets', 'production-build'],
@@ -94,7 +100,7 @@ assertRoute(
 console.log(JSON.stringify({
   status: 'PASS',
   checkpoint: 'POST_REINSTALL_ROUTING_FIXTURES',
-  fixtureCount: 12,
+  fixtureCount: 13,
   fixtures: [
     'soldier-frontend -> production-build',
     'soldier-canonical + status-source -> provenance + soldier-canonical validators',
@@ -106,6 +112,7 @@ console.log(JSON.stringify({
     'soldier-training-material script -> dedicated read-only validator',
     'soldier-training-material helper -> production-build',
     'Soldier detail component -> production-build',
+    'Shared army icon consumer -> production-build',
     'Soldier portrait WebP -> soldier-assets + production-build',
     'Soldier portrait current web consumer -> soldier-assets + production-build',
   ],
