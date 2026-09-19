@@ -12,11 +12,13 @@ import {
 import { HeroCentralDisciplineSection } from "@/components/hero-central-discipline-section";
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
 import { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";
+import { HeroCastingLawSection } from "@/components/hero-casting-law-section";
 import { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";
 import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
 import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
+import { getHeroCastingLawPresentation } from "@/lib/hero-casting-law.functions";
 import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
@@ -37,6 +39,8 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (!Number.isSafeInteger(heroId) || heroId <= 0) throw notFound();
     const data = await getHeroDetailRouteStage5Data({ data: { heroId } });
     if (!data) throw notFound();
+    const castingLaw = await getHeroCastingLawPresentation({ data: { heroId } });
+    if (!castingLaw) throw new Error(`Hero ${heroId} has no frozen Casting Law presentation.`);
     const finalJobStatBars = await getHeroFinalJobStatBarPresentationData();
     const exclusiveEquipment = await getHeroExclusiveEquipmentPresentation({ data: { heroId } });
     const fusionPowers = await getHeroFusionPowerIndex();
@@ -93,7 +97,7 @@ export const Route = createFileRoute("/heroes_/$heroId")({
     if (soldierCards.length !== data.detail.soldiers.count) {
       throw new Error(`Hero ${heroId} Soldier card count mismatch: ${soldierCards.length} != ${data.detail.soldiers.count}.`);
     }
-    return { ...data, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards };
+    return { ...data, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards };
   },
   head: ({ loaderData }) => ({
     meta: [{
@@ -178,7 +182,7 @@ function stripConfigMarkup(value: string | null) {
 }
 
 function HeroDetailPage() {
-  const { hero, detail, soldierCommand, heartFetter, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
+  const { hero, detail, soldierCommand, heartFetter, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const hasSpForm = detail.sp.released;
   const [formMode, setFormMode] = useState<HeroFormMode>("normal");
   useEffect(() => setFormMode("normal"), [hero.heroId]);
@@ -591,6 +595,7 @@ function HeroDetailPage() {
 
         <HeroJobMaterialsSection heroId={hero.heroId} mode={isSpForm ? "sp" : "normal"} />
         <HeroAwakeningMaterialsSection heroId={hero.heroId} />
+        <HeroCastingLawSection castingLaw={castingLaw} />
 
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
