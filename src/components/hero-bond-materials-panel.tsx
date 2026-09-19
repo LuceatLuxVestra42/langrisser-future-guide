@@ -125,10 +125,8 @@ function BondTrack({
               <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
               <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">접기</span>
             </div>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <GoldCost value={profile.total.gold} />
-            </div>
-            <div className="mt-2">
               <MaterialBadges materials={profile.total.materials} resolveAssetUrl={resolveAssetUrl} />
             </div>
           </div>

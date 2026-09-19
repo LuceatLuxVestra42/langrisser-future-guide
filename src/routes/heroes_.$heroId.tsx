@@ -517,8 +517,13 @@ function HeroDetailPage() {
                   .filter((condition) => !condition.favorability)
                   .map((condition, conditionIndex) => (
                     <div key={`${bond.fetterId ?? bond.order}-${conditionIndex}`} className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-muted/20 px-3 py-3">
-                      {fetterIconUrl ? <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-8 w-8 shrink-0 object-contain" /> : null}
-                      <p className="text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
+                      {fetterIconUrl && fetterIconNumber != null ? (
+                        <div className="flex shrink-0 items-center gap-2" data-hero-bond-unlock-number={fetterIconNumber}>
+                          <img src={fetterIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-8 w-8 shrink-0 object-contain" />
+                          <span className="whitespace-nowrap text-xs font-extrabold text-foreground">유대 {fetterIconNumber}</span>
+                        </div>
+                      ) : null}
+                      <p className="min-w-0 text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
                     </div>
                   ));
               })}
