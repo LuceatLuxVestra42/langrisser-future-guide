@@ -52,7 +52,7 @@ check(factionAssets.sourcePolicy?.remoteRuntimeHotlink === false, 'faction icon 
 
 check(armyIcons.source === 'data/configdata/ConfigDataArmyInfo.json', 'class mark source must be ConfigDataArmyInfo');
 check(armyIcons.sourceField === 'Icon_NoBack', 'class mark must use Icon_NoBack');
-check(armyIcons.assetsReady === true && armyIcons.importedAssetCount === 10, 'official class icon manifest must be ready');
+check(armyIcons.assetsReady === true && armyIcons.importedAssetCount === armyIcons.records.length, 'official class icon manifest must be ready');
 
 const assetByFaction = new Map(factionAssets.records.map((row) => [row.factionId, row]));
 for (const row of factionAssets.records) {
