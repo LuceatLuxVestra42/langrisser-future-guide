@@ -280,17 +280,10 @@ function RootShell({ children }: { children: ReactNode }) {
             text-align: left !important;
           }
 
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat]::before {
+          [data-hero-final-job-stats="true"] [data-hero-final-job-stat-label] {
             font-weight: 700;
             color: var(--foreground);
           }
-
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"]::before { content: "생명"; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="ATK"]::before { content: "공격"; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="INT"]::before { content: "지력"; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEF"]::before { content: "방어"; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="MDEF"]::before { content: "마방"; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEX"]::before { content: "기술"; }
 
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat] > div {
             min-width: 0 !important;
