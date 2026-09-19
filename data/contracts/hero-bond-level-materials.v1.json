@@ -1,7 +1,7 @@
 {
   "version": 1,
   "stage": "hero-bond-level-materials-v1",
-  "status": "IMPLEMENTED_PENDING_FREEZE",
+  "status": "PASS",
   "owner": "hero-canonical",
   "purpose": "Freeze per-Hero level-up gold and material costs for the five regular Hero Fetter tracks and the Hero HeartFetter track without reopening already-validated bond effect semantics.",
   "baseline": {
@@ -64,5 +64,31 @@
   "producer": "scripts/build_hero_bond_level_materials.cjs",
   "validator": "scripts/validate_hero_bond_level_materials.cjs",
   "workflow": ".github/workflows/hero-bond-level-materials.yml",
-  "completion": "All 267 canonical Heroes have five frozen regular Fetter cost tracks plus one HeartFetter cost track, every level 2-10 cost is source-exact, every referenced material resolves without conflicting Item metadata, totals reproduce exactly, and validation leaves no unexpected tracked mutation."
+  "completion": "All 267 canonical Heroes have five frozen regular Fetter cost tracks plus one HeartFetter cost track, every level 2-10 cost is source-exact, every referenced material resolves without conflicting Item metadata, totals reproduce exactly, and validation leaves no unexpected tracked mutation.",
+  "verifiedOutput": {
+    "artifactBlobSha": "0caad3189ae704abc42e6efc7602e1320b711061",
+    "summaryBlobSha": "e69931ce7b4fd6f3a63fb534ec149b315b1efc62",
+    "counts": {
+      "heroes": 267,
+      "regularFetterRefs": 1335,
+      "heartFetterRefs": 267,
+      "regularCostProfiles": 15,
+      "heartCostProfiles": 24,
+      "materialItems": 43
+    },
+    "ownerValidator": "Project Tooling R3 Project Check",
+    "independentValidator": "Hero Bond Level Materials",
+    "latestValidatedHeadBeforeCloseout": "03e26d13e5c8a97ba2591b460d0a1466e0e07b01"
+  },
+  "resume": {
+    "completedUnit": "Per-Hero regular Fetter and HeartFetter level 2-10 material/gold cost freeze",
+    "nextUnit": "Presentation/consumer integration only if requested; semantic cost extraction is complete.",
+    "reopenConditions": [
+      "current Hero population changes",
+      "frozen Hero bond cost fields change",
+      "HeartFetter raw evidence mapping changes",
+      "pinned ConfigData source-pack changes",
+      "owning validator hard failure"
+    ]
+  }
 }
