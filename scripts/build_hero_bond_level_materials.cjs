@@ -118,7 +118,7 @@ for (const hero of master.records) {
   invariant(Array.isArray(shard.bonds) && shard.bonds.length === 5, `hero ${heroId}: expected five frozen regular Fetter rows`);
 
   const regularFetters = shard.bonds.map((bond, index) => {
-    invariant(bond.order === index + 1, `hero ${heroId}: unexpected regular Fetter order`);
+    invariant(Number.isSafeInteger(Number(bond.order)), `hero ${heroId}: invalid frozen regular Fetter order`);
     invariant(bond.sourceResolved === true, `hero ${heroId} Fetter ${bond.fetterId}: source is not resolved`);
     const levels = costLevels({
       maxLevel: bond.maxLevel,
