@@ -130,6 +130,20 @@ type HeroVisual = {
 };
 
 type HeroFormMode = "normal" | "sp";
+type MatthewVariant = "cavalry" | "flying" | "archer" | "assassin";
+
+const MATTHEW_HERO_ID = 1;
+const MATTHEW_FIXED_FINAL_JOB_ID = 206;
+const MATTHEW_VARIANTS: ReadonlyArray<{
+  id: MatthewVariant;
+  label: string;
+  finalJobId: number;
+}> = [
+  { id: "cavalry", label: "기병매튜", finalJobId: 307 },
+  { id: "flying", label: "비병매튜", finalJobId: 405 },
+  { id: "archer", label: "궁병매튜", finalJobId: 604 },
+  { id: "assassin", label: "암살매튜", finalJobId: 1104 },
+];
 
 const HERO_RARITY_ICON_PATH_BY_LABEL: Record<string, string> = {
   LLR: "/images/heroes/rarity/LLR.png",
@@ -189,8 +203,14 @@ function HeroDetailPage() {
   const { hero, detail, soldierCommand, heartFetter, bondMaterials, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const hasSpForm = detail.sp.released;
   const [formMode, setFormMode] = useState<HeroFormMode>("normal");
-  useEffect(() => setFormMode("normal"), [hero.heroId]);
+  const [matthewVariant, setMatthewVariant] = useState<MatthewVariant>("cavalry");
+  useEffect(() => {
+    setFormMode("normal");
+    setMatthewVariant("cavalry");
+  }, [hero.heroId]);
   const isSpForm = hasSpForm && formMode === "sp";
+  const isMatthew = hero.heroId === MATTHEW_HERO_ID;
+  const selectedMatthewVariant = MATTHEW_VARIANTS.find((variant) => variant.id === matthewVariant) ?? MATTHEW_VARIANTS[0];
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const displayRarityLabel = isSpForm ? "SP" : hero.rarity.baseLabel;
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[displayRarityLabel] ?? null;
@@ -288,9 +308,15 @@ function HeroDetailPage() {
     if (visibleTalentProgression.length <= 1) return;
     setTalentIndex((current) => Math.min(Math.max(current + delta, 0), visibleTalentProgression.length - 1));
   };
-  const normalFinalJobRows = detail.jobs.branches
+  const allNormalFinalJobRows = detail.jobs.branches
     .filter((branch) => branch.capstone?.rank === 4)
     .map((branch) => ({ key: `normal-${branch.branchIndex}`, capstone: branch.capstone }));
+  const normalFinalJobRows = isMatthew
+    ? allNormalFinalJobRows.filter(({ capstone }) =>
+        capstone?.jobId === MATTHEW_FIXED_FINAL_JOB_ID ||
+        capstone?.jobId === selectedMatthewVariant.finalJobId,
+      )
+    : allNormalFinalJobRows;
   const spFinalJobRows = detail.sp.released && detail.sp.finalJob
     ? [{ key: "sp", capstone: detail.sp.finalJob }]
     : [];
@@ -319,6 +345,7 @@ function HeroDetailPage() {
       data-name-kr-status={hero.localization.nameKrStatus}
       data-name-source-authority={hero.localization.sourceAuthority}
       data-hero-form-mode={isSpForm ? "sp" : "normal"}
+      data-matthew-variant={isMatthew && !isSpForm ? matthewVariant : undefined}
       className="min-h-screen bg-background"
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
@@ -409,32 +436,68 @@ function HeroDetailPage() {
             </div>
           </div>
 
-          {hasSpForm ? (
+          {hasSpForm || isMatthew ? (
             <div
               className="border-t border-border bg-muted/15 p-3 sm:p-4"
               data-hero-form-switch="true"
               data-active-hero-form={isSpForm ? "sp" : "normal"}
+              data-active-matthew-variant={isMatthew && !isSpForm ? matthewVariant : undefined}
             >
-              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/35 p-1.5" role="group" aria-label="전직 형태 선택">
-                <button
-                  type="button"
-                  aria-label="기본 전직"
-                  aria-pressed={!isSpForm}
-                  onClick={() => setFormMode("normal")}
-                  className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${!isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
-                >
-                  기본전직 보기
-                </button>
-                <button
-                  type="button"
-                  aria-label="SP 전직"
-                  aria-pressed={isSpForm}
-                  onClick={() => setFormMode("sp")}
-                  className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
-                >
-                  SP전직 보기
-                </button>
-              </div>
+              {isMatthew ? (
+                <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/35 p-1.5 sm:grid-cols-5" role="group" aria-label="매튜 전직 분기 선택">
+                  {MATTHEW_VARIANTS.map((variant) => {
+                    const active = !isSpForm && matthewVariant === variant.id;
+                    return (
+                      <button
+                        key={variant.id}
+                        type="button"
+                        aria-label={variant.label}
+                        aria-pressed={active}
+                        data-matthew-variant-option={variant.id}
+                        onClick={() => {
+                          setMatthewVariant(variant.id);
+                          setFormMode("normal");
+                        }}
+                        className={`rounded-xl px-3 py-3 text-sm font-extrabold transition sm:text-base ${active ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                      >
+                        {variant.label}
+                      </button>
+                    );
+                  })}
+                  {hasSpForm ? (
+                    <button
+                      type="button"
+                      aria-label="SP 전직"
+                      aria-pressed={isSpForm}
+                      onClick={() => setFormMode("sp")}
+                      className={`rounded-xl px-3 py-3 text-sm font-extrabold transition sm:text-base ${isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                    >
+                      SP전직
+                    </button>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted/35 p-1.5" role="group" aria-label="전직 형태 선택">
+                  <button
+                    type="button"
+                    aria-label="기본 전직"
+                    aria-pressed={!isSpForm}
+                    onClick={() => setFormMode("normal")}
+                    className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${!isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                  >
+                    기본전직 보기
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="SP 전직"
+                    aria-pressed={isSpForm}
+                    onClick={() => setFormMode("sp")}
+                    className={`rounded-xl px-4 py-3 text-sm font-extrabold transition sm:text-base ${isSpForm ? "bg-background text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-background/60 hover:text-foreground"}`}
+                  >
+                    SP전직 보기
+                  </button>
+                </div>
+              )}
             </div>
           ) : null}
         </section>
