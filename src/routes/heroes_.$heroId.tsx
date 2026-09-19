@@ -573,14 +573,14 @@ function HeroDetailPage() {
               data-hero-talent-min-star={visibleTalentProgression[0]?.star ?? ""}
               data-hero-talent-max-star={visibleTalentProgression[visibleTalentProgression.length - 1]?.star ?? ""}
             >
-              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2 sm:gap-3">
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-stretch gap-2 sm:gap-3">
                 <button
                   type="button"
                   aria-label="낮은 성급 고유기 보기"
                   onClick={() => moveTalent(-1)}
                   disabled={!previousTalentRow}
                   data-hero-talent-nav-direction="lower"
-                  className="group flex min-h-24 w-[34px] self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
+                  className="group flex h-full w-[34px] flex-col items-center justify-start gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 pt-8 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
                 >
                   <ChevronLeft className="h-6 w-6 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
                   {previousTalentRow ? (
@@ -614,7 +614,7 @@ function HeroDetailPage() {
                   onClick={() => moveTalent(1)}
                   disabled={!nextTalentRow}
                   data-hero-talent-nav-direction="higher"
-                  className="group flex min-h-24 w-[34px] self-start flex-col items-center justify-center gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 py-3 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
+                  className="group flex h-full w-[34px] flex-col items-center justify-start gap-1 rounded-xl border-2 border-primary/35 bg-primary/5 px-0 pt-8 text-primary shadow-sm transition hover:border-primary/60 hover:bg-primary/10 disabled:cursor-not-allowed disabled:border-border disabled:bg-background disabled:text-muted-foreground disabled:opacity-30 sm:w-[38px]"
                 >
                   <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   {nextTalentRow ? (

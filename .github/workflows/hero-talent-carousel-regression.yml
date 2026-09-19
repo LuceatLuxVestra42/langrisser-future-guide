@@ -197,7 +197,7 @@ jobs:
               const [lowerBox, articleBox] = await Promise.all([lower.boundingBox(), carousel.locator('article').boundingBox()]);
               check(lowerBox && articleBox, `${label} Ashi talent navigation boxes unavailable`);
               check(Math.abs(lowerBox.y - articleBox.y) <= 1, `${label} Ashi lower navigation must stay top-aligned with the talent card: button=${lowerBox.y}, article=${articleBox.y}`);
-              check(lowerBox.height <= 120, `${label} Ashi lower navigation must not stretch with the long talent description: height=${lowerBox.height}`);
+              check(Math.abs(lowerBox.height - articleBox.height) <= 1, `${label} Ashi lower navigation height must match the talent card: button=${lowerBox.height}, article=${articleBox.height}`);
             }
 
             const downward = [6];
