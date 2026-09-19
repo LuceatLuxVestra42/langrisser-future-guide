@@ -1,5 +1,5 @@
 import exclusiveByHeroJson from "../../data/generated/hero-exclusive-equipment-by-hero.v1.json";
-import exclusiveConsumerJson from "../../data/generated/equipment_stage3_5_exclusive_consumer.json";
+import exclusiveConsumerJson from "../../data/generated/equipment_stage3_5_exclusive_consumer.json";\nimport { localizeEquipmentEffectDescription } from "./equipment-effect-description-kr.server";
 
 type ExclusiveByHeroSource = {
   summary: {
