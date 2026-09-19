@@ -314,10 +314,10 @@ function RootShell({ children }: { children: ReactNode }) {
             background: oklch(0.52 0 0) !important;
           }
 
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"] > div > div { background: #d95858 !important; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="ATK"] > div > div { background: #e58a3a !important; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="HP"] > div > div { background: #4fa66a !important; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="ATK"] > div > div { background: #d95c5c !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="INT"] > div > div { background: #7c63c7 !important; }
-          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEF"] > div > div { background: #c9a23a !important; }
+          [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEF"] > div > div { background: #d39a3a !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="MDEF"] > div > div { background: #4d91c7 !important; }
           [data-hero-final-job-stats="true"] td[data-hero-final-job-stat="DEX"] > div > div { background: #35a5a0 !important; }
 
