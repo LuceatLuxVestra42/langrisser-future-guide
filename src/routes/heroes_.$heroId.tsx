@@ -210,7 +210,9 @@ function HeroDetailPage() {
   }, [hero.heroId]);
   const isSpForm = hasSpForm && formMode === "sp";
   const isMatthew = hero.heroId === MATTHEW_HERO_ID;
-  const selectedMatthewVariant = MATTHEW_VARIANTS.find((variant) => variant.id === matthewVariant) ?? MATTHEW_VARIANTS[0];
+  const selectedMatthewVariantFinalJobId = MATTHEW_VARIANTS.find(
+    (variant) => variant.id === matthewVariant,
+  )?.finalJobId ?? 307;
   const displayName = hero.localization.displayName || (hero.identity.nameKr ?? hero.identity.nameCn);
   const displayRarityLabel = isSpForm ? "SP" : hero.rarity.baseLabel;
   const rarityIconPath = HERO_RARITY_ICON_PATH_BY_LABEL[displayRarityLabel] ?? null;
@@ -314,7 +316,7 @@ function HeroDetailPage() {
   const normalFinalJobRows = isMatthew
     ? allNormalFinalJobRows.filter(({ capstone }) =>
         capstone?.jobId === MATTHEW_FIXED_FINAL_JOB_ID ||
-        capstone?.jobId === selectedMatthewVariant.finalJobId,
+        capstone?.jobId === selectedMatthewVariantFinalJobId,
       )
     : allNormalFinalJobRows;
   const spFinalJobRows = detail.sp.released && detail.sp.finalJob
