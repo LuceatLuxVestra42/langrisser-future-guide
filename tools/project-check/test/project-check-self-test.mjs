@@ -168,6 +168,11 @@ expectOwners(
   ['hero-assets'],
 );
 expectOwners(
+  'data/manifests/hero-casting-law-material-icons.v1.json',
+  ['hero-assets'],
+  ['hero-assets'],
+);
+expectOwners(
   'data/contracts/hero-card-icon-source-pack.v1.json',
   ['hero-card-icon-source-pack-assets'],
   ['hero-card-icon-source-pack-assets'],
