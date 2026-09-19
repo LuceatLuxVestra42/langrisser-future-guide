@@ -190,9 +190,8 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
           <span className="hidden text-xs font-bold text-muted-foreground group-open:inline">접기</span>
         </div>
 
-        <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          <RangeSummary title="Lv.1~5 합계" totals={slot.level1to5} />
-          <RangeSummary title="Lv.6~10 합계" totals={slot.level6to10} />
+        <div className="mt-3">
+          <RangeSummary title="Lv.1~10" totals={slot.level1to10} />
         </div>
       </summary>
 
