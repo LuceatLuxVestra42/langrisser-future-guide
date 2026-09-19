@@ -233,24 +233,24 @@ export function HeroCastingLawSection({
             .map((slot) => (
               <div
                 key={`summary-${slot.sourceIndex}-${slot.templateId}`}
-                className="flex w-16 flex-col items-center gap-1.5"
+                className="flex w-20 flex-col items-center gap-1.5"
                 data-casting-law-summary-template-id={slot.templateId}
               >
                 <span
-                  className={`inline-flex h-12 w-12 items-center justify-center rounded-lg border ${summaryToneClass(slot.slotType)}`}
+                  className={`inline-flex h-14 w-14 items-center justify-center rounded-xl border sm:h-16 sm:w-16 ${summaryToneClass(slot.slotType)}`}
                   title={slot.summaryIcon?.labelKr}
                 >
                   <img
                     src={slot.summaryIcon?.iconUrl}
                     alt={slot.summaryIcon?.labelKr ?? ""}
-                    width={40}
-                    height={40}
+                    width={48}
+                    height={48}
                     loading="lazy"
                     decoding="async"
-                    className="h-10 w-10 object-contain"
+                    className="h-12 w-12 object-contain sm:h-14 sm:w-14"
                   />
                 </span>
-                <span className="w-full text-center text-[11px] font-bold leading-tight text-foreground">
+                <span className="w-full text-center text-xs font-bold leading-tight text-foreground">
                   {slot.summaryIcon?.labelKr}
                 </span>
               </div>
