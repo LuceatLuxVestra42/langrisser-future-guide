@@ -1,28 +1,56 @@
-import {
-  getStaticHeroCastingLaw,
-  getStaticHeroCastingLawMaterialName,
-  getStaticHeroCastingLawTemplate,
-  type HeroCastingLawCatalogLevel,
-  type HeroCastingLawRangeTotals,
-  type HeroCastingLawSlot,
-} from "@/lib/hero-casting-law.static";
+export type HeroCastingLawPresentation = {
+  heroId: number;
+  slots: Array<{
+    sourceIndex: number;
+    templateId: number;
+    slotType: string;
+    costProfile: "A" | "B" | "C";
+    templateNameCn: string | null;
+    equipmentType: number | null;
+    level1to5: CastingLawRangeTotals;
+    level6to10: CastingLawRangeTotals;
+    level1to10: CastingLawRangeTotals;
+    levels: Array<{
+      level: number;
+      levelInfoId: number;
+      goldCost: number;
+      materials: CastingLawMaterial[];
+    }>;
+  }>;
+  totals: {
+    level1to5: CastingLawRangeTotals;
+    level6to10: CastingLawRangeTotals;
+    level1to10: CastingLawRangeTotals;
+  };
+};
+
+type CastingLawMaterial = {
+  itemId: number;
+  count: number;
+  nameCn: string;
+};
+
+type CastingLawRangeTotals = {
+  gold: number;
+  materials: CastingLawMaterial[];
+};
 
 function formatNumber(value: number) {
   return value.toLocaleString("ko-KR");
 }
 
-function slotLabel(slot: HeroCastingLawSlot) {
-  if (slot.slotType === "ARMOR") return "갑옷";
-  if (slot.slotType === "HEAD") return "투구";
-  if (slot.slotType === "ACCESSORY") return "악세사리";
-  if (slot.slotType.startsWith("WEAPON_")) {
-    const ordinal = Number(slot.slotType.slice("WEAPON_".length));
+function slotLabel(slotType: string) {
+  if (slotType === "ARMOR") return "갑옷";
+  if (slotType === "HEAD") return "투구";
+  if (slotType === "ACCESSORY") return "악세사리";
+  if (slotType.startsWith("WEAPON_")) {
+    const ordinal = Number(slotType.slice("WEAPON_".length));
     return Number.isSafeInteger(ordinal) && ordinal > 0 ? `무기 ${ordinal}` : "무기";
   }
-  return slot.slotType;
+  return slotType;
 }
 
-function MaterialBadges({ materials }: { materials: HeroCastingLawRangeTotals["materials"] }) {
+function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {materials.map((material) => (
@@ -31,9 +59,7 @@ function MaterialBadges({ materials }: { materials: HeroCastingLawRangeTotals["m
           className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
           data-casting-law-material-id={material.itemId}
         >
-          <span className="max-w-[15rem] truncate">
-            {getStaticHeroCastingLawMaterialName(material.itemId) ?? `Item ${material.itemId}`}
-          </span>
+          <span className="max-w-[15rem] truncate">{material.nameCn}</span>
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
       ))}
@@ -46,7 +72,7 @@ function RangeSummary({
   totals,
 }: {
   title: string;
-  totals: HeroCastingLawRangeTotals;
+  totals: CastingLawRangeTotals;
 }) {
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-3">
@@ -68,7 +94,7 @@ function LevelTable({
   from,
   to,
 }: {
-  levels: HeroCastingLawCatalogLevel[];
+  levels: HeroCastingLawPresentation["slots"][number]["levels"];
   from: number;
   to: number;
 }) {
@@ -93,11 +119,11 @@ function LevelTable({
                 <div className="flex flex-wrap gap-1.5">
                   {level.materials.map((material, index) => (
                     <span
-                      key={`${material.id}-${index}`}
+                      key={`${material.itemId}-${index}`}
                       className="inline-flex items-center gap-1 rounded bg-muted/40 px-2 py-1 text-[11px] font-semibold text-foreground"
-                      data-casting-law-level-material-id={material.id}
+                      data-casting-law-level-material-id={material.itemId}
                     >
-                      <span>{material.item.nameCn}</span>
+                      <span>{material.nameCn}</span>
                       <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
                     </span>
                   ))}
@@ -114,12 +140,7 @@ function LevelTable({
   );
 }
 
-function SlotCard({ slot }: { slot: HeroCastingLawSlot }) {
-  const template = getStaticHeroCastingLawTemplate(slot.templateId);
-  if (!template) {
-    throw new Error(`Casting Law frontend slot references missing template ${slot.templateId}.`);
-  }
-
+function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] }) {
   return (
     <details
       className="group rounded-xl border border-border bg-muted/10"
@@ -131,7 +152,7 @@ function SlotCard({ slot }: { slot: HeroCastingLawSlot }) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-extrabold text-foreground">{slotLabel(slot)}</h3>
+              <h3 className="font-extrabold text-foreground">{slotLabel(slot.slotType)}</h3>
               <span className="rounded bg-muted px-2 py-1 text-[10px] font-black text-muted-foreground">
                 비용형 {slot.costProfile}
               </span>
@@ -154,11 +175,11 @@ function SlotCard({ slot }: { slot: HeroCastingLawSlot }) {
         <div className="grid gap-4 xl:grid-cols-2">
           <div>
             <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.1~5 단계별</h4>
-            <LevelTable levels={template.levels} from={1} to={5} />
+            <LevelTable levels={slot.levels} from={1} to={5} />
           </div>
           <div>
             <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.6~10 단계별</h4>
-            <LevelTable levels={template.levels} from={6} to={10} />
+            <LevelTable levels={slot.levels} from={6} to={10} />
           </div>
         </div>
       </div>
@@ -166,17 +187,16 @@ function SlotCard({ slot }: { slot: HeroCastingLawSlot }) {
   );
 }
 
-export function HeroCastingLawSection({ heroId }: { heroId: number }) {
-  const hero = getStaticHeroCastingLaw(heroId);
-  if (!hero) {
-    throw new Error(`Hero ${heroId} has no frozen Casting Law record.`);
-  }
-
+export function HeroCastingLawSection({
+  castingLaw,
+}: {
+  castingLaw: HeroCastingLawPresentation;
+}) {
   return (
     <section
       className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
       data-hero-casting-law="true"
-      data-casting-law-slot-count={hero.slots.length}
+      data-casting-law-slot-count={castingLaw.slots.length}
     >
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
@@ -185,19 +205,19 @@ export function HeroCastingLawSection({ heroId }: { heroId: number }) {
             부위별 Lv.1~10 강화 재료와 요구 골드
           </p>
         </div>
-        <span className="text-xs font-semibold text-muted-foreground">총 {hero.slots.length}개 슬롯</span>
+        <span className="text-xs font-semibold text-muted-foreground">총 {castingLaw.slots.length}개 슬롯</span>
       </div>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
         <h3 className="text-sm font-extrabold text-foreground">전체 슬롯 합계</h3>
         <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          <RangeSummary title="Lv.1~5" totals={hero.totals.level1to5} />
-          <RangeSummary title="Lv.6~10" totals={hero.totals.level6to10} />
+          <RangeSummary title="Lv.1~5" totals={castingLaw.totals.level1to5} />
+          <RangeSummary title="Lv.6~10" totals={castingLaw.totals.level6to10} />
         </div>
       </div>
 
       <div className="mt-4 space-y-3">
-        {hero.slots.map((slot) => (
+        {castingLaw.slots.map((slot) => (
           <SlotCard key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`} slot={slot} />
         ))}
       </div>
