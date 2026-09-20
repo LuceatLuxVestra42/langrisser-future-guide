@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -21,9 +21,7 @@ import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroBondMaterialsPresentation } from "@/lib/hero-bond-materials.functions";
 import { getHeroCastingLawPresentation } from "@/lib/hero-casting-law.functions";
 import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
-import { resolveHeroFinalJobNameKr } from "@/lib/hero-final-job-localization";
 import { resolveHeroJobNameKr } from "@/lib/hero-job-localization";
-import { resolveHeroSpJobNameKr } from "@/lib/hero-sp-job-localization";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
@@ -383,10 +381,6 @@ function HeroDetailPage() {
         capstone?.jobId === selectedMatthewVariantFinalJobId,
       )
     : allNormalFinalJobRows;
-  const spFinalJobRows = detail.sp.released && detail.sp.finalJob
-    ? [{ key: "sp", capstone: detail.sp.finalJob }]
-    : [];
-  const finalJobRows = isSpForm ? spFinalJobRows : normalFinalJobRows;
   const normalFinalJobDetails = normalFinalJobRows.flatMap(({ capstone }) =>
     capstone?.jobId == null
       ? []
@@ -396,30 +390,13 @@ function HeroDetailPage() {
           centralBondStats: capstone.centralBondStats,
         }],
   );
-  const finalJobNameById = new Map<number, string>();
-  for (const { capstone } of finalJobRows) {
-    if (capstone?.jobId != null) {
-      finalJobNameById.set(
-        capstone.jobId,
-        (isSpForm
-          ? resolveHeroSpJobNameKr({
-              jobId: capstone.jobId,
-              nameCn: capstone.nameCn ?? null,
-            })
-          : resolveHeroFinalJobNameKr({
-              jobId: capstone.jobId,
-              nameCn: capstone.nameCn ?? null,
-            })) ?? capstone.nameCn ?? "전직",
-      );
-    }
-  }
-  const heartFetterRows = [...finalJobNameById.entries()].map(([jobId, jobName]) => ({
-    jobId,
-    jobName,
-    effects: heartFetter.effects
-      .filter((effect) => effect.jobId === jobId)
-      .sort((a, b) => a.level - b.level || a.skillId - b.skillId),
-  }));
+  const spFinalJobDetails = detail.sp.released && detail.sp.finalJob?.jobId != null
+    ? [{
+        jobId: detail.sp.finalJob.jobId,
+        finalStats: detail.sp.finalJob.finalStats,
+        centralBondStats: detail.sp.finalJob.centralBondStats,
+      }]
+    : [];
   const jobNameByConnectionId = new Map<number, string>();
   for (const branch of detail.jobs.branches) {
     for (const job of branch.jobs) {
@@ -775,118 +752,10 @@ function HeroDetailPage() {
           heroId={hero.heroId}
           mode={isSpForm ? "sp" : "normal"}
           allowedJobConnectionIds={selectedMatthewJobConnectionIds}
-          finalJobDetails={normalFinalJobDetails}
+          finalJobDetails={isSpForm ? spFinalJobDetails : normalFinalJobDetails}
           statDomains={finalJobStatBars.domains}
           heartFetterEffects={heartFetter.effects}
         />
-
-        {isSpForm ? (
-          <>
-          <div
-            className="mt-7 border-t border-border pt-5"
-            data-hero-final-job-stats-section="true"
-            data-hero-form-mode={isSpForm ? "sp" : "normal"}
-          >
-            <h3 className="text-base font-extrabold tracking-tight text-foreground">최종 직업 스탯</h3>
-            {finalJobRows.length > 0 ? (
-              <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
-                <table className="w-full min-w-[680px] border-collapse text-sm">
-                  <thead className="bg-muted/50">
-                    <tr className="border-b border-border">
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                      <HeroStatHeader stat="HP" />
-                      <HeroStatHeader stat="ATK" />
-                      <HeroStatHeader stat="INT" />
-                      <HeroStatHeader stat="DEF" />
-                      <HeroStatHeader stat="MDEF" />
-                      <HeroStatHeader stat="DEX" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {finalJobRows.map(({ key, capstone }) => {
-                      if (!capstone) return null;
-                      return (
-                        <Fragment key={key}>
-                          <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
-                            <th scope="row" className="px-4 pb-2 pt-3 text-left">
-                              <div className="font-bold text-foreground">
-                                {(isSpForm
-                                  ? resolveHeroSpJobNameKr({
-                                      jobId: capstone.jobId ?? null,
-                                      nameCn: capstone.nameCn ?? null,
-                                    })
-                                  : resolveHeroFinalJobNameKr({
-                                      jobId: capstone.jobId ?? null,
-                                      nameCn: capstone.nameCn ?? null,
-                                    })) ?? capstone.nameCn ?? "전직"}
-                              </div>
-                            </th>
-                            <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
-                            <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
-                            <JobStatCell stat="INT" value={capstone.finalStats.INT} domain={finalJobStatBars.domains.INT} />
-                            <JobStatCell stat="DEF" value={capstone.finalStats.DEF} domain={finalJobStatBars.domains.DEF} />
-                            <JobStatCell stat="MDEF" value={capstone.finalStats.MDEF} domain={finalJobStatBars.domains.MDEF} />
-                            <JobStatCell stat="DEX" value={capstone.finalStats.DEX} domain={finalJobStatBars.domains.DEX} />
-                          </tr>
-                          {capstone.centralBondStats ? (
-                            <tr className="border-b border-border last:border-b-0 bg-muted/20" data-hero-central-bond-stat-row="true">
-                              <th scope="row" className="px-4 pb-3 pt-2 text-left text-xs font-semibold text-muted-foreground">└ 중앙유대</th>
-                              <JobStatBonusCell value={capstone.centralBondStats.HP} />
-                              <JobStatBonusCell value={capstone.centralBondStats.ATK} />
-                              <JobStatBonusCell value={capstone.centralBondStats.INT} />
-                              <JobStatBonusCell value={capstone.centralBondStats.DEF} />
-                              <JobStatBonusCell value={capstone.centralBondStats.MDEF} />
-                              <JobStatBonusCell value={capstone.centralBondStats.DEX} />
-                            </tr>
-                          ) : null}
-                        </Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
-            )}
-          </div>
-  
-          <div
-            className="mt-7 border-t border-border pt-5"
-            data-hero-heart-fetter="true"
-            data-hero-form-mode={isSpForm ? "sp" : "normal"}
-            data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
-          >
-            <h3 className="text-base font-extrabold tracking-tight text-foreground">유대 Lv4 / Lv7 효과</h3>
-            {heartFetterRows.length > 0 ? (
-              <div className="mt-5 grid gap-3 lg:grid-cols-2">
-                {heartFetterRows.map((row) => (
-                  <article key={row.jobId} className="rounded-xl border border-border bg-muted/20 p-4" data-heart-fetter-job-id={row.jobId}>
-                    <h3 className="font-bold text-foreground">{row.jobName}</h3>
-                    <div className="mt-3 space-y-2">
-                      {row.effects.map((effect) => (
-                        <div
-                          key={`${effect.level}-${effect.skillId}`}
-                          className="rounded-lg border border-border bg-background px-3 py-3"
-                          data-heart-fetter-level={effect.level}
-                          data-heart-fetter-skill-id={effect.skillId}
-                          data-heart-fetter-mapping-mode={effect.mappingMode}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="rounded bg-muted px-2 py-1 text-[11px] font-black text-foreground">Lv.{effect.level}</span>
-                          </div>
-                          <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 Lv4/Lv7 효과 없음</p>
-            )}
-          </div>
-            </>
-        ) : null}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
@@ -1529,82 +1398,4 @@ function formatBondCondition(
 
 function SectionTitle({ title }: { title: string }) { return <h2 className="font-bold text-foreground">{title}</h2>; }
 
-type HeroFinalJobStatKey = "HP" | "ATK" | "INT" | "DEF" | "MDEF" | "DEX";
-
-const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Record<HeroFinalJobStatKey, string> = {
-  HP: "Icon_HP.png",
-  ATK: "Icon_Attack.png",
-  INT: "Icon_Intelligence.png",
-  DEF: "Icon_Defense.png",
-  MDEF: "Icon_MagicDefense.png",
-  DEX: "Icon_Skill.png",
-};
-
-const HERO_FINAL_JOB_STAT_LABEL_BY_KEY: Record<HeroFinalJobStatKey, string> = {
-  HP: "생명",
-  ATK: "공격",
-  INT: "지력",
-  DEF: "방어",
-  MDEF: "마방",
-  DEX: "기술",
-};
-
-function HeroStatLabel({
-  stat,
-  className,
-}: {
-  stat: HeroFinalJobStatKey;
-  className: string;
-}) {
-  const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
-
-  return (
-    <span className={className} data-hero-final-job-stat-label={stat}>
-      <img
-        src={iconUrl}
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        decoding="async"
-        className="h-4 w-4 shrink-0 object-contain"
-      />
-      <span>{HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}</span>
-    </span>
-  );
-}
-
-function HeroStatHeader({ stat }: { stat: HeroFinalJobStatKey }) {
-  return (
-    <th scope="col" className="px-4 py-3 text-right text-xs font-bold text-muted-foreground" data-hero-final-job-stat-header={stat}>
-      <HeroStatLabel stat={stat} className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap" />
-    </th>
-  );
-}
-
-type JobStatBarDomain = { min: number; max: number };
-function getJobStatBarPercent(value: number, domain: JobStatBarDomain) {
-  const normalized = (value - domain.min) / (domain.max - domain.min);
-  return Math.min(100, Math.max(25, 25 + (75 * normalized)));
-}
-function JobStatCell({ stat, value, domain }: { stat: HeroFinalJobStatKey; value: number | null; domain: JobStatBarDomain }) {
-  const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
-  return (
-    <td
-      className="px-4 pb-2 pt-3 text-right font-bold tabular-nums text-foreground"
-      data-hero-final-job-stat={stat}
-      data-stat-domain-min={domain.min}
-      data-stat-domain-max={domain.max}
-      data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
-    >
-      <HeroStatLabel stat={stat} className="inline-flex items-center gap-1.5 whitespace-nowrap" />
-      <div className="relative min-w-[4.5rem] overflow-hidden rounded-md bg-muted/30 px-2 py-1.5">
-        {value == null ? null : (
-          <div className="absolute inset-y-0 left-0 bg-foreground/10" style={{ width: `${barPercent}%` }} aria-hidden="true" />
-        )}
-        <span className="relative z-10">{value ?? "-"}</span>
-      </div>
-    </td>
-  );
-}
-function JobStatBonusCell({ value }: { value: number | null }) { return <td className="px-4 pb-3 pt-2 text-right text-xs font-semibold tabular-nums text-muted-foreground">{value == null ? "-" : `+${value}`}</td>; }
 function HeroNotFound() { return <main className="min-h-screen bg-background"><div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-4 text-center"><Swords className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="text-2xl font-bold text-foreground">영웅을 찾을 수 없어.</h1><p className="mt-2 text-sm text-muted-foreground">Stage 6 확정 Hero 목록에 존재하지 않는 주소야.</p><Link reloadDocument to="/heroes" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-foreground underline underline-offset-4"><ArrowLeft className="h-4 w-4" aria-hidden="true" />영웅 목록으로</Link></div></main>; }
