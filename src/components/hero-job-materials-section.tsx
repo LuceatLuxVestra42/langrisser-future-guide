@@ -250,14 +250,8 @@ function HeroSpJobMovementSection({
           </dl>
 
           <HeroFinalJobStatGraph
-
-
             stats={finalJobDetail.finalStats}
-
-
             domains={statDomains}
-
-
           />
 
           <HeroFinalJobHeartFetter
@@ -603,14 +597,8 @@ function HeroJobTreeCard({
           </dl>
 
           <HeroFinalJobStatGraph
-
-
             stats={finalJobDetail.finalStats}
-
-
             domains={statDomains}
-
-
           />
 
           <HeroFinalJobHeartFetter
