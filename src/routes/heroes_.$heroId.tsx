@@ -755,65 +755,25 @@ function HeroDetailPage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
-          <SectionTitle title="스킬" />
 
-          <div className="mt-5" data-hero-equipable-skills="true" data-equipable-skill-count={equipableSkills.length}>
-            {equipableSkills.length > 0 ? (
-              <div className="grid gap-3 lg:grid-cols-2">
-                {equipableSkills.map((skill) => <SkillCard key={`equipable-${skill.skillId}`} heroId={hero.heroId} skill={skill} />)}
-              </div>
-            ) : (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 스킬 없음</p>
-            )}
-          </div>
-
-          <div className="mt-7 border-t border-border pt-5" data-hero-awakening-skill="true">
-            <h3 className="mb-3 text-sm font-bold text-foreground">각성기</h3>
-            {detail.skills.awakening.status === "VERIFIED" && detail.skills.awakening.skill ? (
-              <div className="grid gap-3">
-                <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} />
-              </div>
-            ) : detail.skills.awakening.status === "NONE" ? (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
-            ) : (
-              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
-            )}
-            <HeroAwakeningMaterialsSection heroId={hero.heroId} />
-          </div>
-
-          {isSpForm ? (
-            <div
-              className="mt-7 border-t border-border pt-5"
-              data-hero-sp-reward-skills="true"
-              data-sp-reward-skill-count={detail.sp.secondStageRewards.skills.length}
-            >
-              <h3 className="mb-3 text-sm font-bold text-foreground">SP 2차 보상 스킬</h3>
-              {detail.sp.secondStageRewards.skills.length > 0 ? (
-                <div className="grid gap-3 lg:grid-cols-2">
-                  {detail.sp.secondStageRewards.skills.map((skill) => (
-                    <SkillCard key={`sp-reward-${skill.skillId}`} heroId={hero.heroId} skill={skill} />
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">SP 2차 보상 스킬 확인 필요</p>
-              )}
-            </div>
-          ) : null}
-        </section>
-
+        <section
+          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+          data-hero-job-block="true"
+          data-hero-form-mode={isSpForm ? "sp" : "normal"}
+        >
+          <SectionTitle title="전직" />
         <HeroJobMaterialsSection
           heroId={hero.heroId}
           mode={isSpForm ? "sp" : "normal"}
           allowedJobConnectionIds={selectedMatthewJobConnectionIds}
         />
 
-        <section
-          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+        <div
+          className="mt-7 border-t border-border pt-5"
           data-hero-final-job-stats-section="true"
           data-hero-form-mode={isSpForm ? "sp" : "normal"}
         >
-          <SectionTitle title="최종 직업 스탯" />
+          <h3 className="text-base font-extrabold tracking-tight text-foreground">최종 직업 스탯</h3>
           {finalJobRows.length > 0 ? (
             <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
               <table className="w-full min-w-[680px] border-collapse text-sm">
@@ -874,15 +834,15 @@ function HeroDetailPage() {
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
           )}
-        </section>
+        </div>
 
-        <section
-          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+        <div
+          className="mt-7 border-t border-border pt-5"
           data-hero-heart-fetter="true"
           data-hero-form-mode={isSpForm ? "sp" : "normal"}
           data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
         >
-          <SectionTitle title="유대 Lv4 / Lv7 효과" />
+          <h3 className="text-base font-extrabold tracking-tight text-foreground">유대 Lv4 / Lv7 효과</h3>
           {heartFetterRows.length > 0 ? (
             <div className="mt-5 grid gap-3 lg:grid-cols-2">
               {heartFetterRows.map((row) => (
@@ -910,7 +870,56 @@ function HeroDetailPage() {
           ) : (
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 Lv4/Lv7 효과 없음</p>
           )}
+        </div>
         </section>
+
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+          <SectionTitle title="스킬" />
+
+          <div className="mt-5" data-hero-equipable-skills="true" data-equipable-skill-count={equipableSkills.length}>
+            {equipableSkills.length > 0 ? (
+              <div className="grid gap-3 lg:grid-cols-2">
+                {equipableSkills.map((skill) => <SkillCard key={`equipable-${skill.skillId}`} heroId={hero.heroId} skill={skill} />)}
+              </div>
+            ) : (
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 스킬 없음</p>
+            )}
+          </div>
+
+          <div className="mt-7 border-t border-border pt-5" data-hero-awakening-skill="true">
+            <h3 className="mb-3 text-sm font-bold text-foreground">각성기</h3>
+            {detail.skills.awakening.status === "VERIFIED" && detail.skills.awakening.skill ? (
+              <div className="grid gap-3">
+                <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} />
+              </div>
+            ) : detail.skills.awakening.status === "NONE" ? (
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
+            ) : (
+              <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
+            )}
+            <HeroAwakeningMaterialsSection heroId={hero.heroId} />
+          </div>
+
+          {isSpForm ? (
+            <div
+              className="mt-7 border-t border-border pt-5"
+              data-hero-sp-reward-skills="true"
+              data-sp-reward-skill-count={detail.sp.secondStageRewards.skills.length}
+            >
+              <h3 className="mb-3 text-sm font-bold text-foreground">SP 2차 보상 스킬</h3>
+              {detail.sp.secondStageRewards.skills.length > 0 ? (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {detail.sp.secondStageRewards.skills.map((skill) => (
+                    <SkillCard key={`sp-reward-${skill.skillId}`} heroId={hero.heroId} skill={skill} />
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">SP 2차 보상 스킬 확인 필요</p>
+              )}
+            </div>
+          ) : null}
+        </section>
+
 
         {isSpForm ? (
           <HeroSpMissionSection
