@@ -663,11 +663,14 @@ function HeroDetailPage() {
           )}
         </section>
 
-        <div className="mt-5 grid items-start gap-5 lg:grid-cols-2" data-hero-upper-support-grid="independent-columns">
-          <div className="grid content-start gap-5 [&>section]:mt-0" data-hero-upper-support-column="left">
+        <div
+          className="mt-5 grid items-start gap-5 lg:grid-cols-2 [&_[data-hero-exclusive-equipment]]:order-1 [&_[data-hero-central-discipline]]:order-2 [&_[data-hero-bond-section]]:order-3 [&_[data-hero-soldier-command]]:order-4 lg:[&_[data-hero-exclusive-equipment]]:order-1 lg:[&_[data-hero-bond-section]]:order-2 lg:[&_[data-hero-soldier-command]]:order-1 lg:[&_[data-hero-central-discipline]]:order-2"
+          data-hero-upper-support-grid="independent-columns"
+        >
+          <div className="contents content-start gap-5 [&>section]:mt-0 lg:grid" data-hero-upper-support-column="left">
             <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
 
-            <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+            <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-bond-section="true">
           <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
             <div className="mt-5 grid grid-cols-1 gap-2" data-hero-bond-unlock-grid="true">
@@ -697,7 +700,7 @@ function HeroDetailPage() {
             </section>
           </div>
 
-          <div className="grid content-start gap-5 [&>section]:mt-0" data-hero-upper-support-column="right">
+          <div className="contents content-start gap-5 [&>section]:mt-0 lg:grid" data-hero-upper-support-column="right">
             <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
             <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} castingLaw={castingLaw} />
           </div>
