@@ -62,19 +62,21 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
     >
       <h2 className="text-lg font-extrabold tracking-tight text-foreground">각성 재료</h2>
 
-      {hero.stage1 ? (
-        <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-awakening-stage-section="1">
-          <p className="text-sm font-extrabold text-foreground">1단계 · 스킬 Cost 상한 6</p>
-          <MaterialList materials={hero.stage1.materials} stage={1} />
-        </div>
-      ) : null}
+      <div className="mt-4 flex flex-col gap-3 xl:flex-row">
+        {hero.stage1 ? (
+          <div className="min-w-0 flex-1 rounded-xl border border-border bg-muted/20 p-4" data-awakening-stage-section="1">
+            <p className="text-sm font-extrabold text-foreground">1단계 · 스킬 Cost 상한 6</p>
+            <MaterialList materials={hero.stage1.materials} stage={1} />
+          </div>
+        ) : null}
 
-      {hero.awakening ? (
-        <div className="mt-3 rounded-xl border border-border bg-muted/20 p-4" data-awakening-stage-section="2">
-          <p className="text-sm font-extrabold text-foreground">2단계 · 각성기 습득</p>
-          <MaterialList materials={hero.awakening.materials} stage={2} />
-        </div>
-      ) : null}
+        {hero.awakening ? (
+          <div className="min-w-0 flex-1 rounded-xl border border-border bg-muted/20 p-4" data-awakening-stage-section="2">
+            <p className="text-sm font-extrabold text-foreground">2단계 · 각성기 습득</p>
+            <MaterialList materials={hero.awakening.materials} stage={2} />
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
