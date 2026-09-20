@@ -130,8 +130,8 @@ function BondTrack({
               <div>
                 <h4 className="text-sm font-extrabold text-foreground">{label}</h4>
               </div>
-              <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
-              <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">접기</span>
+              <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">레벨별 필요 재료 보기</span>
+              <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">레벨별 필요 재료 숨기기</span>
             </div>
             <div className="mt-2">
               <MaterialBadges
