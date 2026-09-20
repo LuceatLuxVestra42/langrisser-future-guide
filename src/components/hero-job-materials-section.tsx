@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getOfficialArmyIconUrlById } from "@/lib/army-icon-assets";
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { resolveHeroJobNameKr } from "@/lib/hero-job-localization";
+import { resolveHeroSpJobNameKr } from "@/lib/hero-sp-job-localization";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 
@@ -186,7 +187,7 @@ function HeroSpJobMovementSection({
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
               <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                {resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
+                {resolveHeroSpJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
               </h3>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
