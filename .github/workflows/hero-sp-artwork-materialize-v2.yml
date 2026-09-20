@@ -66,7 +66,7 @@ jobs:
               if sha!=summary['sha256'] or len(data)!=summary['sizeBytes']:
                   raise RuntimeError(f'artifact byte mismatch for Hero {hid}')
               im=Image.open(webp_path).convert('RGBA')
-              if [im.width,im.height]!=[summary['width'],summary['height']:
+              if [im.width,im.height]!=[summary['width'],summary['height']]:
                   raise RuntimeError(f'dimension mismatch for Hero {hid}')
               amin,amax=im.getchannel('A').getextrema()
               if amin>=255:
