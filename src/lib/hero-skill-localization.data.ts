@@ -1968,9 +1968,9 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       skillId: 11751,
       sourceNameCn: "幻影奇袭",
       nameKr: "환영기습",
-      descKr: "[물리 피해]치명타 확률 +30%. 주위 4칸 내 모든 적군에게 03배 범위 피해를 입힌다.'마법사'와 전투 시 더 큰 피해를 준다. 전투 후 재이동 3칸 가능.",
+      descKr: "[물리 피해]치명타 확률 +30%. 주위 4칸 내 모든 적군에게 0.3배 범위 피해를 입힌다. '마법사'와 전투 시 더 큰 피해를 준다. 전투 후 재이동 3칸 가능.",
       status: "LEGACY_SHEET_KR",
-      source: { type: "legacy-korean-sheet", heroIds: [70], note: "Legacy Korean sheet hero/data/요슈아.js; exact Hero CN + icon/metadata/effect parity against current generated Skill 11751." },
+      source: { type: "legacy-korean-sheet", heroIds: [70], note: "Legacy Korean sheet hero/data/요슈아.js; exact Hero CN + icon/metadata/effect parity against current generated Skill 11751. Legacy text typo 03배 normalized to current generated 0.3배." },
     },
     {
       skillId: 11762,
