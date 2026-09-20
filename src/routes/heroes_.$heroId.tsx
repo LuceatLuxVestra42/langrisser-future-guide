@@ -660,12 +660,12 @@ function HeroDetailPage() {
           )}
         </section>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="equipment-discipline">
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="equipment-command">
         <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
-        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
+        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="bond-command">
+        <div className="mt-5 grid gap-5 lg:grid-cols-2 [&>section]:mt-0 [&>section]:h-full" data-hero-upper-support-grid="bond-discipline">
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
@@ -694,7 +694,7 @@ function HeroDetailPage() {
           )}
           <HeroBondMaterialsPanel materials={bondMaterials} resolveAssetUrl={resolvePublicAssetUrl} />
         </section>
-        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
+        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
         </div>
 
         <section
