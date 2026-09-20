@@ -117,36 +117,36 @@ function RangeSummary({
 
 function LevelTable({
   levels,
-  from,
-  to,
 }: {
   levels: HeroCastingLawPresentation["slots"][number]["levels"];
-  from: number;
-  to: number;
 }) {
-  const rows = levels.filter((level) => level.level >= from && level.level <= to);
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[640px] border-collapse text-xs">
+    <div className="overflow-hidden rounded-lg border border-border">
+      <table className="w-full table-fixed border-collapse text-xs">
+        <colgroup>
+          <col className="w-14 sm:w-16" />
+          <col />
+          <col className="w-[5.25rem] sm:w-24" />
+        </colgroup>
         <thead className="bg-muted/50">
           <tr className="border-b border-border">
-            <th className="px-3 py-2 text-left font-bold text-muted-foreground">단계</th>
-            <th className="px-3 py-2 text-left font-bold text-muted-foreground">필요 재료</th>
-            <th className="px-3 py-2 text-right font-bold text-muted-foreground">골드</th>
+            <th className="px-2 py-2 text-left font-bold text-muted-foreground sm:px-3">단계</th>
+            <th className="px-2 py-2 text-left font-bold text-muted-foreground sm:px-3">필요 재료</th>
+            <th className="px-2 py-2 text-right font-bold text-muted-foreground sm:px-3">골드</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((level) => (
+          {levels.map((level) => (
             <tr key={level.levelInfoId} className="border-b border-border/60 last:border-b-0">
-              <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-extrabold text-foreground">
+              <th scope="row" className="whitespace-nowrap px-2 py-2.5 text-left font-extrabold text-foreground sm:px-3">
                 Lv.{level.level}
               </th>
-              <td className="px-3 py-2.5">
-                <div className="flex flex-wrap gap-1.5">
+              <td className="px-2 py-2.5 sm:px-3">
+                <div className="flex flex-wrap gap-1">
                   {level.materials.map((material, index) => (
                     <span
                       key={`${material.itemId}-${index}`}
-                      className="inline-flex items-center gap-1 rounded bg-muted/40 px-2 py-1 text-[11px] font-semibold text-foreground"
+                      className="inline-flex min-w-0 items-center gap-1 rounded bg-muted/40 px-1.5 py-1 text-[11px] font-semibold text-foreground sm:px-2"
                       data-casting-law-level-material-id={material.itemId}
                     >
                       <img
@@ -164,7 +164,7 @@ function LevelTable({
                   ))}
                 </div>
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right font-bold tabular-nums text-foreground">
+              <td className="whitespace-nowrap px-2 py-2.5 text-right text-[11px] font-bold tabular-nums text-foreground sm:px-3 sm:text-xs">
                 {formatNumber(level.goldCost)}
               </td>
             </tr>
@@ -198,16 +198,8 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
       </summary>
 
       <div className="border-t border-border px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
-        <div className="grid gap-4 xl:grid-cols-2">
-          <div>
-            <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.1~5 단계별</h4>
-            <LevelTable levels={slot.levels} from={1} to={5} />
-          </div>
-          <div>
-            <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.6~10 단계별</h4>
-            <LevelTable levels={slot.levels} from={6} to={10} />
-          </div>
-        </div>
+        <h4 className="mb-2 text-xs font-extrabold text-foreground">Lv.1~10 단계별</h4>
+        <LevelTable levels={slot.levels} />
       </div>
     </details>
   );
