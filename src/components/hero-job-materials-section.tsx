@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { getOfficialArmyIconUrlById } from "@/lib/army-icon-assets";
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
-import { resolveHeroFinalJobNameKr } from "@/lib/hero-final-job-localization";
+import { resolveHeroJobNameKr } from "@/lib/hero-job-localization";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 
@@ -186,7 +186,7 @@ function HeroSpJobMovementSection({
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
               <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                {resolveHeroFinalJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
+                {resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
               </h3>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -337,7 +337,7 @@ function HeroJobMovementSection({
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
                   <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                    {resolveHeroFinalJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "전직"}
+                    {resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "전직"}
                   </h3>
                 </div>
                 <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -490,7 +490,7 @@ export function HeroJobMaterialsSection({
                 data-job-connection-id={connection.jobConnectionId}
               >
                 <h3 className="text-sm font-extrabold text-foreground">
-                  {resolveHeroFinalJobNameKr({
+                  {resolveHeroJobNameKr({
                     jobId: connection.jobId,
                     nameCn: connection.jobNameCn,
                   }) ?? connection.jobNameCn}
