@@ -1,0 +1,50 @@
+name: Hero SP Artwork Source Census
+
+on:
+  push:
+    branches:
+      - work/hero-sp-artwork-source-probe-20260920
+    paths:
+      - scripts/probe-hero-sp-artwork-source-census.py
+      - .github/workflows/hero-sp-artwork-source-census.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pinned Unity parser
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3
+
+      - name: Materialize pinned ConfigData CharImage authority
+        run: |
+          set -euo pipefail
+          source_commit="$(node -e "const c=require('./data/contracts/configdata-source-pack-contract.v1.json'); process.stdout.write(c.authoritativePredecessor.sourceCommitSha)")"
+          test "$source_commit" = "6475e63ee23d18adf733756c26a14fa9e3ed662c"
+          mkdir -p .probe-input
+          git show "$source_commit:data/configdata/ConfigDataCharImageInfo.json" > .probe-input/ConfigDataCharImageInfo.json
+          test -s .probe-input/ConfigDataCharImageInfo.json
+
+      - name: Resolve all current SP official Char sources
+        run: python scripts/probe-hero-sp-artwork-source-census.py
+
+      - name: Upload SP source census
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-sp-artwork-source-census
+          path: .probe-out/sp-source-census
+          if-no-files-found: error
+          retention-days: 7
