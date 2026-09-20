@@ -214,16 +214,18 @@ function stripConfigMarkup(value: string | null) {
 function formatHeroSkillMetadataValue(value: string) {
   return value
     .replace(/回合/g, "턴")
+    .replace(/(\d+)圈/g, "주위 $1칸")
     .replace(/格/g, "칸")
     .replace(/自身/g, "자신")
     .replace(/单体/g, "단일")
-    .replace(/全场/g, "전체");
+    .replace(/全场/g, "전체")
+    .replace(/直线/g, "직선");
 }
 
 function getVisibleHeroSkillMetadataValue(value: string | null) {
   if (!value) return null;
   const formatted = formatHeroSkillMetadataValue(value).trim();
-  if (!formatted || formatted === "-" || formatted === "—") return null;
+  if (!formatted || formatted === "-" || formatted === "—" || formatted === "无") return null;
   return formatted;
 }
 
