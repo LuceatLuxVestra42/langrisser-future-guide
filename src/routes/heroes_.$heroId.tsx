@@ -373,6 +373,17 @@ function HeroDetailPage() {
       .filter((effect) => effect.jobId === jobId)
       .sort((a, b) => a.level - b.level || a.skillId - b.skillId),
   }));
+  const jobNameByConnectionId = new Map<number, string>();
+  for (const branch of detail.jobs.branches) {
+    for (const job of branch.jobs) {
+      if (job.jobConnectionId == null || job.jobId == null) continue;
+      const jobName = resolveHeroFinalJobNameKr({
+        jobId: job.jobId,
+        nameCn: job.nameCn ?? null,
+      }) ?? job.nameCn ?? null;
+      if (jobName) jobNameByConnectionId.set(job.jobConnectionId, jobName);
+    }
+  }
   const hasBondUnlockConditions = detail.bonds.rows.some((bond) => bond.completionConditions.some((condition) => !condition.favorability));
   const equipableSkillById = new Map<number, SkillView>();
   for (const skill of detail.skills.heroDirectSkills) equipableSkillById.set(skill.skillId, skill);
@@ -666,7 +677,7 @@ function HeroDetailPage() {
                           <span className="whitespace-nowrap text-xs font-extrabold text-foreground">유대 {fetterIconNumber}</span>
                         </div>
                       ) : null}
-                      <p className="min-w-0 text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition)}</p>
+                      <p className="min-w-0 text-xs font-semibold leading-5 text-foreground">{formatBondCondition(condition, jobNameByConnectionId)}</p>
                     </div>
                   ));
               })}
@@ -1405,7 +1416,10 @@ function formatSpMissionCondition(mission: SpMissionView) {
   return null;
 }
 
-function formatBondCondition(condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null }) {
+function formatBondCondition(
+  condition: { requiredHero: { heroId: number | null; nameKr: string | null; nameCn: string | null; nameEn: string | null } | null; mission: { missionId: number | null; title: string | null; desc: string | null; missionType: number | null; param2: number | null } | null; stage: { stageId: number | null; nameCn: string | null } | null; favorability: { targetHeroId: number | null; targetHeroNameKr: string | null; targetHeroNameCn: string | null; targetHeroNameEn: string | null; requiredLevel: number | null } | null },
+  jobNameByConnectionId: ReadonlyMap<number, string>,
+) {
   if (condition.favorability) {
     const targetName = condition.favorability.targetHeroNameKr ?? condition.favorability.targetHeroNameCn ?? condition.favorability.targetHeroNameEn ?? "영웅";
     return `${targetName} 호감도 Lv.${condition.favorability.requiredLevel ?? "?"}`;
@@ -1415,6 +1429,10 @@ function formatBondCondition(condition: { requiredHero: { heroId: number | null;
     const stageName = condition.stage?.nameCn ?? condition.mission?.desc ?? condition.mission?.title;
     const heroNameWithParticle = withKoreanParticle(heroName, "와/과");
     return stageName ? `${heroNameWithParticle} 함께 · ${stageName}` : `${heroName} 필요`;
+  }
+  if (condition.mission?.missionType === 29 && condition.mission.param2 != null) {
+    const jobName = jobNameByConnectionId.get(condition.mission.param2);
+    if (jobName) return `전직 · ${jobName}`;
   }
   if (condition.stage?.nameCn) return condition.stage.nameCn;
   if (condition.mission?.desc) return condition.mission.desc;

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { getOfficialArmyIconUrlById } from "@/lib/army-icon-assets";
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
+import { resolveHeroFinalJobNameKr } from "@/lib/hero-final-job-localization";
 import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
 import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
 
@@ -185,7 +186,7 @@ function HeroSpJobMovementSection({
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
               <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                {row.nameCn ?? "SP 전직"}
+                {resolveHeroFinalJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
               </h3>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -336,7 +337,7 @@ function HeroJobMovementSection({
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
                   <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                    {row.nameCn ?? "전직"}
+                    {resolveHeroFinalJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "전직"}
                   </h3>
                 </div>
                 <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -433,11 +434,15 @@ export function HeroJobMaterialsSection({
         ? allowedJobConnectionIdSet.has(connection.jobConnectionId)
         : true,
     )
-    .map((connection) => ({
-      ...connection,
-      jobNameCn: jobMovementByConnectionId.get(connection.jobConnectionId)?.nameCn ?? null,
-      levels: connection.levels.filter((level) => level.materials.length > 0),
-    }))
+    .map((connection) => {
+      const movement = jobMovementByConnectionId.get(connection.jobConnectionId);
+      return {
+        ...connection,
+        jobId: movement?.jobId ?? null,
+        jobNameCn: movement?.nameCn ?? null,
+        levels: connection.levels.filter((level) => level.materials.length > 0),
+      };
+    })
     .filter((connection) => connection.levels.length > 0);
 
   for (const connection of connections) {
@@ -484,7 +489,12 @@ export function HeroJobMaterialsSection({
                 className="rounded-xl border border-border bg-muted/20 p-4"
                 data-job-connection-id={connection.jobConnectionId}
               >
-                <h3 className="text-sm font-extrabold text-foreground">{connection.jobNameCn}</h3>
+                <h3 className="text-sm font-extrabold text-foreground">
+                  {resolveHeroFinalJobNameKr({
+                    jobId: connection.jobId,
+                    nameCn: connection.jobNameCn,
+                  }) ?? connection.jobNameCn}
+                </h3>
 
                 <div className="mt-3 divide-y divide-border/70">
                   {connection.levels.map((level) => (

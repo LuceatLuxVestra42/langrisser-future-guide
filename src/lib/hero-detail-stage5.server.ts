@@ -121,6 +121,7 @@ type Stage6BondCondition = {
     title?: string | null;
     desc?: string | null;
     missionType?: number;
+    param2?: number | null;
   } | null;
   stage?: {
     stageId?: number;
@@ -446,6 +447,7 @@ function projectBonds(bonds: Stage6Bond[] | null | undefined) {
                 title: condition.mission.title ?? null,
                 desc: condition.mission.desc ?? null,
                 missionType: Number.isInteger(condition.mission.missionType) ? Number(condition.mission.missionType) : null,
+                param2: Number.isInteger(condition.mission.param2) ? Number(condition.mission.param2) : null,
               }
             : null,
           stage: condition.stage
