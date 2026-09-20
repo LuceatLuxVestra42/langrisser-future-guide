@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { getOfficialArmyIconUrl } from "@/lib/army-icon-assets";
@@ -124,9 +124,10 @@ function SoldierPage() {
         <header>
           <Link
             to="/"
-            className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground shadow-sm transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent"
           >
-            ← 메인으로
+            <ArrowLeft size={16} aria-hidden="true" />
+            메인으로
           </Link>
         </header>
 
