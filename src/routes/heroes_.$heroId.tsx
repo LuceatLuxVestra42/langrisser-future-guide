@@ -342,9 +342,19 @@ function HeroDetailPage() {
     setVisualIndex((current) => (current + delta + visuals.length) % visuals.length);
   };
 
+  const spTalentMinimumStar =
+    hero.rarity.baseLabel === "SSR"
+      ? 3
+      : hero.rarity.baseLabel === "SR"
+        ? 2
+        : hero.rarity.baseLabel === "R" || hero.rarity.baseLabel === "N"
+          ? 1
+          : null;
   const visibleTalentProgression = (
     isSpForm
-      ? [...detail.sp.talent.starProgression]
+      ? detail.sp.talent.starProgression.filter(
+          (row) => spTalentMinimumStar == null || row.star >= spTalentMinimumStar,
+        )
       : detail.talent.starProgression.filter(
           (row) => detail.talent.initialStar == null || row.star >= detail.talent.initialStar,
         )
