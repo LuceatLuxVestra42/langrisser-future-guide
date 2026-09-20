@@ -396,22 +396,32 @@ function HeroFinalJobStatGraph({
 }) {
   return (
     <div
-      className="mt-2 overflow-x-auto rounded-lg border border-border/70 bg-background/70"
+      className="mt-2"
       data-hero-final-job-stat-graph="true"
+      data-hero-final-job-stats="true"
     >
-      <table className="w-full min-w-[560px] border-collapse text-sm">
-        <thead className="bg-muted/50">
-          <tr className="border-b border-border">
+      <table className="w-full border-collapse text-sm">
+        <tbody>
+          <tr>
             {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
+              const value = stats[stat];
+              const domain = domains[stat];
+              const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
               const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
+
               return (
-                <th
+                <td
                   key={stat}
-                  scope="col"
-                  className="px-3 py-2.5 text-right text-xs font-bold text-muted-foreground"
-                  data-hero-final-job-stat-header={stat}
+                  className="font-bold tabular-nums text-foreground"
+                  data-hero-final-job-stat={stat}
+                  data-stat-domain-min={domain.min}
+                  data-stat-domain-max={domain.max}
+                  data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
                 >
-                  <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                  <span
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap"
+                    data-hero-final-job-stat-label={stat}
+                  >
                     <img
                       src={iconUrl}
                       alt=""
@@ -422,31 +432,11 @@ function HeroFinalJobStatGraph({
                     />
                     <span>{HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}</span>
                   </span>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
-              const value = stats[stat];
-              const domain = domains[stat];
-              const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
 
-              return (
-                <td
-                  key={stat}
-                  className="px-3 py-3 text-right font-bold tabular-nums text-foreground"
-                  data-hero-final-job-stat={stat}
-                  data-stat-domain-min={domain.min}
-                  data-stat-domain-max={domain.max}
-                  data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
-                >
-                  <div className="relative min-w-[4.5rem] overflow-hidden rounded-md bg-muted/30 px-2 py-1.5">
+                  <div className="relative overflow-hidden">
                     {value == null ? null : (
                       <div
-                        className="absolute inset-y-0 left-0 bg-primary/25"
+                        className="absolute inset-y-0 left-0"
                         style={{ width: `${barPercent}%` }}
                         aria-hidden="true"
                       />
