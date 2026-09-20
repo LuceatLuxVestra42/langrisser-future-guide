@@ -1248,6 +1248,8 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     20001,
     10717,
     10819,
+    12409,
+    12410,
   ])],
   [130, new Set([
     10207,
@@ -1401,6 +1403,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     12001,
     12090,
     6007,
+    12427,
   ])],
   [148, new Set([
     10604,
@@ -1409,6 +1412,8 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10804,
     10104,
     10102,
+    12429,
+    12430,
   ])],
   [99161, new Set([
     6003,
@@ -1499,6 +1504,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10711,
     10713,
     10717,
+    12403,
   ])],
   [99172, new Set([
     12068,
@@ -1523,6 +1529,8 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10842,
     12059,
     10809,
+    12436,
+    12437,
   ])],
   [99175, new Set([
     10403,
