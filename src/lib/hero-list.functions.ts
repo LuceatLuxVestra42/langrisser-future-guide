@@ -893,7 +893,6 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10829,
     12014,
     5014,
-    12015,
   ])],
   [91, new Set([
     12063,
