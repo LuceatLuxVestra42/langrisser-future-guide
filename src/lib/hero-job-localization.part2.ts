@@ -39,7 +39,7 @@ export const HERO_JOB_LOCALIZATION_PART_2 = [
   [299, { nameCn: "见习战士", nameKr: "견습 파이터", status: "CONFIRMED_KR" }],
   [301, { nameCn: "骑士", nameKr: "나이트", status: "CONFIRMED_KR" }],
   [302, { nameCn: "骑士长", nameKr: "하이랜더", status: "CONFIRMED_KR" }],
-  [303, { nameCn: "强训骑士", nameKr: "그랜드 나이트", status: "CONFIRMED_KR" }],
+  [303, { nameCn: "强袭骑士", nameKr: "그랜드 나이트", status: "CONFIRMED_KR" }],
   [304, { nameCn: "骑士统帅", nameKr: "나이트 마스터", status: "CONFIRMED_KR" }],
   [305, { nameCn: "强袭统帅", nameKr: "그랜드 마스터", status: "CONFIRMED_KR" }],
   [306, { nameCn: "皇家骑士", nameKr: "로열 나이트", status: "CONFIRMED_KR" }],
