@@ -1,0 +1,24 @@
+name: Hero B2 SP Source Inspect
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/inspect_hero_b2_sp_source.cjs'
+      - '.github/workflows/hero-b2-sp-source-inspect.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-b2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/inspect_hero_b2_sp_source.cjs
