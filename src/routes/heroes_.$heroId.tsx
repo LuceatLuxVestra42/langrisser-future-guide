@@ -1138,6 +1138,21 @@ function HeroSpMissionSection({
       hourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
     );
   }, [missions, dungeonScenario, hourglassRecommendation.combinations]);
+  const hourglassTargetKeys = useMemo(() => {
+    if (hourglassCount === 0 || hourglassRecommendation.combinations.length === 0) {
+      return new Set<string>();
+    }
+    if (hourglassCount === 1) {
+      return new Set(
+        hourglassRecommendation.combinations.flatMap((combination) =>
+          combination.map((candidate) => candidate.missionKey),
+        ),
+      );
+    }
+    return new Set(
+      hourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
+    );
+  }, [hourglassCount, hourglassRecommendation.combinations]);
 
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   if (missions.secondStage.length > 0 && secondStageRewardSoldierNames.length === 0) {
@@ -1174,7 +1189,7 @@ function HeroSpMissionSection({
           }`}
           data-sp-mission-tab="missions"
         >
-          기존 미션
+          모든 미션
         </button>
         <button
           type="button"
@@ -1231,47 +1246,6 @@ function HeroSpMissionSection({
                 );
               })}
             </div>
-            <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              재화·전용장비 등 즉시 처리 가능한 단계는 대기시간 없이 진행하고, 형귀 헬스장·여신의 시련·영겁의 신전에서만 다음 오픈 요일까지 진행해.
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
-            <h3 className="text-sm font-bold text-foreground">던전 진행 순서</h3>
-            {dungeonSchedule.events.length > 0 ? (
-              <ol className="mt-3 grid gap-2 sm:grid-cols-2">
-                {dungeonSchedule.events.map((event) => (
-                  <li
-                    key={event.missionKey}
-                    className="rounded-lg border border-border bg-background px-3 py-3"
-                    data-sp-dungeon-mission-key={event.missionKey}
-                    data-sp-dungeon-day-offset={event.dayOffset}
-                    data-sp-dungeon-weekday={event.weekday}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-[11px] font-bold text-muted-foreground">
-                          {event.phase} · {event.step}단계
-                        </div>
-                        <div className="mt-1 text-sm font-extrabold text-foreground">
-                          {event.labelKr}
-                        </div>
-                      </div>
-                      <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-xs font-black text-foreground">
-                        {HERO_SP_DUNGEON_WEEKDAY_LABEL[event.weekday]}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-xs font-semibold text-muted-foreground">
-                      {event.waitDays > 0 ? `${event.waitDays}일 대기 후 진행` : "바로 진행 가능"}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="mt-3 rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
-                일정 계산이 필요한 형귀·여신·영겁 미션이 없어.
-              </p>
-            )}
           </div>
 
           <div
@@ -1281,7 +1255,7 @@ function HeroSpMissionSection({
             data-sp-hourglass-saved-days={hourglassRecommendation.savedDays}
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-bold text-foreground">시간의 모래시계 추천</h3>
+              <h3 className="text-sm font-bold text-foreground">시간의 모래시계 사용</h3>
               <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-foreground">
                 수요일 시작 → {HERO_SP_DUNGEON_WEEKDAY_LABEL[
                   (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
@@ -1308,47 +1282,38 @@ function HeroSpMissionSection({
                 </button>
               ))}
             </div>
-            {hourglassCount === 0 ? (
-              <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                모래시계를 사용하지 않는 기준 일정이야.
-              </p>
-            ) : hourglassRecommendation.savedDays > 0 ? (
-              <div className="mt-3 space-y-2">
-                {hourglassRecommendation.combinations.map((combination, combinationIndex) => (
-                  <div
-                    key={combination.map((candidate) => candidate.missionKey).join("|")}
-                    className="rounded-lg border border-border bg-background px-3 py-3"
-                    data-sp-hourglass-combination={combinationIndex + 1}
-                  >
-                    <div className="text-xs font-bold text-muted-foreground">
-                      추천 조합 {combinationIndex + 1}
-                    </div>
-                    <div className="mt-2 space-y-1">
-                      {combination.map((candidate) => (
-                        <div
-                          key={candidate.missionKey}
-                          className="text-sm font-extrabold text-foreground"
-                          data-sp-hourglass-candidate={candidate.missionKey}
-                        >
-                          {candidate.phase} · {candidate.step}단계 · {candidate.labelKr}
-                        </div>
-                      ))}
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      이 조합에 모래시계를 사용하면 수요일 시작 기준 {HERO_SP_DUNGEON_WEEKDAY_LABEL[
-                        (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
-                          hourglassCompletionSchedule.finalDayOffset % 7
-                        ] ?? "WED"
-                      ]}에 완료할 수 있어.
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                현재 오픈 조건에서는 선택한 모래시계 개수로 요일 대기시간을 줄일 수 없어.
-              </p>
-            )}
+          </div>
+
+          <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
+            <h3 className="text-sm font-bold text-foreground">던전 진행 순서</h3>
+            {dungeonSchedule.events.length > 0 ? (
+              <ol className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                {dungeonSchedule.events.map((event) => {
+                  const hourglassTarget = hourglassTargetKeys.has(event.missionKey);
+                  return (
+                    <li
+                      key={event.missionKey}
+                      className={`min-w-[6.5rem] flex-1 rounded-lg border px-3 py-2 text-center transition ${
+                        hourglassTarget
+                          ? "border-primary/70 bg-primary/15 shadow-sm ring-2 ring-primary/30"
+                          : "border-border bg-background"
+                      }`}
+                      data-sp-dungeon-mission-key={event.missionKey}
+                      data-sp-dungeon-day-offset={event.dayOffset}
+                      data-sp-dungeon-weekday={event.weekday}
+                      data-sp-hourglass-target={hourglassTarget ? "true" : "false"}
+                    >
+                      <div className="text-sm font-extrabold text-foreground">{event.labelKr}</div>
+                      <div className={`mt-1 text-xs font-bold ${
+                        hourglassTarget ? "text-foreground" : "text-muted-foreground"
+                      }`}>
+                        {HERO_SP_DUNGEON_WEEKDAY_LABEL[event.weekday]}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            ) : null}
           </div>
         </div>
       )}
