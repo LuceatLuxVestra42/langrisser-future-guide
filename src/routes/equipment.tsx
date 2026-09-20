@@ -391,7 +391,7 @@ function EquipmentGeneralListPage() {
                       className="h-20 w-20 object-contain transition duration-200 group-hover:scale-[1.03] sm:h-24 sm:w-24"
                     />
                   </div>
-                  <h2 className="mt-2 line-clamp-2 w-full text-center text-xs font-bold leading-snug text-foreground sm:text-sm">
+                  <h2 className="mt-2 line-clamp-2 w-full break-keep whitespace-normal text-center text-xs font-bold leading-snug text-foreground [overflow-wrap:break-word] sm:text-sm">
                     {displayName}
                   </h2>
                 </Link>
