@@ -1,5 +1,7 @@
 import { ChevronDown } from "lucide-react";
 
+import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
+
 export type HeroCastingLawPresentation = {
   heroId: number;
   slots: Array<{
@@ -96,17 +98,38 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
 function RangeSummary({
   title,
   totals,
+  showGoldIcon = false,
 }: {
   title: string;
   totals: CastingLawRangeTotals;
+  showGoldIcon?: boolean;
 }) {
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="text-xs font-extrabold text-foreground">{title}</h4>
-        <span className="text-xs font-bold tabular-nums text-muted-foreground">
-          골드 {formatNumber(totals.gold)}
-        </span>
+        {showGoldIcon ? (
+          <span
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-1 text-[11px] font-semibold text-foreground sm:px-2"
+            data-casting-law-total-gold={totals.gold}
+          >
+            <img
+              src={getSoldierCommonMaterialIconUrl("gold")}
+              alt=""
+              aria-hidden="true"
+              width={24}
+              height={24}
+              loading="lazy"
+              decoding="async"
+              className="h-6 w-6 shrink-0 object-contain"
+            />
+            <span className="font-extrabold tabular-nums">×{formatNumber(totals.gold)}</span>
+          </span>
+        ) : (
+          <span className="text-xs font-bold tabular-nums text-muted-foreground">
+            골드 {formatNumber(totals.gold)}
+          </span>
+        )}
       </div>
       <div className="mt-2">
         <MaterialBadges materials={totals.materials} />
@@ -261,7 +284,7 @@ export function HeroCastingLawMaterials({
         <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
           <h3 className="text-sm font-extrabold text-foreground">율정 합계비용</h3>
           <div className="mt-3">
-            <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
+            <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} showGoldIcon />
           </div>
         </div>
 
