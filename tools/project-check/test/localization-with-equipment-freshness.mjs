@@ -28,5 +28,10 @@ run(
   ["scripts/audit-localization-effect-descriptions.mjs"],
   "equipment-effect-description-presentation",
 );
+run(
+  process.execPath,
+  ["scripts/validate-localization-heart-fetter-effect-kr.mjs"],
+  "hero-heart-fetter-effect-kr",
+);
 
 console.log("[localization-project-check] PASS");
