@@ -125,26 +125,31 @@ function LevelTable({
   const rows = levels.filter((level) => level.level >= from && level.level <= to);
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full min-w-[640px] border-collapse text-xs">
+      <table className="w-full min-w-[420px] table-fixed border-collapse text-xs">
+        <colgroup>
+          <col className="w-14" />
+          <col />
+          <col className="w-20" />
+        </colgroup>
         <thead className="bg-muted/50">
           <tr className="border-b border-border">
-            <th className="px-3 py-2 text-left font-bold text-muted-foreground">단계</th>
-            <th className="px-3 py-2 text-left font-bold text-muted-foreground">필요 재료</th>
-            <th className="px-3 py-2 text-right font-bold text-muted-foreground">골드</th>
+            <th className="px-2 py-2 text-left font-bold text-muted-foreground">단계</th>
+            <th className="px-2 py-2 text-left font-bold text-muted-foreground">필요 재료</th>
+            <th className="px-2 py-2 text-right font-bold text-muted-foreground">골드</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((level) => (
             <tr key={level.levelInfoId} className="border-b border-border/60 last:border-b-0">
-              <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-extrabold text-foreground">
+              <th scope="row" className="whitespace-nowrap px-2 py-2.5 text-left font-extrabold text-foreground">
                 Lv.{level.level}
               </th>
-              <td className="px-3 py-2.5">
+              <td className="px-2 py-2.5">
                 <div className="flex flex-wrap gap-1.5">
                   {level.materials.map((material, index) => (
                     <span
                       key={`${material.itemId}-${index}`}
-                      className="inline-flex items-center gap-1 rounded bg-muted/40 px-2 py-1 text-[11px] font-semibold text-foreground"
+                      className="inline-flex items-center gap-1 rounded bg-muted/40 px-1.5 py-1 text-[11px] font-semibold text-foreground"
                       data-casting-law-level-material-id={material.itemId}
                     >
                       <img
@@ -162,7 +167,7 @@ function LevelTable({
                   ))}
                 </div>
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right font-bold tabular-nums text-foreground">
+              <td className="whitespace-nowrap px-2 py-2.5 text-right font-bold tabular-nums text-foreground">
                 {formatNumber(level.goldCost)}
               </td>
             </tr>
