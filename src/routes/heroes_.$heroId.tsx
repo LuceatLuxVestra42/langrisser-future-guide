@@ -31,6 +31,12 @@ import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
 import { getHeroSkillDisplayTypeLabelKr } from "@/lib/hero-skill-display-type-presentation";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { resolveHeroSpMissionStageLabelKr } from "@/lib/hero-sp-mission-stage-localization";
+import {
+  HERO_SP_DUNGEON_WEEKDAY_LABEL,
+  recommendHeroSpHourglass,
+  simulateHeroSpDungeonSchedule,
+  type HeroSpDungeonScenario,
+} from "@/lib/hero-sp-mission-dungeon-schedule";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
 import { getSkinFullartVisuals } from "@/lib/skin-fullart-assets";
 import { getSoldierPrototypePageData } from "@/lib/soldier-page.functions";
@@ -1069,6 +1075,16 @@ function SpMaterialIcon({
   );
 }
 
+const HERO_SP_DUNGEON_SCENARIO_OPTIONS: ReadonlyArray<{
+  id: HeroSpDungeonScenario;
+  label: string;
+}> = [
+  { id: "ANIKI_ALL", label: "1. 형귀 전부 오픈" },
+  { id: "GODDESS_ALL", label: "2. 여신 전부 오픈" },
+  { id: "BOTH_ALL", label: "3. 형귀 + 여신 전부 오픈" },
+  { id: "NORMAL", label: "4. 일반 일정" },
+];
+
 function HeroSpMissionSection({
   missions,
   secondStageRewardSoldierNames,
@@ -1076,6 +1092,17 @@ function HeroSpMissionSection({
   missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] };
   secondStageRewardSoldierNames: string[];
 }) {
+  const [activeView, setActiveView] = useState<"missions" | "schedule">("missions");
+  const [dungeonScenario, setDungeonScenario] = useState<HeroSpDungeonScenario>("NORMAL");
+  const dungeonSchedule = useMemo(
+    () => simulateHeroSpDungeonSchedule(missions, dungeonScenario),
+    [missions, dungeonScenario],
+  );
+  const hourglassRecommendation = useMemo(
+    () => recommendHeroSpHourglass(missions, dungeonScenario),
+    [missions, dungeonScenario],
+  );
+
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   if (missions.secondStage.length > 0 && secondStageRewardSoldierNames.length === 0) {
     throw new Error("Released SP second-stage missions have no frozen reward Soldier display name.");
@@ -1085,12 +1112,173 @@ function HeroSpMissionSection({
     secondStageRewardSoldierNames.join(", ") + " 사용가능, 스탯보너스, SP 스킬 2개 획득";
 
   return (
-    <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" data-hero-sp-missions="true" data-sp-first-stage-count={missions.firstStage.length} data-sp-second-stage-count={missions.secondStage.length}>
+    <section
+      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+      data-hero-sp-missions="true"
+      data-sp-first-stage-count={missions.firstStage.length}
+      data-sp-second-stage-count={missions.secondStage.length}
+      data-sp-mission-view={activeView}
+    >
       <SectionTitle title="SP 전직 미션" />
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <SpMissionPhase title="1차 전직" missions={missions.firstStage} completionText="SP전직 및 고유기 획득" />
-        <SpMissionPhase title="2차 전직" missions={missions.secondStage} completionText={secondStageCompletionText} />
+
+      <div
+        className="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-muted/30 p-1.5"
+        role="tablist"
+        aria-label="SP 전직 미션 보기"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === "missions"}
+          onClick={() => setActiveView("missions")}
+          className={`rounded-lg px-3 py-2.5 text-sm font-extrabold transition ${
+            activeView === "missions"
+              ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+              : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
+          }`}
+          data-sp-mission-tab="missions"
+        >
+          기존 미션
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === "schedule"}
+          onClick={() => setActiveView("schedule")}
+          className={`rounded-lg px-3 py-2.5 text-sm font-extrabold transition ${
+            activeView === "schedule"
+              ? "bg-background text-foreground shadow-sm ring-1 ring-border"
+              : "text-muted-foreground hover:bg-background/60 hover:text-foreground"
+          }`}
+          data-sp-mission-tab="schedule"
+        >
+          던전 일정 계산기
+        </button>
       </div>
+
+      {activeView === "missions" ? (
+        <div className="mt-5 grid gap-4 lg:grid-cols-2" role="tabpanel">
+          <SpMissionPhase title="1차 전직" missions={missions.firstStage} completionText="SP전직 및 고유기 획득" />
+          <SpMissionPhase title="2차 전직" missions={missions.secondStage} completionText={secondStageCompletionText} />
+        </div>
+      ) : (
+        <div className="mt-5 space-y-4" role="tabpanel" data-sp-dungeon-calculator="true">
+          <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-bold text-foreground">오픈 조건</h3>
+              <span className="rounded-md bg-muted px-2 py-1 text-[11px] font-bold text-muted-foreground">
+                수요일 시작
+              </span>
+            </div>
+            <div
+              className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2"
+              role="group"
+              aria-label="던전 오픈 조건"
+            >
+              {HERO_SP_DUNGEON_SCENARIO_OPTIONS.map((option) => {
+                const active = dungeonScenario === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setDungeonScenario(option.id)}
+                    className={`min-h-11 rounded-lg border px-3 py-2.5 text-left text-sm font-bold transition ${
+                      active
+                        ? "border-primary/60 bg-primary/10 text-foreground ring-1 ring-primary/20"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    }`}
+                    data-sp-dungeon-scenario={option.id}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
+              재화·전용장비 등 즉시 처리 가능한 단계는 대기시간 없이 진행하고, 형귀 헬스장·여신의 시련·영겁의 신전에서만 다음 오픈 요일까지 진행해.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4">
+            <h3 className="text-sm font-bold text-foreground">던전 진행 순서</h3>
+            {dungeonSchedule.events.length > 0 ? (
+              <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+                {dungeonSchedule.events.map((event) => (
+                  <li
+                    key={event.missionKey}
+                    className="rounded-lg border border-border bg-background px-3 py-3"
+                    data-sp-dungeon-mission-key={event.missionKey}
+                    data-sp-dungeon-day-offset={event.dayOffset}
+                    data-sp-dungeon-weekday={event.weekday}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-[11px] font-bold text-muted-foreground">
+                          {event.phase} · {event.step}단계
+                        </div>
+                        <div className="mt-1 text-sm font-extrabold text-foreground">
+                          {event.labelKr}
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-xs font-black text-foreground">
+                        {HERO_SP_DUNGEON_WEEKDAY_LABEL[event.weekday]}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                      {event.waitDays > 0 ? `${event.waitDays}일 대기 후 진행` : "바로 진행 가능"}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-3 rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
+                일정 계산이 필요한 형귀·여신·영겁 미션이 없어.
+              </p>
+            )}
+          </div>
+
+          <div
+            className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4"
+            data-sp-hourglass-recommendation="true"
+            data-sp-hourglass-saved-days={hourglassRecommendation.savedDays}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-bold text-foreground">시간의 모래시계 추천</h3>
+              {hourglassRecommendation.savedDays > 0 ? (
+                <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-foreground">
+                  대기 {hourglassRecommendation.savedDays}일 단축
+                </span>
+              ) : null}
+            </div>
+            {hourglassRecommendation.savedDays > 0 ? (
+              <div className="mt-3 space-y-2">
+                {hourglassRecommendation.candidates.map((candidate) => (
+                  <div
+                    key={candidate.missionKey}
+                    className="rounded-lg border border-border bg-background px-3 py-3"
+                    data-sp-hourglass-candidate={candidate.missionKey}
+                  >
+                    <div className="text-xs font-bold text-muted-foreground">
+                      {candidate.phase} · {candidate.step}단계
+                    </div>
+                    <div className="mt-1 text-sm font-extrabold text-foreground">
+                      {candidate.labelKr} 미션에 사용
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      이 미션의 던전 진입을 건너뛰었을 때 전체 대기시간이 가장 많이 줄어들어.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                현재 오픈 조건에서는 시간의 모래시계를 사용해도 요일 대기시간이 줄어들지 않아.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
