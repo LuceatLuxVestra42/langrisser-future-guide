@@ -144,6 +144,7 @@ function HeroSpJobMovementSection({
             jobConnectionId: movement.jobConnectionId,
             jobId: movement.jobId,
             nameCn: finalJob.nameCn ?? movement.nameCn,
+            rank: null,
             moveType: movement.moveType,
             moveTypeNameKr: movement.moveTypeNameKr,
             movePoint: movement.movePoint,
