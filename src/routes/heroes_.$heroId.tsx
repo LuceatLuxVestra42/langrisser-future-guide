@@ -423,7 +423,7 @@ function HeroDetailPage() {
         </Link>
 
         <section className="mt-5 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="grid grid-cols-1 min-[600px]:grid-cols-[minmax(0,4fr)_minmax(230px,1fr)]">
+          <div className="grid grid-cols-1 min-[600px]:grid-cols-[minmax(0,4fr)_minmax(230px,1fr)] lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
             <div className="relative min-h-[357px] overflow-hidden bg-muted/25 sm:min-h-[442px] lg:min-h-[527px]">
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-background/70 to-transparent" />
               {activeVisual && failedVisualSrc !== activeVisual.src ? (
@@ -663,13 +663,11 @@ function HeroDetailPage() {
           )}
         </section>
 
-        <div className="mt-5 grid items-start gap-5 lg:grid-cols-2 [&>section]:mt-0" data-hero-upper-support-grid="equipment-command">
-        <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
-        <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
-        </div>
+        <div className="mt-5 grid items-start gap-5 lg:grid-cols-2" data-hero-upper-support-grid="independent-columns">
+          <div className="grid content-start gap-5 [&>section]:mt-0" data-hero-upper-support-column="left">
+            <HeroExclusiveEquipmentSection exclusiveEquipment={exclusiveEquipment} />
 
-        <div className="mt-5 grid items-start gap-5 lg:grid-cols-2 [&>section]:mt-0" data-hero-upper-support-grid="bond-discipline">
-        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+            <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="유대" />
           {hasBondUnlockConditions ? (
             <div className="mt-5 grid grid-cols-1 gap-2" data-hero-bond-unlock-grid="true">
@@ -696,8 +694,13 @@ function HeroDetailPage() {
             <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 해금 조건 없음</p>
           )}
           <HeroBondMaterialsPanel materials={bondMaterials} resolveAssetUrl={resolvePublicAssetUrl} />
-        </section>
-        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} castingLaw={castingLaw} />
+            </section>
+          </div>
+
+          <div className="grid content-start gap-5 [&>section]:mt-0" data-hero-upper-support-column="right">
+            <HeroSoldierCommandSection soldierCommand={soldierCommand} mode={isSpForm ? "sp" : "normal"} />
+            <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} castingLaw={castingLaw} />
+          </div>
         </div>
 
         <section
