@@ -2024,9 +2024,9 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       skillId: 11787,
       sourceNameCn: "召唤构造体",
       nameKr: "구조체 소환",
-      descKr: "[소환]구조체 1개를 소환해 랜덤으로 1회 '개조'한다. (구조체의 생명 속성은 생명자의 최대 생명 100% 계승, 나머지 속성은 소환하는 순간 소환자의 해당 속성 100% 계승)",
+      descKr: "[소환]구조체 1개를 소환해 랜덤으로 1회 '개조'한다. (구조체의 생명 속성은 소환자의 최대 생명 100% 계승, 나머지 속성은 소환하는 순간 소환자의 해당 속성 100% 계승)",
       status: "LEGACY_SHEET_KR",
-      source: { type: "legacy-korean-sheet", heroIds: [59], note: "Legacy Korean sheet hero/data/기자로프.js; exact Hero CN + icon/metadata/effect parity against current generated Skill 11787." },
+      source: { type: "legacy-korean-sheet", heroIds: [59], note: "Legacy Korean sheet hero/data/기자로프.js; exact Hero CN + icon/metadata/effect parity against current generated Skill 11787. Legacy typo 생명자 normalized to current generated 召唤者 meaning 소환자." },
     },
     {
       skillId: 11789,
