@@ -426,7 +426,7 @@ function HeroFinalJobStatGraph({
                       src={iconUrl}
                       alt=""
                       aria-hidden="true"
-                      loading="eager"
+                      loading="lazy"
                       decoding="async"
                       className="h-4 w-4 shrink-0 object-contain"
                     />

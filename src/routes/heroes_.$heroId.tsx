@@ -313,21 +313,28 @@ function HeroDetailPage() {
   const activeVisualSrc = activeVisual?.src ?? null;
   const [failedVisualSrc, setFailedVisualSrc] = useState<string | null>(null);
   const [loadedVisualSrc, setLoadedVisualSrc] = useState<string | null>(null);
+  const previousVisualSrc = visuals.length > 1
+    ? (visuals[(visualIndex - 1 + visuals.length) % visuals.length]?.src ?? null)
+    : null;
   const nextVisualSrc = visuals.length > 1
     ? (visuals[(visualIndex + 1) % visuals.length]?.src ?? null)
     : null;
-  const inactiveSpArtworkPath = hasSpForm && !isSpForm
-    ? getHeroSpArtworkSource(hero.heroId)
-    : null;
-  const inactiveSpArtworkSource = inactiveSpArtworkPath
-    ? resolvePublicAssetUrl(inactiveSpArtworkPath)
+  const inactiveFormArtworkSource = hasSpForm
+    ? (
+        isSpForm
+          ? imageUrl
+          : (() => {
+              const path = getHeroSpArtworkSource(hero.heroId);
+              return path ? resolvePublicAssetUrl(path) : null;
+            })()
+      )
     : null;
 
   useEffect(() => {
     if (!activeVisualSrc || loadedVisualSrc !== activeVisualSrc) return;
 
     const candidates = new Set(
-      [nextVisualSrc, inactiveSpArtworkSource]
+      [previousVisualSrc, nextVisualSrc, inactiveFormArtworkSource]
         .filter((src): src is string => Boolean(src && src !== activeVisualSrc)),
     );
     for (const src of candidates) {
@@ -335,7 +342,13 @@ function HeroDetailPage() {
       image.decoding = "async";
       image.src = src;
     }
-  }, [activeVisualSrc, inactiveSpArtworkSource, loadedVisualSrc, nextVisualSrc]);
+  }, [
+    activeVisualSrc,
+    inactiveFormArtworkSource,
+    loadedVisualSrc,
+    nextVisualSrc,
+    previousVisualSrc,
+  ]);
 
   const moveVisual = (delta: number) => {
     if (visuals.length <= 1) return;
