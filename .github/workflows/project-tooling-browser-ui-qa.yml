@@ -269,9 +269,16 @@ jobs:
                 await assertStar(4);
                 await lower.click();
                 await assertStar(3);
-                await carousel.getByRole('button', { name: '6성', exact: true }).click();
+                const higher = carousel.getByRole('button', { name: '높은 성급 고유기 보기' });
+                await higher.click();
+                await assertStar(4);
+                await higher.click();
+                await assertStar(5);
+                await higher.click();
                 await assertStar(6);
-                await carousel.getByRole('button', { name: '4성', exact: true }).click();
+                await lower.click();
+                await assertStar(5);
+                await lower.click();
                 await assertStar(4);
               }
             }
