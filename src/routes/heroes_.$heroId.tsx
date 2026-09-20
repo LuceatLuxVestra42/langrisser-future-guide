@@ -13,7 +13,6 @@ import { HeroCentralDisciplineSection } from "@/components/hero-central-discipli
 import { HeroExclusiveEquipmentSection } from "@/components/hero-exclusive-equipment-section";
 import { HeroAwakeningMaterialsSection } from "@/components/hero-awakening-materials-section";
 import { HeroBondMaterialsPanel } from "@/components/hero-bond-materials-panel";
-import { HeroCastingLawSection } from "@/components/hero-casting-law-section";
 import { HeroJobMaterialsSection } from "@/components/hero-job-materials-section";
 import { HeroSoldierCommandSection } from "@/components/hero-soldier-command-section";
 import { SoldierDetailDialog } from "@/components/soldier-detail-dialog";
@@ -694,7 +693,7 @@ function HeroDetailPage() {
           )}
           <HeroBondMaterialsPanel materials={bondMaterials} resolveAssetUrl={resolvePublicAssetUrl} />
         </section>
-        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} />
+        <HeroCentralDisciplineSection centralDiscipline={detail.centralDiscipline} castingLaw={castingLaw} />
         </div>
 
         <section
@@ -770,7 +769,6 @@ function HeroDetailPage() {
           allowedJobConnectionIds={selectedMatthewJobConnectionIds}
         />
         <HeroAwakeningMaterialsSection heroId={hero.heroId} />
-        <HeroCastingLawSection castingLaw={castingLaw} />
 
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
