@@ -218,6 +218,13 @@ function formatHeroSkillMetadataValue(value: string) {
     .replace(/自身/g, "자신");
 }
 
+function getVisibleHeroSkillMetadataValue(value: string | null) {
+  if (!value) return null;
+  const formatted = formatHeroSkillMetadataValue(value).trim();
+  if (!formatted || formatted === "-" || formatted === "—") return null;
+  return formatted;
+}
+
 function HeroDetailPage() {
   const { hero, detail, soldierCommand, heartFetter, bondMaterials, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const hasSpForm = detail.sp.released;
@@ -1039,11 +1046,14 @@ function HeroSkillIcon({
 }
 
 function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
+  const cooldown = getVisibleHeroSkillMetadataValue(skill.cooldown);
+  const range = getVisibleHeroSkillMetadataValue(skill.range);
+  const areaOrTarget = getVisibleHeroSkillMetadataValue(skill.areaOrTarget);
   const hasMetadata = Boolean(
     skill.displayType ||
-    skill.cooldown ||
-    skill.range ||
-    skill.areaOrTarget ||
+    cooldown ||
+    range ||
+    areaOrTarget ||
     Number.isInteger(skill.cost),
   );
   return (
@@ -1055,9 +1065,9 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
           {hasMetadata ? (
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
               {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">{getHeroSkillDisplayTypeLabelKr(skill.displayType)}</span> : null}
-              {skill.cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {formatHeroSkillMetadataValue(skill.cooldown)}</span> : null}
-              {skill.range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {formatHeroSkillMetadataValue(skill.range)}</span> : null}
-              {skill.areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {formatHeroSkillMetadataValue(skill.areaOrTarget)}</span> : null}
+              {cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {cooldown}</span> : null}
+              {range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {range}</span> : null}
+              {areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {areaOrTarget}</span> : null}
               {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
             </div>
           ) : null}
