@@ -211,6 +211,13 @@ function stripConfigMarkup(value: string | null) {
   return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
 }
 
+function formatHeroSkillMetadataValue(value: string) {
+  return value
+    .replace(/回合/g, "턴")
+    .replace(/格/g, "칸")
+    .replace(/自身/g, "자신");
+}
+
 function HeroDetailPage() {
   const { hero, detail, soldierCommand, heartFetter, bondMaterials, castingLaw, finalJobStatBars, exclusiveEquipment, factionMarks, soldierCards } = Route.useLoaderData();
   const hasSpForm = detail.sp.released;
@@ -1047,10 +1054,10 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
           <h4 className="font-bold text-foreground">{skill.nameCn ?? "스킬"}</h4>
           {hasMetadata ? (
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
-              {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">유형 {getHeroSkillDisplayTypeLabelKr(skill.displayType)}</span> : null}
-              {skill.cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span> : null}
-              {skill.range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span> : null}
-              {skill.areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span> : null}
+              {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">{getHeroSkillDisplayTypeLabelKr(skill.displayType)}</span> : null}
+              {skill.cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {formatHeroSkillMetadataValue(skill.cooldown)}</span> : null}
+              {skill.range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {formatHeroSkillMetadataValue(skill.range)}</span> : null}
+              {skill.areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {formatHeroSkillMetadataValue(skill.areaOrTarget)}</span> : null}
               {Number.isInteger(skill.cost) ? <span className="rounded bg-zinc-800 px-2 py-1">{skill.cost}코스트</span> : null}
             </div>
           ) : null}
