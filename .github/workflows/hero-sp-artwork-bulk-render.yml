@@ -162,14 +162,14 @@ jobs:
           PY
       - name: Collect production candidate WebPs
         run: |
-          mkdir -p .bulk-webp
-          find .bulk -type f -name '*.webp' -exec cp {} .bulk-webp/ \;
-          test "$(find .bulk-webp -type f -name '*.webp' | wc -l)" -eq 25
-          cp .bulk-summary.json .bulk-webp/manifest.json
+          mkdir -p bulk-webp
+          find .bulk -type f -name '*.webp' -exec cp {} bulk-webp/ \;
+          test "$(find bulk-webp -type f -name '*.webp' | wc -l)" -eq 25
+          cp .bulk-summary.json bulk-webp/manifest.json
       - name: Upload bulk production candidates
         uses: actions/upload-artifact@v4
         with:
           name: hero-sp-artwork-bulk-webp
-          path: .bulk-webp
+          path: bulk-webp
           if-no-files-found: error
           retention-days: 7
