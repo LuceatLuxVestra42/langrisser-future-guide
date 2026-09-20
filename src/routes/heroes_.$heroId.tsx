@@ -1100,13 +1100,34 @@ function SpMaterialIcon({
   );
 }
 
+const HERO_SP_DUNGEON_WEEKDAY_SHORT_LABEL = {
+  WED: "수",
+  THU: "목",
+  FRI: "금",
+  SAT: "토",
+  SUN: "일",
+  MON: "월",
+  TUE: "화",
+} as const;
+
+function getHeroSpDungeonOpenDayText(event: {
+  dungeonGroup: "ANIKI" | "GODDESS" | "TEMPLE";
+  openWeekdays: readonly (keyof typeof HERO_SP_DUNGEON_WEEKDAY_SHORT_LABEL)[];
+}) {
+  const weekdays =
+    event.dungeonGroup === "ANIKI"
+      ? event.openWeekdays.filter((weekday) => weekday !== "SUN")
+      : event.openWeekdays;
+  return `${weekdays.map((weekday) => HERO_SP_DUNGEON_WEEKDAY_SHORT_LABEL[weekday]).join(", ")} 오픈`;
+}
+
 const HERO_SP_DUNGEON_SCENARIO_OPTIONS: ReadonlyArray<{
   id: HeroSpDungeonScenario;
   label: string;
 }> = [
   { id: "ANIKI_ALL", label: "1. 형귀 전부 오픈" },
-  { id: "GODDESS_ALL", label: "2. 여신 전부 오픈" },
-  { id: "BOTH_ALL", label: "3. 형귀 + 여신 전부 오픈" },
+  { id: "GODDESS_ALL", label: "2. 여신의 시련 전부 오픈" },
+  { id: "BOTH_ALL", label: "3. 형귀 + 여신의 시련 전부 오픈" },
   { id: "NORMAL", label: "4. 일반 일정" },
 ];
 
@@ -1203,7 +1224,7 @@ function HeroSpMissionSection({
           }`}
           data-sp-mission-tab="schedule"
         >
-          던전 일정 계산기
+          SP 완료 계산기
         </button>
       </div>
 
@@ -1256,13 +1277,6 @@ function HeroSpMissionSection({
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-foreground">시간의 모래시계 사용</h3>
-              <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-foreground">
-                수요일 시작 → {HERO_SP_DUNGEON_WEEKDAY_LABEL[
-                  (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
-                    hourglassCompletionSchedule.finalDayOffset % 7
-                  ] ?? "WED"
-                ]} 완료
-              </span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="시간의 모래시계 개수">
               {([0, 1, 2] as const).map((count) => (
@@ -1307,13 +1321,20 @@ function HeroSpMissionSection({
                       <div className={`mt-1 text-xs font-bold ${
                         hourglassTarget ? "text-foreground" : "text-muted-foreground"
                       }`}>
-                        {HERO_SP_DUNGEON_WEEKDAY_LABEL[event.weekday]}
+                        {getHeroSpDungeonOpenDayText(event)}
                       </div>
                     </li>
                   );
                 })}
               </ol>
             ) : null}
+            <div className="mt-3 text-center text-sm font-black text-foreground">
+              수요일 시작 → {HERO_SP_DUNGEON_WEEKDAY_LABEL[
+                (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
+                  hourglassCompletionSchedule.finalDayOffset % 7
+                ] ?? "WED"
+              ]} 완료
+            </div>
           </div>
         </div>
       )}
