@@ -253,11 +253,11 @@ jobs:
                   await active.waitFor({ timeout: 10000 });
                   check(await active.getAttribute('data-hero-talent-active-star') === String(star), `Hero ${talentCase.heroId} expected ${star}★ active talent`);
                   const talentName = carousel.locator('[data-hero-talent-name="true"]');
-                                    await talentName.waitFor({ timeout: 10000 });
-                                    check((await talentName.innerText()).trim() === talentCase.nameKr, `Hero ${talentCase.heroId} talent name mismatch at ${star}★`);
-                                    const starDisplay = carousel.locator(`[data-hero-talent-star-display="${star}"]`);
-                                    await starDisplay.waitFor({ timeout: 10000 });
-                                    check((await starDisplay.innerText()).trim() === "★".repeat(star), `Hero ${talentCase.heroId} talent star display mismatch at ${star}★`);
+                  await talentName.waitFor({ timeout: 10000 });
+                  check((await talentName.innerText()).trim() === talentCase.nameKr, `Hero ${talentCase.heroId} talent name mismatch at ${star}★`);
+                  const starDisplay = carousel.locator(`[data-hero-talent-star-display="${star}"]`);
+                  await starDisplay.waitFor({ timeout: 10000 });
+                  check((await starDisplay.innerText()).trim() === "★".repeat(star), `Hero ${talentCase.heroId} talent star display mismatch at ${star}★`);
                   await carousel.getByText(talentCase.desc[star], { exact: true }).waitFor({ timeout: 10000 });
                 };
 
