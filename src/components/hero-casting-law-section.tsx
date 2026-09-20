@@ -219,19 +219,13 @@ export function HeroCastingLawMaterials({
   castingLaw: HeroCastingLawPresentation;
 }) {
   return (
-    <details
-      className="group mt-5 border-t border-border pt-5"
+    <div
+      className="mt-5 border-t border-border pt-5"
       data-hero-casting-law="true"
       data-casting-law-slot-count={castingLaw.slots.length}
     >
-      <summary className="cursor-pointer list-none" data-casting-law-summary="true">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-sm font-extrabold text-foreground">1~5레벨 요구 문양 재료</h3>
-          <ChevronDown
-            className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
-            aria-hidden="true"
-          />
-        </div>
+      <div data-casting-law-summary="true">
+        <h3 className="text-sm font-extrabold text-foreground">1~5레벨 요구 문양 재료</h3>
         <div className="mt-3 flex flex-wrap items-start gap-3">
           {castingLaw.slots
             .filter((slot) => slot.summaryIcon !== null)
@@ -261,20 +255,30 @@ export function HeroCastingLawMaterials({
               </div>
             ))}
         </div>
-      </summary>
+      </div>
 
-      <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
-        <h3 className="text-sm font-extrabold text-foreground">율정 합계비용</h3>
-        <div className="mt-3">
-          <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
+      <details className="group mt-4" data-casting-law-details="true">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+          <span className="text-sm font-extrabold text-foreground">율정 재료</span>
+          <ChevronDown
+            className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
+        </summary>
+
+        <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
+          <h3 className="text-sm font-extrabold text-foreground">율정 합계비용</h3>
+          <div className="mt-3">
+            <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-4 space-y-3">
-        {castingLaw.slots.map((slot) => (
-          <SlotCard key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`} slot={slot} />
-        ))}
-      </div>
-    </details>
+        <div className="mt-4 space-y-3">
+          {castingLaw.slots.map((slot) => (
+            <SlotCard key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`} slot={slot} />
+          ))}
+        </div>
+      </details>
+    </div>
   );
 }
