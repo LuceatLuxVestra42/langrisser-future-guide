@@ -2841,5 +2841,38 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [114], note: "Legacy Korean sheet hero/data/마리엘.js; exact Hero CN + Skill_Mariel2 icon + type/cooldown/range/target/effect parity against current generated Skill 12218." },
     },
+
+    {
+      skillId: 12267,
+      sourceNameCn: "优势打击",
+      nameKr: "우세 공격",
+      descKr: "[물리 피해] 단일 적 부대를 공격해 1.5배 피해를 준다. 자신에게 걸린 강화 효과 1개당 주는 피해 +2%(최대 +10%). 전투 진입 전 자신에게 초절 강화 특수 효과가 있으면 선제공격하며, 동시에 적에게 초절 강화 특수 효과가 없으면 호위를 무시한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [112], note: "Legacy Korean sheet hero/data/토와.js; exact Hero CN + Skill_Towa2 icon + type/cooldown/range/target/effect parity against current generated Skill 12267." },
+    },
+    {
+      skillId: 12269,
+      sourceNameCn: "魅惑",
+      nameKr: "매혹",
+      descKr: "[마법 피해] 전장에 있는 단일 적군에게 0.1배 마법 피해를 준다. 대상이 여성 영웅이 아니면 다음 턴 행동할 수 없고, 대상의 행동 종료 시 주위 1바퀴의 다른 아군에게 각자 남은 생명 25%의 고정 피해를 준다. 해당 효과는 해제할 수 없다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [126], note: "Legacy Korean sheet hero/data/팟시르.js; exact Hero CN + Skill_Patsyr1 icon + type/cooldown/range/area/effect parity against current generated Skill 12269." },
+    },
+    {
+      skillId: 12270,
+      sourceNameCn: "嗜梦",
+      nameKr: "꿈 탐식",
+      descKr: "[마법 피해] 단일 적 부대를 공격해 1.5배 피해를 준다. 대상이 여성 영웅이 아니면 피해 +20% 및 호위 무시.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [126], note: "Legacy Korean sheet hero/data/팟시르.js; exact Hero CN + Skill_Patsyr2 icon + type/cooldown/range/target/effect parity against current generated Skill 12270." },
+    },
+    {
+      skillId: 12271,
+      sourceNameCn: "魅魔之吻",
+      nameKr: "몽마의 입맞춤",
+      descKr: "[패시브] 여성 영웅이 아닌 부대와 전투 진입 시, 전투 후 해당 전투에서 준 피해의 30%만큼 생명을 회복한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [126], note: "Legacy Korean sheet hero/data/팟시르.js; exact Hero CN + Skill_Patsyr3 icon + type/effect parity against current generated Skill 12271." },
+    },
   ],
 };
