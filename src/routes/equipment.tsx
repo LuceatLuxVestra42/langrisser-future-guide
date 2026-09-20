@@ -179,7 +179,7 @@ function EquipmentGeneralListPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="sticky top-3 z-40 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <Link
             to="/"
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent"
