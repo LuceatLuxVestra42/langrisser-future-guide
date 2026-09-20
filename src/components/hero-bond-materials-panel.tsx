@@ -110,7 +110,7 @@ function BondTrack({
 }) {
   return (
     <details
-      className="group rounded-xl border border-border bg-muted/10"
+      className="group min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-muted/10"
       data-hero-bond-cost-profile={profile.profileId}
     >
       <summary className="cursor-pointer list-none p-3 sm:p-4">
@@ -144,8 +144,8 @@ function BondTrack({
         </div>
       </summary>
 
-      <div className="border-t border-border px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
-        <div className="overflow-x-auto rounded-lg border border-border">
+      <div className="min-w-0 max-w-full border-t border-border px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
+        <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-lg border border-border">
           <table className="w-full min-w-[620px] border-collapse text-xs">
             <thead className="bg-muted/50">
               <tr className="border-b border-border">
@@ -186,7 +186,7 @@ export function HeroBondMaterialsPanel({
   resolveAssetUrl: (path: string) => string;
 }) {
   return (
-    <details className="group mt-5 border-t border-border" data-hero-bond-materials="true">
+    <details className="group mt-5 min-w-0 max-w-full border-t border-border" data-hero-bond-materials="true">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pt-5">
         <h3 className="text-sm font-extrabold text-foreground">유대 강화 재료</h3>
         <ChevronDown
@@ -195,7 +195,7 @@ export function HeroBondMaterialsPanel({
         />
       </summary>
 
-      <div className="mt-3 space-y-2">
+      <div className="mt-3 min-w-0 max-w-full space-y-2">
         {materials.regularFetters.map((fetter) => (
           <BondTrack
             key={fetter.fetterId}
