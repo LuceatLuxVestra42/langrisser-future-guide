@@ -189,7 +189,7 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
             <h3 className="font-extrabold text-foreground">{slotLabel(slot.slotType)}</h3>
           </div>
           <span className="text-xs font-bold text-muted-foreground group-open:hidden">단계별 보기</span>
-          <span className="hidden text-xs font-bold text-muted-foreground group-open:inline">접기</span>
+          <span className="hidden text-xs font-bold text-muted-foreground group-open:inline">눌러서 레벨별 재료 확인</span>
         </div>
 
         <div className="mt-3">
