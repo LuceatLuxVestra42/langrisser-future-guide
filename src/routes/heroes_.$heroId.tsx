@@ -1150,7 +1150,21 @@ function HeroSpMissionSection({
     () => recommendHeroSpHourglass(missions, dungeonScenario, hourglassCount),
     [missions, dungeonScenario, hourglassCount],
   );
-  const hourglassCompletionSchedule = useMemo(() => {
+  const singleHourglassRecommendation = useMemo(
+    () => recommendHeroSpHourglass(missions, dungeonScenario, 1),
+    [missions, dungeonScenario],
+  );
+  const singleHourglassCompletionSchedule = useMemo(() => {
+    if (singleHourglassRecommendation.combinations.length === 0) {
+      return simulateHeroSpDungeonSchedule(missions, dungeonScenario);
+    }
+    return simulateHeroSpDungeonSchedule(
+      missions,
+      dungeonScenario,
+      singleHourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
+    );
+  }, [missions, dungeonScenario, singleHourglassRecommendation.combinations]);
+  const requestedHourglassCompletionSchedule = useMemo(() => {
     if (hourglassRecommendation.combinations.length === 0) {
       return simulateHeroSpDungeonSchedule(missions, dungeonScenario);
     }
@@ -1160,13 +1174,19 @@ function HeroSpMissionSection({
       hourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
     );
   }, [missions, dungeonScenario, hourglassRecommendation.combinations]);
+  const twoHourglassesAddNoCompletionBenefit =
+    hourglassCount === 2 &&
+    requestedHourglassCompletionSchedule.finalDayOffset >= singleHourglassCompletionSchedule.finalDayOffset;
+  const hourglassCompletionSchedule = twoHourglassesAddNoCompletionBenefit
+    ? singleHourglassCompletionSchedule
+    : requestedHourglassCompletionSchedule;
   const hourglassTargetKeys = useMemo(() => {
-    if (hourglassCount === 0 || hourglassRecommendation.combinations.length === 0) {
+    if (hourglassCount === 0) {
       return new Set<string>();
     }
-    if (hourglassCount === 1) {
+    if (hourglassCount === 1 || twoHourglassesAddNoCompletionBenefit) {
       return new Set(
-        hourglassRecommendation.combinations.flatMap((combination) =>
+        singleHourglassRecommendation.combinations.flatMap((combination) =>
           combination.map((candidate) => candidate.missionKey),
         ),
       );
@@ -1174,7 +1194,12 @@ function HeroSpMissionSection({
     return new Set(
       hourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
     );
-  }, [hourglassCount, hourglassRecommendation.combinations]);
+  }, [
+    hourglassCount,
+    hourglassRecommendation.combinations,
+    singleHourglassRecommendation.combinations,
+    twoHourglassesAddNoCompletionBenefit,
+  ]);
 
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   if (missions.secondStage.length > 0 && secondStageRewardSoldierNames.length === 0) {
