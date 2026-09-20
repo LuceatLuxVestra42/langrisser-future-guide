@@ -387,6 +387,15 @@ function HeroDetailPage() {
     ? [{ key: "sp", capstone: detail.sp.finalJob }]
     : [];
   const finalJobRows = isSpForm ? spFinalJobRows : normalFinalJobRows;
+  const normalFinalJobDetails = normalFinalJobRows.flatMap(({ capstone }) =>
+    capstone?.jobId == null
+      ? []
+      : [{
+          jobId: capstone.jobId,
+          finalStats: capstone.finalStats,
+          centralBondStats: capstone.centralBondStats,
+        }],
+  );
   const finalJobNameById = new Map<number, string>();
   for (const { capstone } of finalJobRows) {
     if (capstone?.jobId != null) {
@@ -766,111 +775,118 @@ function HeroDetailPage() {
           heroId={hero.heroId}
           mode={isSpForm ? "sp" : "normal"}
           allowedJobConnectionIds={selectedMatthewJobConnectionIds}
+          finalJobDetails={normalFinalJobDetails}
+          statDomains={finalJobStatBars.domains}
+          heartFetterEffects={heartFetter.effects}
         />
 
-        <div
-          className="mt-7 border-t border-border pt-5"
-          data-hero-final-job-stats-section="true"
-          data-hero-form-mode={isSpForm ? "sp" : "normal"}
-        >
-          <h3 className="text-base font-extrabold tracking-tight text-foreground">최종 직업 스탯</h3>
-          {finalJobRows.length > 0 ? (
-            <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
-              <table className="w-full min-w-[680px] border-collapse text-sm">
-                <thead className="bg-muted/50">
-                  <tr className="border-b border-border">
-                    <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
-                    <HeroStatHeader stat="HP" />
-                    <HeroStatHeader stat="ATK" />
-                    <HeroStatHeader stat="INT" />
-                    <HeroStatHeader stat="DEF" />
-                    <HeroStatHeader stat="MDEF" />
-                    <HeroStatHeader stat="DEX" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {finalJobRows.map(({ key, capstone }) => {
-                    if (!capstone) return null;
-                    return (
-                      <Fragment key={key}>
-                        <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
-                          <th scope="row" className="px-4 pb-2 pt-3 text-left">
-                            <div className="font-bold text-foreground">
-                              {(isSpForm
-                                ? resolveHeroSpJobNameKr({
-                                    jobId: capstone.jobId ?? null,
-                                    nameCn: capstone.nameCn ?? null,
-                                  })
-                                : resolveHeroFinalJobNameKr({
-                                    jobId: capstone.jobId ?? null,
-                                    nameCn: capstone.nameCn ?? null,
-                                  })) ?? capstone.nameCn ?? "전직"}
-                            </div>
-                          </th>
-                          <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
-                          <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
-                          <JobStatCell stat="INT" value={capstone.finalStats.INT} domain={finalJobStatBars.domains.INT} />
-                          <JobStatCell stat="DEF" value={capstone.finalStats.DEF} domain={finalJobStatBars.domains.DEF} />
-                          <JobStatCell stat="MDEF" value={capstone.finalStats.MDEF} domain={finalJobStatBars.domains.MDEF} />
-                          <JobStatCell stat="DEX" value={capstone.finalStats.DEX} domain={finalJobStatBars.domains.DEX} />
-                        </tr>
-                        {capstone.centralBondStats ? (
-                          <tr className="border-b border-border last:border-b-0 bg-muted/20" data-hero-central-bond-stat-row="true">
-                            <th scope="row" className="px-4 pb-3 pt-2 text-left text-xs font-semibold text-muted-foreground">└ 중앙유대</th>
-                            <JobStatBonusCell value={capstone.centralBondStats.HP} />
-                            <JobStatBonusCell value={capstone.centralBondStats.ATK} />
-                            <JobStatBonusCell value={capstone.centralBondStats.INT} />
-                            <JobStatBonusCell value={capstone.centralBondStats.DEF} />
-                            <JobStatBonusCell value={capstone.centralBondStats.MDEF} />
-                            <JobStatBonusCell value={capstone.centralBondStats.DEX} />
+        {isSpForm ? (
+          <>
+          <div
+            className="mt-7 border-t border-border pt-5"
+            data-hero-final-job-stats-section="true"
+            data-hero-form-mode={isSpForm ? "sp" : "normal"}
+          >
+            <h3 className="text-base font-extrabold tracking-tight text-foreground">최종 직업 스탯</h3>
+            {finalJobRows.length > 0 ? (
+              <div className="mt-5 overflow-x-auto rounded-xl border border-border" data-hero-final-job-stats="true" data-final-job-stat-candidate-count={finalJobStatBars.candidateCount}>
+                <table className="w-full min-w-[680px] border-collapse text-sm">
+                  <thead className="bg-muted/50">
+                    <tr className="border-b border-border">
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">직업</th>
+                      <HeroStatHeader stat="HP" />
+                      <HeroStatHeader stat="ATK" />
+                      <HeroStatHeader stat="INT" />
+                      <HeroStatHeader stat="DEF" />
+                      <HeroStatHeader stat="MDEF" />
+                      <HeroStatHeader stat="DEX" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {finalJobRows.map(({ key, capstone }) => {
+                      if (!capstone) return null;
+                      return (
+                        <Fragment key={key}>
+                          <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
+                            <th scope="row" className="px-4 pb-2 pt-3 text-left">
+                              <div className="font-bold text-foreground">
+                                {(isSpForm
+                                  ? resolveHeroSpJobNameKr({
+                                      jobId: capstone.jobId ?? null,
+                                      nameCn: capstone.nameCn ?? null,
+                                    })
+                                  : resolveHeroFinalJobNameKr({
+                                      jobId: capstone.jobId ?? null,
+                                      nameCn: capstone.nameCn ?? null,
+                                    })) ?? capstone.nameCn ?? "전직"}
+                              </div>
+                            </th>
+                            <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
+                            <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
+                            <JobStatCell stat="INT" value={capstone.finalStats.INT} domain={finalJobStatBars.domains.INT} />
+                            <JobStatCell stat="DEF" value={capstone.finalStats.DEF} domain={finalJobStatBars.domains.DEF} />
+                            <JobStatCell stat="MDEF" value={capstone.finalStats.MDEF} domain={finalJobStatBars.domains.MDEF} />
+                            <JobStatCell stat="DEX" value={capstone.finalStats.DEX} domain={finalJobStatBars.domains.DEX} />
                           </tr>
-                        ) : null}
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
-          )}
-        </div>
-
-        <div
-          className="mt-7 border-t border-border pt-5"
-          data-hero-heart-fetter="true"
-          data-hero-form-mode={isSpForm ? "sp" : "normal"}
-          data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
-        >
-          <h3 className="text-base font-extrabold tracking-tight text-foreground">유대 Lv4 / Lv7 효과</h3>
-          {heartFetterRows.length > 0 ? (
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {heartFetterRows.map((row) => (
-                <article key={row.jobId} className="rounded-xl border border-border bg-muted/20 p-4" data-heart-fetter-job-id={row.jobId}>
-                  <h3 className="font-bold text-foreground">{row.jobName}</h3>
-                  <div className="mt-3 space-y-2">
-                    {row.effects.map((effect) => (
-                      <div
-                        key={`${effect.level}-${effect.skillId}`}
-                        className="rounded-lg border border-border bg-background px-3 py-3"
-                        data-heart-fetter-level={effect.level}
-                        data-heart-fetter-skill-id={effect.skillId}
-                        data-heart-fetter-mapping-mode={effect.mappingMode}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="rounded bg-muted px-2 py-1 text-[11px] font-black text-foreground">Lv.{effect.level}</span>
+                          {capstone.centralBondStats ? (
+                            <tr className="border-b border-border last:border-b-0 bg-muted/20" data-hero-central-bond-stat-row="true">
+                              <th scope="row" className="px-4 pb-3 pt-2 text-left text-xs font-semibold text-muted-foreground">└ 중앙유대</th>
+                              <JobStatBonusCell value={capstone.centralBondStats.HP} />
+                              <JobStatBonusCell value={capstone.centralBondStats.ATK} />
+                              <JobStatBonusCell value={capstone.centralBondStats.INT} />
+                              <JobStatBonusCell value={capstone.centralBondStats.DEF} />
+                              <JobStatBonusCell value={capstone.centralBondStats.MDEF} />
+                              <JobStatBonusCell value={capstone.centralBondStats.DEX} />
+                            </tr>
+                          ) : null}
+                        </Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 3단계 최종 직업 스탯이 없어.</p>
+            )}
+          </div>
+  
+          <div
+            className="mt-7 border-t border-border pt-5"
+            data-hero-heart-fetter="true"
+            data-hero-form-mode={isSpForm ? "sp" : "normal"}
+            data-heart-fetter-effect-count={heartFetterRows.reduce((sum, row) => sum + row.effects.length, 0)}
+          >
+            <h3 className="text-base font-extrabold tracking-tight text-foreground">유대 Lv4 / Lv7 효과</h3>
+            {heartFetterRows.length > 0 ? (
+              <div className="mt-5 grid gap-3 lg:grid-cols-2">
+                {heartFetterRows.map((row) => (
+                  <article key={row.jobId} className="rounded-xl border border-border bg-muted/20 p-4" data-heart-fetter-job-id={row.jobId}>
+                    <h3 className="font-bold text-foreground">{row.jobName}</h3>
+                    <div className="mt-3 space-y-2">
+                      {row.effects.map((effect) => (
+                        <div
+                          key={`${effect.level}-${effect.skillId}`}
+                          className="rounded-lg border border-border bg-background px-3 py-3"
+                          data-heart-fetter-level={effect.level}
+                          data-heart-fetter-skill-id={effect.skillId}
+                          data-heart-fetter-mapping-mode={effect.mappingMode}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="rounded bg-muted px-2 py-1 text-[11px] font-black text-foreground">Lv.{effect.level}</span>
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 Lv4/Lv7 효과 없음</p>
-          )}
-        </div>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">표시 가능한 유대 Lv4/Lv7 효과 없음</p>
+            )}
+          </div>
+            </>
+        ) : null}
         </section>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
