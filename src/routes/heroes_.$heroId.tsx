@@ -27,7 +27,8 @@ import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equi
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSpArtworkSource } from "@/lib/hero-sp-artwork-assets";
-import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";\nimport { getHeroSkillDisplayTypeLabelKr } from "@/lib/hero-skill-display-type-presentation";
+import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
+import { getHeroSkillDisplayTypeLabelKr } from "@/lib/hero-skill-display-type-presentation";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { resolveHeroSpMissionStageLabelKr } from "@/lib/hero-sp-mission-stage-localization";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
