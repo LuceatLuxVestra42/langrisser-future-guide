@@ -1500,5 +1500,21 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [23], note: "Legacy Korean sheet hero/data/로우가.js; exact Hero CN + Skill_Coldblood icon + type/cooldown/range/effect parity against current generated Skill 11705." },
     },
+    {
+      skillId: 12492,
+      sourceNameCn: "横扫",
+      nameKr: "휩쓸기",
+      descKr: "3줄 직선상의 모든 적에게 0.25배 범위 피해를 주고 위치 이동 효과로 모든 대상을 2칸 밀쳐낸다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99190, 99208, 99217, 99234, 99241, 99252], note: "Legacy Korean sheet hero/data/폴리알.js, 프레시아.js, 호프만.js, 티아나.js, 노노린.js, 루크만.js; exact Hero CN plus cooldown/range/area/effect parity against current generated Skill 12492." },
+    },
+    {
+      skillId: 10108,
+      sourceNameCn: "守护",
+      nameKr: "수호",
+      descKr: "받는 물리 피해량 -5%. 인접한 아군 부대가 물리 공격을 받을 때 대신 전투에 진입한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [21, 33, 40, 99198], note: "Legacy Korean sheet hero/data/발가스.js, 프레아.js, 루인.js, 아마데우스.js; exact Hero CN plus passive/effect parity against current generated Skill 10108." },
+    },
   ],
 };
