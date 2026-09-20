@@ -24,6 +24,11 @@ jobs:
       - name: Probe official installer for Leon SP CharImage 1013
         shell: pwsh
         run: python scripts/probe-hero-sp-artwork-charimage.py
+      - name: Probe pinned ConfigData for CharImage 1013 exact relations
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/probe-hero-sp-charimage-configdata.cjs
       - name: Upload probe report
         if: always()
         uses: actions/upload-artifact@v4
