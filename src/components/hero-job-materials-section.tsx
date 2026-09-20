@@ -251,7 +251,6 @@ function HeroSpJobMovementSection({
 
           <HeroFinalJobStatGraph
             stats={finalJobDetail.finalStats}
-            centralBondStats={finalJobDetail.centralBondStats}
             domains={statDomains}
           />
 
@@ -390,63 +389,76 @@ function HeroJobMaterialsDisclosure({
 
 function HeroFinalJobStatGraph({
   stats,
-  centralBondStats,
   domains,
 }: {
   stats: HeroFinalJobStatsView;
-  centralBondStats: HeroFinalJobCentralBondStatsView;
   domains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
 }) {
   return (
     <div
-      className="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-border/70 bg-background/70 p-2.5"
+      className="mt-2 overflow-x-auto rounded-lg border border-border/70 bg-background/70"
       data-hero-final-job-stat-graph="true"
     >
-      {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
-        const value = stats[stat];
-        const domain = domains[stat];
-        const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
-        const centralBondValue = centralBondStats?.[stat] ?? null;
-        const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
+      <table className="w-full min-w-[560px] border-collapse text-sm">
+        <thead className="bg-muted/50">
+          <tr className="border-b border-border">
+            {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
+              const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
+              return (
+                <th
+                  key={stat}
+                  scope="col"
+                  className="px-3 py-2.5 text-right text-xs font-bold text-muted-foreground"
+                  data-hero-final-job-stat-header={stat}
+                >
+                  <span className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                    <img
+                      src={iconUrl}
+                      alt=""
+                      aria-hidden="true"
+                      loading="eager"
+                      decoding="async"
+                      className="h-4 w-4 shrink-0 object-contain"
+                    />
+                    <span>{HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}</span>
+                  </span>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
+              const value = stats[stat];
+              const domain = domains[stat];
+              const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
 
-        return (
-          <div
-            key={stat}
-            className="relative overflow-hidden rounded-md border border-border/60 bg-muted/20 px-2.5 py-2"
-            data-hero-final-job-stat={stat}
-            data-stat-domain-min={domain.min}
-            data-stat-domain-max={domain.max}
-            data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
-          >
-            {value == null ? null : (
-              <div
-                className="absolute inset-y-0 left-0 bg-foreground/10"
-                style={{ width: `${barPercent}%` }}
-                aria-hidden="true"
-              />
-            )}
-            <div className="relative z-10 flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
-                <img
-                  src={iconUrl}
-                  alt=""
-                  aria-hidden="true"
-                  loading="eager"
-                  decoding="async"
-                  className="h-4 w-4 shrink-0 object-contain"
-                />
-                {HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}
-              </span>
-              <span className="text-sm font-extrabold tabular-nums text-foreground">{value ?? "-"}</span>
-            </div>
-            {centralBondValue != null ? (
-              <div className="relative z-10 mt-1 text-right text-[10px] font-semibold tabular-nums text-muted-foreground">
-                중앙유대 +{centralBondValue}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
+              return (
+                <td
+                  key={stat}
+                  className="px-3 py-3 text-right font-bold tabular-nums text-foreground"
+                  data-hero-final-job-stat={stat}
+                  data-stat-domain-min={domain.min}
+                  data-stat-domain-max={domain.max}
+                  data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
+                >
+                  <div className="relative min-w-[4.5rem] overflow-hidden rounded-md bg-muted/30 px-2 py-1.5">
+                    {value == null ? null : (
+                      <div
+                        className="absolute inset-y-0 left-0 bg-primary/25"
+                        style={{ width: `${barPercent}%` }}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span className="relative z-10">{value ?? "-"}</span>
+                  </div>
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -586,7 +598,6 @@ function HeroJobTreeCard({
 
           <HeroFinalJobStatGraph
             stats={finalJobDetail.finalStats}
-            centralBondStats={finalJobDetail.centralBondStats}
             domains={statDomains}
           />
 
