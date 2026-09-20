@@ -143,8 +143,8 @@ async function verifyHeroFormSwitch(page, label) {
   const spArtwork = page.locator('img[data-hero-active-artwork="true"][data-hero-artwork-form="sp"]');
   check(await spArtwork.count() === 1, `Hero 6 ${label} SP artwork missing`);
   const spArtworkSrc = await spArtwork.getAttribute("src");
-  check(spArtworkSrc?.startsWith("data:image/webp;base64,") === true, `Hero 6 ${label} SP artwork is not the embedded WebP source`);
-  check((spArtworkSrc?.length ?? 0) > 50000, `Hero 6 ${label} SP artwork payload is unexpectedly short`);
+  check(spArtworkSrc?.endsWith("/images/heroes/sp/6.webp") === true, `Hero 6 ${label} SP artwork path mismatch: ${spArtworkSrc}`);
+  check(await spArtwork.evaluate((image) => image.complete && image.naturalWidth > 0 && image.naturalHeight > 0), `Hero 6 ${label} SP artwork failed to load`);
 
   const spMovement = page.locator('[data-hero-sp-job-movement="true"]');
   check(await spMovement.count() === 1, `Hero 6 ${label} SP movement section missing`);
