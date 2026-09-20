@@ -22,6 +22,7 @@ import { getStaticHeroCardIconIndex } from "@/lib/hero-card-icon-assets.static";
 import { getHeroBondMaterialsPresentation } from "@/lib/hero-bond-materials.functions";
 import { getHeroCastingLawPresentation } from "@/lib/hero-casting-law.functions";
 import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
+import { resolveHeroFinalJobNameKr } from "@/lib/hero-final-job-localization";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
@@ -349,7 +350,15 @@ function HeroDetailPage() {
   const finalJobRows = isSpForm ? spFinalJobRows : normalFinalJobRows;
   const finalJobNameById = new Map<number, string>();
   for (const { capstone } of finalJobRows) {
-    if (capstone?.jobId != null) finalJobNameById.set(capstone.jobId, capstone.nameCn ?? "전직");
+    if (capstone?.jobId != null) {
+      finalJobNameById.set(
+        capstone.jobId,
+        resolveHeroFinalJobNameKr({
+          jobId: capstone.jobId,
+          nameCn: capstone.nameCn ?? null,
+        }) ?? capstone.nameCn ?? "전직",
+      );
+    }
   }
   const heartFetterRows = [...finalJobNameById.entries()].map(([jobId, jobName]) => ({
     jobId,
@@ -766,7 +775,12 @@ function HeroDetailPage() {
                       <Fragment key={key}>
                         <tr className="border-b border-border/60" data-final-job-id={capstone.jobId ?? ""}>
                           <th scope="row" className="px-4 pb-2 pt-3 text-left">
-                            <div className="font-bold text-foreground">{capstone.nameCn ?? "전직"}</div>
+                            <div className="font-bold text-foreground">
+                              {resolveHeroFinalJobNameKr({
+                                jobId: capstone.jobId ?? null,
+                                nameCn: capstone.nameCn ?? null,
+                              }) ?? capstone.nameCn ?? "전직"}
+                            </div>
                           </th>
                           <JobStatCell stat="HP" value={capstone.finalStats.HP} domain={finalJobStatBars.domains.HP} />
                           <JobStatCell stat="ATK" value={capstone.finalStats.ATK} domain={finalJobStatBars.domains.ATK} />
