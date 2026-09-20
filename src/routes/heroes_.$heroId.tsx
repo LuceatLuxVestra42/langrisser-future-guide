@@ -23,6 +23,7 @@ import { getHeroBondMaterialsPresentation } from "@/lib/hero-bond-materials.func
 import { getHeroCastingLawPresentation } from "@/lib/hero-casting-law.functions";
 import { getHeroFinalJobStatBarPresentationData } from "@/lib/hero-final-job-stat-bars.functions";
 import { resolveHeroFinalJobNameKr } from "@/lib/hero-final-job-localization";
+import { resolveHeroJobNameKr } from "@/lib/hero-job-localization";
 import { getHeroDetailRouteStage5Data } from "@/lib/hero-list.functions";
 import { getHeroExclusiveEquipmentPresentation } from "@/lib/hero-exclusive-equipment.functions";
 import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
@@ -377,7 +378,7 @@ function HeroDetailPage() {
   for (const branch of detail.jobs.branches) {
     for (const job of branch.jobs) {
       if (job.jobConnectionId == null || job.jobId == null) continue;
-      const jobName = resolveHeroFinalJobNameKr({
+      const jobName = resolveHeroJobNameKr({
         jobId: job.jobId,
         nameCn: job.nameCn ?? null,
       }) ?? job.nameCn ?? null;
