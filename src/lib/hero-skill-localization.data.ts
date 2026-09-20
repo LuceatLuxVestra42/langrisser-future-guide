@@ -2832,5 +2832,14 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [134], note: "Legacy Korean sheet hero/data/아인즈.js; exact Hero CN + Skill_Ains4 icon + type/cooldown/range/target/effect parity against current generated Skill 12189." },
     },
+
+    {
+      skillId: 12218,
+      sourceNameCn: "祷告",
+      nameKr: "기원",
+      descKr: "[지원] 자신에게 걸린 디버프 2개를 제거하고 부대 생명을 30% 회복한다. 사용 후 2칸 재행동하며 다시 공격할 수 있다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [114], note: "Legacy Korean sheet hero/data/마리엘.js; exact Hero CN + Skill_Mariel2 icon + type/cooldown/range/target/effect parity against current generated Skill 12218." },
+    },
   ],
 };
