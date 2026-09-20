@@ -1189,7 +1189,7 @@ function HeroSpMissionSection({
           }`}
           data-sp-mission-tab="missions"
         >
-          기존 미션
+          모든 미션
         </button>
         <button
           type="button"
