@@ -3196,5 +3196,38 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [99197], note: "Legacy Korean sheet hero/data/각성자.js; exact Awakener/2 ↔ Skill_Awakener2 icon + type/cooldown/range/target/effect parity." },
     },
+
+    {
+      skillId: 12534,
+      sourceNameCn: "催折冰寒",
+      nameKr: "살을 에는 추위",
+      descKr: "[마법 피해] 단일 적에게 1.6배 마법 피해를 주며 창병에게 더 큰 피해를 준다. 이동력 -2를 2행동 부여하고, 이미 이동력 저하 효과를 보유했다면 이번 피해 +20%.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99199], note: "Legacy Korean sheet hero/data/사그니.js; exact Sagny/2 ↔ Skill_Sagny2 icon + type/cooldown/range/target/effect parity." },
+    },
+    {
+      skillId: 12536,
+      sourceNameCn: "立挑",
+      nameKr: "입조",
+      descKr: "[물리 피해] 전장에 있는 단일 적에게 0.2배 범위 피해를 주고 행동 불가를 1행동 부여한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99198], note: "Legacy Korean sheet hero/data/아마데우스.js; exact Amadeus/2 ↔ Skill_Amadeus2 icon + type/cooldown/range/target/effect parity." },
+    },
+    {
+      skillId: 12550,
+      sourceNameCn: "落燕",
+      nameKr: "제비 떨구기",
+      descKr: "[액티브] 자신을 목표 위치로 텔레포트한다. 행동 종료 시 자신 주위 2칸 아군에게 주는 피해 +10%를 1행동 부여한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99200], note: "Legacy Korean sheet hero/data/키리카.js; exact Kirika/1 ↔ Skill_Kirika1 icon + type/cooldown/range/target/effect parity." },
+    },
+    {
+      skillId: 12551,
+      sourceNameCn: "舞时雨",
+      nameKr: "흩날리는 비",
+      descKr: "[물리 피해] 코토노카구라 효과를 3개 이상 보유하면 스킬 범위 +1. 범위 내 적에게 0.3배 피해를 주고 화살비를 2행동 부여한다. 화살비는 이동하지 않고 행동 종료 시 공격 2배 수치의 고정 피해를 주며, 이동 1칸마다 피해 계수 -0.5.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99200], note: "Legacy Korean sheet hero/data/키리카.js; exact Kirika/2 ↔ Skill_Kirika2 icon + type/cooldown/range/target/effect parity." },
+    },
   ],
 };
