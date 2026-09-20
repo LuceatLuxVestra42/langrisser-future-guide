@@ -9,6 +9,8 @@ on:
       - 'scripts/build-equipment-name-kr-presentation.mjs'
       - 'src/lib/equipment-page.localized.server.ts'
       - 'src/lib/equipment-page.functions.ts'
+      - 'src/lib/hero-exclusive-equipment.server.ts'
+      - 'src/lib/hero-exclusive-equipment.server.ts'
       - 'package.json'
       - '.github/workflows/equipment-korean-name-frontend-qa.yml'
   pull_request:
@@ -76,12 +78,15 @@ jobs:
           import fs from 'node:fs';
           const functionsSource = fs.readFileSync('src/lib/equipment-page.functions.ts', 'utf8');
           const localizedSource = fs.readFileSync('src/lib/equipment-page.localized.server.ts', 'utf8');
+          const heroExclusiveSource = fs.readFileSync('src/lib/hero-exclusive-equipment.server.ts', 'utf8');
           const routeTree = fs.readFileSync('src/routeTree.gen.ts', 'utf8');
           const assert = (condition, message) => { if (!condition) throw new Error(message); };
           assert(functionsSource.includes('./equipment-page.localized.server'), 'Equipment server functions must consume localized presentation wrapper.');
           assert(localizedSource.includes('equipment-name-kr-user-approved.v1.json'), 'Localized wrapper must consume generated ID projection.');
           assert(localizedSource.includes('byEquipmentId[String(equipmentId)]'), 'Runtime localization lookup must be equipmentId-keyed.');
           assert(!localizedSource.includes('ConfigDataEquipmentInfo'), 'Localized wrapper must not read raw ConfigDataEquipmentInfo.');
+          assert(heroExclusiveSource.includes('equipment-name-kr-user-approved.v1.json'), 'Hero exclusive equipment must consume generated Korean-name projection.');
+          assert(heroExclusiveSource.includes('byEquipmentId[String(equipmentId)]'), 'Hero exclusive equipment localization lookup must be equipmentId-keyed.');
           assert(routeTree.includes('/equipment/exclusive'), 'Route tree missing /equipment/exclusive.');
           assert(routeTree.includes('/equipment/$equipmentId'), 'Route tree missing equipment detail route.');
           assert(routeTree.includes('/equipment'), 'Route tree missing /equipment.');
