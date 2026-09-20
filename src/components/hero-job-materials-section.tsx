@@ -707,6 +707,51 @@ function HeroNormalJobTree({
     }
   }
 
+  const t3Branches = t3Rows.map((t3) => ({
+    t3,
+    children: t4Rows.filter(
+      (t4) => t4ParentByConnectionId.get(t4.jobConnectionId) === t3.jobConnectionId,
+    ),
+  }));
+  const t3BranchesWithoutT4 = t3Branches.filter((branch) => branch.children.length === 0);
+  const t3BranchesWithT4 = t3Branches.filter((branch) => branch.children.length > 0);
+  const compactT3Branches = [...t3BranchesWithoutT4, ...t3BranchesWithT4];
+
+  const renderT3Branch = ({
+    t3,
+    children,
+  }: {
+    t3: HeroJobMovementRow;
+    children: HeroJobMovementRow[];
+  }) => (
+    <div key={t3.jobConnectionId} className="w-full min-w-0 max-w-[340px] justify-self-center">
+      <HeroJobTreeCard
+        row={t3}
+        materialConnection={materialByConnectionId.get(t3.jobConnectionId) ?? null}
+        finalJobDetail={null}
+        statDomains={statDomains}
+        heartFetterEffects={heartFetterEffects}
+      />
+      {children.length > 0 ? (
+        <>
+          <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
+          <div className="grid gap-3">
+            {children.map((t4) => (
+              <HeroJobTreeCard
+                key={t4.jobConnectionId}
+                row={t4}
+                materialConnection={materialByConnectionId.get(t4.jobConnectionId) ?? null}
+                finalJobDetail={finalJobDetailByJobId.get(t4.jobId) ?? null}
+                statDomains={statDomains}
+                heartFetterEffects={heartFetterEffects}
+              />
+            ))}
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+
   const renderTierRow = (rows: HeroJobMovementRow[], tier: number) =>
     rows.length > 0 ? (
       <div
@@ -747,40 +792,35 @@ function HeroNormalJobTree({
       ) : null}
 
       {t3Rows.length > 0 ? (
-        <div className="flex flex-wrap items-start justify-center gap-5" data-hero-job-tier-branches="true">
-          {t3Rows.map((t3) => {
-            const children = t4Rows.filter(
-              (t4) => t4ParentByConnectionId.get(t4.jobConnectionId) === t3.jobConnectionId,
-            );
-            return (
-              <div key={t3.jobConnectionId} className="w-full max-w-[340px]">
-                <HeroJobTreeCard
-                  row={t3}
-                  materialConnection={materialByConnectionId.get(t3.jobConnectionId) ?? null}
-                  finalJobDetail={null}
-                  statDomains={statDomains}
-                  heartFetterEffects={heartFetterEffects}
-                />
-                {children.length > 0 ? (
-                  <>
-                    <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
-                    <div className="grid gap-3">
-                      {children.map((t4) => (
-                        <HeroJobTreeCard
-                          key={t4.jobConnectionId}
-                          row={t4}
-                          materialConnection={materialByConnectionId.get(t4.jobConnectionId) ?? null}
-                          finalJobDetail={finalJobDetailByJobId.get(t4.jobId) ?? null}
-                          statDomains={statDomains}
-                          heartFetterEffects={heartFetterEffects}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : null}
+        <div data-hero-job-tier-branches="true">
+          <div
+            className="hidden items-start justify-center gap-5 lg:grid"
+            style={{
+              gridTemplateColumns: `repeat(${t3Branches.length}, minmax(0, 340px))`,
+            }}
+            data-hero-job-tree-layout="wide"
+          >
+            {t3Branches.map(renderT3Branch)}
+          </div>
+
+          <div className="hidden md:block lg:hidden" data-hero-job-tree-layout="medium">
+            {t3BranchesWithoutT4.length > 0 ? (
+              <div className="flex flex-wrap items-start justify-center gap-5">
+                {t3BranchesWithoutT4.map(renderT3Branch)}
               </div>
-            );
-          })}
+            ) : null}
+            {t3BranchesWithT4.length > 0 ? (
+              <div
+                className={t3BranchesWithoutT4.length > 0 ? "mt-5 grid grid-cols-2 items-start gap-5" : "grid grid-cols-2 items-start gap-5"}
+              >
+                {t3BranchesWithT4.map(renderT3Branch)}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="grid items-start gap-5 md:hidden" data-hero-job-tree-layout="narrow">
+            {compactT3Branches.map(renderT3Branch)}
+          </div>
         </div>
       ) : null}
     </div>
