@@ -12,6 +12,35 @@ const repoRoot = process.cwd();
 const contracts = loadProjectCheckContracts({ repoRoot });
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
 
+const workUnitContract = readJson('tools/project-check/contracts/work-unit.v1.json');
+assert.equal(workUnitContract.schemaId, 'project-check-work-unit-contract/v1');
+assert.equal(workUnitContract.status, 'DESIGN_FROZEN');
+assert.equal(workUnitContract.policy.defaultPurposeCount, 1);
+assert.equal(workUnitContract.policy.defaultPrimaryOwnerCount, 1);
+assert.equal(workUnitContract.policy.defaultCompletionBoundaryCount, 1);
+assert.equal(workUnitContract.policy.splitWhenIndependentPurposeIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenIndependentOwnerIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenIndependentCompletionGateIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenSemanticAndPresentationAreIndependent, true);
+assert.equal(workUnitContract.policy.splitWhenWorkflowToolingAndProductChangeAreIndependent, true);
+assert.equal(workUnitContract.policy.opportunisticAdjacentFix, 'DEFER_TO_NEXT_WORK_UNIT_UNLESS_CURRENT_COMPLETION_BLOCKED');
+assert.equal(workUnitContract.policy.samePurposeGeneratedConsumerBundleAllowed, true);
+assert.equal(workUnitContract.policy.explicitMultiOwnerPathAllowed, true);
+assert.equal(workUnitContract.policy.fileCountIsNotSplitCriterion, true);
+assert.equal(workUnitContract.policy.validatorCountIsNotSplitCriterion, true);
+assert.equal(workUnitContract.policy.ownerRoutingMutation, false);
+assert.equal(workUnitContract.policy.semanticRecomputation, false);
+assert.equal(workUnitContract.policy.ownerPropagation, false);
+assert.equal(workUnitContract.policy.changeClassFanOut, false);
+assert.deepEqual(workUnitContract.completion.required, [
+  'purpose_complete',
+  'owning_validator_or_gate_complete',
+  'no_current_diff_blocker',
+  'tracked_change_matches_declared_scope',
+]);
+assert.equal(workUnitContract.completion.nonBlockingAdjacentIssue, 'REVIEW_OR_NEXT_WORK_UNIT');
+
+
 function validatorIds(route) {
   return route.validators.map(item => item.id);
 }
