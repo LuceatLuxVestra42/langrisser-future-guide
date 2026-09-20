@@ -80,6 +80,13 @@ function isPathActive(pathname: string, target: ExistingRoute) {
   return pathname === target;
 }
 
+function resolveNavHref(to: ExistingRoute) {
+  const base = import.meta.env.BASE_URL || "/";
+  const normalizedBase = base.endsWith("/") ? base : `${base}/`;
+  const normalizedPath = to.replace(/^\/+|\/+$/g, "");
+  return normalizedPath ? `${normalizedBase}${normalizedPath}/` : normalizedBase;
+}
+
 
 export function SiteSectionNav() {
   const location = useLocation();
@@ -151,9 +158,9 @@ export function SiteSectionNav() {
                           asChild
                           className="px-4 py-3 text-sm"
                         >
-                          <Link to="/banners" search={{ view: "single-log" }}>
+                          <a href={`${resolveNavHref("/banners")}?view=single-log`}>
                             {item.label}
-                          </Link>
+                          </a>
                         </DropdownMenuItem>
                       );
                     }
@@ -174,6 +181,7 @@ export function SiteSectionNav() {
                     }
 
                     const itemActive = isPathActive(location.pathname, item.to);
+                    const href = resolveNavHref(item.to);
 
                     return (
                       <DropdownMenuItem
@@ -181,12 +189,12 @@ export function SiteSectionNav() {
                         asChild
                         className="px-4 py-3 text-sm"
                       >
-                        <Link
-                          to={item.to}
+                        <a
+                          href={href}
                           className={cn(itemActive && "bg-accent font-semibold text-accent-foreground")}
                         >
                           {item.label}
-                        </Link>
+                        </a>
                       </DropdownMenuItem>
                     );
                   })}
