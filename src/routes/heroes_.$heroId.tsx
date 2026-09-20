@@ -742,21 +742,37 @@ function HeroDetailPage() {
         </section>
 
 
-        <section
-          className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
-          data-hero-job-block="true"
-          data-hero-form-mode={isSpForm ? "sp" : "normal"}
+        <div
+          className={isSpForm
+            ? "mt-5 grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(340px,380px)_minmax(0,1fr)]"
+            : "mt-5"}
+          data-hero-job-sp-layout={isSpForm ? "side-by-side" : "job-only"}
         >
-          <SectionTitle title="전직" />
-        <HeroJobMaterialsSection
-          heroId={hero.heroId}
-          mode={isSpForm ? "sp" : "normal"}
-          allowedJobConnectionIds={selectedMatthewJobConnectionIds}
-          finalJobDetails={isSpForm ? spFinalJobDetails : normalFinalJobDetails}
-          statDomains={finalJobStatBars.domains}
-          heartFetterEffects={heartFetter.effects}
-        />
-        </section>
+          <section
+            className={`min-w-0 rounded-2xl border border-border bg-card shadow-sm ${isSpForm ? "p-4 sm:p-5" : "p-5 sm:p-6"}`}
+            data-hero-job-block="true"
+            data-hero-form-mode={isSpForm ? "sp" : "normal"}
+          >
+            <SectionTitle title="전직" />
+            <HeroJobMaterialsSection
+              heroId={hero.heroId}
+              mode={isSpForm ? "sp" : "normal"}
+              allowedJobConnectionIds={selectedMatthewJobConnectionIds}
+              finalJobDetails={isSpForm ? spFinalJobDetails : normalFinalJobDetails}
+              statDomains={finalJobStatBars.domains}
+              heartFetterEffects={heartFetter.effects}
+            />
+          </section>
+
+          {isSpForm ? (
+            <HeroSpMissionSection
+              missions={detail.sp.missions}
+              secondStageRewardSoldierNames={detail.sp.secondStageRewards.soldiers.map(
+                (soldier) => soldier.displayName,
+              )}
+            />
+          ) : null}
+        </div>
 
         <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle title="스킬" />
@@ -804,16 +820,6 @@ function HeroDetailPage() {
             </div>
           ) : null}
         </section>
-
-
-        {isSpForm ? (
-          <HeroSpMissionSection
-            missions={detail.sp.missions}
-            secondStageRewardSoldierNames={detail.sp.secondStageRewards.soldiers.map(
-              (soldier) => soldier.displayName,
-            )}
-          />
-        ) : null}
 
 
 
@@ -1155,7 +1161,7 @@ function HeroSpMissionSection({
 
   return (
     <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+      className="min-w-0 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
       data-hero-sp-missions="true"
       data-sp-first-stage-count={missions.firstStage.length}
       data-sp-second-stage-count={missions.secondStage.length}
