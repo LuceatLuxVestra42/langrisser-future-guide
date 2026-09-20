@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+
 import { getSoldierCommonMaterialIconUrl } from "@/lib/soldier-common-material-assets";
 
 type BondMaterial = {
@@ -184,10 +186,14 @@ export function HeroBondMaterialsPanel({
   resolveAssetUrl: (path: string) => string;
 }) {
   return (
-    <div className="mt-5 border-t border-border pt-5" data-hero-bond-materials="true">
-      <div>
+    <details className="group mt-5 border-t border-border" data-hero-bond-materials="true">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pt-5">
         <h3 className="text-sm font-extrabold text-foreground">유대 강화 재료</h3>
-      </div>
+        <ChevronDown
+          className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
 
       <div className="mt-3 space-y-2">
         {materials.regularFetters.map((fetter) => (
@@ -205,6 +211,6 @@ export function HeroBondMaterialsPanel({
           resolveAssetUrl={resolveAssetUrl}
         />
       </div>
-    </div>
+    </details>
   );
 }
