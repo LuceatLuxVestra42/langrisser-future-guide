@@ -1103,6 +1103,16 @@ function HeroSpMissionSection({
     () => recommendHeroSpHourglass(missions, dungeonScenario, hourglassCount),
     [missions, dungeonScenario, hourglassCount],
   );
+  const hourglassCompletionSchedule = useMemo(() => {
+    if (hourglassRecommendation.combinations.length === 0) {
+      return simulateHeroSpDungeonSchedule(missions, dungeonScenario);
+    }
+    return simulateHeroSpDungeonSchedule(
+      missions,
+      dungeonScenario,
+      hourglassRecommendation.combinations[0]?.map((candidate) => candidate.missionKey) ?? [],
+    );
+  }, [missions, dungeonScenario, hourglassRecommendation.combinations]);
 
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
   if (missions.secondStage.length > 0 && secondStageRewardSoldierNames.length === 0) {
@@ -1247,11 +1257,13 @@ function HeroSpMissionSection({
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-foreground">시간의 모래시계 추천</h3>
-              {hourglassRecommendation.savedDays > 0 ? (
-                <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-foreground">
-                  대기 {hourglassRecommendation.savedDays}일 단축
-                </span>
-              ) : null}
+              <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-black text-foreground">
+                수요일 시작 → {HERO_SP_DUNGEON_WEEKDAY_LABEL[
+                  (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
+                    hourglassCompletionSchedule.finalDayOffset % 7
+                  ] ?? "WED"
+                ]} 완료
+              </span>
             </div>
             <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="시간의 모래시계 개수">
               {([0, 1, 2] as const).map((count) => (
@@ -1298,7 +1310,11 @@ function HeroSpMissionSection({
                       ))}
                     </div>
                     <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {hourglassCount}개를 이 조합에 사용했을 때 전체 요일 대기시간이 가장 많이 줄어들어.
+                      이 조합에 모래시계를 사용하면 수요일 시작 기준 {HERO_SP_DUNGEON_WEEKDAY_LABEL[
+                        (["WED", "THU", "FRI", "SAT", "SUN", "MON", "TUE"] as const)[
+                          hourglassCompletionSchedule.finalDayOffset % 7
+                        ] ?? "WED"
+                      ]}에 완료할 수 있어.
                     </p>
                   </div>
                 ))}
