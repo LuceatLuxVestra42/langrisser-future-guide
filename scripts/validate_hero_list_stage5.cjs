@@ -144,10 +144,13 @@ if (
 if (
   !routeSource.includes("const hasMetadata = Boolean(") ||
   !routeSource.includes("skill.displayType ?") ||
-  !routeSource.includes("skill.cooldown ?") ||
-  !routeSource.includes("skill.range ?") ||
-  !routeSource.includes("skill.areaOrTarget ?")
-) fail("Hero detail SkillCard must omit absent nullable metadata instead of rendering null labels.");
+  !routeSource.includes("const cooldown = getVisibleHeroSkillMetadataValue(skill.cooldown)") ||
+  !routeSource.includes("const range = getVisibleHeroSkillMetadataValue(skill.range)") ||
+  !routeSource.includes("const areaOrTarget = getVisibleHeroSkillMetadataValue(skill.areaOrTarget)") ||
+  !routeSource.includes("cooldown ?") ||
+  !routeSource.includes("range ?") ||
+  !routeSource.includes("areaOrTarget ?")
+) fail("Hero detail SkillCard must omit absent or placeholder nullable metadata instead of rendering empty labels.");
 if (
   !routeSource.includes("최종 직업 스탯") ||
   !routeSource.includes('data-hero-final-job-stats="true"') ||
