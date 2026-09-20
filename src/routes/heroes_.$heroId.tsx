@@ -1022,7 +1022,7 @@ function HeroSoldierCard({
         </span>
       </div>
 
-      <div className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center rounded bg-background/80 px-1 shadow-sm backdrop-blur" title={armyLabel}>
+      <div className="absolute right-1.5 top-1.5 flex h-6 min-w-6 items-center justify-center" title={armyLabel}>
         {armyIconUrl ? <img src={armyIconUrl} alt="" aria-hidden="true" loading="lazy" decoding="async" className="h-5 w-5 object-contain" onError={(event) => { event.currentTarget.style.display = "none"; }} /> : <span className="text-[10px] font-bold text-foreground">{armyLabel.slice(0, 1)}</span>}
         <span className="sr-only">{armyLabel}</span>
       </div>
