@@ -2873,5 +2873,6 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       descKr: "[패시브] 여성 영웅이 아닌 부대와 전투 진입 시, 전투 후 해당 전투에서 준 피해의 30%만큼 생명을 회복한다.",
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [126], note: "Legacy Korean sheet hero/data/팟시르.js; exact Hero CN + Skill_Patsyr3 icon + type/effect parity against current generated Skill 12271." },
+    },
   ],
 };
