@@ -7,13 +7,18 @@ const workflowPath = path.join(repoRoot, '.github/workflows/project-tooling-rout
 const workflow = fs.readFileSync(workflowPath, 'utf8');
 
 assert.match(workflow, /publish-pr-preview:\n    name: publish-pr-preview\n    concurrency:\n      group: project-tooling-route-hosted-qa-preview-publish\n      cancel-in-progress: false/);
+assert.match(workflow, /PREVIEW_PATH: preview/);
+assert.match(workflow, /PREVIEW_BASE_URL: https:\/\/luceatluxvestra42\.github\.io\/Data\/preview\//);
+assert.match(workflow, /STATIC_SITE_BASE: \/Data\/preview\//);
+assert.match(workflow, /\"runId\": \"\$\{GITHUB_RUN_ID\}\"/);
+assert.doesNotMatch(workflow, /PREVIEW_PATH: pr-\$\{\{/);
 assert.match(workflow, /for attempt in 1 2 3 4 5; do/);
 assert.match(workflow, /git fetch origin "\$PREVIEW_BRANCH"/);
 assert.match(workflow, /git rebase "origin\/\$PREVIEW_BRANCH"/);
 assert.match(workflow, /BLOCKER_PREVIEW_PUBLISH_RETRY_EXHAUSTED/);
 assert.match(workflow, /deadline=\$\(\(SECONDS \+ 1200\)\)/);
 assert.doesNotMatch(workflow, /deadline=\$\(\(SECONDS \+ 600\)\)/);
-assert.match(workflow, /Strict Hosted QA against exact Data Pages preview[\s\S]*--expected-sha "\$SOURCE_SHA"/);
+assert.match(workflow, /Strict Hosted QA against exact Data Pages preview[\s\S]*--expected-sha "\$SOURCE_SHA"[\s\S]*--expected-run-id "\$GITHUB_RUN_ID"/);
 
 const finalizerHandoffMatch = workflow.match(
   /^  finalizer-handoff:\n[\s\S]*?(?=^  [A-Za-z0-9_-]+:\n)/m,
@@ -111,14 +116,9 @@ for (const fixture of handoffCases) {
 
 assert.equal(classifyHandoffFixture({ sameRepository: false }), 'SKIP_DIFFERENT_REPOSITORY');
 
-assert.match(workflow, /ready_for_review, closed/);
-assert.match(workflow, /cleanup-pr-preview:/);
-assert.match(workflow, /github\.event\.action == 'closed'/);
-assert.match(workflow, /cleanup-pr-preview:[\s\S]*group: project-tooling-route-hosted-qa-preview-publish/);
-assert.match(workflow, /cleanup-pr-preview:[\s\S]*cancel-in-progress: false/);
-assert.match(workflow, /rm -rf -- "\$PREVIEW_PATH"/);
-assert.match(workflow, /BLOCKER_PREVIEW_CLEANUP_RETRY_EXHAUSTED/);
-assert.match(workflow, /PR_PREVIEW_CLEANUP=PASS/);
+assert.match(workflow, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+assert.doesNotMatch(workflow, /cleanup-pr-preview:/);
+assert.doesNotMatch(workflow, /ready_for_review, closed/);
 
 console.log(JSON.stringify({
   status: 'PASS',
@@ -126,7 +126,8 @@ console.log(JSON.stringify({
   previewPublishSerialized: true,
   pushRetryAttempts: 5,
   deploymentWaitBudgetSeconds: 1200,
-  closedPreviewCleanup: true,
+  singleSlotPreview: true,
+  closedPreviewCleanupRequired: false,
   finalizerHandoffContract: true,
   finalizerHandoffCases: handoffCases.length,
 }, null, 2));

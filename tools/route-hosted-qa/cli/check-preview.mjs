@@ -14,14 +14,16 @@ const MANIFEST = 'preview-source.json';
 let requestCounter = 0;
 
 function parseArgs(argv) {
-  const out = { pr: null, expectedSha: null };
+  const out = { pr: null, expectedSha: null, expectedRunId: null };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === '--pr') out.pr = Number(argv[++i]);
     else if (argv[i] === '--expected-sha') out.expectedSha = String(argv[++i] ?? '').toLowerCase();
+    else if (argv[i] === '--expected-run-id') out.expectedRunId = String(argv[++i] ?? '');
     else throw new Error(`Unknown argument: ${argv[i]}`);
   }
   if (!Number.isInteger(out.pr) || out.pr <= 0) throw new Error('--pr must be a positive integer.');
   if (!SHA40.test(out.expectedSha ?? '')) throw new Error('--expected-sha must be an explicit 40-hex SHA.');
+  if (!/^\d+$/.test(out.expectedRunId ?? '')) throw new Error('--expected-run-id must be an explicit numeric GitHub Actions run id.');
   return out;
 }
 
@@ -79,17 +81,17 @@ function flipCaseInPath(url) {
 }
 
 async function main() {
-  const { pr, expectedSha } = parseArgs(process.argv.slice(2));
+  const { pr, expectedSha, expectedRunId } = parseArgs(process.argv.slice(2));
   const contract = loadRouteHostedQaContract();
   const timeoutMs = contract.runtime.requestTimeoutMs;
   const maxAssets = contract.runtime.maxAssetRequests;
-  const previewBase = `${PREVIEW_ORIGIN}${PREVIEW_REPOSITORY_BASE}pr-${pr}/`;
+  const previewBase = `${PREVIEW_ORIGIN}${PREVIEW_REPOSITORY_BASE}preview/`;
   const plan = buildHostedPlan(contract);
   const checks = [];
   const add = (id, pass, details) => checks.push({ id, pass: Boolean(pass), details });
 
-  if (!previewBase.startsWith(`${PREVIEW_ORIGIN}${PREVIEW_REPOSITORY_BASE}pr-`)) {
-    throw new Error('Preview target escaped the admitted Data Pages root.');
+  if (previewBase !== `${PREVIEW_ORIGIN}${PREVIEW_REPOSITORY_BASE}preview/`) {
+    throw new Error('Preview target escaped the admitted Data Pages single slot.');
   }
 
   const manifestResponses = [];
@@ -105,9 +107,11 @@ async function main() {
     manifest?.sourceRepository === SOURCE_REPOSITORY &&
     String(manifest?.sourceSha ?? '').toLowerCase() === expectedSha &&
     Number(manifest?.pullRequest) === pr &&
+    String(manifest?.runId ?? '') === expectedRunId &&
     manifest?.publisher === '.github/workflows/project-tooling-route-hosted-qa.yml';
   add('DEPLOYED_COMMIT_FRESHNESS', manifestPass, {
     expectedSourceSha: expectedSha,
+    expectedRunId,
     pullRequest: pr,
     previewBase,
     manifest,
@@ -218,6 +222,7 @@ async function main() {
     deploymentMutation: false,
     previewBase,
     expectedSourceSha: expectedSha,
+    expectedRunId,
     pullRequest: pr,
     summary: { checkCount: ordered.length, failed: failed.length },
     checks: ordered,
