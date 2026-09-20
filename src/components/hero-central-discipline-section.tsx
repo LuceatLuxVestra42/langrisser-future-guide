@@ -34,7 +34,7 @@ export function HeroCentralDisciplineSection({
 
       {effectText ? (
         <article
-          className="mt-5 rounded-2xl border border-border bg-muted/20 p-4 sm:p-5"
+          className="mt-4"
           data-central-discipline-skill-id={centralDiscipline.skillId ?? undefined}
           data-central-discipline-source-sheet={koreanPresentation?.source.sheet}
           data-central-discipline-source-row={koreanPresentation?.source.effectRow}
