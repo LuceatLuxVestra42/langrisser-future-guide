@@ -32,6 +32,9 @@ const HERO_SOLDIER_ARMY_ORDER = new Map<string, number>(
 
 const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
   [1, new Set([
+    10408,
+    10405,
+    10309,
     10606,
     10403,
     10306,
@@ -54,6 +57,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     11749,
   ])],
   [4, new Set([
+    6009,
     12046,
     10802,
     10801,
@@ -63,6 +67,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10811,
   ])],
   [5, new Set([
+    6006,
     6003,
     5023,
     10842,
@@ -84,6 +89,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10302,
   ])],
   [7, new Set([
+    10225,
     10204,
     10205,
     10206,
@@ -119,6 +125,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10829,
   ])],
   [11, new Set([
+    10408,
     10606,
     10603,
     5021,
@@ -158,6 +165,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     11708,
   ])],
   [15, new Set([
+    6009,
     10801,
     10707,
     10705,
@@ -184,6 +192,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10716,
   ])],
   [18, new Set([
+    6006,
     10802,
     10705,
     10803,
@@ -200,6 +209,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     5025,
   ])],
   [20, new Set([
+    10309,
     5028,
     10314,
     10804,
@@ -244,6 +254,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10803,
   ])],
   [25, new Set([
+    10405,
     10415,
     5024,
     10224,
@@ -252,6 +263,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10404,
   ])],
   [26, new Set([
+    10405,
     10306,
     10415,
     10410,
@@ -260,6 +272,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10104,
   ])],
   [27, new Set([
+    10309,
     10306,
     11710,
     10321,
@@ -355,6 +368,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10406,
   ])],
   [38, new Set([
+    6009,
     10306,
     10305,
     10321,
@@ -397,6 +411,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10603,
   ])],
   [43, new Set([
+    6006,
     10801,
     6003,
     10804,
@@ -421,6 +436,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     5014,
   ])],
   [47, new Set([
+    10408,
     10306,
     10301,
     10418,
@@ -497,6 +513,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     11747,
   ])],
   [56, new Set([
+    6009,
     5023,
     10703,
     10811,
@@ -506,6 +523,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10829,
   ])],
   [57, new Set([
+    6006,
     10802,
     6003,
     5014,
@@ -563,6 +581,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     12009,
   ])],
   [64, new Set([
+    10309,
     10306,
     10321,
     5003,
@@ -676,6 +695,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     5009,
   ])],
   [80, new Set([
+    10309,
     12001,
     11748,
     5015,
@@ -725,6 +745,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10209,
   ])],
   [87, new Set([
+    10225,
     11779,
     11748,
     10214,
@@ -899,6 +920,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     12102,
   ])],
   [112, new Set([
+    10405,
     10415,
     12095,
     12009,
@@ -941,6 +963,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     12090,
   ])],
   [118, new Set([
+    10225,
     10205,
     10206,
     10224,
@@ -978,6 +1001,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10209,
   ])],
   [123, new Set([
+    10408,
     10324,
     10311,
     10301,
@@ -1124,6 +1148,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     5021,
   ])],
   [145, new Set([
+    10225,
     10223,
     5008,
     5025,
@@ -1202,6 +1227,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     6007,
   ])],
   [99168, new Set([
+    6009,
     12046,
     10802,
     10801,
@@ -1393,6 +1419,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10804,
   ])],
   [99192, new Set([
+    10225,
     10403,
     10201,
     5015,
@@ -1620,6 +1647,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     12001,
   ])],
   [99222, new Set([
+    6009,
     10803,
     10717,
     10716,
@@ -1660,6 +1688,7 @@ const LEGACY_SKILL_IDS_BY_HERO = new Map<number, ReadonlySet<number>>([
     10401,
   ])],
   [99228, new Set([
+    10225,
     10223,
     10206,
     5009,
