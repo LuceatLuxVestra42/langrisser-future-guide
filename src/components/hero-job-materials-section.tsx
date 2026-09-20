@@ -73,6 +73,7 @@ type HeroJobMovementRowView = {
   jobConnectionId: number;
   jobId: number;
   nameCn: string | null;
+  rank: number | null;
   moveType: number;
   moveTypeNameKr: string;
   movePoint: number;
@@ -143,6 +144,7 @@ function HeroSpJobMovementSection({
             jobConnectionId: movement.jobConnectionId,
             jobId: movement.jobId,
             nameCn: finalJob.nameCn ?? movement.nameCn,
+            rank: null,
             moveType: movement.moveType,
             moveTypeNameKr: movement.moveTypeNameKr,
             movePoint: movement.movePoint,
@@ -323,7 +325,14 @@ function HeroJobMovementSection({
 
       {movementRows ? (
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {movementRows.map((row, index) => (
+          {movementRows.map((row) => {
+            const isFinalJob = row.rank === 4;
+            const jobName =
+              resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ??
+              row.nameCn ??
+              "전직";
+
+            return (
             <article
               key={row.jobConnectionId}
               className="rounded-xl border border-border bg-muted/20 p-4"
@@ -336,9 +345,8 @@ function HeroJobMovementSection({
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-bold text-muted-foreground">전직 경로 {index + 1}</p>
-                  <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                    {resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "전직"}
+                  <h3 className="truncate text-sm font-extrabold text-foreground">
+                    {row.rank == null ? jobName : `T${row.rank} ${jobName}`}
                   </h3>
                 </div>
                 <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
@@ -364,37 +372,44 @@ function HeroJobMovementSection({
                 </div>
               </div>
 
-              <dl className={`mt-4 grid grid-cols-2 gap-2 ${row.armyId != null ? "sm:grid-cols-3" : ""}`}>
-                <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                  <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
-                  <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
-                </div>
-                <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                  <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-                  <dd className="mt-1">
-                    <img
-                      src={getMovementTypeIconUrl(row.moveType)}
-                      alt={row.moveTypeNameKr}
-                      title={row.moveTypeNameKr}
-                      width={32}
-                      height={32}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-8 w-8 object-contain"
-                    />
-                  </dd>
-                </div>
-                {row.armyId != null ? (
-                  <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                    <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
-                    <dd className="mt-1">
-                      <HeroFinalJobArmyIcon armyId={row.armyId} armyNameCn={row.armyNameCn} />
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
+              {isFinalJob || row.armyId != null ? (
+                <dl className={`mt-4 grid gap-2 ${isFinalJob ? "grid-cols-2" : "grid-cols-1"} ${row.armyId != null ? "sm:grid-cols-3" : ""}`}>
+                  {isFinalJob ? (
+                    <>
+                      <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                        <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
+                        <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+                      </div>
+                      <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                        <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
+                        <dd className="mt-1">
+                          <img
+                            src={getMovementTypeIconUrl(row.moveType)}
+                            alt={row.moveTypeNameKr}
+                            title={row.moveTypeNameKr}
+                            width={32}
+                            height={32}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-8 w-8 object-contain"
+                          />
+                        </dd>
+                      </div>
+                    </>
+                  ) : null}
+                  {row.armyId != null ? (
+                    <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+                      <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
+                      <dd className="mt-1">
+                        <HeroFinalJobArmyIcon armyId={row.armyId} armyNameCn={row.armyNameCn} />
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
+              ) : null}
             </article>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
