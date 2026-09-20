@@ -1,6 +1,19 @@
+import equipmentNameKrJson from "../../data/generated/equipment-name-kr-user-approved.v1.json";
 import exclusiveByHeroJson from "../../data/generated/hero-exclusive-equipment-by-hero.v1.json";
 import exclusiveConsumerJson from "../../data/generated/equipment_stage3_5_exclusive_consumer.json";
 import { localizeEquipmentEffectDescription } from "./equipment-effect-description-kr.server";
+
+type EquipmentNameKrProjection = {
+  byEquipmentId: Record<
+    string,
+    {
+      nameCn: string;
+      nameKr: string | null;
+      pageReady: boolean;
+      status: string;
+    }
+  >;
+};
 
 type ExclusiveByHeroSource = {
   summary: {
@@ -68,11 +81,28 @@ type ExclusiveConsumerSource = {
   detailRecords: ExclusiveEquipmentDetailSource[];
 };
 
+const equipmentNameKr = equipmentNameKrJson as EquipmentNameKrProjection;
 const exclusiveByHero = exclusiveByHeroJson as unknown as ExclusiveByHeroSource;
 const exclusiveConsumer = exclusiveConsumerJson as unknown as ExclusiveConsumerSource;
 const exclusiveDetailById = new Map(
   exclusiveConsumer.detailRecords.map((record) => [record.equipmentId, record]),
 );
+
+function resolveExclusiveEquipmentNameKr(equipmentId: number, nameCn: string) {
+  const localized = equipmentNameKr.byEquipmentId[String(equipmentId)];
+  if (!localized) {
+    throw new Error(`Missing Korean equipment presentation record for exclusive Equipment ${equipmentId}.`);
+  }
+  if (localized.nameCn !== nameCn) {
+    throw new Error(
+      `Exclusive Equipment ${equipmentId} Korean presentation identity mismatch: ${localized.nameCn} !== ${nameCn}.`,
+    );
+  }
+  if (!localized.pageReady || !localized.nameKr) {
+    throw new Error(`Exclusive Equipment ${equipmentId} must have a public Korean presentation name.`);
+  }
+  return localized.nameKr;
+}
 
 function assertFrozenExclusivePredecessors() {
   if (
@@ -127,7 +157,10 @@ export function readHeroExclusiveEquipmentPresentation(heroId: number) {
     equipmentId,
     detail: {
       equipmentId: detail.equipmentId,
-      identity: detail.identity,
+      identity: {
+        ...detail.identity,
+        nameKr: resolveExclusiveEquipmentNameKr(detail.equipmentId, detail.identity.nameCn),
+      },
       classification: {
         group: detail.classification.group,
         groupKo: detail.classification.groupKo,
