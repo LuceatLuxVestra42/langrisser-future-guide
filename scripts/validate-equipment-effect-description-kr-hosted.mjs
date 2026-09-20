@@ -58,6 +58,13 @@ const applyExpectedPresentation = (value) => {
   return presentedLines.join("\n");
 };
 
+const expectedScopeCounts = {
+  general: 206,
+  exclusive: 167,
+};
+const expectedTotalProjectionCount = Object.values(expectedScopeCounts)
+  .reduce((sum, count) => sum + count, 0);
+
 const projections = sourcePaths.map((sourcePath) => {
   const projection = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
   check(projection.version === 1, `${sourcePath}: version must be 1`);
@@ -70,16 +77,37 @@ const projections = sourcePaths.map((sourcePath) => {
 });
 
 const expectedByEquipmentId = new Map();
+const actualScopeCounts = new Map(Object.keys(expectedScopeCounts).map((scope) => [scope, 0]));
 for (const projection of projections) {
+  check(
+    Object.prototype.hasOwnProperty.call(expectedScopeCounts, projection.scope),
+    `unexpected KR effect projection scope: ${projection.scope}`,
+  );
+  let scopedCount = 0;
   for (const [rawEquipmentId, effectText] of Object.entries(projection.byEquipmentId ?? {})) {
     const equipmentId = Number(rawEquipmentId);
     check(Number.isSafeInteger(equipmentId) && equipmentId > 0, `invalid EquipmentID in ${projection.scope}: ${rawEquipmentId}`);
     check(normalizeSemanticText(effectText).length > 0, `blank KR effect description for Equipment ${equipmentId}`);
     check(!expectedByEquipmentId.has(equipmentId), `duplicate KR effect description EquipmentID ${equipmentId}`);
     expectedByEquipmentId.set(equipmentId, { scope: projection.scope, effectText });
+    scopedCount += 1;
   }
+  actualScopeCounts.set(
+    projection.scope,
+    (actualScopeCounts.get(projection.scope) ?? 0) + scopedCount,
+  );
 }
-check(expectedByEquipmentId.size === 261, `KR effect description projection size mismatch: ${expectedByEquipmentId.size}/261`);
+for (const [scope, expectedCount] of Object.entries(expectedScopeCounts)) {
+  const actualCount = actualScopeCounts.get(scope) ?? 0;
+  check(
+    actualCount === expectedCount,
+    `KR effect description ${scope} projection size mismatch: ${actualCount}/${expectedCount}`,
+  );
+}
+check(
+  expectedByEquipmentId.size === expectedTotalProjectionCount,
+  `KR effect description projection size mismatch: ${expectedByEquipmentId.size}/${expectedTotalProjectionCount}`,
+);
 
 const presentationProjectionStats = [...expectedByEquipmentId.entries()].map(([equipmentId, expected]) => {
   const presentationEffectText = applyExpectedPresentation(expected.effectText);
@@ -418,6 +446,7 @@ console.log(JSON.stringify({
     result: "PASS",
   },
   projectionCount: expectedByEquipmentId.size,
+  projectionScopeCounts: Object.fromEntries(actualScopeCounts),
   presentationChangedProjectionCount,
   representativeFixtureCount: fixtureDefinitions.length,
   representativeCases: results,
