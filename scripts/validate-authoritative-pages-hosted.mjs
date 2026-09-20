@@ -264,16 +264,21 @@ try {
   const initialHomeHeroSrc = initialHomeHeroState.src;
   const nextHomeHero = page.getByRole("button", { name: "다음 히어로 이미지" });
   check(await nextHomeHero.count() === 1, "Home Hero next control missing or duplicated");
-  await nextHomeHero.click();
-  await page.waitForFunction(
-    ({ selector, previousSrc }) => {
-      const image = document.querySelector(selector);
-      return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && (image.currentSrc || image.src) !== previousSrc;
-    },
-    { selector: '[data-home-hero-image="true"]', previousSrc: initialHomeHeroSrc },
-    { timeout: 20000 },
-  );
-  const nextHomeHeroState = await readHomeHeroState(page);
+  let nextHomeHeroState = null;
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    await clickHostedArtworkControl(nextHomeHero);
+    for (let probe = 0; probe < 20; probe += 1) {
+      const candidate = await readHomeHeroState(page);
+      if (candidate?.src && candidate.src !== initialHomeHeroSrc) {
+        nextHomeHeroState = candidate;
+        break;
+      }
+      await page.waitForTimeout(100);
+    }
+    if (nextHomeHeroState) break;
+    if (attempt < 5) await page.waitForTimeout(250);
+  }
+  check(nextHomeHeroState, "Home Hero next control did not change the image after hydration retries");
   checkHomeHeroState(nextHomeHeroState, "desktop switched");
   check(nextHomeHeroState.src !== initialHomeHeroSrc, "Home Hero next control did not change the image");
 
