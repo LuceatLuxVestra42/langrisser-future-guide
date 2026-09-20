@@ -1,12 +1,15 @@
 import { useLoaderData } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 import { getOfficialArmyIconUrlById } from "@/lib/army-icon-assets";
 import { getHeroJobMaterialIconUrl } from "@/lib/hero-job-material-icon-assets";
 import { resolveHeroJobNameKr } from "@/lib/hero-job-localization";
 import { resolveHeroSpJobNameKr } from "@/lib/hero-sp-job-localization";
-import { getStaticHeroJobMaterials } from "@/lib/hero-job-materials.static";
-import { getStaticHeroJobMovement } from "@/lib/hero-job-movement.static";
+import { getStaticHeroJobMaterials, type HeroJobMaterialConnection } from "@/lib/hero-job-materials.static";
+import { getStaticHeroJobMovement, type HeroJobMovementRow } from "@/lib/hero-job-movement.static";
+import { getStaticHeroFinalJobArmy } from "@/lib/hero-final-job-army.static";
+import { getStaticHeroFinalJobAttackRange } from "@/lib/hero-final-job-attack-range.static";
 
 function HeroJobMaterialIcon({ sourcePath }: { sourcePath: string | null }) {
   const iconUrl = getHeroJobMaterialIconUrl(sourcePath);
@@ -250,173 +253,306 @@ function HeroSpJobMovementSection({
   );
 }
 
-function HeroJobMovementSection({
-  heroId,
-  allowedJobConnectionIds,
+type HeroJobTreeNodeView = {
+  jobConnectionId: number;
+  jobId: number;
+  nameCn: string | null;
+  rank: number | null;
+};
+
+function HeroJobMaterialsDisclosure({
+  connection,
 }: {
-  heroId: number;
-  allowedJobConnectionIds?: readonly number[] | undefined;
+  connection: HeroJobMaterialConnection | null;
 }) {
-  const [movementRows, setMovementRows] = useState<HeroJobMovementRowView[] | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const levels = connection?.levels.filter((level) => level.materials.length > 0) ?? [];
 
-  useEffect(() => {
-    let cancelled = false;
-    setMovementRows(null);
-    setLoadError(null);
-
-    void Promise.all([
-      import("@/lib/hero-job-movement.static"),
-      import("@/lib/hero-final-job-attack-range.static"),
-      import("@/lib/hero-final-job-army.static"),
-    ])
-      .then(([
-        { getStaticHeroJobMovement },
-        { getStaticHeroFinalJobAttackRange },
-        { getStaticHeroFinalJobArmy },
-      ]) => {
-        const rows = getStaticHeroJobMovement(heroId);
-        if (!rows) {
-          throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
-        }
-        const allowedJobConnectionIdSet = allowedJobConnectionIds
-          ? new Set(allowedJobConnectionIds)
-          : null;
-        const projectedRows = rows
-          .filter((row) =>
-            allowedJobConnectionIdSet
-              ? allowedJobConnectionIdSet.has(row.jobConnectionId)
-              : true,
-          )
-          .map((row) => {
-            const army = getStaticHeroFinalJobArmy(row.jobId);
-            return {
-              ...row,
-              attackRange: getStaticHeroFinalJobAttackRange(row.jobId),
-              armyId: army?.armyId ?? null,
-              armyNameCn: army?.armyNameCn ?? null,
-            };
-          });
-        if (!cancelled) setMovementRows(projectedRows);
-      })
-      .catch((error) => {
-        if (!cancelled) setLoadError(String(error instanceof Error ? error.message : error));
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [heroId, allowedJobConnectionIds]);
-
-  if (loadError) {
-    throw new Error(loadError);
+  if (levels.length === 0) {
+    return (
+      <div className="mt-3 rounded-lg border border-dashed border-border px-3 py-2.5 text-xs font-semibold text-muted-foreground">
+        표시 가능한 전직 재료 없음
+      </div>
+    );
   }
 
   return (
-    <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
-      data-hero-job-movement="true"
-      data-hero-job-movement-count={movementRows?.length ?? 0}
-      data-hero-job-movement-status={movementRows ? "ready" : "loading"}
+    <details
+      className="group mt-3 overflow-hidden rounded-lg border border-border bg-background/80"
+      data-hero-job-material-toggle="true"
     >
-      <div>
-        <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 이동 정보</h2>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs font-extrabold text-foreground marker:content-none">
+        <span>전직 재료</span>
+        <ChevronDown
+          className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
+      <div className="border-t border-border px-3 py-3">
+        <div className="divide-y divide-border/70">
+          {levels.map((level) => (
+            <div
+              key={level.jobLevelId}
+              className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:gap-4"
+              data-job-level-id={level.jobLevelId}
+            >
+              {level.heroLevelRequired != null ? (
+                <span className="shrink-0 text-xs font-bold text-muted-foreground">
+                  영웅 Lv.{level.heroLevelRequired}
+                </span>
+              ) : null}
+              <ul className="flex flex-wrap items-center gap-3">
+                {level.materials.map((material, materialIndex) => (
+                  <li
+                    key={`${material.id}-${materialIndex}`}
+                    className="flex items-center gap-1.5"
+                    data-job-material-id={material.id}
+                  >
+                    <HeroJobMaterialIcon sourcePath={material.jobMaterial.icon} />
+                    <span className="text-sm font-extrabold tabular-nums text-foreground">
+                      ×{material.count}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function HeroJobTreeCard({
+  row,
+  materialConnection,
+}: {
+  row: HeroJobMovementRow;
+  materialConnection: HeroJobMaterialConnection | null;
+}) {
+  const isFinalJob = row.rank === 4;
+  const jobName =
+    resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ??
+    row.nameCn ??
+    "전직";
+  const army = isFinalJob ? getStaticHeroFinalJobArmy(row.jobId) : null;
+  const attackRange = isFinalJob ? getStaticHeroFinalJobAttackRange(row.jobId) : null;
+
+  if (isFinalJob && (!army || attackRange == null)) {
+    throw new Error(`Final Job ${row.jobId} is missing frozen army or attack-range metadata.`);
+  }
+
+  return (
+    <article
+      className="rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
+      data-job-connection-id={row.jobConnectionId}
+      data-job-id={row.jobId}
+      data-job-rank={row.rank ?? ""}
+      data-move-type={row.moveType}
+      data-move-point={row.movePoint}
+      data-basic-attack-range={attackRange ?? ""}
+      data-army-id={army?.armyId ?? ""}
+    >
+      <div className="flex min-w-0 items-center justify-between gap-3">
+        <h3 className="min-w-0 truncate text-sm font-extrabold text-foreground">
+          {row.rank == null ? jobName : `T${row.rank} ${jobName}`}
+        </h3>
+        {isFinalJob && army ? (
+          <div
+            className="flex shrink-0 items-center"
+            title={army.armyNameCn ?? `Army ${army.armyId}`}
+            data-hero-final-job-army-mark="true"
+          >
+            <HeroFinalJobArmyIcon armyId={army.armyId} armyNameCn={army.armyNameCn} />
+          </div>
+        ) : null}
       </div>
 
-      {movementRows ? (
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {movementRows.map((row) => {
-            const isFinalJob = row.rank === 4;
-            const jobName =
-              resolveHeroJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ??
-              row.nameCn ??
-              "전직";
+      <HeroJobMaterialsDisclosure connection={materialConnection} />
 
+      {isFinalJob ? (
+        <dl className="mt-3 grid grid-cols-3 gap-2">
+          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
+            <dt className="text-[10px] font-bold text-muted-foreground">사거리</dt>
+            <dd className="mt-1 flex items-center gap-1 text-sm font-extrabold text-foreground">
+              <img
+                src={getAttackRangeIconUrl()}
+                alt=""
+                aria-hidden="true"
+                width={18}
+                height={18}
+                loading="lazy"
+                decoding="async"
+                className="h-[18px] w-[18px] object-contain"
+              />
+              <span className="tabular-nums">{attackRange}</span>
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
+            <dt className="text-[10px] font-bold text-muted-foreground">이동타입</dt>
+            <dd className="mt-1">
+              <img
+                src={getMovementTypeIconUrl(row.moveType)}
+                alt={row.moveTypeNameKr}
+                title={row.moveTypeNameKr}
+                width={24}
+                height={24}
+                loading="lazy"
+                decoding="async"
+                className="h-6 w-6 object-contain"
+              />
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
+            <dt className="text-[10px] font-bold text-muted-foreground">이동력</dt>
+            <dd className="mt-1 text-sm font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+          </div>
+        </dl>
+      ) : null}
+    </article>
+  );
+}
+
+function HeroNormalJobTree({
+  heroId,
+  allowedJobConnectionIds,
+  materialConnections,
+}: {
+  heroId: number;
+  allowedJobConnectionIds?: readonly number[] | undefined;
+  materialConnections: HeroJobMaterialConnection[];
+}) {
+  const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
+  const movementRows = getStaticHeroJobMovement(heroId);
+  if (!movementRows) {
+    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+  }
+
+  const allowedSet = allowedJobConnectionIds ? new Set(allowedJobConnectionIds) : null;
+  const rowByConnectionId = new Map(
+    movementRows
+      .filter((row) => !allowedSet || allowedSet.has(row.jobConnectionId))
+      .map((row) => [row.jobConnectionId, row]),
+  );
+  const materialByConnectionId = new Map(
+    materialConnections.map((connection) => [connection.jobConnectionId, connection]),
+  );
+
+  const uniqueJobs = new Map<number, HeroJobTreeNodeView>();
+  const t4ParentByConnectionId = new Map<number, number>();
+
+  for (const branch of detail.jobs.branches) {
+    const branchJobs = branch.jobs
+      .filter((job) =>
+        job.jobConnectionId != null &&
+        job.jobId != null &&
+        job.rank != null &&
+        job.rank >= 2 &&
+        job.rank <= 4 &&
+        (!allowedSet || allowedSet.has(job.jobConnectionId)),
+      )
+      .map((job) => ({
+        jobConnectionId: job.jobConnectionId!,
+        jobId: job.jobId!,
+        nameCn: job.nameCn,
+        rank: job.rank,
+      }));
+
+    for (const job of branchJobs) uniqueJobs.set(job.jobConnectionId, job);
+
+    for (let index = 0; index < branchJobs.length - 1; index += 1) {
+      const current = branchJobs[index];
+      const next = branchJobs[index + 1];
+      if (current?.rank === 3 && next?.rank === 4) {
+        const existing = t4ParentByConnectionId.get(next.jobConnectionId);
+        if (existing != null && existing !== current.jobConnectionId) {
+          throw new Error(
+            `Hero ${heroId} T4 JobConnection ${next.jobConnectionId} has conflicting T3 parents ${existing}/${current.jobConnectionId}.`,
+          );
+        }
+        t4ParentByConnectionId.set(next.jobConnectionId, current.jobConnectionId);
+      }
+    }
+  }
+
+  const rowsForRank = (rank: number) =>
+    [...uniqueJobs.values()]
+      .filter((job) => job.rank === rank)
+      .map((job) => {
+        const row = rowByConnectionId.get(job.jobConnectionId);
+        if (!row) {
+          throw new Error(`Hero ${heroId} JobConnection ${job.jobConnectionId} is missing frozen movement metadata.`);
+        }
+        return row;
+      })
+      .sort((a, b) => a.jobConnectionId - b.jobConnectionId);
+
+  const t2Rows = rowsForRank(2);
+  const t3Rows = rowsForRank(3);
+  const t4Rows = rowsForRank(4);
+
+  for (const t4 of t4Rows) {
+    if (!t4ParentByConnectionId.has(t4.jobConnectionId)) {
+      throw new Error(`Hero ${heroId} T4 JobConnection ${t4.jobConnectionId} has no explicit T3 predecessor in the verified job tree.`);
+    }
+  }
+
+  return (
+    <div
+      className="mt-5"
+      data-hero-job-tree="true"
+      data-t2-count={t2Rows.length}
+      data-t3-count={t3Rows.length}
+      data-t4-count={t4Rows.length}
+    >
+      {t2Rows.length > 0 ? (
+        <div className="flex flex-wrap justify-center gap-3">
+          {t2Rows.map((row) => (
+            <div key={row.jobConnectionId} className="w-full max-w-[280px]">
+              <HeroJobTreeCard
+                row={row}
+                materialConnection={materialByConnectionId.get(row.jobConnectionId) ?? null}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {t2Rows.length > 0 && t3Rows.length > 0 ? (
+        <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
+      ) : null}
+
+      {t3Rows.length > 0 ? (
+        <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3" data-hero-job-tier-branches="true">
+          {t3Rows.map((t3) => {
+            const children = t4Rows.filter(
+              (t4) => t4ParentByConnectionId.get(t4.jobConnectionId) === t3.jobConnectionId,
+            );
             return (
-            <article
-              key={row.jobConnectionId}
-              className="rounded-xl border border-border bg-muted/20 p-4"
-              data-job-connection-id={row.jobConnectionId}
-              data-job-id={row.jobId}
-              data-move-type={row.moveType}
-              data-move-point={row.movePoint}
-              data-basic-attack-range={row.attackRange ?? ""}
-              data-army-id={row.armyId ?? ""}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="truncate text-sm font-extrabold text-foreground">
-                    {row.rank == null ? jobName : `T${row.rank} ${jobName}`}
-                  </h3>
-                </div>
-                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                  {row.attackRange != null ? (
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground"
-                      title={`공격 사거리 ${row.attackRange}`}
-                      aria-label={`공격 사거리 ${row.attackRange}`}
-                    >
-                      <img
-                        src={getAttackRangeIconUrl()}
-                        alt=""
-                        aria-hidden="true"
-                        width={20}
-                        height={20}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-5 w-5 object-contain"
-                      />
-                      <span className="tabular-nums">{row.attackRange}</span>
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-
-              {isFinalJob || row.armyId != null ? (
-                <dl className={`mt-4 grid gap-2 ${isFinalJob ? "grid-cols-2" : "grid-cols-1"} ${row.armyId != null ? "sm:grid-cols-3" : ""}`}>
-                  {isFinalJob ? (
-                    <>
-                      <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                        <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
-                        <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
-                      </div>
-                      <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                        <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-                        <dd className="mt-1">
-                          <img
-                            src={getMovementTypeIconUrl(row.moveType)}
-                            alt={row.moveTypeNameKr}
-                            title={row.moveTypeNameKr}
-                            width={32}
-                            height={32}
-                            loading="lazy"
-                            decoding="async"
-                            className="h-8 w-8 object-contain"
-                          />
-                        </dd>
-                      </div>
-                    </>
-                  ) : null}
-                  {row.armyId != null ? (
-                    <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-                      <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
-                      <dd className="mt-1">
-                        <HeroFinalJobArmyIcon armyId={row.armyId} armyNameCn={row.armyNameCn} />
-                      </dd>
+              <div key={t3.jobConnectionId} className="min-w-0">
+                <HeroJobTreeCard
+                  row={t3}
+                  materialConnection={materialByConnectionId.get(t3.jobConnectionId) ?? null}
+                />
+                {children.length > 0 ? (
+                  <>
+                    <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
+                    <div className="grid gap-3">
+                      {children.map((t4) => (
+                        <HeroJobTreeCard
+                          key={t4.jobConnectionId}
+                          row={t4}
+                          materialConnection={materialByConnectionId.get(t4.jobConnectionId) ?? null}
+                        />
+                      ))}
                     </div>
-                  ) : null}
-                </dl>
-              ) : null}
-            </article>
+                  </>
+                ) : null}
+              </div>
             );
           })}
         </div>
-      ) : (
-        <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-          전직 이동 정보를 불러오는 중이야.
-        </p>
-      )}
-    </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -435,42 +571,23 @@ export function HeroJobMaterialsSection({
     throw new Error(`Hero ${heroId} has no frozen job-material record.`);
   }
 
-  const jobMovementRows = getStaticHeroJobMovement(heroId);
-  if (!jobMovementRows) {
-    throw new Error(`Hero ${heroId} has no frozen job-name source.`);
-  }
-  const jobMovementByConnectionId = new Map(jobMovementRows.map((row) => [row.jobConnectionId, row]));
-
   const allowedJobConnectionIdSet = allowedJobConnectionIds
     ? new Set(allowedJobConnectionIds)
     : null;
-  const connections = hero.connections
+  const materialConnections = hero.connections
     .filter((connection) =>
       allowedJobConnectionIdSet
         ? allowedJobConnectionIdSet.has(connection.jobConnectionId)
         : true,
     )
-    .map((connection) => {
-      const movement = jobMovementByConnectionId.get(connection.jobConnectionId);
-      return {
-        ...connection,
-        jobId: movement?.jobId ?? null,
-        jobNameCn: movement?.nameCn ?? null,
-        levels: connection.levels.filter((level) => level.materials.length > 0),
-      };
-    })
-    .filter((connection) => connection.levels.length > 0);
+    .map((connection) => ({
+      ...connection,
+      levels: connection.levels.filter((level) => level.materials.length > 0),
+    }));
 
-  for (const connection of connections) {
-    if (!connection.jobNameCn) {
-      throw new Error(
-        `Hero ${heroId} JobConnection ${connection.jobConnectionId} has no verified Chinese job name.`,
-      );
-    }
-  }
-
-  const materialEntryCount = connections.reduce(
-    (sum, connection) => sum + connection.levels.reduce((levelSum, level) => levelSum + level.materials.length, 0),
+  const materialEntryCount = materialConnections.reduce(
+    (sum, connection) =>
+      sum + connection.levels.reduce((levelSum, level) => levelSum + level.materials.length, 0),
     0,
   );
 
@@ -482,75 +599,15 @@ export function HeroJobMaterialsSection({
   }
 
   return (
-    <>
-      <HeroJobMovementSection
+    <div
+      data-hero-job-materials="true"
+      data-job-material-entry-count={materialEntryCount}
+    >
+      <HeroNormalJobTree
         heroId={heroId}
         allowedJobConnectionIds={allowedJobConnectionIds}
+        materialConnections={materialConnections}
       />
-
-      <section
-        className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
-        data-hero-job-materials="true"
-        data-job-material-entry-count={materialEntryCount}
-      >
-        <div>
-          <h2 className="text-lg font-extrabold tracking-tight text-foreground">전직 재료</h2>
-        </div>
-
-        {connections.length > 0 ? (
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            {connections.map((connection) => (
-              <article
-                key={connection.jobConnectionId}
-                className="rounded-xl border border-border bg-muted/20 p-4"
-                data-job-connection-id={connection.jobConnectionId}
-              >
-                <h3 className="text-sm font-extrabold text-foreground">
-                  {resolveHeroJobNameKr({
-                    jobId: connection.jobId,
-                    nameCn: connection.jobNameCn,
-                  }) ?? connection.jobNameCn}
-                </h3>
-
-                <div className="mt-3 divide-y divide-border/70">
-                  {connection.levels.map((level) => (
-                    <div
-                      key={level.jobLevelId}
-                      className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:gap-4"
-                      data-job-level-id={level.jobLevelId}
-                    >
-                      {level.heroLevelRequired != null ? (
-                        <span className="shrink-0 text-xs font-bold text-muted-foreground">
-                          영웅 Lv.{level.heroLevelRequired}
-                        </span>
-                      ) : null}
-
-                      <ul className="flex flex-wrap items-center gap-3">
-                        {level.materials.map((material, materialIndex) => (
-                          <li
-                            key={`${material.id}-${materialIndex}`}
-                            className="flex items-center gap-1.5"
-                            data-job-material-id={material.id}
-                          >
-                            <HeroJobMaterialIcon sourcePath={material.jobMaterial.icon} />
-                            <span className="text-sm font-extrabold tabular-nums text-foreground">
-                              ×{material.count}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-            이 영웅의 일반 전직 경로에는 표시할 승급 재료가 없어.
-          </p>
-        )}
-      </section>
-    </>
+    </div>
   );
 }
