@@ -7,6 +7,7 @@ const HERO_LIST = path.join(ROOT, "data/generated/hero-list-stage1.v1.json");
 const SERVER = path.join(ROOT, "src/lib/hero-detail-stage5.server.ts");
 const FUNCTIONS = path.join(ROOT, "src/lib/hero-list.functions.ts");
 const ROUTE = path.join(ROOT, "src/routes/heroes_.$heroId.tsx");
+const JOB_MATERIALS_COMPONENT = path.join(ROOT, "src/components/hero-job-materials-section.tsx");
 const OUT = path.join(ROOT, "data/validation/hero-list-stage5.v1.json");
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
@@ -123,6 +124,7 @@ if (capstoneCount !== jobBranchCount || verifiedCapstoneStatCount !== capstoneCo
 const serverSource = fs.readFileSync(SERVER, "utf8");
 const functionsSource = fs.readFileSync(FUNCTIONS, "utf8");
 const routeSource = fs.readFileSync(ROUTE, "utf8");
+const jobMaterialsSource = fs.readFileSync(JOB_MATERIALS_COMPONENT, "utf8");
 if (!serverSource.includes("import.meta.glob<Stage6HeroShard>")) fail("Stage 5 server must use lazy shard modules.");
 if (!serverSource.includes("eager: false")) fail("Stage 5 shard glob must remain lazy.");
 if (serverSource.includes("ConfigData")) fail("Stage 5 server must not read raw ConfigData.");
@@ -152,10 +154,12 @@ if (
   !routeSource.includes("areaOrTarget ?")
 ) fail("Hero detail SkillCard must omit absent or placeholder nullable metadata instead of rendering empty labels.");
 if (
-  !routeSource.includes("최종 직업 스탯") ||
-  !routeSource.includes('data-hero-final-job-stats="true"') ||
   !routeSource.includes("branch.capstone?.rank === 4") ||
-  !routeSource.includes('data-hero-soldier-cards="true"')
+  !routeSource.includes('data-hero-soldier-cards="true"') ||
+  !routeSource.includes("finalJobDetails={isSpForm ? spFinalJobDetails : normalFinalJobDetails}") ||
+  !routeSource.includes("statDomains={finalJobStatBars.domains}") ||
+  !jobMaterialsSource.includes('data-hero-final-job-stat-graph="true"') ||
+  !jobMaterialsSource.includes("HeroFinalJobHeartFetter")
 ) fail("Stage 5 required detail blocks are missing.");
 
 for (const witness of [1, 6]) {
