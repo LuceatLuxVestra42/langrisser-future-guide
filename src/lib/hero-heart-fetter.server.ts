@@ -38,6 +38,28 @@ type SkillShard = {
   skills: Record<string, string>;
 };
 
+type LocalizationOverlay = {
+  schemaVersion: number;
+  kind: "HERO_HEART_FETTER_EFFECT_KR";
+  status: string;
+  owner: string;
+  policy: {
+    semanticAuthority: boolean;
+    presentationLocalizationOnly: boolean;
+    preservesSkillId: boolean;
+    fallbackToCn: boolean;
+  };
+  counts: {
+    skills: number;
+    unresolved: number;
+  };
+  skills: Record<string, {
+    descriptionCn: string;
+    descriptionKr: string;
+    method: string;
+  }>;
+};
+
 export type HeroHeartFetterEffect = {
   level: 4 | 7;
   jobId: number;
@@ -63,6 +85,10 @@ const skillShardModules = import.meta.glob<SkillShard>(
   "../../data/generated/hero-heart-fetter-site-consumer/skill-text-*.json",
   { eager: true, import: "default" },
 );
+const localizationOverlayModules = import.meta.glob<LocalizationOverlay>(
+  "../../data/presentation/hero-heart-fetter-effect-kr.v1.json",
+  { eager: true, import: "default" },
+);
 
 function getSingleModule<T>(modules: Record<string, T>, label: string): T {
   const values = Object.values(modules);
@@ -73,6 +99,7 @@ function getSingleModule<T>(modules: Record<string, T>, label: string): T {
 }
 
 const manifest = getSingleModule(manifestModules, "Hero HeartFetter manifest");
+const localizationOverlay = getSingleModule(localizationOverlayModules, "Hero HeartFetter Korean localization");
 if (
   manifest.schemaVersion !== 1 ||
   manifest.stage !== "hero-heart-fetter-site-consumer-v1" ||
@@ -97,6 +124,20 @@ if (
   throw new Error("Hero HeartFetter frozen presentation manifest is not production-ready.");
 }
 
+if (
+  localizationOverlay.schemaVersion !== 1 ||
+  localizationOverlay.kind !== "HERO_HEART_FETTER_EFFECT_KR" ||
+  localizationOverlay.owner !== "localization" ||
+  localizationOverlay.policy.semanticAuthority !== false ||
+  localizationOverlay.policy.presentationLocalizationOnly !== true ||
+  localizationOverlay.policy.preservesSkillId !== true ||
+  localizationOverlay.policy.fallbackToCn !== false ||
+  localizationOverlay.counts.skills !== manifest.counts.uniqueSkills ||
+  localizationOverlay.counts.unresolved !== 0
+) {
+  throw new Error("Hero HeartFetter Korean localization overlay is not production-ready.");
+}
+
 const skillTextById = new Map<number, string>();
 for (const shard of Object.values(skillShardModules)) {
   if (shard.schemaVersion !== 1 || shard.kind !== "SKILL_TEXT") {
@@ -115,6 +156,26 @@ for (const shard of Object.values(skillShardModules)) {
 }
 if (skillTextById.size !== manifest.counts.uniqueSkills) {
   throw new Error("Hero HeartFetter skill-text population gate failed.");
+}
+
+const localizedTextById = new Map<number, string>();
+for (const [skillIdText, row] of Object.entries(localizationOverlay.skills)) {
+  const skillId = Number(skillIdText);
+  const sourceText = skillTextById.get(skillId);
+  if (
+    !Number.isSafeInteger(skillId) ||
+    skillId <= 0 ||
+    !sourceText ||
+    row.descriptionCn !== sourceText ||
+    typeof row.descriptionKr !== "string" ||
+    row.descriptionKr.length === 0
+  ) {
+    throw new Error(`Hero HeartFetter Korean localization record is invalid for Skill ${skillIdText}.`);
+  }
+  localizedTextById.set(skillId, row.descriptionKr);
+}
+if (localizedTextById.size !== manifest.counts.uniqueSkills) {
+  throw new Error("Hero HeartFetter Korean localization population gate failed.");
 }
 
 const presentationByHeroId = new Map<number, HeroHeartFetterPresentation>();
@@ -151,9 +212,9 @@ for (const shard of Object.values(heroShardModules)) {
         throw new Error(`Hero ${heroId} has a duplicate HeartFetter presentation tuple.`);
       }
       tupleKeys.add(tupleKey);
-      const text = skillTextById.get(skillId);
+      const text = localizedTextById.get(skillId);
       if (!text) {
-        throw new Error(`Hero ${heroId} HeartFetter Skill ${skillId} has no frozen text payload.`);
+        throw new Error(`Hero ${heroId} HeartFetter Skill ${skillId} has no Korean localization payload.`);
       }
       effectRowCount += 1;
       mappingModeCounts[mappingMode] += 1;
