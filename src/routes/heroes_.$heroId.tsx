@@ -28,6 +28,7 @@ import { getHeroFusionPowerIndex } from "@/lib/hero-fusion-power.functions";
 import { getHeroSkinAcquisitionDisplayLabel } from "@/lib/hero-skin-acquisition-display";
 import { getHeroSpArtworkSource } from "@/lib/hero-sp-artwork-assets";
 import { getHeroSkillIconUrl } from "@/lib/hero-skill-icon-assets";
+import { getHeroSkillDisplayTypeLabelKr } from "@/lib/hero-skill-display-type-presentation";
 import { getHeroSpMaterialPresentation } from "@/lib/hero-sp-material-icon-assets";
 import { resolveHeroSpMissionStageLabelKr } from "@/lib/hero-sp-mission-stage-localization";
 import { getOfficialSoldierPortraitUrl } from "@/lib/soldier-portrait-assets";
@@ -995,7 +996,7 @@ function SkillCard({ heroId, skill }: { heroId: number; skill: SkillView }) {
           <h4 className="font-bold text-foreground">{skill.nameCn ?? "스킬"}</h4>
           {hasMetadata ? (
             <div className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-300" data-hero-skill-metadata="true">
-              {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">유형 {skill.displayType}</span> : null}
+              {skill.displayType ? <span className="rounded bg-zinc-800 px-2 py-1">유형 {getHeroSkillDisplayTypeLabelKr(skill.displayType)}</span> : null}
               {skill.cooldown ? <span className="rounded bg-zinc-800 px-2 py-1">쿨 {skill.cooldown}</span> : null}
               {skill.range ? <span className="rounded bg-zinc-800 px-2 py-1">사거리 {skill.range}</span> : null}
               {skill.areaOrTarget ? <span className="rounded bg-zinc-800 px-2 py-1">범위 {skill.areaOrTarget}</span> : null}
