@@ -257,7 +257,7 @@ export function HeroCastingLawMaterials({
         </div>
       </div>
 
-      <details className="group mt-4" data-casting-law-details="true">
+      <details className="group mt-4 border-t border-border pt-4" data-casting-law-details="true">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
           <span className="text-sm font-extrabold text-foreground">율정 재료</span>
           <ChevronDown
