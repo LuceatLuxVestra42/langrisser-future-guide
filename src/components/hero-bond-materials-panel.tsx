@@ -54,7 +54,7 @@ function MaterialBadges({
       {materials.map((material) => (
         <span
           key={material.itemId}
-          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-1 text-[11px] font-semibold text-foreground sm:px-2"
           data-hero-bond-material-id={material.itemId}
         >
           <img
@@ -79,7 +79,7 @@ function MaterialBadges({
 function GoldCost({ value }: { value: number }) {
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground"
+      className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-1 text-[11px] font-semibold text-foreground sm:px-2"
       data-hero-bond-gold-cost={value}
     >
       <img
@@ -131,7 +131,7 @@ function BondTrack({
                 <h4 className="text-sm font-extrabold text-foreground">{label}</h4>
               </div>
               <span className="text-[11px] font-bold text-muted-foreground group-open:hidden">레벨별 필요 재료 보기</span>
-              <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">레벨별 필요 재료 숨기기</span>
+              <span className="hidden text-[11px] font-bold text-muted-foreground group-open:inline">눌러서 레벨별 재료 확인</span>
             </div>
             <div className="mt-2">
               <MaterialBadges
@@ -144,26 +144,31 @@ function BondTrack({
         </div>
       </summary>
 
-      <div className="min-w-0 max-w-full border-t border-border px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
-        <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-lg border border-border">
-          <table className="w-full min-w-[620px] border-collapse text-xs">
+      <div className="min-w-0 max-w-full border-t border-border px-2 pb-3 pt-3 sm:px-3 sm:pb-4">
+        <div className="w-full min-w-0 max-w-full overflow-hidden rounded-lg border border-border">
+          <table className="w-full table-fixed border-collapse text-xs">
+            <colgroup>
+              <col className="w-16 sm:w-[4.5rem]" />
+              <col />
+              <col className="w-24 sm:w-28" />
+            </colgroup>
             <thead className="bg-muted/50">
               <tr className="border-b border-border">
-                <th className="px-3 py-2 text-left font-bold text-muted-foreground">목표 레벨</th>
-                <th className="px-3 py-2 text-left font-bold text-muted-foreground">필요 재료</th>
-                <th className="px-3 py-2 text-right font-bold text-muted-foreground">골드</th>
+                <th className="px-2 py-2 text-left font-bold text-muted-foreground">목표 레벨</th>
+                <th className="px-2 py-2 text-left font-bold text-muted-foreground">필요 재료</th>
+                <th className="px-2 py-2 text-right font-bold text-muted-foreground">골드</th>
               </tr>
             </thead>
             <tbody>
               {profile.levels.map((level) => (
                 <tr key={level.targetLevel} className="border-b border-border/60 last:border-b-0">
-                  <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left font-extrabold text-foreground">
+                  <th scope="row" className="whitespace-nowrap px-2 py-2.5 text-left font-extrabold text-foreground">
                     Lv.{level.targetLevel}
                   </th>
-                  <td className="px-3 py-2.5">
+                  <td className="min-w-0 px-2 py-2.5">
                     <MaterialBadges materials={level.materials} resolveAssetUrl={resolveAssetUrl} />
                   </td>
-                  <td className="whitespace-nowrap px-3 py-2.5 text-right">
+                  <td className="whitespace-nowrap px-2 py-2.5 text-right">
                     <div className="flex justify-end">
                       <GoldCost value={level.goldCost} />
                     </div>
