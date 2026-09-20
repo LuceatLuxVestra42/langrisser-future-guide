@@ -195,6 +195,17 @@ expectOwners(
   ['hero-frontend'],
   ['production-build'],
 );
+expectOwners(
+  'src/data/hero-sp-mission-dungeon-schedule.json',
+  ['hero-frontend'],
+  ['production-build'],
+);
+
+const heroSpScheduleHosted = routeProjectCheckPaths(
+  ['src/data/hero-sp-mission-dungeon-schedule.json'],
+  contracts,
+);
+assert.deepEqual(mergeGateIds(heroSpScheduleHosted), ['hosted-preview']);
 
 const heroFrontendHosted = routeProjectCheckPaths(['src/routes/heroes.tsx'], contracts);
 assert.deepEqual(mergeGateIds(heroFrontendHosted), ['hosted-preview']);
