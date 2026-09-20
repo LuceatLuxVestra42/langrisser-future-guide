@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "schemaId": "project-check-work-unit-contract/v1",
+  "stage": "R3",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Keep implementation work units small without reinterpreting changed paths or changing owner routing.",
+  "policy": {
+    "defaultPurposeCount": 1,
+    "defaultPrimaryOwnerCount": 1,
+    "defaultCompletionBoundaryCount": 1,
+    "splitWhenIndependentPurposeIntroduced": true,
+    "splitWhenIndependentOwnerIntroduced": true,
+    "splitWhenIndependentCompletionGateIntroduced": true,
+    "splitWhenSemanticAndPresentationAreIndependent": true,
+    "splitWhenWorkflowToolingAndProductChangeAreIndependent": true,
+    "opportunisticAdjacentFix": "DEFER_TO_NEXT_WORK_UNIT_UNLESS_CURRENT_COMPLETION_BLOCKED",
+    "samePurposeGeneratedConsumerBundleAllowed": true,
+    "explicitMultiOwnerPathAllowed": true,
+    "fileCountIsNotSplitCriterion": true,
+    "validatorCountIsNotSplitCriterion": true,
+    "ownerRoutingMutation": false,
+    "semanticRecomputation": false,
+    "ownerPropagation": false,
+    "changeClassFanOut": false
+  },
+  "completion": {
+    "required": [
+      "purpose_complete",
+      "owning_validator_or_gate_complete",
+      "no_current_diff_blocker",
+      "tracked_change_matches_declared_scope"
+    ],
+    "nonBlockingAdjacentIssue": "REVIEW_OR_NEXT_WORK_UNIT"
+  }
+}

@@ -12,8 +12,41 @@ const repoRoot = process.cwd();
 const contracts = loadProjectCheckContracts({ repoRoot });
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
 
+const workUnitContract = readJson('tools/project-check/contracts/work-unit.v1.json');
+assert.equal(workUnitContract.schemaId, 'project-check-work-unit-contract/v1');
+assert.equal(workUnitContract.status, 'DESIGN_FROZEN');
+assert.equal(workUnitContract.policy.defaultPurposeCount, 1);
+assert.equal(workUnitContract.policy.defaultPrimaryOwnerCount, 1);
+assert.equal(workUnitContract.policy.defaultCompletionBoundaryCount, 1);
+assert.equal(workUnitContract.policy.splitWhenIndependentPurposeIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenIndependentOwnerIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenIndependentCompletionGateIntroduced, true);
+assert.equal(workUnitContract.policy.splitWhenSemanticAndPresentationAreIndependent, true);
+assert.equal(workUnitContract.policy.splitWhenWorkflowToolingAndProductChangeAreIndependent, true);
+assert.equal(workUnitContract.policy.opportunisticAdjacentFix, 'DEFER_TO_NEXT_WORK_UNIT_UNLESS_CURRENT_COMPLETION_BLOCKED');
+assert.equal(workUnitContract.policy.samePurposeGeneratedConsumerBundleAllowed, true);
+assert.equal(workUnitContract.policy.explicitMultiOwnerPathAllowed, true);
+assert.equal(workUnitContract.policy.fileCountIsNotSplitCriterion, true);
+assert.equal(workUnitContract.policy.validatorCountIsNotSplitCriterion, true);
+assert.equal(workUnitContract.policy.ownerRoutingMutation, false);
+assert.equal(workUnitContract.policy.semanticRecomputation, false);
+assert.equal(workUnitContract.policy.ownerPropagation, false);
+assert.equal(workUnitContract.policy.changeClassFanOut, false);
+assert.deepEqual(workUnitContract.completion.required, [
+  'purpose_complete',
+  'owning_validator_or_gate_complete',
+  'no_current_diff_blocker',
+  'tracked_change_matches_declared_scope',
+]);
+assert.equal(workUnitContract.completion.nonBlockingAdjacentIssue, 'REVIEW_OR_NEXT_WORK_UNIT');
+
+
 function validatorIds(route) {
   return route.validators.map(item => item.id);
+}
+
+function mergeGateIds(route) {
+  return route.mergeGates.map(item => item.id);
 }
 
 function expectOwners(filePath, expectedOwners, expectedValidators) {
@@ -162,6 +195,45 @@ expectOwners(
   ['hero-frontend'],
   ['production-build'],
 );
+
+const heroFrontendHosted = routeProjectCheckPaths(['src/routes/heroes.tsx'], contracts);
+assert.deepEqual(mergeGateIds(heroFrontendHosted), ['hosted-preview']);
+
+const equipmentPresentationHosted = routeProjectCheckPaths([
+  'data/presentation/equipment-effect-description-kr-general.part1.v1.json',
+], contracts);
+assert.deepEqual(equipmentPresentationHosted.owners, ['equipment-frontend', 'localization']);
+assert.deepEqual(mergeGateIds(equipmentPresentationHosted), ['hosted-preview']);
+
+const soldierPresentationHosted = routeProjectCheckPaths([
+  'data/presentation/soldier-ability-kr.v1.json',
+], contracts);
+assert.deepEqual(soldierPresentationHosted.owners, ['localization', 'soldier-frontend']);
+assert.deepEqual(mergeGateIds(soldierPresentationHosted), ['hosted-preview']);
+
+const routeHostedQaToolingHosted = routeProjectCheckPaths([
+  'tools/route-hosted-qa/cli/check-preview.mjs',
+], contracts);
+assert.deepEqual(routeHostedQaToolingHosted.owners, ['route-hosted-qa']);
+assert.deepEqual(mergeGateIds(routeHostedQaToolingHosted), ['hosted-preview']);
+
+const projectCheckToolingNoHosted = routeProjectCheckPaths([
+  'tools/project-check/contracts/work-unit.v1.json',
+], contracts);
+assert.deepEqual(projectCheckToolingNoHosted.owners, ['project-check']);
+assert.deepEqual(mergeGateIds(projectCheckToolingNoHosted), []);
+
+const canonicalOnlyNoHosted = routeProjectCheckPaths([
+  'data/validation/hero-stage6-4-final.v1.json',
+], contracts);
+assert.deepEqual(canonicalOnlyNoHosted.owners, ['hero-canonical', 'status-source']);
+assert.deepEqual(mergeGateIds(canonicalOnlyNoHosted), []);
+
+const validatorToolingNoHosted = routeProjectCheckPaths([
+  'scripts/validate-hero-fusion-power-frontend.mjs',
+], contracts);
+assert.deepEqual(validatorToolingNoHosted.owners, ['hero-canonical']);
+assert.deepEqual(mergeGateIds(validatorToolingNoHosted), []);
 expectOwners(
   'data/generated/hero-card-icon-assets.v1.json',
   ['hero-assets'],

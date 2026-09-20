@@ -32,6 +32,16 @@ Before implementation, define the smallest work unit that can complete the reque
 
 Prefer one purpose and one clear completion condition per work unit. Separate structural research, semantic validation, implementation, bulk application, regression validation, asset/localization work, hosted QA, and browser/UI QA when they have different owners or completion gates.
 
+The frozen work-unit sizing policy is defined in `tools/project-check/contracts/work-unit.v1.json`. Apply it before implementation:
+
+- default to one purpose, one primary owner, and one completion boundary;
+- split when an independent purpose, owner, or completion gate is introduced;
+- split independent semantic/presentation or workflow-tooling/product changes instead of expanding the current unit;
+- defer opportunistic adjacent fixes unless they block the current completion condition;
+- keep same-purpose source/generated/consumer bundles together when they are required for one owning completion boundary;
+- do not split merely because a valid work unit touches many files or runs multiple validators;
+- explicit multi-owner paths defined by the current owner contract remain valid and do not by themselves require a split.
+
 When the current owner has satisfied its completion condition and the remaining work belongs to another layer, stop extending the current investigation. Record an owner handoff with the completed result, direct evidence, remaining BLOCKER/REVIEW items, the next owner, and the next starting point.
 
 ## Completed upstream and semantic boundaries
