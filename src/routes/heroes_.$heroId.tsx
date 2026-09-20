@@ -215,7 +215,9 @@ function formatHeroSkillMetadataValue(value: string) {
   return value
     .replace(/回合/g, "턴")
     .replace(/格/g, "칸")
-    .replace(/自身/g, "자신");
+    .replace(/自身/g, "자신")
+    .replace(/单体/g, "단일")
+    .replace(/全场/g, "전체");
 }
 
 function getVisibleHeroSkillMetadataValue(value: string | null) {
