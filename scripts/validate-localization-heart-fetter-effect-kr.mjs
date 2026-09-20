@@ -52,7 +52,8 @@ for (const id of sourceIds) {
     continue;
   }
   if (/[\u3400-\u9FFF]/u.test(row.descriptionKr)) errors.push(`skill ${id}: Chinese character remains in descriptionKr`);
-  if (/(?:\\+\\+|--|\\+-|-\\+)/.test(row.descriptionKr)) errors.push(`skill ${id}: malformed adjacent signs in descriptionKr`);\n  const srcNums = numericTokens(stripJobPrefix(cn));
+  if (/(?:\\+\\+|--|\\+-|-\\+)/.test(row.descriptionKr)) errors.push(`skill ${id}: malformed adjacent signs in descriptionKr`);
+  const srcNums = numericTokens(stripJobPrefix(cn));
   const krNums = numericTokens(row.descriptionKr);
   if (JSON.stringify(srcNums) !== JSON.stringify(krNums)) {
     errors.push(`skill ${id}: numeric token parity failed: ${JSON.stringify(srcNums)} != ${JSON.stringify(krNums)}`);
