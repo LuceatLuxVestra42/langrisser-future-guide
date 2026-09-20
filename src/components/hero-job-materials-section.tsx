@@ -260,6 +260,51 @@ type HeroJobTreeNodeView = {
   rank: number | null;
 };
 
+type HeroFinalJobStatKey = "HP" | "ATK" | "INT" | "DEF" | "MDEF" | "DEX";
+type HeroFinalJobStatsView = Record<HeroFinalJobStatKey, number | null>;
+type HeroFinalJobStatDomain = { min: number; max: number };
+type HeroFinalJobCentralBondStatsView = Record<HeroFinalJobStatKey, number | null> | null;
+type HeroHeartFetterEffectView = {
+  jobId: number;
+  level: number;
+  skillId: number;
+  text: string | null;
+  mappingMode: string | null;
+};
+type HeroFinalJobCardDetail = {
+  jobId: number;
+  finalStats: HeroFinalJobStatsView;
+  centralBondStats: HeroFinalJobCentralBondStatsView;
+};
+
+const HERO_FINAL_JOB_STAT_KEYS: HeroFinalJobStatKey[] = ["HP", "ATK", "INT", "DEF", "MDEF", "DEX"];
+const HERO_FINAL_JOB_STAT_ICON_BY_KEY: Record<HeroFinalJobStatKey, string> = {
+  HP: "Icon_HP.png",
+  ATK: "Icon_Attack.png",
+  INT: "Icon_Intelligence.png",
+  DEF: "Icon_Defense.png",
+  MDEF: "Icon_MagicDefense.png",
+  DEX: "Icon_Skill.png",
+};
+const HERO_FINAL_JOB_STAT_LABEL_BY_KEY: Record<HeroFinalJobStatKey, string> = {
+  HP: "생명",
+  ATK: "공격",
+  INT: "지력",
+  DEF: "방어",
+  MDEF: "마방",
+  DEX: "기술",
+};
+
+function stripConfigMarkup(value: string | null) {
+  if (!value) return "-";
+  return value.replace(/<color=[^>]+>/g, "").replace(/<\/color>/g, "");
+}
+
+function getJobStatBarPercent(value: number, domain: HeroFinalJobStatDomain) {
+  const normalized = (value - domain.min) / (domain.max - domain.min);
+  return Math.min(100, Math.max(25, 25 + (75 * normalized)));
+}
+
 function HeroJobMaterialsDisclosure({
   connection,
 }: {
@@ -269,8 +314,12 @@ function HeroJobMaterialsDisclosure({
 
   if (levels.length === 0) {
     return (
-      <div className="mt-3 rounded-lg border border-dashed border-border px-3 py-2.5 text-xs font-semibold text-muted-foreground">
-        표시 가능한 전직 재료 없음
+      <div
+        className="mt-3 flex min-h-11 items-center justify-between rounded-lg border border-dashed border-border bg-background/60 px-3 py-2.5 text-xs font-extrabold text-muted-foreground"
+        data-hero-job-material-toggle="empty"
+      >
+        <span>전직 재료</span>
+        <ChevronDown className="h-4 w-4 shrink-0 opacity-35" aria-hidden="true" />
       </div>
     );
   }
@@ -280,7 +329,7 @@ function HeroJobMaterialsDisclosure({
       className="group mt-3 overflow-hidden rounded-lg border border-border bg-background/80"
       data-hero-job-material-toggle="true"
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs font-extrabold text-foreground marker:content-none">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs font-extrabold text-foreground marker:content-none">
         <span>전직 재료</span>
         <ChevronDown
           className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
@@ -303,7 +352,7 @@ function HeroJobMaterialsDisclosure({
               <ul className="flex flex-wrap items-center gap-3">
                 {level.materials.map((material, materialIndex) => (
                   <li
-                    key={`${material.id}-${materialIndex}`}
+                    key={\`\${material.id}-\${materialIndex}\`}
                     className="flex items-center gap-1.5"
                     data-job-material-id={material.id}
                   >
@@ -322,12 +371,124 @@ function HeroJobMaterialsDisclosure({
   );
 }
 
+function HeroFinalJobStatGraph({
+  stats,
+  centralBondStats,
+  domains,
+}: {
+  stats: HeroFinalJobStatsView;
+  centralBondStats: HeroFinalJobCentralBondStatsView;
+  domains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
+}) {
+  return (
+    <div
+      className="mt-2 grid grid-cols-2 gap-2 rounded-lg border border-border/70 bg-background/70 p-2.5"
+      data-hero-final-job-stat-graph="true"
+    >
+      {HERO_FINAL_JOB_STAT_KEYS.map((stat) => {
+        const value = stats[stat];
+        const domain = domains[stat];
+        const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
+        const centralBondValue = centralBondStats?.[stat] ?? null;
+        const iconUrl = \`\${import.meta.env.BASE_URL}images/shared/stats/\${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}\`;
+
+        return (
+          <div
+            key={stat}
+            className="relative overflow-hidden rounded-md border border-border/60 bg-muted/20 px-2.5 py-2"
+            data-hero-final-job-stat={stat}
+            data-stat-domain-min={domain.min}
+            data-stat-domain-max={domain.max}
+            data-stat-bar-percent={value == null ? undefined : barPercent.toFixed(3)}
+          >
+            {value == null ? null : (
+              <div
+                className="absolute inset-y-0 left-0 bg-foreground/10"
+                style={{ width: \`\${barPercent}%\` }}
+                aria-hidden="true"
+              />
+            )}
+            <div className="relative z-10 flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
+                <img
+                  src={iconUrl}
+                  alt=""
+                  aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
+                  className="h-4 w-4 shrink-0 object-contain"
+                />
+                {HERO_FINAL_JOB_STAT_LABEL_BY_KEY[stat]}
+              </span>
+              <span className="text-sm font-extrabold tabular-nums text-foreground">{value ?? "-"}</span>
+            </div>
+            {centralBondValue != null ? (
+              <div className="relative z-10 mt-1 text-right text-[10px] font-semibold tabular-nums text-muted-foreground">
+                중앙유대 +{centralBondValue}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function HeroFinalJobHeartFetter({
+  effects,
+}: {
+  effects: HeroHeartFetterEffectView[];
+}) {
+  if (effects.length === 0) {
+    return (
+      <div
+        className="mt-2 rounded-lg border border-dashed border-border bg-background/50 px-3 py-3 text-xs text-muted-foreground"
+        data-hero-final-job-heart-fetter="empty"
+      >
+        표시 가능한 유대 Lv4/Lv7 효과 없음
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="mt-2 rounded-lg border border-border/70 bg-background/70 p-3"
+      data-hero-final-job-heart-fetter="true"
+      data-heart-fetter-effect-count={effects.length}
+    >
+      <h4 className="text-xs font-extrabold text-foreground">유대 Lv4 / Lv7 효과</h4>
+      <div className="mt-2 space-y-2">
+        {effects.map((effect) => (
+          <div
+            key={\`\${effect.level}-\${effect.skillId}\`}
+            className="rounded-md border border-border/70 bg-muted/20 px-2.5 py-2.5"
+            data-heart-fetter-level={effect.level}
+            data-heart-fetter-skill-id={effect.skillId}
+            data-heart-fetter-mapping-mode={effect.mappingMode ?? ""}
+          >
+            <span className="rounded bg-muted px-2 py-1 text-[10px] font-black text-foreground">
+              Lv.{effect.level}
+            </span>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{stripConfigMarkup(effect.text)}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function HeroJobTreeCard({
   row,
   materialConnection,
+  finalJobDetail,
+  statDomains,
+  heartFetterEffects,
 }: {
   row: HeroJobMovementRow;
   materialConnection: HeroJobMaterialConnection | null;
+  finalJobDetail: HeroFinalJobCardDetail | null;
+  statDomains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
+  heartFetterEffects: HeroHeartFetterEffectView[];
 }) {
   const isFinalJob = row.rank === 4;
   const jobName =
@@ -337,13 +498,13 @@ function HeroJobTreeCard({
   const army = isFinalJob ? getStaticHeroFinalJobArmy(row.jobId) : null;
   const attackRange = isFinalJob ? getStaticHeroFinalJobAttackRange(row.jobId) : null;
 
-  if (isFinalJob && (!army || attackRange == null)) {
-    throw new Error(`Final Job ${row.jobId} is missing frozen army or attack-range metadata.`);
+  if (isFinalJob && (!army || attackRange == null || !finalJobDetail)) {
+    throw new Error(\`Final Job \${row.jobId} is missing frozen army, attack-range, or stat metadata.\`);
   }
 
   return (
     <article
-      className="rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
+      className="w-full rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
       data-job-connection-id={row.jobConnectionId}
       data-job-id={row.jobId}
       data-job-rank={row.rank ?? ""}
@@ -354,12 +515,12 @@ function HeroJobTreeCard({
     >
       <div className="flex min-w-0 items-center justify-between gap-3">
         <h3 className="min-w-0 truncate text-sm font-extrabold text-foreground">
-          {row.rank == null ? jobName : `T${row.rank} ${jobName}`}
+          {row.rank == null ? jobName : \`T\${row.rank} \${jobName}\`}
         </h3>
         {isFinalJob && army ? (
           <div
             className="flex shrink-0 items-center"
-            title={army.armyNameCn ?? `Army ${army.armyId}`}
+            title={army.armyNameCn ?? \`Army \${army.armyId}\`}
             data-hero-final-job-army-mark="true"
           >
             <HeroFinalJobArmyIcon armyId={army.armyId} armyNameCn={army.armyNameCn} />
@@ -369,44 +530,55 @@ function HeroJobTreeCard({
 
       <HeroJobMaterialsDisclosure connection={materialConnection} />
 
-      {isFinalJob ? (
-        <dl className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
-            <dt className="text-[10px] font-bold text-muted-foreground">사거리</dt>
-            <dd className="mt-1 flex items-center gap-1 text-sm font-extrabold text-foreground">
-              <img
-                src={getAttackRangeIconUrl()}
-                alt=""
-                aria-hidden="true"
-                width={18}
-                height={18}
-                loading="lazy"
-                decoding="async"
-                className="h-[18px] w-[18px] object-contain"
-              />
-              <span className="tabular-nums">{attackRange}</span>
-            </dd>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
-            <dt className="text-[10px] font-bold text-muted-foreground">이동타입</dt>
-            <dd className="mt-1">
-              <img
-                src={getMovementTypeIconUrl(row.moveType)}
-                alt={row.moveTypeNameKr}
-                title={row.moveTypeNameKr}
-                width={24}
-                height={24}
-                loading="lazy"
-                decoding="async"
-                className="h-6 w-6 object-contain"
-              />
-            </dd>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-background/70 px-2.5 py-2">
-            <dt className="text-[10px] font-bold text-muted-foreground">이동력</dt>
-            <dd className="mt-1 text-sm font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
-          </div>
-        </dl>
+      {isFinalJob && finalJobDetail ? (
+        <>
+          <dl className="mt-2 grid grid-cols-2 gap-2" data-hero-final-job-mobility="true">
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[10px] font-bold text-muted-foreground">사거리</dt>
+              <dd className="mt-1 flex items-center gap-2 text-base font-extrabold text-foreground">
+                <img
+                  src={getAttackRangeIconUrl()}
+                  alt=""
+                  aria-hidden="true"
+                  width={24}
+                  height={24}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-6 w-6 object-contain"
+                />
+                <span className="tabular-nums">{attackRange}</span>
+              </dd>
+            </div>
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[10px] font-bold text-muted-foreground">이동방식</dt>
+              <dd className="mt-1 flex items-center gap-2 text-base font-extrabold text-foreground">
+                <img
+                  src={getMovementTypeIconUrl(row.moveType)}
+                  alt={row.moveTypeNameKr}
+                  title={row.moveTypeNameKr}
+                  width={24}
+                  height={24}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-6 w-6 object-contain"
+                />
+                <span className="tabular-nums">{row.movePoint}</span>
+              </dd>
+            </div>
+          </dl>
+
+          <HeroFinalJobStatGraph
+            stats={finalJobDetail.finalStats}
+            centralBondStats={finalJobDetail.centralBondStats}
+            domains={statDomains}
+          />
+
+          <HeroFinalJobHeartFetter
+            effects={heartFetterEffects
+              .filter((effect) => effect.jobId === row.jobId)
+              .sort((a, b) => a.level - b.level || a.skillId - b.skillId)}
+          />
+        </>
       ) : null}
     </article>
   );
@@ -416,15 +588,21 @@ function HeroNormalJobTree({
   heroId,
   allowedJobConnectionIds,
   materialConnections,
+  finalJobDetails,
+  statDomains,
+  heartFetterEffects,
 }: {
   heroId: number;
   allowedJobConnectionIds?: readonly number[] | undefined;
   materialConnections: HeroJobMaterialConnection[];
+  finalJobDetails: HeroFinalJobCardDetail[];
+  statDomains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
+  heartFetterEffects: HeroHeartFetterEffectView[];
 }) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const movementRows = getStaticHeroJobMovement(heroId);
   if (!movementRows) {
-    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
+    throw new Error(\`Hero \${heroId} has no frozen job-movement record.\`);
   }
 
   const allowedSet = allowedJobConnectionIds ? new Set(allowedJobConnectionIds) : null;
@@ -436,6 +614,7 @@ function HeroNormalJobTree({
   const materialByConnectionId = new Map(
     materialConnections.map((connection) => [connection.jobConnectionId, connection]),
   );
+  const finalJobDetailByJobId = new Map(finalJobDetails.map((detailRow) => [detailRow.jobId, detailRow]));
 
   const uniqueJobs = new Map<number, HeroJobTreeNodeView>();
   const t4ParentByConnectionId = new Map<number, number>();
@@ -446,7 +625,7 @@ function HeroNormalJobTree({
         job.jobConnectionId != null &&
         job.jobId != null &&
         job.rank != null &&
-        job.rank >= 2 &&
+        job.rank >= 1 &&
         job.rank <= 4 &&
         (!allowedSet || allowedSet.has(job.jobConnectionId)),
       )
@@ -466,7 +645,7 @@ function HeroNormalJobTree({
         const existing = t4ParentByConnectionId.get(next.jobConnectionId);
         if (existing != null && existing !== current.jobConnectionId) {
           throw new Error(
-            `Hero ${heroId} T4 JobConnection ${next.jobConnectionId} has conflicting T3 parents ${existing}/${current.jobConnectionId}.`,
+            \`Hero \${heroId} T4 JobConnection \${next.jobConnectionId} has conflicting T3 parents \${existing}/\${current.jobConnectionId}.\`,
           );
         }
         t4ParentByConnectionId.set(next.jobConnectionId, current.jobConnectionId);
@@ -480,58 +659,79 @@ function HeroNormalJobTree({
       .map((job) => {
         const row = rowByConnectionId.get(job.jobConnectionId);
         if (!row) {
-          throw new Error(`Hero ${heroId} JobConnection ${job.jobConnectionId} is missing frozen movement metadata.`);
+          throw new Error(\`Hero \${heroId} JobConnection \${job.jobConnectionId} is missing frozen movement metadata.\`);
         }
         return row;
       })
       .sort((a, b) => a.jobConnectionId - b.jobConnectionId);
 
+  const t1Rows = rowsForRank(1);
   const t2Rows = rowsForRank(2);
   const t3Rows = rowsForRank(3);
   const t4Rows = rowsForRank(4);
 
   for (const t4 of t4Rows) {
     if (!t4ParentByConnectionId.has(t4.jobConnectionId)) {
-      throw new Error(`Hero ${heroId} T4 JobConnection ${t4.jobConnectionId} has no explicit T3 predecessor in the verified job tree.`);
+      throw new Error(\`Hero \${heroId} T4 JobConnection \${t4.jobConnectionId} has no explicit T3 predecessor in the verified job tree.\`);
+    }
+    if (!finalJobDetailByJobId.has(t4.jobId)) {
+      throw new Error(\`Hero \${heroId} T4 Job \${t4.jobId} has no projected final stat detail.\`);
     }
   }
+
+  const renderTierRow = (rows: HeroJobMovementRow[], tier: number) =>
+    rows.length > 0 ? (
+      <div
+        className="flex flex-wrap items-start justify-center gap-5"
+        data-hero-job-tier={tier}
+      >
+        {rows.map((row) => (
+          <div key={row.jobConnectionId} className="w-full max-w-[340px]">
+            <HeroJobTreeCard
+              row={row}
+              materialConnection={materialByConnectionId.get(row.jobConnectionId) ?? null}
+              finalJobDetail={finalJobDetailByJobId.get(row.jobId) ?? null}
+              statDomains={statDomains}
+              heartFetterEffects={heartFetterEffects}
+            />
+          </div>
+        ))}
+      </div>
+    ) : null;
 
   return (
     <div
       className="mt-5"
       data-hero-job-tree="true"
+      data-t1-count={t1Rows.length}
       data-t2-count={t2Rows.length}
       data-t3-count={t3Rows.length}
       data-t4-count={t4Rows.length}
     >
-      {t2Rows.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-3">
-          {t2Rows.map((row) => (
-            <div key={row.jobConnectionId} className="w-full max-w-[280px]">
-              <HeroJobTreeCard
-                row={row}
-                materialConnection={materialByConnectionId.get(row.jobConnectionId) ?? null}
-              />
-            </div>
-          ))}
-        </div>
+      {renderTierRow(t1Rows, 1)}
+      {t1Rows.length > 0 && t2Rows.length > 0 ? (
+        <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
       ) : null}
 
+      {renderTierRow(t2Rows, 2)}
       {t2Rows.length > 0 && t3Rows.length > 0 ? (
         <div className="mx-auto h-7 w-px bg-border" aria-hidden="true" />
       ) : null}
 
       {t3Rows.length > 0 ? (
-        <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3" data-hero-job-tier-branches="true">
+        <div className="flex flex-wrap items-start justify-center gap-5" data-hero-job-tier-branches="true">
           {t3Rows.map((t3) => {
             const children = t4Rows.filter(
               (t4) => t4ParentByConnectionId.get(t4.jobConnectionId) === t3.jobConnectionId,
             );
             return (
-              <div key={t3.jobConnectionId} className="min-w-0">
+              <div key={t3.jobConnectionId} className="w-full max-w-[340px]">
                 <HeroJobTreeCard
                   row={t3}
                   materialConnection={materialByConnectionId.get(t3.jobConnectionId) ?? null}
+                  finalJobDetail={null}
+                  statDomains={statDomains}
+                  heartFetterEffects={heartFetterEffects}
                 />
                 {children.length > 0 ? (
                   <>
@@ -542,6 +742,9 @@ function HeroNormalJobTree({
                           key={t4.jobConnectionId}
                           row={t4}
                           materialConnection={materialByConnectionId.get(t4.jobConnectionId) ?? null}
+                          finalJobDetail={finalJobDetailByJobId.get(t4.jobId) ?? null}
+                          statDomains={statDomains}
+                          heartFetterEffects={heartFetterEffects}
                         />
                       ))}
                     </div>
@@ -560,15 +763,21 @@ export function HeroJobMaterialsSection({
   heroId,
   mode,
   allowedJobConnectionIds,
+  finalJobDetails,
+  statDomains,
+  heartFetterEffects,
 }: {
   heroId: number;
   mode: "normal" | "sp";
   allowedJobConnectionIds?: readonly number[] | undefined;
+  finalJobDetails: HeroFinalJobCardDetail[];
+  statDomains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
+  heartFetterEffects: HeroHeartFetterEffectView[];
 }) {
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
   if (!hero) {
-    throw new Error(`Hero ${heroId} has no frozen job-material record.`);
+    throw new Error(\`Hero \${heroId} has no frozen job-material record.\`);
   }
 
   const allowedJobConnectionIdSet = allowedJobConnectionIds
@@ -593,7 +802,7 @@ export function HeroJobMaterialsSection({
 
   if (mode === "sp") {
     if (!detail.sp.released || !detail.sp.finalJob) {
-      throw new Error(`Hero ${heroId} requested SP form without a released frozen SP final job.`);
+      throw new Error(\`Hero \${heroId} requested SP form without a released frozen SP final job.\`);
     }
     return <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />;
   }
@@ -607,6 +816,9 @@ export function HeroJobMaterialsSection({
         heroId={heroId}
         allowedJobConnectionIds={allowedJobConnectionIds}
         materialConnections={materialConnections}
+        finalJobDetails={finalJobDetails}
+        statDomains={statDomains}
+        heartFetterEffects={heartFetterEffects}
       />
     </div>
   );
