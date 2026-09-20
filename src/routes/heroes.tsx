@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RotateCcw, Search, UserRound } from "lucide-react";
+import { ArrowLeft, RotateCcw, Search, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { getHeroCardIconIndex } from "@/lib/hero-card-icon-assets.functions";
@@ -330,9 +330,10 @@ function HeroGridPage() {
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <Link
           to="/"
-          className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:border-foreground/30 hover:bg-muted/40"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-primary/25 bg-card px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/45 hover:bg-accent"
         >
-          ← 메인으로
+          <ArrowLeft size={16} aria-hidden="true" />
+          메인으로
         </Link>
 
         <section aria-label="영웅 목록 필터" className="mt-4 rounded-lg border border-border bg-card p-3 sm:p-4">
