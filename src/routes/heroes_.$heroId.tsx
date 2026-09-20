@@ -1138,7 +1138,7 @@ function HeroSpMissionSection({
   missions: { firstStage: SpMissionView[]; secondStage: SpMissionView[] };
   secondStageRewardSoldierNames: string[];
 }) {
-  const [activeView, setActiveView] = useState<"missions" | "schedule">("missions");
+  const [activeView, setActiveView] = useState<"missions" | "schedule">("schedule");
   const [dungeonScenario, setDungeonScenario] = useState<HeroSpDungeonScenario>("NORMAL");
   const [hourglassCount, setHourglassCount] = useState<0 | 1 | 2>(1);
   const dungeonSchedule = useMemo(
