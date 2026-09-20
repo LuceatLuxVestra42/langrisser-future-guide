@@ -45,9 +45,8 @@ type BannerSearch = {
 };
 
 export const Route = createFileRoute("/banners")({
-  validateSearch: (search: Record<string, unknown>): BannerSearch => ({
-    view: search.view === "single-log" ? "single-log" : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): BannerSearch =>
+    search["view"] === "single-log" ? { view: "single-log" } : {},
   loader: () => getBannerPageData(),
   head: () => ({
     meta: [
@@ -205,7 +204,7 @@ function BannerPage() {
               type="button"
               onClick={() =>
                 void navigate({
-                  search: (previous) => ({ ...previous, view: undefined }),
+                  search: {},
                 })
               }
               className={navButtonClass}
