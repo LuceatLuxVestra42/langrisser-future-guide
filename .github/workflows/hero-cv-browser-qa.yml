@@ -43,7 +43,7 @@ jobs:
             echo "Hero CV Browser QA requires exact PR head SHA: $PR_HEAD_SHA" >&2
             exit 2
           fi
-          base="https://luceatluxvestra42.github.io/Data/pr-${PR_NUMBER}/"
+          base='https://luceatluxvestra42.github.io/Data/preview/'
           EXPECTED_SOURCE_SHA="$PR_HEAD_SHA" PREVIEW_BASE_URL="$base" node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const base = process.env.PREVIEW_BASE_URL;
