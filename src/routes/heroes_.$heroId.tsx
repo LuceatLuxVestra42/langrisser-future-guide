@@ -268,7 +268,8 @@ function HeroDetailPage() {
   }
   const closeSoldierDetail = useCallback(() => setSelectedSoldierId(null), []);
   const imageUrl = hero.card.webAssetPath ? resolvePublicAssetUrl(hero.card.webAssetPath) : null;
-  const spArtworkSource = isSpForm ? getHeroSpArtworkSource(hero.heroId) : null;
+  const spArtworkPath = isSpForm ? getHeroSpArtworkSource(hero.heroId) : null;
+  const spArtworkSource = spArtworkPath ? resolvePublicAssetUrl(spArtworkPath) : null;
   const primaryImageUrl = spArtworkSource ?? imageUrl;
   const visuals: HeroVisual[] = [];
   if (primaryImageUrl) {
@@ -299,8 +300,11 @@ function HeroDetailPage() {
   const nextVisualSrc = visuals.length > 1
     ? (visuals[(visualIndex + 1) % visuals.length]?.src ?? null)
     : null;
-  const inactiveSpArtworkSource = hasSpForm && !isSpForm
+  const inactiveSpArtworkPath = hasSpForm && !isSpForm
     ? getHeroSpArtworkSource(hero.heroId)
+    : null;
+  const inactiveSpArtworkSource = inactiveSpArtworkPath
+    ? resolvePublicAssetUrl(inactiveSpArtworkPath)
     : null;
 
   useEffect(() => {
