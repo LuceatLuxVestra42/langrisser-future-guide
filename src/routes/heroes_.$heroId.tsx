@@ -1094,13 +1094,14 @@ function HeroSpMissionSection({
 }) {
   const [activeView, setActiveView] = useState<"missions" | "schedule">("missions");
   const [dungeonScenario, setDungeonScenario] = useState<HeroSpDungeonScenario>("NORMAL");
+  const [hourglassCount, setHourglassCount] = useState<0 | 1 | 2>(1);
   const dungeonSchedule = useMemo(
     () => simulateHeroSpDungeonSchedule(missions, dungeonScenario),
     [missions, dungeonScenario],
   );
   const hourglassRecommendation = useMemo(
-    () => recommendHeroSpHourglass(missions, dungeonScenario),
-    [missions, dungeonScenario],
+    () => recommendHeroSpHourglass(missions, dungeonScenario, hourglassCount),
+    [missions, dungeonScenario, hourglassCount],
   );
 
   if (missions.firstStage.length === 0 && missions.secondStage.length === 0) return null;
@@ -1241,6 +1242,7 @@ function HeroSpMissionSection({
           <div
             className="rounded-xl border border-border bg-muted/10 p-3 sm:p-4"
             data-sp-hourglass-recommendation="true"
+            data-sp-hourglass-count={hourglassCount}
             data-sp-hourglass-saved-days={hourglassRecommendation.savedDays}
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1251,29 +1253,59 @@ function HeroSpMissionSection({
                 </span>
               ) : null}
             </div>
-            {hourglassRecommendation.savedDays > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="시간의 모래시계 개수">
+              {([0, 1, 2] as const).map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  aria-pressed={hourglassCount === count}
+                  onClick={() => setHourglassCount(count)}
+                  className={`min-h-11 rounded-lg border px-4 py-2 text-sm font-extrabold transition ${
+                    hourglassCount === count
+                      ? "border-primary/60 bg-primary/10 text-foreground ring-1 ring-primary/20"
+                      : "border-border bg-background text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-sp-hourglass-count-option={count}
+                >
+                  {count}개
+                </button>
+              ))}
+            </div>
+            {hourglassCount === 0 ? (
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                모래시계를 사용하지 않는 기준 일정이야.
+              </p>
+            ) : hourglassRecommendation.savedDays > 0 ? (
               <div className="mt-3 space-y-2">
-                {hourglassRecommendation.candidates.map((candidate) => (
+                {hourglassRecommendation.combinations.map((combination, combinationIndex) => (
                   <div
-                    key={candidate.missionKey}
+                    key={combination.map((candidate) => candidate.missionKey).join("|")}
                     className="rounded-lg border border-border bg-background px-3 py-3"
-                    data-sp-hourglass-candidate={candidate.missionKey}
+                    data-sp-hourglass-combination={combinationIndex + 1}
                   >
                     <div className="text-xs font-bold text-muted-foreground">
-                      {candidate.phase} · {candidate.step}단계
+                      추천 조합 {combinationIndex + 1}
                     </div>
-                    <div className="mt-1 text-sm font-extrabold text-foreground">
-                      {candidate.labelKr} 미션에 사용
+                    <div className="mt-2 space-y-1">
+                      {combination.map((candidate) => (
+                        <div
+                          key={candidate.missionKey}
+                          className="text-sm font-extrabold text-foreground"
+                          data-sp-hourglass-candidate={candidate.missionKey}
+                        >
+                          {candidate.phase} · {candidate.step}단계 · {candidate.labelKr}
+                        </div>
+                      ))}
                     </div>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                      이 미션의 던전 진입을 건너뛰었을 때 전체 대기시간이 가장 많이 줄어들어.
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {hourglassCount}개를 이 조합에 사용했을 때 전체 요일 대기시간이 가장 많이 줄어들어.
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                현재 오픈 조건에서는 시간의 모래시계를 사용해도 요일 대기시간이 줄어들지 않아.
+                현재 오픈 조건에서는 선택한 모래시계 개수로 요일 대기시간을 줄일 수 없어.
               </p>
             )}
           </div>
