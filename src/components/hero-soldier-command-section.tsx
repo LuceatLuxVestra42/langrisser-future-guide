@@ -34,13 +34,9 @@ function PercentValue({ value, emphasized = false }: { value: number; emphasized
   );
 }
 
-function CommandVariantTable({ title, variant, mode }: { title: string; variant: CommandVariant; mode: "NORMAL" | "SP" }) {
+function CommandVariantTable({ variant, mode }: { variant: CommandVariant; mode: "NORMAL" | "SP" }) {
   return (
     <article className="min-w-0 overflow-hidden rounded-xl border border-border bg-background" data-command-mode={mode}>
-      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/35 px-3 py-3">
-        <h3 className="font-bold text-foreground">{title}</h3>
-        <span className="text-[11px] font-bold text-muted-foreground">최종 지휘 보정</span>
-      </div>
       <div className="min-w-0" data-command-table-fit="true">
         <table className="w-full table-fixed border-collapse text-xs sm:text-sm">
           <thead>
@@ -85,13 +81,10 @@ export function HeroSoldierCommandSection({
       data-hero-soldier-command="true"
       data-hero-form-mode={mode}
     >
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">병사 지휘 보정</h2>
-      </div>
+      <h2 className="font-bold text-foreground">병사 지휘 보정</h2>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <CommandVariantTable
-          title={mode === "sp" ? "SP 클래스" : "일반 클래스"}
           mode={mode === "sp" ? "SP" : "NORMAL"}
           variant={variant}
         />
