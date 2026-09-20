@@ -94,9 +94,15 @@ type HeroSpFinalJobView = {
 function HeroSpJobMovementSection({
   heroId,
   finalJob,
+  finalJobDetail,
+  statDomains,
+  heartFetterEffects,
 }: {
   heroId: number;
   finalJob: HeroSpFinalJobView;
+  finalJobDetail: HeroFinalJobCardDetail;
+  statDomains: Record<HeroFinalJobStatKey, HeroFinalJobStatDomain>;
+  heartFetterEffects: HeroHeartFetterEffectView[];
 }) {
   const [row, setRow] = useState<HeroJobMovementRowView | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -170,86 +176,97 @@ function HeroSpJobMovementSection({
     throw new Error(loadError);
   }
 
+  if (finalJob.jobId !== finalJobDetail.jobId) {
+    throw new Error(
+      `Hero ${heroId} SP final-job detail mismatch: ${String(finalJob.jobId)} != ${finalJobDetail.jobId}.`,
+    );
+  }
+
   return (
-    <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+    <div
+      className="mt-5 flex justify-center"
       data-hero-sp-job-movement="true"
       data-hero-sp-job-movement-status={row ? "ready" : "loading"}
-      data-job-connection-id={row?.jobConnectionId ?? ""}
-      data-job-id={row?.jobId ?? ""}
-      data-move-type={row?.moveType ?? ""}
-      data-move-point={row?.movePoint ?? ""}
-      data-basic-attack-range={row?.attackRange ?? ""}
-      data-army-id={row?.armyId ?? ""}
     >
-      <div>
-        <h2 className="text-lg font-extrabold tracking-tight text-foreground">SP 전직 이동 정보</h2>
-      </div>
-
       {row ? (
-        <article className="mt-5 rounded-xl border border-border bg-muted/20 p-4">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold text-muted-foreground">SP 전직</p>
-              <h3 className="mt-1 truncate text-sm font-extrabold text-foreground">
-                {resolveHeroSpJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "SP 전직"}
-              </h3>
-            </div>
-            <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-              <span
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-bold text-foreground"
-                title={`공격 사거리 ${row.attackRange}`}
-                aria-label={`공격 사거리 ${row.attackRange}`}
+        <article
+          className="w-full max-w-[340px] rounded-xl border border-border bg-muted/20 p-4 shadow-sm"
+          data-job-connection-id={row.jobConnectionId}
+          data-job-id={row.jobId}
+          data-job-rank="SP"
+          data-move-type={row.moveType}
+          data-move-point={row.movePoint}
+          data-basic-attack-range={row.attackRange ?? ""}
+          data-army-id={row.armyId ?? ""}
+        >
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <h3 className="min-w-0 truncate text-sm font-extrabold text-foreground">
+              SP {resolveHeroSpJobNameKr({ jobId: row.jobId, nameCn: row.nameCn }) ?? row.nameCn ?? "전직"}
+            </h3>
+            {row.armyId != null ? (
+              <div
+                className="flex shrink-0 items-center"
+                title={row.armyNameCn ?? `Army ${row.armyId}`}
+                data-hero-final-job-army-mark="true"
               >
+                <HeroFinalJobArmyIcon armyId={row.armyId} armyNameCn={row.armyNameCn} />
+              </div>
+            ) : null}
+          </div>
+
+          <dl className="mt-3 grid grid-cols-2 gap-2" data-hero-final-job-mobility="true">
+            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
+              <dt className="text-[10px] font-bold text-muted-foreground">사거리</dt>
+              <dd className="mt-1 flex items-center gap-2 text-base font-extrabold text-foreground">
                 <img
                   src={getAttackRangeIconUrl()}
                   alt=""
                   aria-hidden="true"
-                  width={20}
-                  height={20}
+                  width={24}
+                  height={24}
                   loading="lazy"
                   decoding="async"
-                  className="h-5 w-5 object-contain"
+                  className="h-6 w-6 object-contain"
                 />
                 <span className="tabular-nums">{row.attackRange}</span>
-              </span>
-            </div>
-          </div>
-
-          <dl className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-              <dt className="text-[11px] font-bold text-muted-foreground">이동력</dt>
-              <dd className="mt-1 text-base font-extrabold tabular-nums text-foreground">{row.movePoint}</dd>
+              </dd>
             </div>
             <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-              <dt className="text-[11px] font-bold text-muted-foreground">이동타입</dt>
-              <dd className="mt-1">
+              <dt className="text-[10px] font-bold text-muted-foreground">이동방식</dt>
+              <dd className="mt-1 flex items-center gap-2 text-base font-extrabold text-foreground">
                 <img
                   src={getMovementTypeIconUrl(row.moveType)}
                   alt={row.moveTypeNameKr}
                   title={row.moveTypeNameKr}
-                  width={32}
-                  height={32}
+                  width={24}
+                  height={24}
                   loading="lazy"
                   decoding="async"
-                  className="h-8 w-8 object-contain"
+                  className="h-6 w-6 object-contain"
                 />
-              </dd>
-            </div>
-            <div className="rounded-lg border border-border/70 bg-background/70 px-3 py-2.5">
-              <dt className="text-[11px] font-bold text-muted-foreground">병종</dt>
-              <dd className="mt-1">
-                <HeroFinalJobArmyIcon armyId={row.armyId!} armyNameCn={row.armyNameCn} />
+                <span className="tabular-nums">{row.movePoint}</span>
               </dd>
             </div>
           </dl>
+
+          <HeroFinalJobStatGraph
+            stats={finalJobDetail.finalStats}
+            centralBondStats={finalJobDetail.centralBondStats}
+            domains={statDomains}
+          />
+
+          <HeroFinalJobHeartFetter
+            effects={heartFetterEffects
+              .filter((effect) => effect.jobId === row.jobId)
+              .sort((a, b) => a.level - b.level || a.skillId - b.skillId)}
+          />
         </article>
       ) : (
-        <p className="mt-4 rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-          SP 전직 이동 정보를 불러오는 중이야.
-        </p>
+        <div className="w-full max-w-[340px] rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          SP 전직 정보를 불러오는 중이야.
+        </div>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -804,7 +821,20 @@ export function HeroJobMaterialsSection({
     if (!detail.sp.released || !detail.sp.finalJob) {
       throw new Error(`Hero ${heroId} requested SP form without a released frozen SP final job.`);
     }
-    return <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />;
+    const jobId = detail.sp.finalJob.jobId;
+    const finalJobDetail = finalJobDetails.find((row) => row.jobId === jobId);
+    if (!finalJobDetail) {
+      throw new Error(`Hero ${heroId} SP Job ${String(jobId)} has no projected final stat detail.`);
+    }
+    return (
+      <HeroSpJobMovementSection
+        heroId={heroId}
+        finalJob={detail.sp.finalJob}
+        finalJobDetail={finalJobDetail}
+        statDomains={statDomains}
+        heartFetterEffects={heartFetterEffects}
+      />
+    );
   }
 
   return (
