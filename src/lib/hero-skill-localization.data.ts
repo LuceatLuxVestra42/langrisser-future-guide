@@ -2276,5 +2276,13 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [67], note: "Legacy Korean sheet hero/data/오메가.js; exact Hero CN + Skill_ArrowCrash7 icon + type/cooldown/range/target/effect parity against current generated Skill 12019." },
     },
+    {
+      skillId: 12015,
+      sourceNameCn: "神威",
+      nameKr: "신의 위엄",
+      descKr: "[마법 피해] 단일 적 부대에 1.6배 피해를 준다. 전투 진입 전 적에게 자신의 지력 2배만큼 고정 피해를 주고 자신의 생명을 지력 2배만큼 회복한다. 2턴 지속. 전투 후 주위 2칸 내 모든 적의 이동력 -3 및 호위 불가를 부여한다. 1턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [89], note: "Legacy Korean sheet hero/data/유리아.js; exact Hero CN + Skill_Pledge icon + type/cooldown/range/target/core-effect parity against current generated Skill 12015." },
+    },
   ],
 };
