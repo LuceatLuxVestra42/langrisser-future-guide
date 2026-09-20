@@ -74,7 +74,7 @@ export type HeroSpDungeonScheduleEvent = HeroSpDungeonScheduleEntry & {
 
 export type HeroSpHourglassRecommendation = {
   savedDays: number;
-  candidates: HeroSpDungeonScheduleEvent[];
+  combinations: HeroSpDungeonScheduleEvent[][];
 };
 
 const WEEKDAY_ORDER = scheduleData.weekdayOrder as HeroSpDungeonWeekday[];
@@ -170,13 +170,14 @@ function flattenScheduledMissions(missions: HeroSpSchedulePhases) {
 export function simulateHeroSpDungeonSchedule(
   missions: HeroSpSchedulePhases,
   scenario: HeroSpDungeonScenario,
-  skipMissionKey: string | null = null,
+  skipMissionKeys: readonly string[] = [],
 ) {
   let dayOffset = 0;
   const events: HeroSpDungeonScheduleEvent[] = [];
+  const skipMissionKeySet = new Set(skipMissionKeys);
 
   for (const row of flattenScheduledMissions(missions)) {
-    if (row.missionKey === skipMissionKey) continue;
+    if (skipMissionKeySet.has(row.missionKey)) continue;
     const waitDays = waitUntilOpen(dayOffset, row.schedule, scenario);
     dayOffset += waitDays;
     events.push({
@@ -200,26 +201,48 @@ export function simulateHeroSpDungeonSchedule(
 export function recommendHeroSpHourglass(
   missions: HeroSpSchedulePhases,
   scenario: HeroSpDungeonScenario,
+  hourglassCount: 0 | 1 | 2,
 ): HeroSpHourglassRecommendation {
   const baseline = simulateHeroSpDungeonSchedule(missions, scenario);
-  let savedDays = 0;
-  const candidateKeys: string[] = [];
+  if (hourglassCount === 0 || baseline.events.length === 0) {
+    return { savedDays: 0, combinations: [] };
+  }
 
-  for (const event of baseline.events) {
-    const skipped = simulateHeroSpDungeonSchedule(missions, scenario, event.missionKey);
-    const candidateSavedDays = baseline.finalDayOffset - skipped.finalDayOffset;
-    if (candidateSavedDays > savedDays) {
-      savedDays = candidateSavedDays;
-      candidateKeys.length = 0;
-      candidateKeys.push(event.missionKey);
-    } else if (candidateSavedDays === savedDays && candidateSavedDays > 0) {
-      candidateKeys.push(event.missionKey);
+  const candidateCombinations: HeroSpDungeonScheduleEvent[][] = [];
+  const events = baseline.events;
+  if (hourglassCount === 1) {
+    for (const event of events) candidateCombinations.push([event]);
+  } else {
+    for (let first = 0; first < events.length; first += 1) {
+      for (let second = first + 1; second < events.length; second += 1) {
+        const firstEvent = events[first];
+        const secondEvent = events[second];
+        if (firstEvent && secondEvent) candidateCombinations.push([firstEvent, secondEvent]);
+      }
     }
   }
 
-  const candidateKeySet = new Set(candidateKeys);
+  let savedDays = 0;
+  const combinations: HeroSpDungeonScheduleEvent[][] = [];
+
+  for (const combination of candidateCombinations) {
+    const skipped = simulateHeroSpDungeonSchedule(
+      missions,
+      scenario,
+      combination.map((event) => event.missionKey),
+    );
+    const candidateSavedDays = baseline.finalDayOffset - skipped.finalDayOffset;
+    if (candidateSavedDays > savedDays) {
+      savedDays = candidateSavedDays;
+      combinations.length = 0;
+      combinations.push(combination);
+    } else if (candidateSavedDays === savedDays && candidateSavedDays > 0) {
+      combinations.push(combination);
+    }
+  }
+
   return {
     savedDays,
-    candidates: baseline.events.filter((event) => candidateKeySet.has(event.missionKey)),
+    combinations,
   };
 }
