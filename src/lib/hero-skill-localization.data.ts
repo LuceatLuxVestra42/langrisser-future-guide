@@ -3270,5 +3270,14 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [99205], note: "Legacy Korean sheet hero/data/투어밀크.js; exact Tourmilk/2 ↔ Skill_Tourmilk2 icon + type/cooldown/range/target/effect parity." },
     },
+
+    {
+      skillId: 12563,
+      sourceNameCn: "谧夜洗礼",
+      nameKr: "고요한 밤의 세례",
+      descKr: "[액티브] 자신 주위 1바퀴 범위 내 모든 적의 무작위 버프 1개를 강탈한다. 범위 안에 아군이 설치한 수호의 열쇠가 있으면 해당 지형 특수 효과를 제거하고 고유 스킬 재행동 효과를 발동한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [99206], note: "Legacy Korean sheet hero/data/이리스.js; exact Iris/2 ↔ Skill_Iris2 icon + type/cooldown/range/target/effect parity." },
+    },
   ],
 };
