@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+
 export type HeroCastingLawPresentation = {
   heroId: number;
   slots: Array<{
@@ -211,21 +213,25 @@ function SlotCard({ slot }: { slot: HeroCastingLawPresentation["slots"][number] 
   );
 }
 
-export function HeroCastingLawSection({
+export function HeroCastingLawMaterials({
   castingLaw,
 }: {
   castingLaw: HeroCastingLawPresentation;
 }) {
   return (
-    <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+    <details
+      className="group mt-5 border-t border-border pt-5"
       data-hero-casting-law="true"
       data-casting-law-slot-count={castingLaw.slots.length}
     >
-      <h2 className="text-lg font-extrabold tracking-tight text-foreground">율정</h2>
-
-      <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-summary="true">
-        <h3 className="text-sm font-extrabold text-foreground">요구 문양재료</h3>
+      <summary className="cursor-pointer list-none" data-casting-law-summary="true">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-sm font-extrabold text-foreground">1~5레벨 요구 문양 재료</h3>
+          <ChevronDown
+            className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
+        </div>
         <div className="mt-3 flex flex-wrap items-start gap-3">
           {castingLaw.slots
             .filter((slot) => slot.summaryIcon !== null)
@@ -255,10 +261,10 @@ export function HeroCastingLawSection({
               </div>
             ))}
         </div>
-      </div>
+      </summary>
 
       <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
-        <h3 className="text-sm font-extrabold text-foreground">합계 비용</h3>
+        <h3 className="text-sm font-extrabold text-foreground">율정 합계비용</h3>
         <div className="mt-3">
           <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
         </div>
@@ -269,6 +275,6 @@ export function HeroCastingLawSection({
           <SlotCard key={`${slot.sourceIndex}-${slot.templateId}-${slot.slotType}`} slot={slot} />
         ))}
       </div>
-    </section>
+    </details>
   );
 }

@@ -1,3 +1,4 @@
+import { HeroCastingLawMaterials, type HeroCastingLawPresentation } from "@/components/hero-casting-law-section";
 import { getHeroCentralDisciplineKoBySkillId } from "@/lib/hero-central-discipline-ko";
 
 export type HeroCentralDisciplinePresentation = {
@@ -12,8 +13,10 @@ function stripConfigMarkup(value: string) {
 
 export function HeroCentralDisciplineSection({
   centralDiscipline,
+  castingLaw,
 }: {
   centralDiscipline: HeroCentralDisciplinePresentation;
+  castingLaw: HeroCastingLawPresentation;
 }) {
   let koreanPresentation = null;
   if (centralDiscipline.released) {
@@ -50,6 +53,8 @@ export function HeroCentralDisciplineSection({
       ) : (
         <p className="mt-4 text-sm text-muted-foreground">중앙율정 없음</p>
       )}
+
+      <HeroCastingLawMaterials castingLaw={castingLaw} />
     </section>
   );
 }
