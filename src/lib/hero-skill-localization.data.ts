@@ -1700,5 +1700,13 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [29], note: "Legacy Korean sheet hero/data/티아리스.js; exact Hero CN plus icon/cooldown/range/target/effect parity against current generated Skill 10832." },
     },
+    {
+      skillId: 11737,
+      sourceNameCn: "魔武术",
+      nameKr: "마무술",
+      descKr: "[지원]'마무'시전: 영웅이 입히는 모든 마법 피해를 물리 피해로 취급. 공격의 10%를 지력에 추가, 4턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [38], note: "Legacy Korean sheet hero/data/제리올.js; exact Hero CN + Skill_MagicAttack icon + type/cooldown/range/target/effect parity against current generated Skill 11737. 클로제 legacy text reverses the damage-conversion direction and is excluded as evidence." },
+    },
   ],
 };
