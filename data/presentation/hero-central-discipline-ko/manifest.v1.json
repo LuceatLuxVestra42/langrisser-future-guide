@@ -1,7 +1,7 @@
 {
   "version": 1,
   "artifact": "hero-central-discipline-ko-presentation-overlay",
-  "scope": "Korean central-discipline effect text presentation overlay for explicitly mapped Drive rows; semantic Hero->CastingLawSkill relation is inherited read-only from frozen Hero Stage 5-2.",
+  "scope": "Korean central-discipline effect text presentation overlay for frozen Hero->CastingLawSkill relations. Original Drive row provenance is preserved per record; reviewed display text is admitted from the repository review source without recomputing semantic relations.",
   "status": "C3_READY_FOR_VALIDATION",
   "semanticPredecessor": {
     "repositoryCommit": "5087a16f1ced3ca42721288f32735eed6e1c0c9c",
@@ -22,7 +22,7 @@
     "runtimeDriveFetch": false,
     "semanticRelationRecomputed": false,
     "releaseDateYearInferred": false,
-    "effectTextPolicy": "PRESERVE_SOURCE_CELL_TEXT"
+    "effectTextPolicy": "PRESERVE_REVIEWED_SOURCE_TEXT_AFTER_EXPLICIT_NEWLINE_NORMALIZATION"
   },
   "summary": {
     "recordCount": 164,
@@ -33,11 +33,52 @@
     "sourceRecentCount": 16
   },
   "shards": [
-    {"path":"data/presentation/hero-central-discipline-ko/part-01.v1.json","recordCount":20,"firstHeroId":56,"lastHeroId":21},
-    {"path":"data/presentation/hero-central-discipline-ko/part-02.v1.json","recordCount":30,"firstHeroId":67,"lastHeroId":99174},
-    {"path":"data/presentation/hero-central-discipline-ko/part-03.v1.json","recordCount":30,"firstHeroId":99165,"lastHeroId":81},
-    {"path":"data/presentation/hero-central-discipline-ko/part-04.v1.json","recordCount":30,"firstHeroId":27,"lastHeroId":99200},
-    {"path":"data/presentation/hero-central-discipline-ko/part-05.v1.json","recordCount":30,"firstHeroId":99201,"lastHeroId":99213},
-    {"path":"data/presentation/hero-central-discipline-ko/part-06.v1.json","recordCount":24,"firstHeroId":99217,"lastHeroId":99231}
-  ]
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-01.v1.json",
+      "recordCount": 20,
+      "firstHeroId": 56,
+      "lastHeroId": 21
+    },
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-02.v1.json",
+      "recordCount": 30,
+      "firstHeroId": 67,
+      "lastHeroId": 99174
+    },
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-03.v1.json",
+      "recordCount": 30,
+      "firstHeroId": 99165,
+      "lastHeroId": 81
+    },
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-04.v1.json",
+      "recordCount": 30,
+      "firstHeroId": 27,
+      "lastHeroId": 99200
+    },
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-05.v1.json",
+      "recordCount": 30,
+      "firstHeroId": 99201,
+      "lastHeroId": 99213
+    },
+    {
+      "path": "data/presentation/hero-central-discipline-ko/part-06.v1.json",
+      "recordCount": 24,
+      "firstHeroId": 99217,
+      "lastHeroId": 99231
+    }
+  ],
+  "reviewedPresentationSource": {
+    "path": "data/presentation/hero-central-discipline-ko/review-source-2026-09-20.txt",
+    "fileName": "현재_사이트_중앙율정_출력데이터_2026-09-20.txt",
+    "sourceSnapshotRef": "669c2d3c1ab8f40d0006728335bb9304dc36bb57",
+    "recordCount": 166,
+    "koreanOverlayRecordCount": 164,
+    "cnFallbackRecordCount": 2,
+    "changedEffectTextCount": 109,
+    "relationAdmission": "Exact HeroID + CastingLawSkillID equality against the existing frozen overlay; 164/164 Korean records matched with zero missing, extra, or duplicate relations.",
+    "newlineNormalization": "Literal \\\\n markers are materialized as line breaks; record-boundary physical line breaks are preserved without inserting duplicate blank lines."
+  }
 }
