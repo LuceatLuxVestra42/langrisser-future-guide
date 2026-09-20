@@ -86,8 +86,6 @@ export function SiteSectionNav() {
 
   if (location.pathname === "/") return null;
 
-  const singlePickupHref = `${import.meta.env.BASE_URL}banners?view=single-log`;
-
   return (
     <nav
       aria-label="주요 정보 페이지"
@@ -153,7 +151,9 @@ export function SiteSectionNav() {
                           asChild
                           className="px-4 py-3 text-sm"
                         >
-                          <a href={singlePickupHref}>{item.label}</a>
+                          <Link to="/banners" search={{ view: "single-log" }}>
+                            {item.label}
+                          </Link>
                         </DropdownMenuItem>
                       );
                     }

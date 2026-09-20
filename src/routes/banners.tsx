@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   CalendarDays,
@@ -40,7 +40,13 @@ function getKoreanToday() {
   return `${year}-${month}-${day}`;
 }
 
+type BannerSearch = {
+  view?: "single-log";
+};
+
 export const Route = createFileRoute("/banners")({
+  validateSearch: (search: Record<string, unknown>): BannerSearch =>
+    search["view"] === "single-log" ? { view: "single-log" } : {},
   loader: () => getBannerPageData(),
   head: () => ({
     meta: [
@@ -124,10 +130,9 @@ function BannerImage({
 
 function BannerPage() {
   const data = Route.useLoaderData();
-  const location = useLocation();
-  const [showSinglePickupLog, setShowSinglePickupLog] = useState(
-    () => new URLSearchParams(location.searchStr).get("view") === "single-log",
-  );
+  const { view } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const showSinglePickupLog = view === "single-log";
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
   const [expandedEventOccurrence, setExpandedEventOccurrence] = useState<string | null>(null);
   const [displayStartDate, setDisplayStartDate] = useState<string | null>(null);
@@ -197,7 +202,11 @@ function BannerPage() {
           <div className="sticky top-3 z-40 mb-8 flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={() => setShowSinglePickupLog(false)}
+              onClick={() =>
+                void navigate({
+                  search: {},
+                })
+              }
               className={navButtonClass}
             >
               <ArrowLeft size={16} aria-hidden="true" />
@@ -223,7 +232,11 @@ function BannerPage() {
           </Link>
           <button
             type="button"
-            onClick={() => setShowSinglePickupLog(true)}
+            onClick={() =>
+              void navigate({
+                search: (previous) => ({ ...previous, view: "single-log" }),
+              })
+            }
             className={navButtonClass}
           >
             1인 log
