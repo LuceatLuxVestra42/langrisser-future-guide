@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import {
   ArrowLeft,
   CalendarDays,
@@ -124,7 +124,10 @@ function BannerImage({
 
 function BannerPage() {
   const data = Route.useLoaderData();
-  const [showSinglePickupLog, setShowSinglePickupLog] = useState(false);
+  const location = useLocation();
+  const [showSinglePickupLog, setShowSinglePickupLog] = useState(
+    () => new URLSearchParams(location.searchStr).get("view") === "single-log",
+  );
   const [expandedWishOccurrence, setExpandedWishOccurrence] = useState<string | null>(null);
   const [expandedEventOccurrence, setExpandedEventOccurrence] = useState<string | null>(null);
   const [displayStartDate, setDisplayStartDate] = useState<string | null>(null);
