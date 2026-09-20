@@ -61,13 +61,25 @@ try {
     await image.waitFor({ state: 'visible', timeout: 15000 });
 
     const expectedPath = `${expectedRepositoryBase.replace(/\/$/, '')}${fixture.publicPath}`;
-    const imageState = await image.evaluate((node) => ({
-      srcAttr: node.getAttribute('src'),
-      currentSrc: node.currentSrc,
-      complete: node.complete,
-      naturalWidth: node.naturalWidth,
-      naturalHeight: node.naturalHeight,
-    }));
+    const imageState = await image.evaluate(async (node) => {
+      const srcAttr = node.getAttribute('src');
+      if (!srcAttr) throw new Error('Awakening icon img is missing src');
+      await node.decode();
+      return {
+        srcAttr,
+        currentSrc: node.currentSrc,
+        complete: node.complete,
+        naturalWidth: node.naturalWidth,
+        naturalHeight: node.naturalHeight,
+      };
+    });
+    const srcUrl = new URL(imageState.srcAttr, base);
+    if (srcUrl.origin !== base.origin || srcUrl.pathname !== expectedPath) {
+      throw new Error(`Hero ${fixture.heroId} icon src mismatch: expected=${expectedPath} actual=${srcUrl.pathname}`);
+    }
+    if (!imageState.currentSrc) {
+      throw new Error(`Hero ${fixture.heroId} icon currentSrc remained empty after decode`);
+    }
     const currentUrl = new URL(imageState.currentSrc, base);
     if (currentUrl.origin !== base.origin || currentUrl.pathname !== expectedPath) {
       throw new Error(`Hero ${fixture.heroId} icon URL mismatch: expected=${expectedPath} actual=${currentUrl.pathname}`);
