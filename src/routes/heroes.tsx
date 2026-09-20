@@ -338,7 +338,7 @@ function HeroGridPage() {
         <section aria-label="영웅 목록 필터" className="mt-4 rounded-lg border border-border bg-card p-3 sm:p-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <span className="mb-1.5 block text-xs font-bold text-foreground">통합 필터</span>
+              <span className="mb-1.5 block text-[13px] font-bold text-foreground">통합 필터</span>
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="통합 필터 분류">
                 <FilterSectionButton
                   active={openFilterSections.rarity}
@@ -379,7 +379,7 @@ function HeroGridPage() {
                   active={rarity === ALL_RARITIES}
                   onClick={() => setRarity(ALL_RARITIES)}
                 >
-                  전체
+                  <span className="text-[13px]">전체</span>
                 </FilterButton>
                 {rarityOptions.map((option) => (
                   <FilterButton
@@ -437,7 +437,7 @@ function HeroGridPage() {
             {openFilterSections.faction ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="진영 필터">
                 <FilterButton active={factionIds.length === 0} onClick={() => setFactionIds([])}>
-                  전체
+                  <span className="text-[13px]">전체</span>
                 </FilterButton>
                 {factionOptions.map((option) => (
                   <FilterButton
@@ -462,7 +462,7 @@ function HeroGridPage() {
             {openFilterSections.origin ? (
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="출전작 필터">
                 <FilterButton active={originId === null} onClick={() => setOriginId(null)}>
-                  전체
+                  <span className="text-[13px]">전체</span>
                 </FilterButton>
                 {originOptions.map((option) => (
                   <FilterButton
@@ -478,7 +478,7 @@ function HeroGridPage() {
           </div>
 
           <div className="mt-4 border-t border-border pt-4">
-            <label htmlFor="hero-search" className="mb-1.5 block text-xs font-bold text-foreground">
+            <label htmlFor="hero-search" className="mb-1.5 block text-[13px] font-bold text-foreground">
               이름 검색
             </label>
             <div className="relative">
@@ -554,7 +554,7 @@ function FilterSectionButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`h-10 whitespace-nowrap rounded-md border px-4 text-xs font-bold transition ${
+      className={`h-10 whitespace-nowrap rounded-md border px-4 text-[13px] font-bold transition ${
         active
           ? "border-foreground bg-foreground text-background"
           : "border-border bg-background text-foreground hover:border-foreground/30"
