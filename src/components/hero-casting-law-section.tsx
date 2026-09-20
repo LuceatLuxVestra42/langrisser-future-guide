@@ -69,7 +69,41 @@ function summaryToneClass(slotType: string) {
   return "border-border bg-background";
 }
 
-function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
+function GoldBadge({
+  value,
+  size = "summary",
+}: {
+  value: number;
+  size?: "summary" | "level";
+}) {
+  const iconSize = size === "summary" ? 28 : 24;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold text-foreground`}
+      data-casting-law-gold={value}
+    >
+      <img
+        src={getSoldierCommonMaterialIconUrl("gold")}
+        alt=""
+        aria-hidden="true"
+        width={iconSize}
+        height={iconSize}
+        loading="lazy"
+        decoding="async"
+        className={size === "summary" ? "h-7 w-7 shrink-0 object-contain" : "h-6 w-6 shrink-0 object-contain"}
+      />
+      <span className="font-extrabold tabular-nums">×{formatNumber(value)}</span>
+    </span>
+  );
+}
+
+function MaterialBadges({
+  materials,
+  gold,
+}: {
+  materials: CastingLawMaterial[];
+  gold: number;
+}) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {materials.map((material) => (
@@ -91,6 +125,7 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
           <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
         </span>
       ))}
+      <GoldBadge value={gold} />
     </div>
   );
 }
@@ -98,41 +133,15 @@ function MaterialBadges({ materials }: { materials: CastingLawMaterial[] }) {
 function RangeSummary({
   title,
   totals,
-  showGoldIcon = false,
 }: {
   title: string;
   totals: CastingLawRangeTotals;
-  showGoldIcon?: boolean;
 }) {
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="text-xs font-extrabold text-foreground">{title}</h4>
-        {showGoldIcon ? (
-          <span
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-1 text-[11px] font-semibold text-foreground sm:px-2"
-            data-casting-law-total-gold={totals.gold}
-          >
-            <img
-              src={getSoldierCommonMaterialIconUrl("gold")}
-              alt=""
-              aria-hidden="true"
-              width={24}
-              height={24}
-              loading="lazy"
-              decoding="async"
-              className="h-6 w-6 shrink-0 object-contain"
-            />
-            <span className="font-extrabold tabular-nums">×{formatNumber(totals.gold)}</span>
-          </span>
-        ) : (
-          <span className="text-xs font-bold tabular-nums text-muted-foreground">
-            골드 {formatNumber(totals.gold)}
-          </span>
-        )}
-      </div>
+      <h4 className="text-xs font-extrabold text-foreground">{title}</h4>
       <div className="mt-2">
-        <MaterialBadges materials={totals.materials} />
+        <MaterialBadges materials={totals.materials} gold={totals.gold} />
       </div>
     </div>
   );
@@ -149,13 +158,11 @@ function LevelTable({
         <colgroup>
           <col className="w-14 sm:w-16" />
           <col />
-          <col className="w-[5.25rem] sm:w-24" />
         </colgroup>
         <thead className="bg-muted/50">
           <tr className="border-b border-border">
             <th className="px-2 py-2 text-left font-bold text-muted-foreground sm:px-3">단계</th>
             <th className="px-2 py-2 text-left font-bold text-muted-foreground sm:px-3">필요 재료</th>
-            <th className="px-2 py-2 text-right font-bold text-muted-foreground sm:px-3">골드</th>
           </tr>
         </thead>
         <tbody>
@@ -185,10 +192,8 @@ function LevelTable({
                       <span className="font-extrabold tabular-nums">×{formatNumber(material.count)}</span>
                     </span>
                   ))}
+                  <GoldBadge value={level.goldCost} size="level" />
                 </div>
-              </td>
-              <td className="whitespace-nowrap px-2 py-2.5 text-right text-[11px] font-bold tabular-nums text-foreground sm:px-3 sm:text-xs">
-                {formatNumber(level.goldCost)}
               </td>
             </tr>
           ))}
@@ -284,7 +289,7 @@ export function HeroCastingLawMaterials({
         <div className="mt-4 rounded-xl border border-border bg-muted/20 p-4" data-casting-law-hero-total="true">
           <h3 className="text-sm font-extrabold text-foreground">율정 합계비용</h3>
           <div className="mt-3">
-            <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} showGoldIcon />
+            <RangeSummary title="Lv.1~10" totals={castingLaw.totals.level1to10} />
           </div>
         </div>
 
