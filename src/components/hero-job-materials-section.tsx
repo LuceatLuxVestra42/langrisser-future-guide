@@ -352,7 +352,7 @@ function HeroJobMaterialsDisclosure({
               <ul className="flex flex-wrap items-center gap-3">
                 {level.materials.map((material, materialIndex) => (
                   <li
-                    key={\`\${material.id}-\${materialIndex}\`}
+                    key={`${material.id}-${materialIndex}`}
                     className="flex items-center gap-1.5"
                     data-job-material-id={material.id}
                   >
@@ -390,7 +390,7 @@ function HeroFinalJobStatGraph({
         const domain = domains[stat];
         const barPercent = value == null ? 0 : getJobStatBarPercent(value, domain);
         const centralBondValue = centralBondStats?.[stat] ?? null;
-        const iconUrl = \`\${import.meta.env.BASE_URL}images/shared/stats/\${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}\`;
+        const iconUrl = `${import.meta.env.BASE_URL}images/shared/stats/${HERO_FINAL_JOB_STAT_ICON_BY_KEY[stat]}`;
 
         return (
           <div
@@ -404,7 +404,7 @@ function HeroFinalJobStatGraph({
             {value == null ? null : (
               <div
                 className="absolute inset-y-0 left-0 bg-foreground/10"
-                style={{ width: \`\${barPercent}%\` }}
+                style={{ width: `${barPercent}%` }}
                 aria-hidden="true"
               />
             )}
@@ -460,7 +460,7 @@ function HeroFinalJobHeartFetter({
       <div className="mt-2 space-y-2">
         {effects.map((effect) => (
           <div
-            key={\`\${effect.level}-\${effect.skillId}\`}
+            key={`${effect.level}-${effect.skillId}`}
             className="rounded-md border border-border/70 bg-muted/20 px-2.5 py-2.5"
             data-heart-fetter-level={effect.level}
             data-heart-fetter-skill-id={effect.skillId}
@@ -499,7 +499,7 @@ function HeroJobTreeCard({
   const attackRange = isFinalJob ? getStaticHeroFinalJobAttackRange(row.jobId) : null;
 
   if (isFinalJob && (!army || attackRange == null || !finalJobDetail)) {
-    throw new Error(\`Final Job \${row.jobId} is missing frozen army, attack-range, or stat metadata.\`);
+    throw new Error(`Final Job ${row.jobId} is missing frozen army, attack-range, or stat metadata.`);
   }
 
   return (
@@ -515,12 +515,12 @@ function HeroJobTreeCard({
     >
       <div className="flex min-w-0 items-center justify-between gap-3">
         <h3 className="min-w-0 truncate text-sm font-extrabold text-foreground">
-          {row.rank == null ? jobName : \`T\${row.rank} \${jobName}\`}
+          {row.rank == null ? jobName : `T${row.rank} ${jobName}`}
         </h3>
         {isFinalJob && army ? (
           <div
             className="flex shrink-0 items-center"
-            title={army.armyNameCn ?? \`Army \${army.armyId}\`}
+            title={army.armyNameCn ?? `Army ${army.armyId}`}
             data-hero-final-job-army-mark="true"
           >
             <HeroFinalJobArmyIcon armyId={army.armyId} armyNameCn={army.armyNameCn} />
@@ -602,7 +602,7 @@ function HeroNormalJobTree({
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const movementRows = getStaticHeroJobMovement(heroId);
   if (!movementRows) {
-    throw new Error(\`Hero \${heroId} has no frozen job-movement record.\`);
+    throw new Error(`Hero ${heroId} has no frozen job-movement record.`);
   }
 
   const allowedSet = allowedJobConnectionIds ? new Set(allowedJobConnectionIds) : null;
@@ -645,7 +645,7 @@ function HeroNormalJobTree({
         const existing = t4ParentByConnectionId.get(next.jobConnectionId);
         if (existing != null && existing !== current.jobConnectionId) {
           throw new Error(
-            \`Hero \${heroId} T4 JobConnection \${next.jobConnectionId} has conflicting T3 parents \${existing}/\${current.jobConnectionId}.\`,
+            `Hero ${heroId} T4 JobConnection ${next.jobConnectionId} has conflicting T3 parents ${existing}/${current.jobConnectionId}.`,
           );
         }
         t4ParentByConnectionId.set(next.jobConnectionId, current.jobConnectionId);
@@ -659,7 +659,7 @@ function HeroNormalJobTree({
       .map((job) => {
         const row = rowByConnectionId.get(job.jobConnectionId);
         if (!row) {
-          throw new Error(\`Hero \${heroId} JobConnection \${job.jobConnectionId} is missing frozen movement metadata.\`);
+          throw new Error(`Hero ${heroId} JobConnection ${job.jobConnectionId} is missing frozen movement metadata.`);
         }
         return row;
       })
@@ -672,10 +672,10 @@ function HeroNormalJobTree({
 
   for (const t4 of t4Rows) {
     if (!t4ParentByConnectionId.has(t4.jobConnectionId)) {
-      throw new Error(\`Hero \${heroId} T4 JobConnection \${t4.jobConnectionId} has no explicit T3 predecessor in the verified job tree.\`);
+      throw new Error(`Hero ${heroId} T4 JobConnection ${t4.jobConnectionId} has no explicit T3 predecessor in the verified job tree.`);
     }
     if (!finalJobDetailByJobId.has(t4.jobId)) {
-      throw new Error(\`Hero \${heroId} T4 Job \${t4.jobId} has no projected final stat detail.\`);
+      throw new Error(`Hero ${heroId} T4 Job ${t4.jobId} has no projected final stat detail.`);
     }
   }
 
@@ -777,7 +777,7 @@ export function HeroJobMaterialsSection({
   const { detail } = useLoaderData({ from: "/heroes_/$heroId" });
   const hero = getStaticHeroJobMaterials(heroId);
   if (!hero) {
-    throw new Error(\`Hero \${heroId} has no frozen job-material record.\`);
+    throw new Error(`Hero ${heroId} has no frozen job-material record.`);
   }
 
   const allowedJobConnectionIdSet = allowedJobConnectionIds
@@ -802,7 +802,7 @@ export function HeroJobMaterialsSection({
 
   if (mode === "sp") {
     if (!detail.sp.released || !detail.sp.finalJob) {
-      throw new Error(\`Hero \${heroId} requested SP form without a released frozen SP final job.\`);
+      throw new Error(`Hero ${heroId} requested SP form without a released frozen SP final job.`);
     }
     return <HeroSpJobMovementSection heroId={heroId} finalJob={detail.sp.finalJob} />;
   }
