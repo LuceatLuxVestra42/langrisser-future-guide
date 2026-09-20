@@ -2874,5 +2874,38 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [126], note: "Legacy Korean sheet hero/data/팟시르.js; exact Hero CN + Skill_Patsyr3 icon + type/effect parity against current generated Skill 12271." },
     },
+
+    {
+      skillId: 12290,
+      sourceNameCn: "星丽剑",
+      nameKr: "성려검",
+      descKr: "[마법 피해] 단일 적 부대를 공격해 1.5배 피해를 준다. 전투 진입 전 병사 사거리 +1. 행동 종료 시 자신 주위 2칸 범위 내 모든 아군의 디버프 2개를 제거하고 지력 1.5배 수치만큼 생명을 회복한다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [141], note: "Legacy Korean sheet hero/data/카유라.js; exact Hero CN + Skill_Kayura3 icon + type/cooldown/range/target/effect parity against current generated Skill 12290." },
+    },
+    {
+      skillId: 12313,
+      sourceNameCn: "影斩",
+      nameKr: "그림자 베기",
+      descKr: "[물리 피해] 단일 적 부대를 공격해 1.4배 피해를 준다. 전투 진입 전 이동하지 않았다면 호위를 무시하고, 적을 처치한 후 2칸 재이동할 수 있다. 해당 스킬은 근접전 피해 감면 영향을 받지 않는다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [106], note: "Legacy Korean sheet hero/data/입실론.js; exact Hero CN + Skill_Epsilon3 icon + type/cooldown/range/target/effect parity against current generated Skill 12313." },
+    },
+    {
+      skillId: 12318,
+      sourceNameCn: "林间传送",
+      nameKr: "숲길 전이",
+      descKr: "[지원] 아군 1부대를 범위 내 임의의 숲 또는 초원 지형으로 이동시킨다. 플레이어 부대에만 사용할 수 있다.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [105], note: "Legacy Korean sheet hero/data/뮤.js; exact Hero CN + Skill_Mu1 icon + type/cooldown/range/target/effect parity against current generated Skill 12318." },
+    },
+    {
+      skillId: 12321,
+      sourceNameCn: "藤蔓缠绕",
+      nameKr: "휘감기는 덩굴",
+      descKr: "[마법 피해] 범위 내 적들에게 0.33배 마법 피해를 준다. 명중한 적이 숲 또는 초원 지형에 있으면 이동력 -3, 그 외 지형이면 이동력 -1. 2턴 지속.",
+      status: "LEGACY_SHEET_KR",
+      source: { type: "legacy-korean-sheet", heroIds: [105], note: "Legacy Korean sheet hero/data/뮤.js; exact Hero CN + Skill_Mu4 icon + type/cooldown/range/area/effect parity against current generated Skill 12321." },
+    },
   ],
 };
