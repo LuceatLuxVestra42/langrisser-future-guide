@@ -743,7 +743,7 @@ function HeroDetailPage() {
           <div className="mt-7 border-t border-border pt-5" data-hero-awakening-skill="true">
             <h3 className="mb-3 text-sm font-bold text-foreground">각성기</h3>
             {detail.skills.awakening.status === "VERIFIED" && detail.skills.awakening.skill ? (
-              <div className="grid gap-3 lg:grid-cols-2">
+              <div className="grid gap-3">
                 <SkillCard heroId={hero.heroId} skill={detail.skills.awakening.skill} />
               </div>
             ) : detail.skills.awakening.status === "NONE" ? (
