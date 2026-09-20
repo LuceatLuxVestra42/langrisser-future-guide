@@ -1212,5 +1212,13 @@ export const HERO_SKILL_KR_CATALOG: HeroSkillKrCatalog = {
       status: "LEGACY_SHEET_KR",
       source: { type: "legacy-korean-sheet", heroIds: [99263], note: "Legacy Korean sheet hero/data/시벨리.js; exact Hero CN + icon + metadata/effect parity against current generated Skill 13076." },
     },
+    {
+      skillId: 5023,
+      sourceNameCn: "魔防应援",
+      nameKr: "마방 지원",
+      descKr: "행동 종료 시 인접한 아군 1명의 마방 +20%, 기절·강화 방해·이동력 감소 면역 부여, 1턴 지속.",
+      status: "CONFIRMED_KR",
+      source: { type: "manual-review", heroIds: [5, 22, 30, 56, 91, 134, 99184, 99191, 99203], note: "Korean-server in-game wording/effect manually verified; current generated Skill 5023 ID/CN/effect cross-checked. Legacy +30% records are not reused." },
+    },
   ],
 };
