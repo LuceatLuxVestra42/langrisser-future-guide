@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+
 import { getHeroAwakeningMaterialIconUrl } from "@/lib/hero-awakening-material-icon-assets";
 import {
   getStaticHeroAwakeningMaterials,
@@ -53,16 +55,22 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
   if (!hero.stage1 && !hero.awakening) return null;
 
   return (
-    <section
-      className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+    <details
+      className="group mt-4 border-t border-border"
       data-hero-awakening-materials="true"
       data-awakening-stage1-material-entry-count={hero.stage1?.materials.length ?? 0}
       data-awakening-stage2-material-entry-count={hero.awakening?.materials.length ?? 0}
       data-awakening-skill-id={hero.awakening?.skillId ?? ""}
     >
-      <h2 className="text-lg font-extrabold tracking-tight text-foreground">각성 재료</h2>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 pt-4">
+        <h4 className="text-sm font-extrabold text-foreground">각성 재료</h4>
+        <ChevronDown
+          className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
 
-      <div className="mt-4 flex flex-col gap-3 xl:flex-row">
+      <div className="mt-3 flex flex-col gap-3 xl:flex-row">
         {hero.stage1 ? (
           <div className="min-w-0 flex-1 rounded-xl border border-border bg-muted/20 p-4" data-awakening-stage-section="1">
             <p className="text-sm font-extrabold text-foreground">1단계 · 스킬 Cost 상한 6</p>
@@ -77,6 +85,6 @@ export function HeroAwakeningMaterialsSection({ heroId }: { heroId: number }) {
           </div>
         ) : null}
       </div>
-    </section>
+    </details>
   );
 }

@@ -751,6 +751,7 @@ function HeroDetailPage() {
             ) : (
               <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">각성기 없음</p>
             )}
+            <HeroAwakeningMaterialsSection heroId={hero.heroId} />
           </div>
 
           {isSpForm ? (
@@ -778,7 +779,6 @@ function HeroDetailPage() {
           mode={isSpForm ? "sp" : "normal"}
           allowedJobConnectionIds={selectedMatthewJobConnectionIds}
         />
-        <HeroAwakeningMaterialsSection heroId={hero.heroId} />
 
         <section
           className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
