@@ -1,0 +1,130 @@
+name: Hero SP Artwork Leon Source Probe
+
+on:
+  push:
+    branches:
+      - work/hero-sp-artwork-source-probe-20260920
+    paths:
+      - scripts/probe-hero-sp-artwork-leon.py
+      - .github/workflows/hero-sp-artwork-leon-source-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install pinned extraction dependencies
+        run: python -m pip install --disable-pip-version-check UnityPy==1.25.3 Pillow numpy
+
+      - name: Resolve exact Leon SP source chain
+        run: python scripts/probe-hero-sp-artwork-leon.py
+
+      - name: Restore proven Spine 3.3 geometry renderer
+        run: |
+          mkdir -p .runtime/geometry
+          git show 9aa141fd54bbbed13b95bf5f2f918e0ec2e65158:tools/skin-fullart0/SpineGeometry.cs > .runtime/geometry/SpineGeometry.cs
+          git show 9aa141fd54bbbed13b95bf5f2f918e0ec2e65158:scripts/render-skin-fullart0-geometry.py > .runtime/render-spine-geometry.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.runtime/render-spine-geometry.py')
+          s=p.read_text(encoding='utf-8').replace("'skinId': 102,", "'heroId': 6, 'charImageId': 1013,")
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Checkout exact Spine 3.3-era runtime
+        uses: actions/checkout@v4
+        with:
+          repository: EsotericSoftware/spine-runtimes
+          ref: 1c1936532527900f74cfb58f7002998bf157b254
+          path: .runtime/spine-runtimes
+          fetch-depth: 1
+
+      - name: Build version-matched geometry probe
+        run: |
+          runtime_src="$GITHUB_WORKSPACE/.runtime/spine-runtimes/spine-csharp/src"
+          program="$GITHUB_WORKSPACE/.runtime/geometry/SpineGeometry.cs"
+          cat > .runtime/geometry/SpineGeometry.csproj <<EOF
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net8.0</TargetFramework>
+              <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+              <Nullable>disable</Nullable>
+              <ImplicitUsings>disable</ImplicitUsings>
+              <LangVersion>latest</LangVersion>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+            </PropertyGroup>
+            <ItemGroup>
+              <Compile Include="$runtime_src/**/*.cs" />
+              <Compile Include="$program" />
+            </ItemGroup>
+          </Project>
+          EOF
+          dotnet build .runtime/geometry/SpineGeometry.csproj -c Release
+
+      - name: Render Leon SP idle_Normal with alpha
+        run: |
+          atlas="$(python -c "import json; print(json.load(open('.probe-out/leon-sp/source-evidence.json'))['spine']['atlasPath'])")"
+          skel="$(python -c "import json; print(json.load(open('.probe-out/leon-sp/source-evidence.json'))['spine']['skeletonPath'])")"
+          texture="$(python -c "import json; print(json.load(open('.probe-out/leon-sp/source-evidence.json'))['spine']['texturePath'])")"
+          dotnet run --project .runtime/geometry/SpineGeometry.csproj -c Release --no-build --             "$atlas" "$skel" ".probe-out/leon-sp/geometry.json"
+          python .runtime/render-spine-geometry.py             --geometry ".probe-out/leon-sp/geometry.json"             --texture "$texture"             --output ".probe-out/leon-sp/leon-sp.png"             --evidence-output ".probe-out/leon-sp/render-evidence.json"
+
+      - name: Freeze probe summary
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from PIL import Image
+          root=Path('.probe-out/leon-sp')
+          source=json.load(open(root/'source-evidence.json',encoding='utf-8'))
+          render=json.load(open(root/'render-evidence.json',encoding='utf-8'))
+          p=root/'leon-sp.png'
+          im=Image.open(p).convert('RGBA')
+          alpha=im.getchannel('A')
+          result={
+            'schemaVersion':1,
+            'status':'PASS_LEON_SP_OFFICIAL_TRANSPARENT_RENDER',
+            'heroId':6,
+            'charImageId':1013,
+            'sourceSpinePath':source['authority']['sourceSpinePath'],
+            'bundleSha256':source['authority']['bundleSha256'],
+            'spineVersion':source['spine']['version'],
+            'pose':render['render']['pose'],
+            'width':im.width,'height':im.height,
+            'hasAlpha':alpha.getextrema()[0] < 255,
+            'sizeBytes':p.stat().st_size,
+            'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),
+            'renderableAttachmentCount':render['render']['renderableAttachmentCount'],
+            'triangleCount':render['render']['triangleCount'],
+            'guardrails':source['guardrails']
+          }
+          if not result['hasAlpha']: raise RuntimeError('Leon SP render has no transparent pixels')
+          (root/'summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result,ensure_ascii=False))
+          PY
+
+      - name: Upload Leon SP probe artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-sp-artwork-leon-source-probe
+          path: .probe-out/leon-sp
+          if-no-files-found: error
+          retention-days: 7
