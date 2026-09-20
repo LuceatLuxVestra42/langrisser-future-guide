@@ -1,0 +1,34 @@
+name: Hero SP Artwork CharImage Probe
+
+on:
+  push:
+    branches:
+      - work/hero-sp-artwork-charimage-probe-20260920
+    paths:
+      - scripts/probe-hero-sp-artwork-charimage.py
+      - .github/workflows/hero-sp-artwork-charimage-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install UnityPy
+        shell: pwsh
+        run: python -m pip install --disable-pip-version-check --quiet UnityPy==1.25.3
+      - name: Probe official installer for Leon SP CharImage 1013
+        shell: pwsh
+        run: python scripts/probe-hero-sp-artwork-charimage.py
+      - name: Upload probe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-sp-artwork-charimage-1013-probe
+          path: ${{ runner.temp }}/hero-sp-artwork-charimage-probe/report
+          if-no-files-found: warn
+          retention-days: 5
