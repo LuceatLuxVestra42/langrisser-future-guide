@@ -149,16 +149,18 @@ async function verifyHeroFormSwitch(page, label) {
     null,
     { timeout: 45000 },
   );
-  check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP movement JobID mismatch`);
-  check(await spMovement.getAttribute("data-army-id") === "3", `Hero 6 ${label} SP movement Army_ID mismatch`);
-  const spArmyIcon = spMovement.locator('[data-hero-final-job-army-icon="official"]');
+  const spCard = spMovement.locator('[data-job-rank="SP"][data-job-id]');
+  check(await spCard.count() === 1, `Hero 6 ${label} SP job card missing or duplicated`);
+  check(await spCard.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP movement JobID mismatch`);
+  check(await spCard.getAttribute("data-army-id") === "3", `Hero 6 ${label} SP movement Army_ID mismatch`);
+  const spArmyIcon = spCard.locator('[data-hero-final-job-army-icon="official"]');
   check(await spArmyIcon.count() === 1, `Hero 6 ${label} SP army icon missing`);
   const spArmyIconSrc = await spArmyIcon.getAttribute("src");
   check(spArmyIconSrc?.endsWith("/images/army/Icon_Occupation_Cavalry.png") === true, `Hero 6 ${label} SP army icon mismatch: ${spArmyIconSrc}`);
-  const spMoveType = Number(await spMovement.getAttribute("data-move-type"));
+  const spMoveType = Number(await spCard.getAttribute("data-move-type"));
   const expectedSpIconFile = movementIconFileByType[spMoveType];
   check(expectedSpIconFile, `Hero 6 ${label} SP movement has unsupported MoveType ${spMoveType}`);
-  const spMovementIconSrc = await spMovement.locator('img[src*="/images/shared/movement/"]').getAttribute("src");
+  const spMovementIconSrc = await spCard.locator('img[src*="/images/shared/movement/"]').getAttribute("src");
   check(spMovementIconSrc?.endsWith(`/images/shared/movement/${expectedSpIconFile}`) === true, `Hero 6 ${label} SP movement icon mismatch for MoveType ${spMoveType}: ${spMovementIconSrc}`);
   check(await page.locator('[data-hero-job-tree="true"]').count() === 0, `Hero 6 ${label} normal job tree leaked into SP form`);
   check(await page.locator('[data-hero-job-materials="true"]').count() === 0, `Hero 6 ${label} normal job materials leaked into SP form`);
@@ -174,7 +176,7 @@ async function verifyHeroFormSwitch(page, label) {
   check(await talent.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} talent did not switch to SP form`);
   check(await talent.locator('[data-hero-talent-min-star]').getAttribute("data-hero-talent-min-star") === "1", `Hero 6 ${label} SP talent progression did not start at 1 star`);
 
-  check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP final-job isolation mismatch`);
+  check(await spCard.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP final-job isolation mismatch`);
 
   const spHeartFetterJobIds = await page.locator('[data-hero-heart-fetter="true"] [data-heart-fetter-job-id]').evaluateAll((nodes) =>
     nodes.map((node) => Number(node.getAttribute("data-heart-fetter-job-id"))),
