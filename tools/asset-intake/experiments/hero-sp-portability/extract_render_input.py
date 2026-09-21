@@ -8,7 +8,7 @@ UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safa
 ev=json.loads(EVIDENCE.read_text(encoding='utf-8'))
 rows=[r for r in ev['records'] if int(r['heroId'])==HERO_ID and int(r['charImageId'])==CHAR_IMAGE_ID]
 if len(rows)!=1: raise RuntimeError(f'evidence record cardinality {len(rows)}')
-r=rows[0]; ver=ev['officialInstallerVersion']; base=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{ver}'
+r=rows[0]; ver=ev['source']['officialInstallerVersion']; base=f'http://mhmnzupdate.zlongame.com/MHMNZ/InstallVersion/InstallPage_{ver}'
 out=pathlib.Path('out')/str(HERO_ID); rawdir=out/'raw'; rawdir.mkdir(parents=True,exist_ok=True)
 
 def norm(x):return str(x).replace('\\','/').strip('/').lower()
