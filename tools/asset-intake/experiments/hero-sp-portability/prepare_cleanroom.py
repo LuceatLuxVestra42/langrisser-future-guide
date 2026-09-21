@@ -40,7 +40,7 @@ def main():
         files.append({'path': name, 'sha256': sha256(dst)})
     if any((p / '.git').exists() for p in [target, *target.parents]):
         raise SystemExit('clean-room workspace must not be inside a Git checkout')
-    forbidden = [b'git show ', b'langrisser-future-guide', b'public/images/heroes/sp']
+    forbidden = [b'git' + b' show ', b'langrisser-' + b'future-guide', b'public/images/heroes/' + b'sp']
     for row in files:
         if not row['path'].endswith(('.py', '.cs')):
             continue
