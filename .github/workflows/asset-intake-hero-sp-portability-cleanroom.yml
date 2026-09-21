@@ -1,0 +1,72 @@
+name: Asset Intake Hero SP Portability Clean Room
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  run-cleanroom:
+    if: github.head_ref == 'test/asset-portability-cleanroom-20260922'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout experiment setup
+        uses: actions/checkout@v5
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Setup dotnet 8.0.425
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.425'
+
+      - name: Prepare isolated clean room
+        run: python tools/asset-intake/experiments/hero-sp-portability/prepare_cleanroom.py
+
+      - name: Install exact Python dependencies
+        run: python -m pip install --disable-pip-version-check -r /tmp/langrisser-asset-portability-sp/requirements.lock.txt
+
+      - name: Validate clean-room readiness
+        working-directory: /tmp/langrisser-asset-portability-sp
+        run: |
+          test ! -e .git
+          python run_cleanroom.py
+
+      - name: Execute five-case portability experiment
+        working-directory: /tmp/langrisser-asset-portability-sp
+        run: python run_cleanroom.py --execute
+
+      - name: Verify PASS manifest
+        working-directory: /tmp/langrisser-asset-portability-sp
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('out/manifest.json').read_text(encoding='utf-8'))
+          assert x['status']=='PASS_CLEANROOM_SP_PORTABILITY', x
+          assert x['count']==5, x
+          assert x['heroIds']==[6,13,29,37,56], x
+          assert x['guardrails']['nameJoin'] is False
+          assert x['guardrails']['idArithmetic'] is False
+          assert x['guardrails']['repositoryHistoryRuntimeDependency'] is False
+          print(json.dumps({'status':x['status'],'count':x['count'],'heroIds':x['heroIds']}))
+          PY
+
+      - name: Upload clean-room proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-sp-portability-cleanroom-proof
+          path: |
+            /tmp/langrisser-asset-portability-sp/SETUP.json
+            /tmp/langrisser-asset-portability-sp/out/manifest.json
+            /tmp/langrisser-asset-portability-sp/out/*/summary.json
+            /tmp/langrisser-asset-portability-sp/out/*.webp
+            /tmp/langrisser-asset-portability-sp/out/*/*.webp
+          if-no-files-found: warn
+          retention-days: 7
