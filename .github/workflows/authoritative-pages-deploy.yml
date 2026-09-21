@@ -28,7 +28,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          printf 'SOURCE_SHA=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          source_sha="$(git rev-parse HEAD)"
+          printf 'SOURCE_SHA=%s\n' "$source_sha" >> "$GITHUB_ENV"
+          printf 'EXPECTED_SOURCE_SHA=%s\n' "$source_sha" >> "$GITHUB_ENV"
           printf 'SOURCE_REF=%s\n' 'v1-stable' >> "$GITHUB_ENV"
 
       - name: Setup Bun
