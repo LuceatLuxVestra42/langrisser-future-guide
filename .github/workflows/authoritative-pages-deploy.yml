@@ -1,9 +1,6 @@
 name: Authoritative GitHub Pages Deploy
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -21,10 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - name: Checkout exact product source
+      - name: Checkout frozen V1 product source
         uses: actions/checkout@v5
         with:
+          ref: v1-stable
           fetch-depth: 0
+
+      - name: Capture frozen V1 source identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'SOURCE_SHA=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          printf 'SOURCE_REF=%s\n' 'v1-stable' >> "$GITHUB_ENV"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -153,8 +158,8 @@ jobs:
           cat > dist/client/authoritative-pages-source.json <<JSON
           {
             "status": "AUTHORITATIVE_GITHUB_PAGES_DEPLOYMENT",
-            "sourceSha": "${GITHUB_SHA}",
-            "sourceRef": "${GITHUB_REF_NAME}",
+            "sourceSha": "${SOURCE_SHA}",
+            "sourceRef": "${SOURCE_REF}",
             "skinSource": "CURRENT_REPOSITORY_FROZEN_CONSUMER",
             "skinPngCount": 540,
             "heroArtworkResolvedCount": 267,
@@ -191,12 +196,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b gh-pages
           git add -A
-          git commit -m "Authoritative Pages deploy ${GITHUB_SHA}"
+          git commit -m "Authoritative Pages deploy ${SOURCE_SHA}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages:gh-pages
 
       - name: Wait for authoritative Pages source to become live
         env:
-          EXPECTED_SOURCE_SHA: ${{ github.sha }}
           HOSTED_BASE_URL: ${{ env.HOSTED_BASE_URL }}
         shell: bash
         run: |
@@ -207,20 +211,20 @@ jobs:
             if curl --silent --show-error --fail --location --max-time 20 "$probe" -o "$manifest"; then
               live_sha="$(node -e "const fs=require('fs');try{const value=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));process.stdout.write(String(value.sourceSha||''))}catch{}" "$manifest")"
               printf 'PAGES_READINESS attempt=%s expected=%s live=%s timestamp=%s\n' \
-                "$attempt" "$EXPECTED_SOURCE_SHA" "${live_sha:-<missing>}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-              if [[ "$live_sha" == "$EXPECTED_SOURCE_SHA" ]]; then
+                "$attempt" "$SOURCE_SHA" "${live_sha:-<missing>}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              if [[ "$live_sha" == "$SOURCE_SHA" ]]; then
                 printf 'PAGES_READINESS_PASS expected=%s timestamp=%s\n' \
-                  "$EXPECTED_SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                  "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
                 exit 0
               fi
             else
               printf 'PAGES_READINESS_RETRY attempt=%s expected=%s timestamp=%s\n' \
-                "$attempt" "$EXPECTED_SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+                "$attempt" "$SOURCE_SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
             fi
             sleep 10
           done
           printf 'PAGES_READINESS_FAIL expected=%s baseUrl=%s timestamp=%s\n' \
-            "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+            "$SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
           cat "$manifest" >&2 2>/dev/null || true
           exit 1
 
@@ -231,7 +235,6 @@ jobs:
 
       - name: Verify actual hosted composed surface
         env:
-          EXPECTED_SOURCE_SHA: ${{ github.sha }}
           HOSTED_BASE_URL: ${{ env.HOSTED_BASE_URL }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -245,7 +248,7 @@ jobs:
 
             for attempt in $(seq 1 "$max_attempts"); do
               printf 'HOSTED_QA_START validator=%s attempt=%s/%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
-                "$validator" "$attempt" "$max_attempts" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                "$validator" "$attempt" "$max_attempts" "$SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
               if "$@"; then
                 printf 'HOSTED_QA_PASS validator=%s attempt=%s/%s timestamp=%s\n' \
                   "$validator" "$attempt" "$max_attempts" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -255,7 +258,7 @@ jobs:
               fi
 
               printf 'HOSTED_QA_ATTEMPT_FAIL validator=%s attempt=%s/%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
-                "$validator" "$attempt" "$max_attempts" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+                "$validator" "$attempt" "$max_attempts" "$status" "$SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
 
               if [[ "$attempt" -lt "$max_attempts" ]]; then
                 sleep 5
@@ -263,7 +266,7 @@ jobs:
             done
 
             printf 'HOSTED_QA_FAIL validator=%s attempts=%s exit=%s expectedSource=%s baseUrl=%s timestamp=%s\n' \
-              "$validator" "$max_attempts" "$status" "$EXPECTED_SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
+              "$validator" "$max_attempts" "$status" "$SOURCE_SHA" "$HOSTED_BASE_URL" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >&2
             printf '%s\n' 'HOSTED_QA_MANIFEST_PROBE_BEGIN' >&2
             curl --silent --show-error --location --max-time 20 \
               -D /tmp/hosted-manifest.headers \
@@ -276,7 +279,7 @@ jobs:
           }
 
           run_hosted_validator route-hosted-qa-strict \
-            node tools/route-hosted-qa/cli/check.mjs --expected-sha "$EXPECTED_SOURCE_SHA"
+            node tools/route-hosted-qa/cli/check.mjs --expected-sha "$SOURCE_SHA"
           run_hosted_validator authoritative-pages \
             node scripts/validate-authoritative-pages-hosted.mjs
           run_hosted_validator hero-central-discipline \
@@ -291,7 +294,8 @@ jobs:
       - name: Print authoritative deployment source
         if: always()
         run: |
-          printf 'productSource=%s\n' "$GITHUB_SHA"
+          printf 'productSource=%s\n' "$SOURCE_SHA"
+          printf 'productSourceRef=%s\n' "$SOURCE_REF"
           printf 'skinSource=%s\n' 'CURRENT_REPOSITORY_FROZEN_CONSUMER'
           printf 'heroArtworkResolvedCount=267\n'
           printf 'heroCardIconResolvedCount=267\n'
