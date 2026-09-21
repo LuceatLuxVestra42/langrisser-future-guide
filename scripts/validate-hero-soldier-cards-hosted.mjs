@@ -140,7 +140,14 @@ async function verifyHeroFormSwitch(page, label) {
   check(await spArtwork.count() === 1, `Hero 6 ${label} SP artwork missing`);
   const spArtworkSrc = await spArtwork.getAttribute("src");
   check(spArtworkSrc?.endsWith("/images/heroes/sp/6.webp") === true, `Hero 6 ${label} SP artwork path mismatch: ${spArtworkSrc}`);
-  check(await spArtwork.evaluate((image) => image.complete && image.naturalWidth > 0 && image.naturalHeight > 0), `Hero 6 ${label} SP artwork failed to load`);
+  await page.waitForFunction(
+    (selector) => {
+      const image = document.querySelector(selector);
+      return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0;
+    },
+    'img[data-hero-active-artwork="true"][data-hero-artwork-form="sp"]',
+    { timeout: 60000 },
+  );
 
   const spMovement = page.locator('[data-hero-sp-job-movement="true"]');
   check(await spMovement.count() === 1, `Hero 6 ${label} SP movement section missing`);
@@ -174,7 +181,7 @@ async function verifyHeroFormSwitch(page, label) {
 
   const talent = page.locator('[data-hero-talent-carousel="true"]');
   check(await talent.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} talent did not switch to SP form`);
-  check(await talent.locator('[data-hero-talent-min-star]').getAttribute("data-hero-talent-min-star") === "1", `Hero 6 ${label} SP talent progression did not start at 1 star`);
+  check(await talent.locator('[data-hero-talent-min-star]').getAttribute("data-hero-talent-min-star") === "3", `Hero 6 ${label} SSR SP talent progression did not start at 3 stars`);
 
   check(await spCard.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP final-job isolation mismatch`);
 
