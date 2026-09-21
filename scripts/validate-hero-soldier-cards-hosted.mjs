@@ -185,11 +185,8 @@ async function verifyHeroFormSwitch(page, label) {
 
   check(await spCard.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP final-job isolation mismatch`);
 
-  const spHeartFetterJobIds = await page.locator('[data-hero-heart-fetter="true"] [data-heart-fetter-job-id]').evaluateAll((nodes) =>
-    nodes.map((node) => Number(node.getAttribute("data-heart-fetter-job-id"))),
-  );
-  check(spHeartFetterJobIds.every((jobId) => jobId === 377), `Hero 6 ${label} SP HeartFetter isolation mismatch: ${JSON.stringify(spHeartFetterJobIds)}`);
-  check(await page.locator('[data-hero-heart-fetter="true"]').getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} HeartFetter section did not switch to SP form`);
+  const spHeartFetter = spCard.locator('[data-hero-final-job-heart-fetter]');
+  check(await spHeartFetter.count() === 1, `Hero 6 ${label} SP HeartFetter block missing or duplicated`);
 
   await page.getByRole("button", { name: "기본 전직", exact: true }).click();
   await page.waitForFunction(() => document.querySelector("main")?.getAttribute("data-hero-form-mode") === "normal", null, { timeout: 45000 });
