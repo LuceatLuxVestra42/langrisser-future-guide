@@ -9,6 +9,7 @@ HERE = Path(__file__).resolve().parent
 ALLOWLIST = [
     'fixture.v1.json',
     'requirements.lock.txt',
+    'global.json',
     'extract_render_input.py',
     'render_spine_geometry.py',
     'SpineGeometry.cs',
