@@ -72,18 +72,11 @@ for (const [path, label] of [
 }
 
 async function verifyHeroJobMovement(page, label) {
-  const section = page.locator('[data-hero-job-movement="true"]');
-  check(await section.count() === 1, `Hero 6 ${label} Job movement section missing or duplicated`);
+  const section = page.locator('[data-hero-job-tree="true"]');
+  check(await section.count() === 1, `Hero 6 ${label} Job tree section missing or duplicated`);
 
-  await page.waitForFunction(
-    () => document.querySelector('[data-hero-job-movement="true"]')?.getAttribute("data-hero-job-movement-status") === "ready",
-    null,
-    { timeout: 45000 },
-  );
-
-  check(await section.getAttribute("data-hero-job-movement-count") === String(expectedHero6MovementRows.length), `Hero 6 ${label} Job movement count mismatch`);
   const rows = section.locator("[data-job-id][data-move-type][data-move-point]");
-  check(await rows.count() === expectedHero6MovementRows.length, `Hero 6 ${label} hydrated Job movement row count mismatch`);
+  check(await rows.count() === expectedHero6MovementRows.length, `Hero 6 ${label} Job tree row count mismatch`);
 
   const actualRows = await rows.evaluateAll((nodes) => nodes.map((node) => ({
     jobId: Number(node.getAttribute("data-job-id")),
@@ -91,16 +84,6 @@ async function verifyHeroJobMovement(page, label) {
     movePoint: Number(node.getAttribute("data-move-point")),
   })));
   check(JSON.stringify(actualRows) === JSON.stringify(expectedHero6MovementRows), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
-  const actualIconSources = await rows.evaluateAll((nodes) => nodes.map((node) => {
-    const moveType = Number(node.getAttribute("data-move-type"));
-    const image = node.querySelector('img[src*="/images/shared/movement/"]');
-    return { moveType, src: image?.getAttribute("src") ?? null };
-  }));
-  for (const icon of actualIconSources) {
-    const expectedFile = movementIconFileByType[icon.moveType];
-    check(expectedFile, `Hero 6 ${label} Job movement has unsupported MoveType ${icon.moveType}`);
-    check(icon.src?.endsWith(`/images/shared/movement/${expectedFile}`) === true, `Hero 6 ${label} Job movement icon mismatch for MoveType ${icon.moveType}: ${icon.src}`);
-  }
 
   for (const row of expectedHero6MovementRows) {
     const card = section.locator(`[data-job-id="${row.jobId}"]`);
@@ -108,13 +91,24 @@ async function verifyHeroJobMovement(page, label) {
     if (!expectedArmy) {
       check(await card.getAttribute("data-army-id") === "", `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly has an army projection`);
       check(await card.locator('[data-hero-final-job-army-icon]').count() === 0, `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly renders an army icon`);
+      check(await card.locator('[data-hero-final-job-mobility]').count() === 0, `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly renders final-job mobility`);
       continue;
     }
+
     check(await card.getAttribute("data-army-id") === String(expectedArmy.armyId), `Hero 6 ${label} final Job ${row.jobId} Army_ID mismatch`);
     const armyIcon = card.locator('[data-hero-final-job-army-icon="official"]');
     check(await armyIcon.count() === 1, `Hero 6 ${label} final Job ${row.jobId} official army icon missing`);
-    const src = await armyIcon.getAttribute("src");
-    check(src?.endsWith(`/images/army/${expectedArmy.iconFile}`) === true, `Hero 6 ${label} final Job ${row.jobId} army icon mismatch: ${src}`);
+    const armySrc = await armyIcon.getAttribute("src");
+    check(armySrc?.endsWith(`/images/army/${expectedArmy.iconFile}`) === true, `Hero 6 ${label} final Job ${row.jobId} army icon mismatch: ${armySrc}`);
+
+    const expectedMovementFile = movementIconFileByType[row.moveType];
+    check(expectedMovementFile, `Hero 6 ${label} Job movement has unsupported MoveType ${row.moveType}`);
+    const mobility = card.locator('[data-hero-final-job-mobility="true"]');
+    check(await mobility.count() === 1, `Hero 6 ${label} final Job ${row.jobId} mobility block missing or duplicated`);
+    const movementIcon = mobility.locator('img[src*="/images/shared/movement/"]');
+    check(await movementIcon.count() === 1, `Hero 6 ${label} final Job ${row.jobId} movement icon missing or duplicated`);
+    const movementSrc = await movementIcon.getAttribute("src");
+    check(movementSrc?.endsWith(`/images/shared/movement/${expectedMovementFile}`) === true, `Hero 6 ${label} final Job ${row.jobId} movement icon mismatch: ${movementSrc}`);
   }
 }
 
