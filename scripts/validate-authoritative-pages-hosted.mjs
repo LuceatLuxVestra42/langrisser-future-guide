@@ -268,10 +268,18 @@ try {
   await page.waitForFunction(
     ({ selector, previousSrc }) => {
       const image = document.querySelector(selector);
-      return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && (image.currentSrc || image.src) !== previousSrc;
+      return image instanceof HTMLImageElement && (image.currentSrc || image.src) !== previousSrc;
     },
     { selector: '[data-home-hero-image="true"]', previousSrc: initialHomeHeroSrc },
     { timeout: 20000 },
+  );
+  await page.waitForFunction(
+    (selector) => {
+      const image = document.querySelector(selector);
+      return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
+    },
+    '[data-home-hero-image="true"]',
+    { timeout: 60000 },
   );
   const nextHomeHeroState = await readHomeHeroState(page);
   checkHomeHeroState(nextHomeHeroState, "desktop switched");
