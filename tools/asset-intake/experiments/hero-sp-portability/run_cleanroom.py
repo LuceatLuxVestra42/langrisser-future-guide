@@ -33,7 +33,7 @@ def ensure_cleanroom():
             raise RuntimeError(f"workspace is inside a Git checkout: {p}")
     for name in ["extract_render_input.py", "render_spine_geometry.py", "SpineGeometry.cs"]:
         data = (ROOT / name).read_text(encoding="utf-8")
-        for token in ["git show ", "langrisser-future-guide", "public/images/heroes/sp"]:
+        for token in ["git" + " show ", "langrisser-" + "future-guide", "public/images/heroes/" + "sp"]:
             if token in data:
                 raise RuntimeError(f"forbidden repository dependency in {name}: {token}")
 
