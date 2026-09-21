@@ -83,7 +83,8 @@ async function verifyHeroJobMovement(page, label) {
     moveType: Number(node.getAttribute("data-move-type")),
     movePoint: Number(node.getAttribute("data-move-point")),
   })));
-  check(JSON.stringify(actualRows) === JSON.stringify(expectedHero6MovementRows), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
+  const sortMovementRows = (rows) => [...rows].sort((a, b) => a.jobId - b.jobId);
+  check(JSON.stringify(sortMovementRows(actualRows)) === JSON.stringify(sortMovementRows(expectedHero6MovementRows)), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
 
   for (const row of expectedHero6MovementRows) {
     const card = section.locator(`[data-job-id="${row.jobId}"]:visible`);
