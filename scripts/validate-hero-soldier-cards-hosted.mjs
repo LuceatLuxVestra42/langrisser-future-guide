@@ -127,8 +127,8 @@ async function verifyHeroFormSwitch(page, label) {
   check(await normalCommand.getAttribute("data-hero-form-mode") === "normal", `Hero 6 ${label} Soldier command did not default to normal form`);
   check(await normalCommand.locator('[data-command-mode="NORMAL"]').count() === 1, `Hero 6 ${label} normal Soldier command table missing`);
   check(await normalCommand.locator('[data-command-mode="SP"]').count() === 0, `Hero 6 ${label} SP Soldier command leaked into normal form`);
-  const normalFinalJobIds = await page.locator('[data-hero-final-job-stats-section="true"] [data-final-job-id]').evaluateAll((nodes) =>
-    nodes.map((node) => Number(node.getAttribute("data-final-job-id"))),
+  const normalFinalJobIds = await page.locator('[data-hero-job-tree="true"] [data-job-rank="4"][data-job-id]:visible').evaluateAll((nodes) =>
+    nodes.map((node) => Number(node.getAttribute("data-job-id"))),
   );
   check(normalFinalJobIds.length > 0 && !normalFinalJobIds.includes(377), `Hero 6 ${label} normal final jobs contain SP Job 377: ${JSON.stringify(normalFinalJobIds)}`);
 
@@ -160,7 +160,7 @@ async function verifyHeroFormSwitch(page, label) {
   check(expectedSpIconFile, `Hero 6 ${label} SP movement has unsupported MoveType ${spMoveType}`);
   const spMovementIconSrc = await spMovement.locator('img[src*="/images/shared/movement/"]').getAttribute("src");
   check(spMovementIconSrc?.endsWith(`/images/shared/movement/${expectedSpIconFile}`) === true, `Hero 6 ${label} SP movement icon mismatch for MoveType ${spMoveType}: ${spMovementIconSrc}`);
-  check(await page.locator('[data-hero-job-movement="true"]').count() === 0, `Hero 6 ${label} normal movement leaked into SP form`);
+  check(await page.locator('[data-hero-job-tree="true"]').count() === 0, `Hero 6 ${label} normal job tree leaked into SP form`);
   check(await page.locator('[data-hero-job-materials="true"]').count() === 0, `Hero 6 ${label} normal job materials leaked into SP form`);
   check(await page.locator('[data-hero-sp-reward-skills="true"]').count() === 1, `Hero 6 ${label} SP reward skills missing`);
   check(await page.locator('[data-hero-sp-missions="true"]').count() === 1, `Hero 6 ${label} SP missions missing`);
@@ -174,10 +174,7 @@ async function verifyHeroFormSwitch(page, label) {
   check(await talent.getAttribute("data-hero-form-mode") === "sp", `Hero 6 ${label} talent did not switch to SP form`);
   check(await talent.locator('[data-hero-talent-min-star]').getAttribute("data-hero-talent-min-star") === "1", `Hero 6 ${label} SP talent progression did not start at 1 star`);
 
-  const spFinalJobIds = await page.locator('[data-hero-final-job-stats-section="true"] [data-final-job-id]').evaluateAll((nodes) =>
-    nodes.map((node) => Number(node.getAttribute("data-final-job-id"))),
-  );
-  check(JSON.stringify(spFinalJobIds) === JSON.stringify([377]), `Hero 6 ${label} SP final-job isolation mismatch: ${JSON.stringify(spFinalJobIds)}`);
+  check(await spMovement.getAttribute("data-job-id") === "377", `Hero 6 ${label} SP final-job isolation mismatch`);
 
   const spHeartFetterJobIds = await page.locator('[data-hero-heart-fetter="true"] [data-heart-fetter-job-id]').evaluateAll((nodes) =>
     nodes.map((node) => Number(node.getAttribute("data-heart-fetter-job-id"))),
