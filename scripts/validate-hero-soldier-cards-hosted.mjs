@@ -75,7 +75,7 @@ async function verifyHeroJobMovement(page, label) {
   const section = page.locator('[data-hero-job-tree="true"]');
   check(await section.count() === 1, `Hero 6 ${label} Job tree section missing or duplicated`);
 
-  const rows = section.locator("[data-job-id][data-move-type][data-move-point]");
+  const rows = section.locator("[data-job-id][data-move-type][data-move-point]:visible");
   check(await rows.count() === expectedHero6MovementRows.length, `Hero 6 ${label} Job tree row count mismatch`);
 
   const actualRows = await rows.evaluateAll((nodes) => nodes.map((node) => ({
@@ -86,7 +86,7 @@ async function verifyHeroJobMovement(page, label) {
   check(JSON.stringify(actualRows) === JSON.stringify(expectedHero6MovementRows), `Hero 6 ${label} Job movement parity mismatch: ${JSON.stringify(actualRows)}`);
 
   for (const row of expectedHero6MovementRows) {
-    const card = section.locator(`[data-job-id="${row.jobId}"]`);
+    const card = section.locator(`[data-job-id="${row.jobId}"]:visible`);\n    check(await card.count() === 1, `Hero 6 ${label} visible Job ${row.jobId} card missing or duplicated`);
     const expectedArmy = expectedHero6FinalJobArmyById[row.jobId];
     if (!expectedArmy) {
       check(await card.getAttribute("data-army-id") === "", `Hero 6 ${label} non-final Job ${row.jobId} unexpectedly has an army projection`);
