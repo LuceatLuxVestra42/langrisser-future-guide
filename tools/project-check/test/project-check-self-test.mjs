@@ -269,6 +269,30 @@ for (const exclusiveEquipmentPath of exclusiveEquipmentRelationRoutingPaths) {
   assert.equal(route.manualReviews.length, 0);
 }
 
+const relationDeliveryRoutingPaths = [
+  'tools/relation-delivery/test/relation-delivery-self-test.mjs',
+  'tools/relation-delivery/lib/contract.mjs',
+  'data/contracts/relation-delivery-v1.json',
+  'data/validation/relation-delivery-a5.v1.json',
+  '.github/workflows/relation-delivery-a5.yml',
+];
+
+for (const relationDeliveryPath of relationDeliveryRoutingPaths) {
+  const route = expectOwners(
+    relationDeliveryPath,
+    ['relation-delivery'],
+    ['relation-delivery-self-test'],
+  );
+  assert.equal(route.status, 'PLAN_READY');
+  assert.equal(route.manualReviews.length, 0);
+}
+
+const unownedRelationGenerated = routeProjectCheckPaths([
+  'data/generated/relation-delivery-generic.v1.json',
+], contracts);
+assert.equal(unownedRelationGenerated.status, 'MANUAL_REVIEW');
+assert.equal(unownedRelationGenerated.manualReviews[0]?.type, 'UNMATCHED_PATH');
+
 expectOwners(
   'data/generated/hero-card-icon-assets.v1.json',
   ['hero-assets'],
