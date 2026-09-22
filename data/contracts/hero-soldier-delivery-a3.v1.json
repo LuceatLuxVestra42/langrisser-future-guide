@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-delivery-a3-contract/v1",
+  "stage": "relation-delivery-A3",
+  "status": "EXPERIMENT_FROZEN",
+  "purpose": "Prove in-memory delivery projection of the frozen Hero <-> Soldier canonical relation with exact pair, full provenance structure, deterministic serialization order, and bidirectional lookup parity without rereading raw ConfigData.",
+  "authority": {
+    "semantic": "data/generated/hero-soldier-relations.v1.json",
+    "lookup": [
+      "data/generated/hero-soldier-by-hero.v1.json",
+      "data/generated/hero-soldier-by-soldier.v1.json"
+    ],
+    "provenanceSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "ownerValidation": "data/validation/hero-soldier-integration-stageC-final.v1.json"
+  },
+  "artifacts": {
+    "builder": "scripts/build-hero-soldier-delivery-a3.mjs",
+    "validator": "scripts/validate-hero-soldier-delivery-a3.mjs",
+    "validation": "data/validation/hero-soldier-delivery-a3.v1.json"
+  },
+  "deliveryMode": "RUNTIME_PROJECTION_TEST_ONLY",
+  "projectorPolicy": {
+    "allowedRelationInputs": [
+      "data/generated/hero-soldier-relations.v1.json"
+    ],
+    "forbidden": [
+      "data/configdata/**",
+      "name JOIN",
+      "filename similarity",
+      "ID arithmetic",
+      "relation rediscovery",
+      "missing-edge repair",
+      "manual pair insertion"
+    ]
+  },
+  "expected": {
+    "heroCount": 267,
+    "soldierCount": 224,
+    "edgeCount": 5977,
+    "provenanceCount": 5978
+  },
+  "exactParity": [
+    "heroId",
+    "soldierId",
+    "full provenance entry structure",
+    "edge serialization order",
+    "provenance serialization order",
+    "Hero -> Soldier index",
+    "Soldier -> Hero index"
+  ],
+  "nonScope": [
+    "canonical relation regeneration",
+    "localization",
+    "release metadata",
+    "frontend UI",
+    "shared relation subsystem",
+    "other relation domains"
+  ]
+}
