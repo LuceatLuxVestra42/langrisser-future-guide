@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "schemaId": "relation-delivery-consumer-migration-validation/v1",
+  "experimentId": "2-2",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/relation-delivery-consumer-migration.v1.json",
+  "sourceAuthority": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "mainHead": "b07722d4a639ba5c0c1532cb3ff3a0bce1dc0e75",
+    "a5ContractGitBlobSha": "94dfd9ba45e271743611344d47f501c800958b11",
+    "a5ValidationGitBlobSha": "f32a90341b9dc13c7362384f45ccb183d3154cf0"
+  },
+  "implementationEvidence": {
+    "headSha": "17699c42efbcbd4cb1d4dde5b70287e2896e2f38",
+    "workflow": "Relation Delivery Consumer Migration 2-2",
+    "runId": 35686053201,
+    "jobs": {
+      "producer": "PASS",
+      "freshConsumer": "PASS",
+      "parityValidator": "PASS"
+    },
+    "siblingChecks": {
+      "relationDeliveryA5": {
+        "runId": 35686053171,
+        "status": "PASS"
+      },
+      "projectToolingR3ProjectCheck": {
+        "runId": 35686053174,
+        "status": "PASS"
+      },
+      "projectToolingRouteHostedQA": {
+        "runId": 35686053160,
+        "status": "PASS"
+      },
+      "localizationAudit": {
+        "runId": 35686053212,
+        "status": "PASS"
+      }
+    }
+  },
+  "portablePackage": {
+    "actionsArtifactId": 10677201243,
+    "actionsArtifactDigest": "sha256:eff5d45fb94419808ff9c87b4cc509fa0c7406f290e44808ebd1b8b5451d3d6c",
+    "manifestSha256": "642c5219ca042e92b3c1320a5609748e541cd8c311d0f1495649e90f55aecc45",
+    "profileCount": 4,
+    "payloadCount": 5,
+    "persistence": "CI_ARTIFACT_ONLY",
+    "genericSemanticArtifactCreated": false
+  },
+  "oracle": {
+    "actionsArtifactId": 10677245943,
+    "actionsArtifactDigest": "sha256:27714c28385d62943723852d2b8b6d54ee76067ee427117017523539cb023470",
+    "packageReadAllowed": false,
+    "packageBuilderImportAllowed": false,
+    "expectedOutputCanonicalSha256": "c7abda452ca1d2325eb4b134df394f6956d8441f1d0425a7c8374d45573ed05b"
+  },
+  "consumerOutput": {
+    "actionsArtifactId": 10676831730,
+    "actionsArtifactDigest": "sha256:f8c1a53cc17b1831962d2b09af2b1a92d1fe38683892b1631c193a87c450e950",
+    "consumerOutputCanonicalSha256": "c7abda452ca1d2325eb4b134df394f6956d8441f1d0425a7c8374d45573ed05b",
+    "fullStructuralParity": true,
+    "canonicalDigestParity": true
+  },
+  "a3Transport": {
+    "status": "PASS",
+    "semanticEdgeCount": 5977,
+    "semanticProvenanceEntryCount": 5978,
+    "transportHeroLookupPairCount": 5977,
+    "transportSoldierLookupPairCount": 5977,
+    "serializedTransportProvenanceInstanceCount": 11956,
+    "missingPairCount": 0,
+    "extraPairCount": 0,
+    "metadataMismatchCount": 0,
+    "orderMismatchCount": 0
+  },
+  "freshConsumerBoundary": {
+    "sourceCheckoutPresent": false,
+    "oraclePresentAtConsumerRuntime": false,
+    "rawConfigDataPresent": false,
+    "canonicalRelationSourcePresent": false,
+    "domainValidatorPresent": false,
+    "packageDataDirectoryPresent": false,
+    "packageScriptsDirectoryPresent": false,
+    "packageToolsDirectoryPresent": false,
+    "sourceGitDirectoryPresent": false,
+    "sourceFetchPrimitiveAudit": "PASS",
+    "physicalNetworkIsolationApplied": false,
+    "claim": "SOURCE_CHECKOUT_AND_RUNTIME_SOURCE_DEPENDENCY_ABSENT"
+  },
+  "semanticPreservation": {
+    "fullPublishedLookupKeyspaceConsumed": true,
+    "missingKeySemantics": "PASS",
+    "explicitEmptySemantics": "PASS",
+    "heterogeneousIdTypes": "PASS",
+    "opaqueMetadataAndProvenance": "PASS",
+    "orderPreservation": "PASS"
+  },
+  "negativeControls": {
+    "actionsArtifactId": 10676791769,
+    "actionsArtifactDigest": "sha256:ed534b90267e62b90293379317ca4f4ba5d8dc84fd894ca88f1189ad35cf5250",
+    "results": [
+      {
+        "id": "N1a",
+        "expected": "FAIL_PACKAGE_INTEGRITY",
+        "observed": "FAIL_PACKAGE_INTEGRITY",
+        "pass": true
+      },
+      {
+        "id": "N1b",
+        "expected": "FAIL_MISSING_RELATION_DELIVERY",
+        "observed": "FAIL_MISSING_RELATION_DELIVERY",
+        "pass": true
+      },
+      {
+        "id": "N2",
+        "expected": "FAIL_INVALID_LOOKUP_ENVELOPE",
+        "observed": "FAIL_INVALID_LOOKUP_ENVELOPE",
+        "pass": true
+      },
+      {
+        "id": "N3",
+        "expected": "FAIL_DELIVERY_PARITY",
+        "observed": "FAIL_DELIVERY_PARITY",
+        "pass": true
+      }
+    ]
+  },
+  "boundaries": {
+    "canonicalRelationRebuildAtConsumerCount": 0,
+    "rawConfigDataReadAtConsumerCount": 0,
+    "nameJoinCount": 0,
+    "semanticIdArithmeticCount": 0,
+    "fallbackRelationSynthesisCount": 0,
+    "sourceCheckoutAtConsumerCount": 0,
+    "oracleAtConsumerRuntimeCount": 0,
+    "unexpectedTrackedMutationCount": 0,
+    "blockerCount": 0
+  },
+  "decision": "COMPLETE. A5-proven portable relation delivery crossed a fresh no-checkout consumer boundary and reproduced the full published lookup surface with exact structural and digest parity against an independently generated full oracle. Missing-key versus explicit-empty semantics, heterogeneous ID types, opaque metadata/provenance, and ordering were preserved. All four negative controls failed at their intended layers. This result validates migration-consumer independence only; canonical relation semantics remain domain-owned and production frontend adoption remains separate scope."
+}

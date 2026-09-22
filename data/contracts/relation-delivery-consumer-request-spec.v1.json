@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "schemaId": "relation-delivery-consumer-request-spec/v1",
+  "experimentId": "2-2",
+  "requiredProfiles": [
+    "hero-exclusive-equipment",
+    "hero-skin",
+    "hero-soldier",
+    "banner-hero"
+  ],
+  "probes": [
+    {
+      "relationKey": "hero-exclusive-equipment",
+      "direction": "Hero->ExclusiveEquipment",
+      "fromId": 24,
+      "claim": "RELATION_LOOKUP_KEY_ABSENCE_ONLY"
+    }
+  ],
+  "expectedAnswersIncluded": false
+}
