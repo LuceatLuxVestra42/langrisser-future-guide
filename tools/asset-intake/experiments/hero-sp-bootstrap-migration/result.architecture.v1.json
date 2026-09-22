@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS_SP_BOOTSTRAP_ARCHITECTURE",
+  "completion": "BOOTSTRAP_ARCHITECTURE_COMPLETE",
+  "authorityBoundary": "DOWNSTREAM_SP_ASSET_MIGRATION_EVIDENCE_NOT_CANONICAL_SEMANTICS",
+  "execution": {
+    "sourceBranch": "test/asset-portability-cleanroom-20260922",
+    "runHeadSha": "a37c39a60fd1c3362b5d7bddc9bdd48c75c03b77",
+    "workflowRunId": 35673128439,
+    "jobs": {
+      "producer": 106573848345,
+      "consumerA": 106573959769,
+      "consumerB": 106573959721,
+      "negativeMissingContract": 106573959742,
+      "negativeBadSourceHash": 106573959955,
+      "compare": 106574373850
+    },
+    "artifacts": {
+      "bootstrapPackage": {
+        "id": 10671274357,
+        "digest": "sha256:2e6fca4131ce155e55039b2cb852920ceaf59857c0b970860517bf7ab8adcb42"
+      },
+      "runA": {
+        "id": 10671777680,
+        "digest": "sha256:7286d6798b91b11ef5c1a1f17482330efd07b25c7f168657fafe7dbe63461673"
+      },
+      "runB": {
+        "id": 10671164494,
+        "digest": "sha256:e7e10fc8c321388256323cc08fabedaac4350b3caddc97ab8fb823e2ca060b82"
+      },
+      "negativeMissing": {
+        "id": 10672037327,
+        "digest": "sha256:e41d9151d24340c5e6cbfd18b51aec61cbae2b2fc618681ccbe6f931e2824ca7"
+      },
+      "negativeHash": {
+        "id": 10672007430,
+        "digest": "sha256:b27710e55faab46f02885e3cb410c37112ec428f54418d51e5d17f901cbb3edb"
+      },
+      "finalProof": {
+        "id": 10671244514,
+        "digest": "sha256:b374343502dba4e70ead4ba6e72d5d60a55016c912e8c3d2adec7bfabf99c4eb"
+      }
+    }
+  },
+  "bootstrap": {
+    "package": "hero-sp-bootstrap-v1.tar",
+    "bootstrapPackageSha256": "b1c601d74fdf34bf12a61aceed49ec7611567c8dad0c1868350c5e932300e100",
+    "payloadDigest": "sha256:7419b9e570e0ba37b3e25edf766df9028bd76dfd62a38c0f449edb05084763ca",
+    "fileCount": 61,
+    "recordCount": 5,
+    "deterministicCanonicalTar": true,
+    "pythonWheelhouseVendored": true,
+    "spineRuntimeSourceVendored": true,
+    "spineRuntimeCommit": "1c1936532527900f74cfb58f7002998bf157b254"
+  },
+  "isolation": {
+    "repositoryModel": "fresh-local-git-repository-on-separate-isolated-runners",
+    "persistentRemoteRepositoryCreated": false,
+    "gitRemotes": [],
+    "assetIntakeRuntimePresent": false,
+    "sourceRepositoryCheckoutPresentInConsumers": false,
+    "existingGeneratedAssetInput": false,
+    "existingProductionManifestInput": false,
+    "runtimeGitHubAccessBlocked": true,
+    "runtimePyPIAccessBlocked": true,
+    "materializationAllowedNetworkHosts": [
+      "mhmnzupdate.zlongame.com"
+    ]
+  },
+  "independentRuns": [
+    "A",
+    "B"
+  ],
+  "manifestSha256": "9b8c75c7b3092afcaf9d9c5b7c20741a611bed718641c8e27aac08fea8433ea3",
+  "heroIds": [
+    6,
+    13,
+    29,
+    37,
+    56
+  ],
+  "heroAssets": {
+    "6": "d1516cb5304efee27538fcae72468b932aeece57972d9728bd939627c5aa029e",
+    "13": "98c68a9f1ae6ed57514c5e425af7ca58cf2c7c88207d15d83f26d26d1d018a25",
+    "29": "324920006f7e986e00db2c5be5095372b45ecd8583f04fbf72b29ce09a83fc6d",
+    "37": "c91022024571d103dee3c49be81fea9251e41662cb73fbf7e511f149be0af2f2",
+    "56": "de04a18dcbac70bccd04e08a2976bacaabcc1e6e4afdd2cf46919462dd98a11e"
+  },
+  "frontendConsumer": "HeroID -> generated manifest -> generated WebP",
+  "negativeControls": [
+    {
+      "case": "missing contract",
+      "expected": "FAIL_MISSING_ASSET_CONTRACT",
+      "status": "PASS_NEGATIVE_MISSING_CONTRACT"
+    },
+    {
+      "case": "tampered bundle SHA256",
+      "expected": "FAIL_SOURCE_HASH_MISMATCH",
+      "status": "PASS_NEGATIVE_BAD_SOURCE_HASH"
+    }
+  ],
+  "conclusion": "The representative SP bootstrap architecture reproduced deterministic assets in two fresh isolated Git repositories without Asset Intake runtime, source-repository checkout/history, existing generated assets, GitHub runtime access, or PyPI runtime access."
+}
