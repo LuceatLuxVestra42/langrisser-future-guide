@@ -77,7 +77,7 @@ console.log(JSON.stringify({
   semanticProvenanceEntryCount: profile.semanticCounts.provenanceEntryCount,
   transportHeroLookupPairCount: seenByDirection.get('Hero->Soldier'),
   transportSoldierLookupPairCount: seenByDirection.get('Soldier->Hero'),
-  serializedTransportProvenanceInstanceCount,
+  serializedTransportProvenanceInstanceCount: serializedProvenanceInstanceCount,
   missingPairCount,
   extraPairCount,
   metadataMismatchCount,
