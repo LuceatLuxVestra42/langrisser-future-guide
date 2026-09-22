@@ -94,6 +94,10 @@
       "validators": ["skin-relation"]
     },
     {
+      "id": "relation-delivery",
+      "validators": ["relation-delivery-self-test"]
+    },
+    {
       "id": "shared-movement",
       "validators": ["shared-movement"]
     },
@@ -592,6 +596,11 @@
       "id": "skin-relation",
       "patterns": ["data/generated/skin-stage1-*", "data/generated/skin-stage2-*", "data/validation/skin-stage1-*", "data/validation/skin-stage2-*", "data/contracts/skin-stage1-*", "data/contracts/skin-stage2-*", "scripts/*skin-stage1*", "scripts/*skin-stage2*"],
       "owners": ["skin-relation"]
+    },
+    {
+      "id": "relation-delivery",
+      "patterns": ["tools/relation-delivery/**", "data/contracts/relation-delivery-*", "data/validation/relation-delivery-*", ".github/workflows/relation-delivery-*"],
+      "owners": ["relation-delivery"]
     },
     {
       "id": "shared-movement",
