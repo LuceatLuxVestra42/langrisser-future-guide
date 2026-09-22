@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "schemaId": "hero-exclusive-equipment-delivery-a1-contract/v1",
+  "stage": "relation-delivery-A1",
+  "status": "EXPERIMENT_FROZEN",
+  "purpose": "Prove that the frozen Hero <-> Exclusive Equipment canonical relation can be projected into a delivery shape with exact semantic and lookup parity, without rereading raw ConfigData or inferring any relation.",
+  "authority": {
+    "semantic": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "lookup": [
+      "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "data/generated/hero-exclusive-equipment-by-equipment.v1.json"
+    ]
+  },
+  "artifacts": {
+    "builder": "scripts/build_hero_exclusive_equipment_delivery_a1.cjs",
+    "delivery": "data/generated/hero-exclusive-equipment-delivery-a1.v1.json",
+    "validator": "scripts/validate_hero_exclusive_equipment_delivery_a1.cjs",
+    "validation": "data/validation/hero-exclusive-equipment-delivery-a1.v1.json"
+  },
+  "projectorPolicy": {
+    "allowedRelationInputs": [
+      "data/generated/hero-exclusive-equipment-relations.v1.json"
+    ],
+    "forbidden": [
+      "data/configdata/**",
+      "name JOIN",
+      "filename similarity",
+      "ID arithmetic",
+      "missing-edge repair",
+      "fallback relation synthesis",
+      "manual pair insertion"
+    ]
+  },
+  "semanticParity": {
+    "expectedEdgeCount": 167,
+    "exactFields": [
+      "heroId",
+      "equipmentId",
+      "relationType",
+      "verificationStatus",
+      "provenance"
+    ],
+    "relationType": "exclusive",
+    "verificationStatus": "VERIFIED"
+  },
+  "lookupParity": {
+    "byHeroKeyCount": 167,
+    "byHeroPairCount": 167,
+    "heroMissingKeyCount": 100,
+    "byEquipmentKeyCount": 167,
+    "byEquipmentPairCount": 167,
+    "absentHeroRepresentation": "MISSING_KEY"
+  },
+  "nonScope": [
+    "canonical relation regeneration",
+    "general Equipment relation",
+    "frontend UI",
+    "navigation",
+    "shared relation subsystem",
+    "common TypeScript abstraction",
+    "other relation domains"
+  ]
+}

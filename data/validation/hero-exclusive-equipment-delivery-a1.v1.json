@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "schemaId": "hero-exclusive-equipment-delivery-a1-validation/v1",
+  "stage": "relation-delivery-A1",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-exclusive-equipment-delivery-a1.v1.json",
+  "authority": {
+    "semantic": "data/generated/hero-exclusive-equipment-relations.v1.json",
+    "lookup": [
+      "data/generated/hero-exclusive-equipment-by-hero.v1.json",
+      "data/generated/hero-exclusive-equipment-by-equipment.v1.json"
+    ]
+  },
+  "deliveryArtifact": {
+    "path": "data/generated/hero-exclusive-equipment-delivery-a1.v1.json",
+    "gitBlobSha": "db07f0d12cdbe74f4f0a49de53c829841244e74a"
+  },
+  "checks": {
+    "contractAccepted": true,
+    "sourceBlobPinned": true,
+    "projectorInputTraceExact": true,
+    "canonicalEdgeCount167": true,
+    "deliveryEdgeCount167": true,
+    "missingEdgeCountZero": true,
+    "extraEdgeCountZero": true,
+    "duplicateEdgeCountZero": true,
+    "semanticRecordsExact": true,
+    "relationTypeMismatchZero": true,
+    "verificationMismatchZero": true,
+    "provenanceMismatchZero": true,
+    "metadataMismatchZero": true,
+    "byHeroKeyCount167": true,
+    "byHeroPairCount167": true,
+    "heroMissingKeyCount100": true,
+    "byHeroLookupExact": true,
+    "byEquipmentKeyCount167": true,
+    "byEquipmentPairCount167": true,
+    "byEquipmentLookupExact": true,
+    "lookupMetadataMismatchZero": true,
+    "b4SemanticGatePass": true,
+    "b6LookupGatePass": true,
+    "builderRepositoryPathAllowlistExact": true,
+    "rawConfigDataReadLiteralZero": true,
+    "nameJoinTokenZero": true,
+    "semanticIdArithmeticZero": true,
+    "manualPairLiteralZero": true
+  },
+  "summary": {
+    "canonicalEdgeCount": 167,
+    "deliveryEdgeCount": 167,
+    "missingEdgeCount": 0,
+    "extraEdgeCount": 0,
+    "duplicateEdgeCount": 0,
+    "metadataMismatchCount": 0,
+    "provenanceMismatchCount": 0,
+    "byHeroKeyCount": 167,
+    "heroMissingKeyCount": 100,
+    "byEquipmentKeyCount": 167,
+    "lookupMetadataMismatchCount": 0,
+    "failedCheckCount": 0
+  },
+  "boundaryEvidence": {
+    "projectorInputTrace": [
+      "data/generated/hero-exclusive-equipment-relations.v1.json"
+    ],
+    "builderRepositoryPathLiterals": [
+      "data/generated/hero-exclusive-equipment-delivery-a1.v1.json",
+      "data/generated/hero-exclusive-equipment-relations.v1.json"
+    ],
+    "rawConfigDataLiteralCount": 0,
+    "nameJoinTokenCount": 0,
+    "semanticIdArithmeticCount": 0,
+    "manualPairLiteralCount": 0
+  },
+  "diagnostics": {
+    "failedChecks": [],
+    "missingEdges": [],
+    "extraEdges": [],
+    "byHeroMissingKeys": [],
+    "byHeroExtraKeys": [],
+    "byHeroValueMismatchCount": 0,
+    "byEquipmentMissingKeys": [],
+    "byEquipmentExtraKeys": [],
+    "byEquipmentValueMismatchCount": 0
+  }
+}

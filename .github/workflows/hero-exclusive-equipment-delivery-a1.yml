@@ -1,0 +1,45 @@
+name: Hero Exclusive Equipment Delivery A1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data/contracts/hero-exclusive-equipment-delivery-a1.v1.json
+      - data/generated/hero-exclusive-equipment-delivery-a1.v1.json
+      - data/validation/hero-exclusive-equipment-delivery-a1.v1.json
+      - scripts/build_hero_exclusive_equipment_delivery_a1.cjs
+      - scripts/validate_hero_exclusive_equipment_delivery_a1.cjs
+      - data/generated/hero-exclusive-equipment-relations.v1.json
+      - data/generated/hero-exclusive-equipment-by-hero.v1.json
+      - data/generated/hero-exclusive-equipment-by-equipment.v1.json
+      - data/validation/hero-exclusive-equipment-relation-stageB4-validation.v1.json
+      - data/validation/hero-exclusive-equipment-relation-stageB6-consumer-summary.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a1-delivery-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check A1 projector reproducibility
+        run: node scripts/build_hero_exclusive_equipment_delivery_a1.cjs --check
+
+      - name: Check A1 semantic lookup and boundary parity
+        run: node scripts/validate_hero_exclusive_equipment_delivery_a1.cjs --check
+
+      - name: Run existing Hero Equipment owner validator
+        run: npm run validate:coverage:hero-equipment-relation
+
+      - name: Verify no tracked mutation
+        run: git diff --exit-code
