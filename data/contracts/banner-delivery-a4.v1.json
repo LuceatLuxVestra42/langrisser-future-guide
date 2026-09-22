@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "schemaId": "banner-delivery-a4-contract/v1",
+  "stage": "relation-delivery-A4",
+  "status": "EXPERIMENT_FROZEN",
+  "purpose": "Prove that frozen Banner -> Hero explicit ID relations can be projected into a delivery shape with exact subtype/source metadata and exact zero-edge definition semantics, without synthesizing relations.",
+  "authority": {
+    "semantic": "data/generated/banner-definition-hero-relations.v1.json",
+    "ownerValidation": "data/validation/banner-stage3-8-regression-freeze-summary.v1.json"
+  },
+  "artifacts": {
+    "builder": "scripts/build-banner-delivery-a4.mjs",
+    "delivery": "data/generated/banner-delivery-a4.v1.json",
+    "validator": "scripts/validate-banner-delivery-a4.mjs",
+    "validation": "data/validation/banner-delivery-a4.v1.json"
+  },
+  "projectorPolicy": {
+    "allowedRelationInputs": [
+      "data/generated/banner-definition-hero-relations.v1.json"
+    ],
+    "forbidden": [
+      "data/configdata/**",
+      "name JOIN",
+      "filename similarity",
+      "ID arithmetic",
+      "missing-edge repair",
+      "fallback relation synthesis",
+      "manual pair insertion",
+      "synthetic relation edge"
+    ]
+  },
+  "expected": {
+    "definitionCount": 77,
+    "edgeCount": 600,
+    "pickupHeroEdgeCount": 136,
+    "wishCandidateHeroEdgeCount": 464,
+    "zeroEdgeDefinitionCount": 8
+  },
+  "exactParity": [
+    "definitionResults",
+    "edge records",
+    "relationType",
+    "sourceRecordKey",
+    "sourceField",
+    "sourceIndex",
+    "zero-edge bannerDefinitionId set"
+  ],
+  "nonScope": [
+    "canonical Banner relation regeneration",
+    "banner asset resolution",
+    "frontend UI",
+    "shared relation subsystem",
+    "other relation domains"
+  ]
+}
