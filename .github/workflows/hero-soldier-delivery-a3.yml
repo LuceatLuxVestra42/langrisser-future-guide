@@ -1,0 +1,44 @@
+name: Hero Soldier Delivery A3
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data/contracts/hero-soldier-delivery-a3.v1.json
+      - data/validation/hero-soldier-delivery-a3.v1.json
+      - scripts/build-hero-soldier-delivery-a3.mjs
+      - scripts/validate-hero-soldier-delivery-a3.mjs
+      - data/generated/hero-soldier-relations.v1.json
+      - data/generated/hero-soldier-by-hero.v1.json
+      - data/generated/hero-soldier-by-soldier.v1.json
+      - data/contracts/hero-soldier-relation-edge-schema.v1.json
+      - data/validation/hero-soldier-integration-stageC-final.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a3-delivery-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run A3 runtime delivery projection
+        run: node scripts/build-hero-soldier-delivery-a3.mjs
+
+      - name: Check A3 pair provenance lookup and boundary parity
+        run: node scripts/validate-hero-soldier-delivery-a3.mjs --check
+
+      - name: Run existing Hero Soldier owner validator
+        run: npm run validate:coverage:hero-soldier-relation
+
+      - name: Verify no tracked mutation
+        run: git diff --exit-code
