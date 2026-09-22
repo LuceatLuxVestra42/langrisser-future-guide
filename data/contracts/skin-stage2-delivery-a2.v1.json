@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "schemaId": "skin-stage2-delivery-a2-contract/v1",
+  "stage": "relation-delivery-A2",
+  "status": "EXPERIMENT_FROZEN",
+  "purpose": "Prove that the frozen Skin Stage 2 unified Hero <-> Skin relation can be projected into a delivery shape with exact owner, sourceOrder, reverse-list, and explicit-empty parity without relation rediscovery.",
+  "authority": {
+    "semantic": "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+  },
+  "artifacts": {
+    "builder": "scripts/build-skin-stage2-delivery-a2.mjs",
+    "delivery": "data/generated/skin-stage2-delivery-a2.v1.json",
+    "validator": "scripts/validate-skin-stage2-delivery-a2.mjs",
+    "validation": "data/validation/skin-stage2-delivery-a2.v1.json"
+  },
+  "projectorPolicy": {
+    "allowedRelationInputs": [
+      "data/generated/skin-stage2-3-bidirectional-relation.v1.json"
+    ],
+    "forbidden": [
+      "data/configdata/**",
+      "name JOIN",
+      "filename similarity",
+      "ID arithmetic",
+      "missing-edge repair",
+      "fallback relation synthesis",
+      "manual pair insertion"
+    ]
+  },
+  "expected": {
+    "skinCount": 540,
+    "heroKeyCount": 267,
+    "edgeCount": 540,
+    "zeroSkinHeroCount": 32,
+    "skinToHero": "EXACTLY_ONE",
+    "heroToSkin": "ZERO_OR_MANY",
+    "absentHeroRepresentation": "PRESENT_EMPTY_ARRAY"
+  },
+  "exactMetadata": [
+    "heroId",
+    "sourceOrder"
+  ],
+  "nonScope": [
+    "canonical relation regeneration",
+    "asset mapping",
+    "frontend UI",
+    "shared relation subsystem",
+    "other relation domains"
+  ]
+}
