@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "schemaId": "relation-delivery-contract/v1",
+  "stage": "relation-delivery-A5",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Extract only the delivery invariants proven by A1-A4 while leaving canonical identity, relation membership, provenance meaning, ordering semantics, and source authority with each owning domain.",
+  "authorityBoundary": {
+    "semanticAuthorityRemainsDomainOwned": true,
+    "relationDeliveryIsSemanticAuthority": false,
+    "relationDeliveryMayCreateEdges": false,
+    "relationDeliveryMayRepairMissingEdges": false,
+    "relationDeliveryMayInterpretNames": false,
+    "relationDeliveryMayUseIdArithmetic": false,
+    "genericGeneratedRelationArtifactAllowed": false
+  },
+  "lookupEnvelope": {
+    "shape": {
+      "present": "boolean",
+      "targets": "readonly target[]"
+    },
+    "rules": [
+      "present=false requires targets=[] and means the owning source has no key for the requested fromId.",
+      "present=true may carry targets=[] and therefore preserves explicit empty-key semantics.",
+      "targetId is mandatory and must be preserved exactly.",
+      "fromId and targetId types are independent and may be number or string.",
+      "Metadata is opaque to the shared layer and must be preserved according to the owning domain contract."
+    ]
+  },
+  "projectionPolicy": {
+    "sourceRule": "A projector reads only its declared frozen/generated owning relation authority. Lookup indexes may be validation oracles but may not be semantic inputs unless the owning domain explicitly declares them as authority.",
+    "forbidden": [
+      "raw ConfigData relation reread",
+      "name JOIN",
+      "filename similarity",
+      "ID arithmetic",
+      "missing-edge repair",
+      "fallback relation synthesis",
+      "manual pair insertion",
+      "cross-domain semantic reinterpretation"
+    ],
+    "persistence": "DOMAIN_CHOICE_RUNTIME_OR_GENERATED",
+    "genericSorting": "FORBIDDEN_UNLESS_OWNING_CONTRACT_REQUIRES_IT"
+  },
+  "metadataPolicy": {
+    "sharedFields": [
+      "targetId"
+    ],
+    "domainMetadata": "OPAQUE_EXACT_PRESERVATION",
+    "provenance": "PRESERVE_FULL_STRUCTURE_WHEN_OWNING_RELATION_CARRIES_PROVENANCE",
+    "order": "PRESERVE_OWNING_CONTRACT_ORDER_AND_ORDER_METADATA"
+  },
+  "provenProfiles": [
+    {
+      "relationKey": "hero-exclusive-equipment",
+      "evidence": {
+        "path": "data/validation/hero-exclusive-equipment-delivery-a1.v1.json",
+        "gitBlobSha": "c1c16562304524744f5d6611344ed2f426361c90"
+      },
+      "fromKind": "Hero",
+      "toKind": "ExclusiveEquipment",
+      "fromIdType": "number",
+      "toIdType": "number",
+      "keyPresence": "MISSING_KEY_ALLOWED",
+      "observed": {
+        "edgeCount": 167,
+        "presentHeroKeyCount": 167,
+        "missingHeroKeyCount": 100
+      },
+      "metadata": [
+        "relationType",
+        "verificationStatus",
+        "provenance"
+      ],
+      "parity": "EXACT"
+    },
+    {
+      "relationKey": "hero-skin",
+      "evidence": {
+        "path": "data/validation/skin-stage2-delivery-a2.v1.json",
+        "gitBlobSha": "851a27c21e94b92207235894bb2054dbd1a0381f"
+      },
+      "fromKind": "Hero",
+      "toKind": "Skin",
+      "fromIdType": "number",
+      "toIdType": "number",
+      "keyPresence": "ALL_KEYS_PRESENT_EXPLICIT_EMPTY_ALLOWED",
+      "observed": {
+        "edgeCount": 540,
+        "presentHeroKeyCount": 267,
+        "explicitEmptyHeroKeyCount": 32
+      },
+      "metadata": [
+        "sourceOrder"
+      ],
+      "parity": "EXACT"
+    },
+    {
+      "relationKey": "hero-soldier",
+      "evidence": {
+        "path": "data/validation/hero-soldier-delivery-a3.v1.json",
+        "gitBlobSha": "91d0d7b481cef2ea008fd4520f91135239cb9ba8"
+      },
+      "fromKind": "Hero|Soldier",
+      "toKind": "Soldier|Hero",
+      "fromIdType": "number",
+      "toIdType": "number",
+      "keyPresence": "FULL_CANONICAL_KEYSPACE_PRESENT",
+      "observed": {
+        "edgeCount": 5977,
+        "provenanceCount": 5978,
+        "heroKeyCount": 267,
+        "soldierKeyCount": 224
+      },
+      "metadata": [
+        "full provenance structure",
+        "deterministic edge order",
+        "deterministic provenance order"
+      ],
+      "parity": "EXACT"
+    },
+    {
+      "relationKey": "banner-hero",
+      "evidence": {
+        "path": "data/validation/banner-delivery-a4.v1.json",
+        "gitBlobSha": "1a96a52493ad294562d9f057ee78eb9d21b10e08"
+      },
+      "fromKind": "BannerDefinition",
+      "toKind": "Hero",
+      "fromIdType": "string",
+      "toIdType": "number",
+      "keyPresence": "ALL_DEFINITION_KEYS_PRESENT_EXPLICIT_EMPTY_ALLOWED",
+      "observed": {
+        "definitionCount": 77,
+        "edgeCount": 600,
+        "pickupHeroEdgeCount": 136,
+        "wishCandidateHeroEdgeCount": 464,
+        "explicitEmptyDefinitionCount": 8
+      },
+      "metadata": [
+        "relationType",
+        "sourceRecordKey",
+        "sourceField",
+        "sourceIndex",
+        "remaining source edge metadata"
+      ],
+      "parity": "EXACT"
+    }
+  ],
+  "evidenceRequirements": {
+    "everyProfilePassComplete": true,
+    "everyProfileFailedCheckCount": 0,
+    "rawConfigDataLiteralCount": 0,
+    "nameJoinTokenCount": 0,
+    "semanticIdArithmeticCount": 0,
+    "manualPairLiteralCount": 0
+  },
+  "consumerRule": "A downstream consumer may depend on this shared delivery envelope only after the owning domain has produced or exposed an accepted projection. The shared layer never reopens or reconstructs the owning relation.",
+  "completion": "A5 is complete when the four proven profiles remain PASS/COMPLETE, their distinct key-presence and metadata/order semantics are explicitly represented, the shared lookup envelope distinguishes missing keys from explicit empty keys, and an independent relation-delivery validator passes with zero semantic recomputation."
+}

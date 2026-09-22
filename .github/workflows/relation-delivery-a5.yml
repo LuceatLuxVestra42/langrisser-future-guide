@@ -1,0 +1,49 @@
+name: Relation Delivery A5
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - tools/relation-delivery/**
+      - data/contracts/relation-delivery-*
+      - data/validation/relation-delivery-*
+      - .github/workflows/relation-delivery-*
+      - data/validation/hero-exclusive-equipment-delivery-a1.v1.json
+      - data/validation/skin-stage2-delivery-a2.v1.json
+      - data/validation/hero-soldier-delivery-a3.v1.json
+      - data/validation/banner-delivery-a4.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a5-shared-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Recheck A1 Exclusive Equipment evidence
+        run: node scripts/validate_hero_exclusive_equipment_delivery_a1.cjs --check
+
+      - name: Recheck A2 Skin evidence
+        run: node scripts/validate-skin-stage2-delivery-a2.mjs --check
+
+      - name: Recheck A3 Hero Soldier evidence
+        run: node scripts/validate-hero-soldier-delivery-a3.mjs --check
+
+      - name: Recheck A4 Banner Hero evidence
+        run: node scripts/validate-banner-delivery-a4.mjs --check
+
+      - name: Validate A5 shared delivery contract
+        run: node tools/relation-delivery/test/relation-delivery-self-test.mjs
+
+      - name: Verify no tracked mutation
+        run: git diff --exit-code
