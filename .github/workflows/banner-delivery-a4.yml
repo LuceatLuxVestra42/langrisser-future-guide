@@ -1,0 +1,42 @@
+name: Banner Delivery A4
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - data/contracts/banner-delivery-a4.v1.json
+      - data/generated/banner-delivery-a4.v1.json
+      - data/validation/banner-delivery-a4.v1.json
+      - scripts/build-banner-delivery-a4.mjs
+      - scripts/validate-banner-delivery-a4.mjs
+      - data/generated/banner-definition-hero-relations.v1.json
+      - data/validation/banner-stage3-8-regression-freeze-summary.v1.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a4-delivery-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check A4 projector reproducibility
+        run: node scripts/build-banner-delivery-a4.mjs --check
+
+      - name: Check A4 subtype source and zero-edge parity
+        run: node scripts/validate-banner-delivery-a4.mjs --check
+
+      - name: Run existing Banner owner validator
+        run: npm run validate:coverage:banner-data
+
+      - name: Verify no tracked mutation
+        run: git diff --exit-code
