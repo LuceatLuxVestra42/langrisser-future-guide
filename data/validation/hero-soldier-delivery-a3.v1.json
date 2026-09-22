@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "schemaId": "hero-soldier-delivery-a3-validation/v1",
+  "stage": "relation-delivery-A3",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": "data/contracts/hero-soldier-delivery-a3.v1.json",
+  "authority": {
+    "semantic": "data/generated/hero-soldier-relations.v1.json",
+    "lookup": [
+      "data/generated/hero-soldier-by-hero.v1.json",
+      "data/generated/hero-soldier-by-soldier.v1.json"
+    ],
+    "provenanceSchema": "data/contracts/hero-soldier-relation-edge-schema.v1.json",
+    "ownerValidation": "data/validation/hero-soldier-integration-stageC-final.v1.json"
+  },
+  "runtimeProjection": {
+    "persisted": false,
+    "sourceGitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+  },
+  "checks": {
+    "contractAccepted": true,
+    "sourceBlobPinned": true,
+    "projectorInputTraceExact": true,
+    "sourceEdgeCount5977": true,
+    "deliveryEdgeCount5977": true,
+    "semanticEdgesAndProvenanceExact": true,
+    "duplicatePairZero": true,
+    "provenanceCount5978": true,
+    "heroKeyCount267": true,
+    "soldierKeyCount224": true,
+    "heroIndexPairCount5977": true,
+    "soldierIndexPairCount5977": true,
+    "byHeroLookupExact": true,
+    "bySoldierLookupExact": true,
+    "edgeSerializationOrderExact": true,
+    "provenanceSerializationOrderExact": true,
+    "stageCOwnerGateFrozen": true,
+    "builderRepositoryPathAllowlistExact": true,
+    "rawConfigDataReadLiteralZero": true,
+    "nameJoinTokenZero": true,
+    "semanticIdArithmeticZero": true,
+    "manualPairLiteralZero": true
+  },
+  "summary": {
+    "edgeCount": 5977,
+    "provenanceCount": 5978,
+    "heroKeyCount": 267,
+    "soldierKeyCount": 224,
+    "byHeroMismatchCount": 0,
+    "bySoldierMismatchCount": 0,
+    "duplicatePairCount": 0,
+    "edgeOrderMismatchCount": 0,
+    "provenanceOrderMismatchCount": 0,
+    "failedCheckCount": 0
+  },
+  "boundaryEvidence": {
+    "projectorInputTrace": [
+      "data/generated/hero-soldier-relations.v1.json"
+    ],
+    "builderRepositoryPathLiterals": [
+      "data/generated/hero-soldier-relations.v1.json"
+    ],
+    "rawConfigDataLiteralCount": 0,
+    "nameJoinTokenCount": 0,
+    "semanticIdArithmeticCount": 0,
+    "manualPairLiteralCount": 0
+  },
+  "diagnostics": {
+    "failedChecks": []
+  }
+}
