@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "schemaId": "relation-delivery-a5-validation/v1",
+  "stage": "relation-delivery-A5",
+  "status": "PASS",
+  "completion": "COMPLETE",
+  "contract": {
+    "path": "data/contracts/relation-delivery-v1.json",
+    "gitBlobSha": "94dfd9ba45e271743611344d47f501c800958b11"
+  },
+  "evidence": [
+    {
+      "path": "data/validation/hero-exclusive-equipment-delivery-a1.v1.json",
+      "gitBlobSha": "c1c16562304524744f5d6611344ed2f426361c90",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "failedCheckCount": 0
+    },
+    {
+      "path": "data/validation/skin-stage2-delivery-a2.v1.json",
+      "gitBlobSha": "851a27c21e94b92207235894bb2054dbd1a0381f",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "failedCheckCount": 0
+    },
+    {
+      "path": "data/validation/hero-soldier-delivery-a3.v1.json",
+      "gitBlobSha": "91d0d7b481cef2ea008fd4520f91135239cb9ba8",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "failedCheckCount": 0
+    },
+    {
+      "path": "data/validation/banner-delivery-a4.v1.json",
+      "gitBlobSha": "1a96a52493ad294562d9f057ee78eb9d21b10e08",
+      "status": "PASS",
+      "completion": "COMPLETE",
+      "failedCheckCount": 0
+    }
+  ],
+  "checks": {
+    "contractSchema": true,
+    "contractFrozen": true,
+    "semanticAuthorityRemainsDomainOwned": true,
+    "sharedLayerNotSemanticAuthority": true,
+    "genericGeneratedRelationArtifactForbidden": true,
+    "lookupEnvelopePresentBoolean": true,
+    "lookupEnvelopeTargetsArray": true,
+    "fourProfiles": true,
+    "equipmentMissingKeyPolicy": true,
+    "skinExplicitEmptyPolicy": true,
+    "soldierFullKeyspacePolicy": true,
+    "bannerExplicitEmptyPolicy": true,
+    "bannerMixedIdTypes": true,
+    "opaqueMetadataPolicy": true,
+    "genericSortingForbidden": true,
+    "profileEvidenceExact": true,
+    "allProfilesPassComplete": true,
+    "allProfileBoundaryCountersZero": true
+  },
+  "summary": {
+    "profileCount": 4,
+    "passedProfileCount": 4,
+    "profileEvidenceMismatchCount": 0,
+    "boundaryViolationCount": 0,
+    "failedProfileCount": 0,
+    "failedCheckCount": 0
+  },
+  "extractedDifferences": {
+    "missingKeyVsExplicitEmptyDistinct": true,
+    "equipmentMissingHeroKeys": 100,
+    "skinExplicitEmptyHeroKeys": 32,
+    "soldierProvenanceCount": 5978,
+    "bannerZeroEdgeDefinitionKeys": 8,
+    "bannerFromIdType": "string",
+    "bannerToIdType": "number"
+  },
+  "boundaries": {
+    "semanticRecomputationCount": 0,
+    "canonicalMutationCount": 0,
+    "genericGeneratedRelationArtifactCount": 0,
+    "frontendConsumerChangeCount": 0
+  },
+  "diagnostics": {
+    "failedChecks": []
+  }
+}
