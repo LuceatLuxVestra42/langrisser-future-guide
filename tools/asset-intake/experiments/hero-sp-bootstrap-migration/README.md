@@ -1,6 +1,6 @@
 # Hero SP Bootstrap Migration Experiment
 
-Status: SETUP_FOR_EXECUTION
+Status: PASS_SP_ASSET_INTAKE_MIGRATION_INDEPENDENCE / COMPLETE
 
 Purpose: prove that the tested Hero SP asset contract can be consumed by fresh Git repositories that do not checkout, mount, or query the source repository and do not contain Asset Intake runtime tooling.
 
@@ -24,3 +24,13 @@ Consumer materialization must not use:
 The five architecture representatives are Hero IDs 6, 13, 29, 37, and 56.
 
 PASS boundary: PASS_SP_BOOTSTRAP_ARCHITECTURE.
+
+
+## Completed results
+
+- Representative architecture: `PASS_SP_BOOTSTRAP_ARCHITECTURE`
+- Current frozen SP25 population: `PASS_SP_ASSET_INTAKE_MIGRATION_INDEPENDENCE`
+- Durable evidence: `result.architecture.v1.json`, `result.sp25-migration-independence.v1.json`
+- Resume checkpoint: `tools/asset-intake/checkpoints/hero-sp-bootstrap-migration-independence-pass-20260922.md`
+
+The destination-side runtime dependency is the frozen bootstrap package, not Asset Intake. Python 3.11 and .NET SDK 8.0.425 remain host prerequisites; Python wheels and the pinned Spine runtime source are carried inside the bootstrap package.
