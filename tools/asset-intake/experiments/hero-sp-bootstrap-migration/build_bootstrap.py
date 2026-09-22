@@ -48,12 +48,13 @@ def canonical_tar(source_root,out):
             else:raise RuntimeError(f'unsupported file type: {rel}')
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--output-dir',required=True);args=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('--output-dir',required=True);ap.add_argument('--contract-file');args=ap.parse_args()
     outdir=pathlib.Path(args.output_dir).resolve();outdir.mkdir(parents=True,exist_ok=True)
+    contract_source=pathlib.Path(args.contract_file).resolve() if args.contract_file else (PORTABILITY/'fixture.v1.json')
     with tempfile.TemporaryDirectory(prefix='hero-sp-bootstrap-') as td:
         t=pathlib.Path(td);root=t/'payload';root.mkdir()
-        contract=json.loads((PORTABILITY/'fixture.v1.json').read_text(encoding='utf-8'))
-        contract['status']='FROZEN_SP_BOOTSTRAP_CONTRACT'
+        contract=json.loads(contract_source.read_text(encoding='utf-8'))
+        if contract.get('status')=='SETUP_READY_NOT_EXECUTED': contract['status']='FROZEN_SP_BOOTSTRAP_CONTRACT'
         contract['authorityBoundary']='PORTABLE_INPUT_CONTRACT_NOT_DISCOVERY_AUTHORITY'
         (root/'contract').mkdir()
         (root/'contract'/'hero-sp.v1.json').write_text(json.dumps(contract,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -105,7 +106,7 @@ def main():
         if h1!=h2:raise RuntimeError(f'canonical tar nondeterminism {h1} != {h2}')
         side=outdir/(PACKAGE_NAME+'.sha256')
         side.write_text(f'{h1}  {PACKAGE_NAME}\n',encoding='utf-8')
-        meta={'status':'PASS_FROZEN_BOOTSTRAP_PACKAGE_BUILD','package':PACKAGE_NAME,'bootstrapPackageSha256':h1,'payloadDigest':manifest['payloadDigest'],'fileCount':len(rows),'spineRuntimeCommit':SPINE_COMMIT}
+        meta={'status':'PASS_FROZEN_BOOTSTRAP_PACKAGE_BUILD','package':PACKAGE_NAME,'bootstrapPackageSha256':h1,'payloadDigest':manifest['payloadDigest'],'fileCount':len(rows),'recordCount':len(contract['records']),'spineRuntimeCommit':SPINE_COMMIT}
         (outdir/'bootstrap-build-result.json').write_text(json.dumps(meta,indent=2)+'\n',encoding='utf-8')
         print(json.dumps(meta))
 
