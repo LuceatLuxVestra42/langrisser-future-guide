@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "schemaId": "relation-delivery-consumer-migration-contract/v1",
+  "experimentId": "2-2",
+  "status": "DESIGN_FROZEN",
+  "purpose": "Prove that A5-proven relation delivery can cross a migration boundary and be consumed in a fresh execution environment without source checkout, raw ConfigData, canonical relation rebuild, or domain semantic validators at consumer runtime.",
+  "designBase": {
+    "repository": "LuceatLuxVestra42/langrisser-future-guide",
+    "branch": "main",
+    "head": "b07722d4a639ba5c0c1532cb3ff3a0bce1dc0e75"
+  },
+  "authority": {
+    "a5Contract": {
+      "path": "data/contracts/relation-delivery-v1.json",
+      "gitBlobSha": "94dfd9ba45e271743611344d47f501c800958b11"
+    },
+    "a5Validation": {
+      "path": "data/validation/relation-delivery-a5.v1.json",
+      "gitBlobSha": "f32a90341b9dc13c7362384f45ccb183d3154cf0"
+    },
+    "portableContractLibrary": {
+      "path": "tools/relation-delivery/lib/contract.mjs",
+      "gitBlobSha": "65af4aff726561c7ed3e620bde6993eab6220a19"
+    }
+  },
+  "profiles": [
+    {
+      "relationKey": "hero-exclusive-equipment",
+      "validation": {
+        "path": "data/validation/hero-exclusive-equipment-delivery-a1.v1.json",
+        "gitBlobSha": "c1c16562304524744f5d6611344ed2f426361c90"
+      },
+      "acceptedDelivery": {
+        "path": "data/generated/hero-exclusive-equipment-delivery-a1.v1.json",
+        "gitBlobSha": "db07f0d12cdbe74f4f0a49de53c829841244e74a"
+      },
+      "lookups": [
+        {
+          "direction": "Hero->ExclusiveEquipment",
+          "sourceIndex": "byHeroId",
+          "sourceShape": "TARGET_ARRAY",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "MISSING_KEY_ALLOWED"
+        },
+        {
+          "direction": "ExclusiveEquipment->Hero",
+          "sourceIndex": "byEquipmentId",
+          "sourceShape": "TARGET_ARRAY",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "ALL_DELIVERY_KEYS_PRESENT"
+        }
+      ]
+    },
+    {
+      "relationKey": "hero-skin",
+      "validation": {
+        "path": "data/validation/skin-stage2-delivery-a2.v1.json",
+        "gitBlobSha": "851a27c21e94b92207235894bb2054dbd1a0381f"
+      },
+      "acceptedDelivery": {
+        "path": "data/generated/skin-stage2-delivery-a2.v1.json",
+        "gitBlobSha": "5597a3265ad45c6c903793440e8a1b61ea6539ae"
+      },
+      "lookups": [
+        {
+          "direction": "Hero->Skin",
+          "sourceIndex": "byHeroId",
+          "sourceShape": "TARGET_ARRAY",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "ALL_KEYS_PRESENT_EXPLICIT_EMPTY_ALLOWED"
+        },
+        {
+          "direction": "Skin->Hero",
+          "sourceIndex": "bySkinId",
+          "sourceShape": "SINGLE_TARGET",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "ALL_DELIVERY_KEYS_PRESENT"
+        }
+      ]
+    },
+    {
+      "relationKey": "hero-soldier",
+      "validation": {
+        "path": "data/validation/hero-soldier-delivery-a3.v1.json",
+        "gitBlobSha": "91d0d7b481cef2ea008fd4520f91135239cb9ba8"
+      },
+      "runtimeSource": {
+        "path": "data/generated/hero-soldier-relations.v1.json",
+        "gitBlobSha": "1e70dc3700578bc7bf03e01b7c893b4583ee59d6"
+      },
+      "runtimeBuilder": {
+        "path": "scripts/build-hero-soldier-delivery-a3.mjs",
+        "gitBlobSha": "162a0ddee97fb970e05a1d4405bd2d2a9ce01240"
+      },
+      "runtimeValidator": {
+        "path": "scripts/validate-hero-soldier-delivery-a3.mjs",
+        "gitBlobSha": "66e6759f9d77fb971b879cc7131b2c6986b81e75"
+      },
+      "lookups": [
+        {
+          "direction": "Hero->Soldier",
+          "sourceIndex": "byHeroId",
+          "sourceShape": "SCALAR_TARGET_ID_ARRAY_WITH_EDGE_METADATA",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "FULL_CANONICAL_KEYSPACE_PRESENT"
+        },
+        {
+          "direction": "Soldier->Hero",
+          "sourceIndex": "bySoldierId",
+          "sourceShape": "SCALAR_TARGET_ID_ARRAY_WITH_EDGE_METADATA",
+          "fromIdType": "number",
+          "targetIdType": "number",
+          "keyPresence": "FULL_CANONICAL_KEYSPACE_PRESENT"
+        }
+      ],
+      "semanticCounts": {
+        "edgeCount": 5977,
+        "provenanceEntryCount": 5978
+      }
+    },
+    {
+      "relationKey": "banner-hero",
+      "validation": {
+        "path": "data/validation/banner-delivery-a4.v1.json",
+        "gitBlobSha": "1a96a52493ad294562d9f057ee78eb9d21b10e08"
+      },
+      "acceptedDelivery": {
+        "path": "data/generated/banner-delivery-a4.v1.json",
+        "gitBlobSha": "fafa725de4f667c84cd46ea572f834c889badd72"
+      },
+      "lookups": [
+        {
+          "direction": "BannerDefinition->Hero",
+          "sourceIndex": "byDefinitionId",
+          "sourceShape": "TARGET_ARRAY",
+          "fromIdType": "string",
+          "targetIdType": "number",
+          "keyPresence": "ALL_DEFINITION_KEYS_PRESENT_EXPLICIT_EMPTY_ALLOWED"
+        }
+      ]
+    }
+  ],
+  "transport": {
+    "packageSchema": "relation-delivery-portable-package/v1",
+    "profileSchema": "relation-delivery-portable-profile/v1",
+    "persistence": "CI_ARTIFACT_ONLY",
+    "semanticAuthority": false,
+    "genericSemanticArtifact": false,
+    "manifestOwnHashPolicy": "OUTER_EVIDENCE_ONLY",
+    "payloadClosure": {
+      "declaredFilesOnly": true,
+      "unexpectedFilesAllowed": false,
+      "symlinksAllowed": false,
+      "absolutePathsAllowed": false,
+      "parentTraversalAllowed": false,
+      "sha256Required": true
+    },
+    "normalization": {
+      "singleTargetWrapping": "TRANSPORT_ONLY",
+      "a3EdgeMetadataJoin": "PROFILE_SPECIFIC_TRANSPORT_ENCODER_ONLY",
+      "genericSorting": "FORBIDDEN",
+      "arrayOrder": "PRESERVE"
+    }
+  },
+  "oracle": {
+    "mode": "FULL_PARITY",
+    "packageReadAllowed": false,
+    "packageBuilderImportAllowed": false,
+    "inputs": "FROZEN_ACCEPTED_DELIVERY_AND_A3_FROZEN_RUNTIME_SOURCE",
+    "objectKeyCanonicalizationForDigest": "LEXICAL",
+    "arrayCanonicalizationForDigest": "PRESERVE_ORDER"
+  },
+  "consumer": {
+    "sourceCheckout": "ABSENT",
+    "oracleAtRuntime": "ABSENT",
+    "domainValidatorAtRuntime": "ABSENT",
+    "rawConfigDataAtRuntime": "ABSENT",
+    "canonicalRelationAtRuntime": "ABSENT",
+    "requiredProfiles": [
+      "hero-exclusive-equipment",
+      "hero-skin",
+      "hero-soldier",
+      "banner-hero"
+    ],
+    "absentLookupProbe": {
+      "relationKey": "hero-exclusive-equipment",
+      "direction": "Hero->ExclusiveEquipment",
+      "fromId": 24,
+      "claim": "RELATION_LOOKUP_KEY_ABSENCE_ONLY"
+    }
+  },
+  "negativeControls": [
+    {
+      "id": "N1a",
+      "mutation": "DELETE_DECLARED_PROFILE_FILE_KEEP_MANIFEST",
+      "expected": "FAIL_PACKAGE_INTEGRITY"
+    },
+    {
+      "id": "N1b",
+      "mutation": "REMOVE_REQUIRED_PROFILE_AND_REWRITE_MANIFEST_INTEGRITY_FIELDS",
+      "expected": "FAIL_MISSING_RELATION_DELIVERY"
+    },
+    {
+      "id": "N2",
+      "mutation": "SET_PRESENT_FALSE_WITH_NON_EMPTY_TARGETS_AND_REWRITE_INTEGRITY_FIELDS",
+      "expected": "FAIL_INVALID_LOOKUP_ENVELOPE"
+    },
+    {
+      "id": "N3",
+      "mutation": "DROP_A3_PROVENANCE_AND_REWRITE_ALL_TRANSPORT_INTEGRITY_FIELDS",
+      "expected": "FAIL_DELIVERY_PARITY"
+    }
+  ],
+  "completionCriteria": [
+    "portable package contains exactly the four required relation profiles and declared payload closure",
+    "fresh consumer runtime has no source checkout, oracle, raw ConfigData, canonical relation source, or domain validator dependency",
+    "consumer traverses the full published lookup keyspace plus the explicit Equipment missing-key probe",
+    "missing-key and explicit-empty semantics remain distinct",
+    "heterogeneous ID types, opaque metadata/provenance, and array ordering are preserved exactly",
+    "A3 semantic edge/provenance counts remain distinct from duplicated transport serialization counts",
+    "consumer output deep structural parity and canonical digest parity both pass against an independently generated full oracle",
+    "N1a, N1b, N2, and N3 fail with their exact expected error classes",
+    "name JOIN, semantic ID arithmetic, fallback synthesis, canonical rebuild, and unexpected tracked mutation remain zero",
+    "blocker count is zero"
+  ]
+}

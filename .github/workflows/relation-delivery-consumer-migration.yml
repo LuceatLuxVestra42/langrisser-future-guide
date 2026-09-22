@@ -1,0 +1,206 @@
+name: Relation Delivery Consumer Migration 2-2
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - tools/relation-delivery/**
+      - data/contracts/relation-delivery-*
+      - data/validation/relation-delivery-*
+      - .github/workflows/relation-delivery-*
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  producer:
+    name: Producer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Recheck A3 runtime projection parity
+        run: node scripts/validate-hero-soldier-delivery-a3.mjs --check
+
+      - name: Recheck A5 frozen delivery contract
+        run: node tools/relation-delivery/test/relation-delivery-self-test.mjs
+
+      - name: Build portable delivery package
+        run: node tools/relation-delivery/consumer-migration/build-package.mjs --out-dir "$RUNNER_TEMP/package"
+
+      - name: Validate A3 transport normalization
+        run: node tools/relation-delivery/consumer-migration/validate-a3-transport-parity.mjs --package-dir "$RUNNER_TEMP/package"
+
+      - name: Build independent full oracle
+        run: node tools/relation-delivery/consumer-migration/build-oracle.mjs --out "$RUNNER_TEMP/oracle/oracle.json"
+
+      - name: Prepare consumer harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/consumer-harness"
+          cp tools/relation-delivery/consumer-migration/consumer-runtime.mjs "$RUNNER_TEMP/consumer-harness/consumer-runtime.mjs"
+          cp data/contracts/relation-delivery-consumer-request-spec.v1.json "$RUNNER_TEMP/consumer-harness/request-spec.json"
+
+      - name: Prepare validator harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/validator-harness"
+          cp tools/relation-delivery/consumer-migration/consumer-runtime.mjs "$RUNNER_TEMP/validator-harness/consumer-runtime.mjs"
+          cp tools/relation-delivery/consumer-migration/validate-parity.mjs "$RUNNER_TEMP/validator-harness/validate-parity.mjs"
+          cp tools/relation-delivery/consumer-migration/run-negative-controls.mjs "$RUNNER_TEMP/validator-harness/run-negative-controls.mjs"
+          cp data/contracts/relation-delivery-consumer-request-spec.v1.json "$RUNNER_TEMP/validator-harness/request-spec.json"
+
+      - name: Upload portable package
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-package-2-2
+          path: ${{ runner.temp }}/package
+          if-no-files-found: error
+
+      - name: Upload oracle
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-oracle-2-2
+          path: ${{ runner.temp }}/oracle/oracle.json
+          if-no-files-found: error
+
+      - name: Upload consumer harness
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-consumer-harness-2-2
+          path: ${{ runner.temp }}/consumer-harness
+          if-no-files-found: error
+
+      - name: Upload validator harness
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-validator-harness-2-2
+          path: ${{ runner.temp }}/validator-harness
+          if-no-files-found: error
+
+      - name: Verify source checkout stayed clean
+        run: git diff --exit-code
+
+  fresh-consumer:
+    name: Fresh Consumer
+    needs: producer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+      actions: read
+    steps:
+      - name: Download portable package only
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-package-2-2
+          path: ${{ runner.temp }}/package
+
+      - name: Download consumer harness
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-consumer-harness-2-2
+          path: ${{ runner.temp }}/harness
+
+      - name: Assert no source checkout and no oracle
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e "$GITHUB_WORKSPACE/.git"
+          test ! -e "$RUNNER_TEMP/oracle"
+          test ! -e "$RUNNER_TEMP/package/data"
+          test ! -e "$RUNNER_TEMP/package/scripts"
+          test ! -e "$RUNNER_TEMP/package/tools"
+          test ! -e "$RUNNER_TEMP/package/.git"
+
+      - name: Assert consumer has no network or source-fetch primitives
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -En 'https?://|fetch[[:space:]]*\(|node:child_process|child_process|\bgit\b|\bcurl\b|\bwget\b|LuceatLuxVestra42|langrisser-future-guide' "$RUNNER_TEMP/harness/consumer-runtime.mjs"
+
+      - name: Create fresh repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/fresh-consumer"
+          cd "$RUNNER_TEMP/fresh-consumer"
+          git init -q
+          test -d .git
+
+      - name: Consume full portable lookup surface
+        run: node "$RUNNER_TEMP/harness/consumer-runtime.mjs" "$RUNNER_TEMP/package" "$RUNNER_TEMP/harness/request-spec.json" "$RUNNER_TEMP/fresh-consumer/consumer-output.json"
+
+      - name: Upload consumer output
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-consumer-output-2-2
+          path: ${{ runner.temp }}/fresh-consumer/consumer-output.json
+          if-no-files-found: error
+
+  parity-validator:
+    name: Parity Validator
+    needs:
+      - producer
+      - fresh-consumer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+      actions: read
+    steps:
+      - name: Download portable package
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-package-2-2
+          path: ${{ runner.temp }}/package
+
+      - name: Download consumer output
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-consumer-output-2-2
+          path: ${{ runner.temp }}/output
+
+      - name: Download independent oracle
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-oracle-2-2
+          path: ${{ runner.temp }}/oracle
+
+      - name: Download validator harness
+        uses: actions/download-artifact@v4
+        with:
+          name: relation-delivery-validator-harness-2-2
+          path: ${{ runner.temp }}/harness
+
+      - name: Assert validator has no source checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e "$GITHUB_WORKSPACE/.git"
+
+      - name: Validate full structural parity and digest parity
+        run: node "$RUNNER_TEMP/harness/validate-parity.mjs" "$RUNNER_TEMP/output/consumer-output.json" "$RUNNER_TEMP/oracle/oracle.json"
+
+      - name: Run negative controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$RUNNER_TEMP/harness/run-negative-controls.mjs"             "$RUNNER_TEMP/package"             "$RUNNER_TEMP/harness/request-spec.json"             "$RUNNER_TEMP/oracle/oracle.json"             "$RUNNER_TEMP/harness/consumer-runtime.mjs"             "$RUNNER_TEMP/harness/validate-parity.mjs"             | tee "$RUNNER_TEMP/negative-control-results.txt"
+
+      - name: Upload negative-control evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: relation-delivery-negative-controls-2-2
+          path: ${{ runner.temp }}/negative-control-results.txt
+          if-no-files-found: error
