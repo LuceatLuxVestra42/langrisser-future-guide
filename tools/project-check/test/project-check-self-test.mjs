@@ -245,6 +245,30 @@ const validatorToolingNoHosted = routeProjectCheckPaths([
 ], contracts);
 assert.deepEqual(validatorToolingNoHosted.owners, ['hero-canonical']);
 assert.deepEqual(mergeGateIds(validatorToolingNoHosted), []);
+
+const exclusiveEquipmentRelationRoutingPaths = [
+  'scripts/build_hero_exclusive_equipment_relation_stageB3.cjs',
+  'scripts/build_hero_exclusive_equipment_relation_stageB5.cjs',
+  'scripts/validate_hero_exclusive_equipment_relation_stageB4.cjs',
+  'scripts/validate_hero_exclusive_equipment_relation_stageB5.cjs',
+  'scripts/validate_hero_exclusive_equipment_relation_stageB6.cjs',
+  'scripts/build_hero_exclusive_equipment_delivery_a1.cjs',
+  'scripts/validate_hero_exclusive_equipment_delivery_a1.cjs',
+  'data/generated/hero-exclusive-equipment-delivery-a1.v1.json',
+  'data/validation/hero-exclusive-equipment-delivery-a1.v1.json',
+  'data/contracts/hero-exclusive-equipment-delivery-a1.v1.json',
+];
+
+for (const exclusiveEquipmentPath of exclusiveEquipmentRelationRoutingPaths) {
+  const route = expectOwners(
+    exclusiveEquipmentPath,
+    ['hero-equipment-relation'],
+    ['hero-equipment-relation'],
+  );
+  assert.equal(route.status, 'PLAN_READY');
+  assert.equal(route.manualReviews.length, 0);
+}
+
 expectOwners(
   'data/generated/hero-card-icon-assets.v1.json',
   ['hero-assets'],
